@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>The Royal Ur</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- BOARD -->
+        <canvas id="board"></canvas>
+        <canvas id="tiles"></canvas>
+
+        <!-- SCORES -->
+        <canvas id="left-tiles" class="score"></canvas>
+        <canvas id="left-score" class="score"></canvas>
+        <canvas id="right-tiles" class="score"></canvas>
+        <canvas id="right-score" class="score"></canvas>
+
+        <!-- DICE -->
+        <canvas id="dice"></canvas>
+
+        <!-- STATUS -->
+        <div id="network-status" class="network-status">Connecting...</div>
+        <div id="message-container" class="message-container">
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- SCRIPTS -->
+        <script src="js/lib/reconnecting-websocket.min.js"></script>
+        <script src="js/utils.js"></script>
+        <script src="js/resources.js"></script>
+        <script src="js/render.js"></script>
+        <script src="js/client.js"></script>
+        <script src="js/packets.js"></script>
+        <script src="js/network.js"></script>
+
+        <!-- CREDITS -->
+        <div id="credits">
+            <a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a>
+            <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+            <div id="created-by">
+                Created by
+                <a href="https://twitter.com/soth_dev">Paddy Lamont</a>
+            </div>
+        </div>
+    </body>
+</html>

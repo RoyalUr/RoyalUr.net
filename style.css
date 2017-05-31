@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+@font-face {
+    font-family: KorraFont;
+    src: url(res/Cool-BoldDuranGo.ttf);
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    background: url("res/wood-dark.png") repeat;
+}
+
+html {
+    overflow: hidden;
+}
+
+body {
+    overflow: auto;
+}
+
+canvas {
+    position: absolute;
+    display: none;
+}
+
+
+
+/*
+ *  BOARD
+ */
+
+#board {
+    z-index: 1;
+}
+
+
+
+/*
+ * TILES
+ */
+
+#tiles {
+    z-index: 4;
+}
+
+
+
+/*
+ * SCORES
+ */
+
+.score {
+    z-index: 1;
+}
+
+
+
+/*
+ * DICE
+ */
+
+#dice {
+    z-index: 3;
+}
+
+
+
+/*
+ * STATUS
+ */
+#network-status {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 5;
+
+    opacity: 0;
+    padding: 5px;
+    padding-left: 10px;
+
+    font-family: Nunito, sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    text-shadow: 0 0 10px rgb(0, 0, 0);
+    color: white;
+}
+
+#message-container {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+
+    opacity: 0;
+
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.25);
+
+    display: table;
+    text-align: center;
+}
+
+#message {
+    display: table-cell;
+    vertical-align: middle;
+
+    font-family: Nunito, sans-serif;
+    font-weight: 600;
+    font-size: 50px;
+    text-shadow: 0 0 20px rgb(0, 0, 0);
+    color: white;
+
+    white-space: pre;
+}
+
+
+
+/*
+ *  CREDITS
+ */
+
+#credits {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    vertical-align: baseline;
+}
+
+#created-by {
+    padding: 10px;
+    padding-bottom: 6px;
+
+    font-family: KorraFont, sans-serif;
+    color: white;
+
+    background: url("res/wood.png") repeat;
+    border-top-right-radius: 10px;
+    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+}
+
+#created-by a {
+    display: inline-block;
+    margin-left: 2px;
+
+    text-decoration: none;
+    color: rgb(85, 26, 139);
+    cursor: pointer;
+}
+
+.twitter-follow-button {
+    display: none;
+    margin-left: 3px;
+    margin-bottom: 6px;
+    vertical-align: text-bottom;
+
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.twitter-follow-button-rendered {
+    display: inline-block;
+}
