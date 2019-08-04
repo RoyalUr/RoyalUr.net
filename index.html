@@ -4,8 +4,18 @@
         <meta charset="utf-8">
         <title>The Royal Ur</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.png"/>
     </head>
     <body>
+        <!-- MENU -->
+        <div id="menu-container">
+            <div id="menu">
+                <p id="title">The Royal Game of Ur</p>
+                <p id="play" class="menu-button">Play</p>
+                <p id="learn" class="menu-button">Learn</p>
+            </div>
+        </div>
+        
         <!-- BOARD -->
         <canvas id="board"></canvas>
         <canvas id="tiles"></canvas>
@@ -36,9 +46,9 @@
 
         <!-- CREDITS -->
         <div id="credits">
-            <a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a>
-            <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+            <!-- Twitter button will be placed here after other content is loaded -->
+            <div id="twitter-button"></div>
+            
             <div id="created-by">
                 Created by
                 <a href="https://twitter.com/soth_dev">Paddy Lamont</a>

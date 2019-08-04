@@ -1,4 +1,84 @@
 //
+// MENU
+//
+
+const menuDiv = document.getElementById("menu"),
+      playButton = document.getElementById("play"),
+      learnButton = document.getElementById("learn");
+
+const menuState = {
+    onMenu: true,
+    inGame: false,
+
+    menuFade: createFade(0.5),
+    boardFade: createFade(1)
+};
+menuState.menuFade.visible();
+
+function setOnMenu(onMenu, hasty) {
+    menuState.onMenu = onMenu;
+
+    const fadeOverride = (hasty ? 0 : undefined);
+
+    if (onMenu) {
+        menuState.menuFade.fadeIn(fadeOverride);
+    } else {
+        menuState.menuFade.fadeOut(fadeOverride);
+
+        setTimeout(() => {
+            if (!menuState.onMenu) {
+                message.fade = createFade(2, 0.5).fadeIn();
+            }
+        }, (hasty ? 0 : 500))
+    }
+}
+
+function setInGame(inGame) {
+    menuState.inGame = inGame;
+
+    if (inGame) {
+        setMessageText("Found your Game");
+        message.fade.fadeOut();
+
+        setTimeout(() => {
+            if (menuState.inGame) {
+                menuState.boardFade.fadeIn();
+            }
+        }, 500)
+    } else {
+        menuState.boardFade.fadeOut();
+    }
+}
+
+function redrawMenu() {
+    menuDiv.style.opacity = menuState.menuFade.get();
+    networkStatus.hidden = false;
+
+    if (!menuState.onMenu && !menuState.inGame) {
+        if (networkStatus.connected) {
+            setMessageText("Searching for a Game" + createDots());
+        } else {
+            networkStatus.hidden = true;
+            setMessageText(getNetworkStatus());
+        }
+    }
+
+    const boardFade = menuState.boardFade.get(),
+          one = clamp(boardFade * 2, 0, 1),
+          two = clamp(boardFade * 2 - 1, 0, 1);
+
+    boardCanvas.style.opacity = one;
+    tilesCanvas.style.opacity = one;
+    diceCanvas.style.opacity = two;
+    leftPlayerRenderTarget.scoreCanvas.style.opacity = two;
+    leftPlayerRenderTarget.tilesCanvas.style.opacity = two;
+    rightPlayerRenderTarget.scoreCanvas.style.opacity = two;
+    rightPlayerRenderTarget.tilesCanvas.style.opacity = two;
+}
+
+
+
+//
 // BOARD
 //
 
@@ -356,7 +436,6 @@ function resetTiles() {
 }
 
 let tilePathAnchorTime = 0,
-    tilePathAnchorLastTileReleaseTime = LONG_TIME_AGO,
     tilePathLastMouseDownTime = LONG_TIME_AGO;
 
 function updateTilePathAnchorTime() {
@@ -430,7 +509,7 @@ function redrawTiles() {
     tilePathLastMouseDownTime = mouseDownTime;
 
     if(mouseDown) {
-        ctx.lineDashOffset = (-0.75) * width * timeMouseDown + (-0.3) * width * (time - timeMouseDown) - 0.5 * locDistance(mouseX, mouseY, mouseDownX, mouseDownY);
+        ctx.lineDashOffset = (-0.75) * width * timeMouseDown + (-0.3) * width * (time - timeMouseDown) + (-0.5) * locDistance(mouseX, mouseY, mouseDownX, mouseDownY);
     } else {
         ctx.lineDashOffset = (-0.75) * width * time;
     }
@@ -670,11 +749,6 @@ function redrawScores() {
         for(let index = 0; index < tileCount; ++index) {
             const tileLeft = left + (index + 0.5) * tileSpace;
 
-            if(isNaN(tileLeft) || isNaN(top) || isNaN(tileWidth) || isNaN(tileWidth)) {
-                console.log("(" + tileSpace + ", " + tileWidth + ", " + index + ", " + tileLeft + ", " + left + ", " + top + ", " + owner + ")");
-                console.log("-> " + tileLeft + ", " + top + ", " + tileWidth + ", " + tileWidth);
-            }
-
             paintTile(ctx, tileLeft, top, tileWidth, tileWidth, owner);
         }
     }
@@ -750,8 +824,8 @@ function redrawScores() {
         tilesCtx.restore();
     }
 
-    const p1TilesLeft = (6 - ownPlayer.tiles.current) * tileSpace,
-          p1ScoreLeft = (6 - ownPlayer.score.current) * tileSpace;
+    const p1TilesLeft = (7 - ownPlayer.tiles.current) * tileSpace,
+          p1ScoreLeft = (7 - ownPlayer.score.current) * tileSpace;
 
     drawPlayer(ownPlayer, p1TilesLeft, p1ScoreLeft);
     drawPlayer(otherPlayer, 0, 0);
@@ -837,6 +911,11 @@ function layoutDice() {
     diceCanvas.style.left = diceLeft + "px";
 }
 
+const lastDice = [0,0,0,0],
+      diceDown = [true,true,true,true];
+let lastDiceSound = 0,
+    lastDiceSelected = 0;
+
 function redrawDice() {
     const active = (diceActive && !diceRolling && ownPlayer.active);
 
@@ -863,7 +942,14 @@ function redrawDice() {
         diceSelected = clamp(Math.floor(4 * selectTime), 0, 4);
         diceRollingValues = [randInt(1, 6), randInt(1, 6), randInt(1, 6), randInt(1, 6)];
 
-        if(diceSelected == 4) {
+        if(lastDiceSelected !== diceSelected) {
+            lastDiceSelected = diceSelected;
+            if(diceRolling && diceSelected > 0 && diceValues[diceSelected - 1] <= 3) {
+                playSound("dice_select");
+            }
+        }
+        
+        if(diceSelected === 4) {
             diceRolling = false;
             diceCallback();
         }
@@ -879,6 +965,8 @@ function redrawDice() {
 
         let sizeModifier = (diceRolling ? 1 : 0);
 
+        let down = false;
+        
         if(timeToSelect > 0 && timeToSelect < 0.5) {
             const t = 1 - 2 * timeToSelect;
 
@@ -887,25 +975,41 @@ function redrawDice() {
             const a = 0.15;
 
             if(timeToSelect > -a) {
+                down = true;
                 const t = timeToSelect / (-a);
 
                 sizeModifier = 0.2 * easeOutSine(t);
             } else if(timeToSelect > -2 * a) {
+                down = true;
+                
                 const t = (timeToSelect + a) / (-a);
 
                 sizeModifier = 0.2 * (1 - easeInSine(t));
             } else {
+                down = true;
+                
                 sizeModifier = 0;
             }
         } else if(animTime < 0.5) {
             sizeModifier = easeOutSine(2 * animTime);
         }
-
+        
         const diceWidth = (1 + 0.2 * sizeModifier) * width,
               diceValue = (index < diceSelected ? diceValues[index] : diceRollingValues[index]),
               diceImage = getDiceImageFromValue(diceValue, diceWidth),
               diceHighlighted = (index < diceSelected && diceValue <= 3);
 
+        if(down && !diceDown[index]) {
+            playSound("dice_hit");
+        }
+        diceDown[index] = down;
+        
+        if(diceValue !== lastDice[index] && (time - lastDiceSound) > 0.1) {
+            playSound("dice_click");
+            lastDice[index] = diceValue;
+            lastDiceSound = time;
+        }
+        
         paintDice(diceCtx, diceImage, diceWidth, (index + 0.5) * space, 1.5 * space, diceHighlighted);
     }
 
@@ -992,8 +1096,10 @@ const networkStatusElement = document.getElementById("network-status");
 
 const networkStatus = {
     status: "",
+    connected: false,
 
     fade: createFade(1.0),
+    hidden: false,
 
     dots: false,
     lastChange: 0
@@ -1004,6 +1110,7 @@ networkStatus.fadeOut = networkStatus.fade.fadeOut;
 
 function setNetworkStatus(status, dots) {
     networkStatus.status = status;
+    networkStatus.connected = (status === "Connected");
     networkStatus.fade.visible();
     networkStatus.dots = dots;
     networkStatus.lastChange = getTime();
@@ -1018,22 +1125,30 @@ function resetNetworkStatus() {
     networkStatus.lastChange = 0;
 }
 
-function redrawNetworkStatus() {
-    networkStatusElement.style.opacity = networkStatus.fade.get();
+function createDots() {
+    const time = getTime() - networkStatus.lastChange,
+          dotCount = Math.floor((time * 3) % 3) + 1;
 
-    let status = networkStatus.status;
-    {
-        const time = getTime() - networkStatus.lastChange;
-
-        if(networkStatus.dots) {
-            const dotCount = Math.floor((time * 3) % 3) + 1;
-
-            for(let i=0; i < dotCount; ++i) {
-                status += ".";
-            }
-        }
+    let dots = "";
+    for(let i=0; i < dotCount; ++i) {
+        dots += ".";
     }
-    networkStatusElement.textContent = status;
+
+    return dots;
+}
+
+function getNetworkStatus() {
+    let status = networkStatus.status;
+    if(networkStatus.dots) {
+        status += createDots();
+    }
+    return status;
+}
+
+function redrawNetworkStatus() {
+    networkStatusElement.style.display = (networkStatus.hidden ? "none" : "block");
+    networkStatusElement.style.opacity = networkStatus.fade.get();
+    networkStatusElement.textContent = getNetworkStatus();
 }
 
 
@@ -1046,8 +1161,6 @@ const messageContainerElement = document.getElementById("message-container"),
       messageElement = document.getElementById("message");
 
 const message = {
-    fade: createFade(),
-
     message: "",
     fade: createFade(0)
 };
@@ -1056,15 +1169,24 @@ const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
       DEFAULT_MESSAGE_STAY_DURATION     = 1.5,
       DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
 
-function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
+function setMessageText(statusMessage) {
     message.message = statusMessage;
     messageElement.textContent = statusMessage;
+}
 
+function setMessageAndFade(statusMessage, fade) {
+    setMessageText(statusMessage);
+    message.fade = fade;
+}
+
+function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
     fadeInDuration  = (fadeInDuration !== undefined  ? fadeInDuration  : DEFAULT_MESSAGE_FADE_IN_DURATION);
     stayDuration    = (stayDuration !== undefined    ? stayDuration    : DEFAULT_MESSAGE_STAY_DURATION);
     fadeOutDuration = (fadeOutDuration !== undefined ? fadeOutDuration : DEFAULT_MESSAGE_FADE_OUT_DURATION);
 
-    message.fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
+    const fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
+
+    setMessageAndFade(statusMessage, fade);
 }
 
 function redrawMessage() {
@@ -1097,6 +1219,9 @@ let mouseDown = false,
 function setupElements() {
     startTime = getTime();
 
+    playButton.addEventListener("click", onPlayClick);
+    learnButton.addEventListener("click", onLearnClick);
+
     diceCanvas.addEventListener("click", onDiceClick);
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
     diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
@@ -1104,7 +1229,12 @@ function setupElements() {
     function updateMouse(x, y, down) {
         mouseX = x;
         mouseY = y;
-        hoveredTile = canvasToTile(x, y);
+        
+        const newHoveredTile = canvasToTile(x, y);
+        if(!locEquals(hoveredTile, newHoveredTile)) {
+            onTileHover(newHoveredTile);
+        }
+        hoveredTile = newHoveredTile;
 
         if(down === undefined)
             return;
@@ -1144,12 +1274,18 @@ function setupElements() {
         onTileRelease(hoveredTile);
 
         updateMouse(mouseX, mouseY, false);
-    }
+    };
 
     window.requestAnimationFrame(function() {
         resize();
         redraw();
     });
+    
+    addTwitterButton();
+}
+
+function addTwitterButton() {
+    document.getElementById("twitter-button").innerHTML ='<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
 }
 
 let fps_start = new Date().getTime(),
@@ -1170,14 +1306,35 @@ function resetGame() {
     resetNetworkStatus();
 }
 
+function updateElementVisibilities(elements) {
+    for (let index = 0; index < elements.length; ++index) {
+        let element = elements[index];
+
+        if (element.style.opacity === "0") {
+            element.style.display = "none";
+        } else {
+            element.style.display = "block";
+        }
+    }
+}
+
 function redraw() {
     ++fps_redraws;
 
+    redrawMenu();
     redrawTiles();
     redrawDice();
     redrawScores();
     redrawNetworkStatus();
     redrawMessage();
+
+    updateElementVisibilities([
+        menuDiv, boardCanvas, tilesCanvas,
+        leftPlayerRenderTarget.tilesCanvas,
+        leftPlayerRenderTarget.scoreCanvas,
+        rightPlayerRenderTarget.tilesCanvas,
+        rightPlayerRenderTarget.scoreCanvas
+    ]);
 
     window.requestAnimationFrame(redraw);
 }
@@ -1200,7 +1357,6 @@ function resize() {
         boardCanvas.height = boardHeight;
         boardCanvas.style.left = boardLeft + "px";
         boardCanvas.style.top = boardTop + "px";
-        boardCanvas.style.display = "block";
 
         tilesHeight = boardHeight;
         tilesWidth = boardWidth * 1.5;
@@ -1212,7 +1368,6 @@ function resize() {
         tilesCanvas.height = tilesHeight;
         tilesCanvas.style.left = tilesLeft + "px";
         tilesCanvas.style.top = tilesTop + "px";
-        tilesCanvas.style.display = "block";
     }
 
     // RESIZE SCORE
@@ -1220,7 +1375,7 @@ function resize() {
         const tileWidth = getTileWidth(),
               tileSpace = Math.round(tileWidth / tileWidthRatio);
 
-        scoreWidth = 6 * tileWidth;
+        scoreWidth = 7 * tileWidth;
         scoreHeight = tileWidth;
 
         const tilesCountWidth = scoreWidth,
@@ -1228,7 +1383,7 @@ function resize() {
 
         const verticalPadding = Math.round(yBorderRatio * boardHeight),
               tilesCountTop = boardTop + verticalPadding,
-              scoreTop = boardTop + boardHeight - scoreHeight - verticalPadding;
+              scoreTop = boardTop + boardHeight - scoreHeight - verticalPadding,
               p1Left = boardLeft - scoreWidth,
               p2Left = boardLeft + boardWidth;
 
@@ -1241,25 +1396,21 @@ function resize() {
         leftTiles.height = tilesCountHeight;
         leftTiles.style.top = tilesCountTop + "px";
         leftTiles.style.left = p1Left + "px";
-        leftTiles.style.display = "block";
 
         rightTiles.width = tilesCountWidth;
         rightTiles.height = tilesCountHeight;
         rightTiles.style.top = tilesCountTop + "px";
         rightTiles.style.left = p2Left + "px";
-        rightTiles.style.display = "block";
 
         leftScore.width = scoreWidth;
         leftScore.height = scoreHeight;
         leftScore.style.top = scoreTop + "px";
         leftScore.style.left = p1Left + "px";
-        leftScore.style.display = "block";
 
         rightScore.width = scoreWidth;
         rightScore.height = scoreHeight;
         rightScore.style.top = scoreTop + "px";
         rightScore.style.left = p2Left + "px";
-        rightScore.style.display = "block";
     }
 
     // RESIZE DICE
@@ -1271,11 +1422,9 @@ function resize() {
 
         diceCanvas.width = diceWidth;
         diceCanvas.height = diceHeight;
-        diceCanvas.style.display = "block";
 
         layoutDice();
     }
 
-    redraw();
     redrawBoard();
 }

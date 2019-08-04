@@ -4,36 +4,75 @@
 
 const audioResources = [
     // Sounds
+    
+    // Sounds when moving a tile
     {
         key: "place_1",
-        url: "res/audio/place_1.mp3",
-        song: false
+        url: "res/audio/place_1.mp3"
     }, {
         key: "place_2",
-        url: "res/audio/place_2.mp3",
-        song: false
+        url: "res/audio/place_2.mp3"
     }, {
         key: "place_3",
-        url: "res/audio/place_3.mp3",
-        song: false
+        url: "res/audio/place_3.mp3"
     }, {
         key: "place_4",
-        url: "res/audio/place_4.mp3",
-        song: false
+        url: "res/audio/place_4.mp3"
     },
 
+    // Sounds when selecting a tile
     {
         key: "pickup_1",
-        url: "res/audio/pickup_1.mp3",
-        song: false
+        url: "res/audio/pickup_1.mp3"
     }, {
         key: "pickup_2",
-        url: "res/audio/pickup_2.mp3",
-        song: false
+        url: "res/audio/pickup_2.mp3"
     }, {
         key: "pickup_3",
-        url: "res/audio/pickup_3.mp3",
-        song: false
+        url: "res/audio/pickup_3.mp3"
+    },
+    
+    // Sound when trying to pick up a tile that cannot be moved
+    {
+        key: "error",
+        url: "res/audio/error.wav",
+        volume: 0.5,
+        instances: 3
+    },
+    
+    // Sound when taking out an enemy tile
+    {
+        key: "kill",
+        url: "res/audio/kill.wav",
+        volume: 0.5
+    },
+    
+    // Sound when hovering over tiles
+    {
+        key: "hover",
+        url: "res/audio/hover.wav",
+        volume: 0.5,
+        instances: 3
+    },
+    
+    // Sounds when rolling dice
+    {
+        key: "dice_click",
+        url: "res/audio/dice_click.mp3",
+        volume: 0.5,
+        instances: 5
+    },
+    {
+        key: "dice_hit",
+        url: "res/audio/dice_hit.wav",
+        volume: 0.3,
+        instances: 4
+    },
+    {
+        key: "dice_select",
+        url: "res/audio/dice_select.mp3",
+        volume: 0.3,
+        instances: 4
     }
 ];
 
@@ -77,11 +116,26 @@ function updateAudioVolumes() {
     for(let index = 0; index < audioResources.length; ++index) {
         const resource = audioResources[index];
 
-        if(!resource.element)
+        if(!resource.elements)
             continue;
 
-        resource.element.volume = (resource.song ? songVolume : soundVolume);
+        let volume = (resource.song ? songVolume : soundVolume);
+        
+        if(resource.volume) {
+            volume *= resource.volume;
+        }
+        
+        for(let elementIndex = 0; elementIndex < resource.elements.length; ++elementIndex) {
+            resource.elements[elementIndex].volume = volume;
+        }
     }
+}
+
+function isAudioPlaying(element) {
+    return element.currentTime > 0
+            && !element.paused
+            && !element.ended
+            && element.readyState > 2;
 }
 
 function playSound(key, onComplete) {
@@ -96,9 +150,30 @@ function playSound(key, onComplete) {
 
         if(resource.key !== key)
             continue;
+        
+        let element = undefined;
+        
+        for(let elementIndex = 0; elementIndex < resource.elements.length; ++elementIndex) {
+            const potentialElement = resource.elements[elementIndex];
+            
+            if(!isAudioPlaying(potentialElement)) {
+                element = potentialElement;
+                break;
+            }
+        }
 
-        resource.element.onended = onComplete;
-        resource.element.play();
+        if(element === undefined) {
+            error("Ran out of audio instances to play the sound \"" + key + "\"");
+            return;
+        }
+        
+        element.onended = onComplete;
+        const playPromise = element.play();
+        
+        // It can sometimes be stopped from playing on page load
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {element.play();});
+        }
         return;
     }
 
@@ -139,25 +214,35 @@ function playSong() {
 
 function loadAudio(onComplete) {
     const countdown = {
-        count: audioResources.length
+        count: 0
     };
 
     for(let index = 0; index < audioResources.length; ++index) {
-        const resource = audioResources[index],
-              element = document.createElement("audio");
+        const resource = audioResources[index];
+        
+        resource.elements = [];
+        
+        let instances = (resource.instances !== undefined ? resource.instances : 1);
+        countdown.count += instances;
+        
+        for(let instance = 0; instance < instances; ++instance) {
+            const element = document.createElement("audio");
 
-        resource.element = element;
+            resource.elements.push(element);
 
-        element.preload = "auto";
-        element.onloadeddata = function() {
-            countdown.count -= 1;
+            element.preload = "auto";
+            element.onloadeddata = function() {
+                countdown.count -= 1;
 
-            if(countdown.count === 0) {
-                onComplete();
-            }
-        };
-        element.src = resource.url;
+                if(countdown.count === 0) {
+                    onComplete();
+                }
+            };
+            element.src = resource.url;
+        }
     }
+    
+    updateAudioVolumes();
 }
 
 

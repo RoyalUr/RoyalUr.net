@@ -1,4 +1,18 @@
 //
+// MENU
+//
+
+function onPlayClick(hasty) {
+    setOnMenu(false, hasty);
+    connect();
+}
+
+function onLearnClick() {
+    console.log("learn");
+}
+
+
+//
 // NETWORK : CONNECTING
 //
 
@@ -10,8 +24,6 @@ function onNetworkConnecting() {
 }
 
 function onNetworkConnected() {
-    console.log("reset");
-
     resetGame();
 
     setNetworkStatus("Connected", false).fadeOut();
@@ -34,8 +46,10 @@ function onNetworkDisconnect() {
 //
 
 function onPacketGame(game) {
+    history.pushState(game.gameID, "RoyalUr Game", "#" + game.gameID);
+    
+    setInGame(true);
     setOwnPlayer(game.ownPlayer);
-
     otherPlayer.name = game.opponentName;
 }
 
@@ -43,6 +57,23 @@ function onPacketMessage(data) {
     console.log("message: " + data.message);
 
     setMessage(data.message);
+}
+
+function onPacketMove(move) {
+    console.log("move: " + JSON.stringify(move));
+    
+    const tile = getTile(move.from),
+          replaced = getTile(move.to);
+    if(tile !== TILE_EMPTY) {
+        setTile(move.to, tile);
+        setTile(move.from, TILE_EMPTY);
+        
+        if(replaced !== TILE_EMPTY) {
+            playSound("kill");
+        } else {
+            playSound("place");
+        }
+    }
 }
 
 function onPacketState(state) {
@@ -83,6 +114,20 @@ const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
 
 let lastTileClickWasSelect = false;
 
+function onTileHover(x, y) {
+    if(y === undefined) {
+        y = x[1];
+        x = x[0];
+    }
+    
+    if(isAwaitingMove()
+       && !isTileSelected()
+       && getTile(x, y) === ownPlayer.playerNo
+       && isValidMoveFrom(x, y)) {
+        playSound("hover");
+    }
+}
+
 function onTileClick(x, y) {
     if(y === undefined) {
         y = x[1];
@@ -103,10 +148,16 @@ function onTileClick(x, y) {
     if(isTileSelected(x, y))
         return;
 
+    const tileOwner = getTile(x, y);
+    
     if(!isAwaitingMove()
-       || getTile(x, y) !== ownPlayer.playerNo
+       || tileOwner !== ownPlayer.playerNo
        || !isValidMoveFrom(x, y)) {
 
+        if(tileOwner !== TILE_EMPTY) {
+            playSound("error");
+        }
+        
         unselectTile();
         return;
     }
@@ -131,9 +182,7 @@ function onTileRelease(x, y) {
         return;
     }
 
-    const time = getTime();
-
-    lastReleaseTime = time;
+    lastReleaseTime = getTime();
     lastReleaseTile = [x, y];
 
     updateTilePathAnchorTime();
@@ -151,16 +200,26 @@ function onTileRelease(x, y) {
 }
 
 function sendMove() {
-    sendPacket(writeMovePacket(selectedTile));
-
-    const to = getTileMoveToLocation(selectedTile);
+    const to = getTileMoveToLocation(selectedTile),
+          replaced = getTile(to);
 
     setTile(to, getTile(selectedTile));
     setTile(selectedTile, TILE_EMPTY);
 
+    if(locEquals(selectedTile, getTileStart())) {
+        takeTile(getActivePlayer());
+    }
+
+    sendPacket(writeMovePacket(selectedTile));
+
     unselectTile();
     ownPlayer.active = false;
-    playSound("place");
+    
+    if(replaced !== TILE_EMPTY) {
+        playSound("kill");
+    } else {
+        playSound("place");
+    }
 }
 
 function setupStartTiles() {
@@ -176,7 +235,6 @@ function setupStartTiles() {
     if(!isValidMoveFrom(location))
         return;
 
-    takeTile(activePlayer);
     setTile(location, owner);
 }
 
@@ -206,7 +264,10 @@ loadImages(setup);
 
 function setup() {
     setupElements();
-    connect();
+
+    if (window.location.hash) {
+        onPlayClick(true);
+    }
 
     loadAudio(function() {
         updateAudioVolumes();

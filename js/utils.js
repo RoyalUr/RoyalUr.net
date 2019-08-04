@@ -225,10 +225,10 @@ function formatNumber(num, totalLength, decimalPlaces) {
     let string = num.toString(),
         dotIndex = string.indexOf('.');
 
-    if(decimalPlaces == 0) {
-        if(dotIndex != -1) string = string.substring(0, dotIndex);
+    if(decimalPlaces === 0) {
+        if(dotIndex !== -1) string = string.substring(0, dotIndex);
     } else {
-        if(dotIndex == -1) {
+        if(dotIndex === -1) {
             dotIndex = string.length;
             string += '.';
         }
@@ -279,22 +279,24 @@ function createFade(defaultInDuration, defaultOutDuration) {
         } else {
             this.start -= (1 - currentValue) * this.duration;
         }
+
+        return this;
     }.bind(fade);
 
     fade.fadeIn = function(duration) {
-        this.fade(true, duration);
+        return this.fade(true, duration);
     }.bind(fade);
 
     fade.fadeOut = function(duration) {
-        this.fade(false, duration);
+        return this.fade(false, duration);
     }.bind(fade);
 
     fade.visible = function() {
-        this.fade(true, 0);
+        return this.fade(true, 0);
     }.bind(fade);
 
     fade.invisible = function() {
-        this.fade(false, 0);
+        return this.fade(false, 0);
     }.bind(fade);
 
     const getRaw0To1 = function() {

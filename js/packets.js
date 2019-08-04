@@ -51,6 +51,7 @@ function readSetIdPacket(packet) {
 
 function readGamePacket(packet) {
     return {
+        gameID: packet.nextGameID(),
         ownPlayer: packet.nextPlayer(),
         opponentName: packet.nextVarString()
     };
@@ -156,6 +157,10 @@ function PacketIn(data) {
         return this.nextString(36);
     }.bind(this);
 
+    this.nextGameID = function() {
+        return this.nextString(5);
+    }
+    
     this.nextBool = function() {
         const char = this.nextChar();
 
@@ -214,6 +219,7 @@ function PacketIn(data) {
 const outgoingPackets = [
     "open",
     "reopen",
+    "game",
     "roll",
     "move"
 ];
@@ -248,6 +254,16 @@ function writeReOpenPacket(previousId) {
 
     packet.write(previousId);
 
+    return packet;
+}
+
+function writeGamePacket(gameID) {
+    assert(gameID.length == 5, "gameId must have 5 characters");
+    
+    const packet = new PacketOut("game");
+    
+    packet.write(gameID);
+    
     return packet;
 }
 

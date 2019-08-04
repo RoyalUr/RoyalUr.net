@@ -21,6 +21,14 @@ function sendPacket(packet) {
 }
 
 function connect() {
+    onNetworkConnecting();
+
+    // Delay actually connecting to the socket for debug purposes
+    // TODO : Remove this delay
+    setTimeout(() => connectSocket(), 3000);
+}
+
+function connectSocket() {
     socket = new ReconnectingWebSocket(address, null, {
         debug: false,
 
@@ -29,14 +37,12 @@ function connect() {
         reconnectDecay: 1.5
     });
 
-    onNetworkConnecting();
-
     socket.onconnecting = function() {
         if(socketState === "opened")
             return;
 
         onNetworkConnecting();
-    }
+    };
 
     socket.onopen = function() {
         if(socket.readyState !== WebSocket.OPEN || socketState === "opened")
@@ -52,7 +58,7 @@ function connect() {
         }
 
         onNetworkConnected();
-    }
+    };
 
     socket.onclose = function() {
         const lastState = socketState;
@@ -63,7 +69,7 @@ function connect() {
 
         onNetworkDisconnect();
         console.info("Connection lost, attempting to reconnect...");
-    }
+    };
 
     socket.onmessage = function() {
         debug("Recieved packet length " + event.data.length + ": " + event.data);
@@ -73,13 +79,13 @@ function connect() {
         if(packet.type in packetHandlers) {
             packetHandlers[packet.type](packet);
         } else {
-            console.log("Unknown packet " + event.data);
+            console.log("Unhandled " + packet.type + " packet " + event.data);
         }
-    }
+    };
 
     socket.onerror = function() {
 
-    }
+    };
 }
 
 
@@ -95,6 +101,7 @@ const packetHandlers = {
     "game": onPacketGame,
     "message": onPacketMessage,
     "state": onPacketState,
+    "move": onPacketMove,
     "win": onPacketWin
 };
 
