@@ -1,6 +1,5 @@
-let address = "ws://localhost:9113";
-
-let debugNetwork = true;
+const address = "ws://" + window.location.hostname + ":9113",
+      debugNetwork = (window.location.hostname === "localhost");
 
 function debug(message) {
     if(debugNetwork) console.log(message);
@@ -23,9 +22,18 @@ function sendPacket(packet) {
 function connect() {
     onNetworkConnecting();
 
-    // Delay actually connecting to the socket for debug purposes
-    // TODO : Remove this delay
-    setTimeout(() => connectSocket(), 3000);
+    // If we're debugging networking, fake a delay in the connection to the socket
+    if (debugNetwork) {
+        setTimeout(() => connectSocket(), 1000);
+    } else {
+        connectSocket();
+    }
+}
+
+function disconnect() {
+    const prevSocket = socket;
+    socket = null;
+    prevSocket.close();
 }
 
 function connectSocket() {
@@ -42,7 +50,7 @@ function connectSocket() {
             return;
 
         onNetworkConnecting();
-    };
+    }.bind(socket);
 
     socket.onopen = function() {
         if(socket.readyState !== WebSocket.OPEN || socketState === "opened")
@@ -58,18 +66,18 @@ function connectSocket() {
         }
 
         onNetworkConnected();
-    };
+    }.bind(socket);
 
     socket.onclose = function() {
         const lastState = socketState;
         socketState = "closed";
 
-        if(lastState !== "opened")
+        if(socket !== this || lastState !== "opened")
             return;
 
         onNetworkDisconnect();
         console.info("Connection lost, attempting to reconnect...");
-    };
+    }.bind(socket);
 
     socket.onmessage = function() {
         debug("Recieved packet length " + event.data.length + ": " + event.data);
@@ -81,11 +89,11 @@ function connectSocket() {
         } else {
             console.log("Unhandled " + packet.type + " packet " + event.data);
         }
-    };
+    }.bind(socket);
 
     socket.onerror = function() {
 
-    };
+    }.bind(socket);
 }
 
 
@@ -98,6 +106,7 @@ const packetHandlers = {
     "setid": onPacketSetID,
 
     // client.js
+    "invalid_game": onPacketInvalidGame,
     "game": onPacketGame,
     "message": onPacketMessage,
     "state": onPacketState,

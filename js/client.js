@@ -1,4 +1,27 @@
 //
+// CLIENT
+//
+
+function getGameID() {
+    if (!window.location.hash || window.location.hash === "")
+        return null;
+
+    const gameID = window.location.hash.substr(1);
+    if (gameID.length !== GAME_ID_LENGTH) {
+        history.pushState(null, "Royal Ur", "#");
+        return null;
+    }
+
+    return gameID;
+}
+
+function onHashChange() {
+    console.log("hash changed to " + window.location.hash);
+}
+
+
+
+//
 // MENU
 //
 
@@ -27,6 +50,13 @@ function onNetworkConnected() {
     resetGame();
 
     setNetworkStatus("Connected", false).fadeOut();
+
+    const gameID = getGameID();
+    if (gameID !== null) {
+        sendPacket(writeJoinGamePacket(gameID));
+    } else {
+        sendPacket(writeFindGamePacket())
+    }
 }
 
 function onNetworkDisconnect() {
@@ -45,8 +75,18 @@ function onNetworkDisconnect() {
 // NETWORK : GAME
 //
 
+function onPacketInvalidGame() {
+    disconnect();
+    resetNetworkStatus();
+    setInGame(false);
+    setOnMenu(true, true);
+
+    history.pushState(null, "Royal Ur", "#");
+    setMessage("Game could not be found", 0, 2, 1)
+}
+
 function onPacketGame(game) {
-    history.pushState(game.gameID, "RoyalUr Game", "#" + game.gameID);
+    history.pushState(game.gameID, "Royal Ur Game", "#" + game.gameID);
     
     setInGame(true);
     setOwnPlayer(game.ownPlayer);
@@ -265,7 +305,8 @@ loadImages(setup);
 function setup() {
     setupElements();
 
-    if (window.location.hash) {
+    window.onhashchange = onHashChange;
+    if (getGameID() !== null) {
         onPlayClick(true);
     }
 

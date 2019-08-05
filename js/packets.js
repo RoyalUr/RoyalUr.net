@@ -1,4 +1,5 @@
-const ZERO_CHAR_CODE = "0".charCodeAt(0);
+const ZERO_CHAR_CODE = "0".charCodeAt(0),
+      GAME_ID_LENGTH = 6;
 
 //
 // INCOMING
@@ -7,6 +8,7 @@ const ZERO_CHAR_CODE = "0".charCodeAt(0);
 const incomingPackets = [
     "error",
     "setid",
+    "invalid_game",
     "game",
     "message",
     "state",
@@ -17,6 +19,7 @@ const incomingPackets = [
 const incomingPacketReaders = {
     "error": readErrorPacket,
     "setid": readSetIdPacket,
+    "invalid_game": readInvalidGamePacket,
     "game": readGamePacket,
     "message": readMessagePacket,
     "state": readStatePacket,
@@ -47,6 +50,10 @@ function readSetIdPacket(packet) {
     return {
         id: packet.nextUUID()
     };
+}
+
+function readInvalidGamePacket(packet) {
+    return {};
 }
 
 function readGamePacket(packet) {
@@ -158,14 +165,14 @@ function PacketIn(data) {
     }.bind(this);
 
     this.nextGameID = function() {
-        return this.nextString(5);
-    }
+        return this.nextString(GAME_ID_LENGTH);
+    };
     
     this.nextBool = function() {
         const char = this.nextChar();
 
-        if(char == 't') return true;
-        if(char == 'f') return false;
+        if(char === 't') return true;
+        if(char === 'f') return false;
 
         assert(false, "expected a boolean, 't' or 'f'");
     }.bind(this);
@@ -177,8 +184,8 @@ function PacketIn(data) {
     this.nextPlayer = function() {
         const player = this.nextDigit();
 
-        if(player == 1) return "dark";
-        if(player == 2) return "light";
+        if(player === 1) return "dark";
+        if(player === 2) return "light";
 
         assert(false, "invalid player " + player);
     }.bind(this);
@@ -206,7 +213,7 @@ function PacketIn(data) {
     }.bind(this);
 
     this.assertEmpty = function() {
-        assert(this.index == this.data.length, "expected packet " + this.type + " to be fully read");
+        assert(this.index === this.data.length, "expected packet " + this.type + " to be fully read");
     }.bind(this);
 }
 
@@ -219,7 +226,9 @@ function PacketIn(data) {
 const outgoingPackets = [
     "open",
     "reopen",
-    "game",
+    "join_game",
+    "find_game",
+    "create_game",
     "roll",
     "move"
 ];
@@ -248,7 +257,7 @@ function writeOpenPacket() {
 }
 
 function writeReOpenPacket(previousId) {
-    assert(previousId.length == 36, "previousId must be a uuid");
+    assert(previousId.length === 36, "previousId must be a uuid");
 
     const packet = new PacketOut("reopen");
 
@@ -257,14 +266,18 @@ function writeReOpenPacket(previousId) {
     return packet;
 }
 
-function writeGamePacket(gameID) {
-    assert(gameID.length == 5, "gameId must have 5 characters");
+function writeJoinGamePacket(gameID) {
+    assert(gameID.length === GAME_ID_LENGTH, "gameId must have " + GAME_ID_LENGTH + " characters");
     
-    const packet = new PacketOut("game");
+    const packet = new PacketOut("join_game");
     
     packet.write(gameID);
     
     return packet;
+}
+
+function writeFindGamePacket() {
+    return new PacketOut("find_game");
 }
 
 function writeDiceRollPacket() {
@@ -272,7 +285,7 @@ function writeDiceRollPacket() {
 }
 
 function writeMovePacket(from) {
-    assert(from.length == 2, "from must be a length 2 array")
+    assert(from.length === 2, "from must be a length 2 array")
 
     const packet = new PacketOut("move");
 
