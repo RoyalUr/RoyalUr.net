@@ -485,7 +485,12 @@ function redrawTiles() {
             if(locEquals([x, y], pathTile) || locEquals([x, y], to))
                 continue;
 
-            renderTile(ctx, [x, y], width, width, tiles[x][y], (isTileSelected(x, y) ? 255 : 0));
+            const hovered = locEquals([x, y], hoveredTile),
+                  selected = isTileSelected(x, y),
+                  tileWidth = width * (hovered ? hoverWidthRatio : 1),
+                  shadowColour = (selected ? 255 : 0);
+
+            renderTile(ctx, [x, y], tileWidth, tileWidth, tiles[x][y], shadowColour);
         }
     }
 
@@ -560,14 +565,20 @@ function redrawTiles() {
 
     ctx.restore();
 
-    if(isValidMove) {
-        renderTile(ctx, to, width, width, owner, (locEquals(hoveredTile, to) ? 255 : 0));
-    } else if(getTile(to) !== TILE_EMPTY) {
-        renderTile(ctx, to, width, width, getTile(to), 0);
+    const endHovered = locEquals(hoveredTile, to),
+          tileHoverWidth = width * hoverWidthRatio,
+          cyclicWidthMul = 1 + 0.03 * Math.cos(5 * time),
+          tileCyclicWidth = tileHoverWidth * cyclicWidthMul;
+
+    if(getTile(to) !== TILE_EMPTY) {
+        const tileWidth = (isValidMove ? tileCyclicWidth : tileHoverWidth);
+        renderTile(ctx, to, tileWidth, tileWidth, getTile(to), (endHovered ? 255 : 0));
+    } else if(isValidMove) {
+        renderTile(ctx, to, tileCyclicWidth, tileCyclicWidth, owner, (endHovered ? 255 : 0));
     }
 
     if(!isTileSelected(draggedTile)) {
-        renderTile(ctx, pathTile, width, width, owner, (isTileSelected(pathTile) ? 255 : 0));
+        renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, (isTileSelected(pathTile) ? 255 : 0));
     } else {
         const fromCanvas = tileToCanvas(pathTile),
               location = locAdd(fromCanvas, [mouseX - mouseDownX, mouseY - mouseDownY]);
@@ -577,10 +588,9 @@ function redrawTiles() {
 
         const tileLocation = canvasToTile(location);
 
-        const endHovered = locEquals(hoveredTile, to),
-              shadowRed = (endHovered ? 0 : 255),
-              shadowGreen = 255,
-              shadowBlue = (endHovered ? 0 : 255);
+        const shadowRed = (endHovered || false ? 0 : 255),
+              shadowGreen = (endHovered || false ? 150 : 255),
+              shadowBlue = (endHovered || false ? 0 : 255);
 
         const draggedOnBoard = isTileOnBoard(canvasToTile(mouseX, mouseY)),
               draggedWidth = width * (draggedOnBoard ? hoverWidthRatio : 1),
