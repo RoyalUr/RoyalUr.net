@@ -77,11 +77,11 @@ function drawCircularShadow(ctx, x, y, radius, r, g, b) {
 
     ctx.save();
 
-    const gradient = ctx.createRadialGradient(x, y, radius * 0.75, x, y, radius * 1.5);
+    const gradient = ctx.createRadialGradient(x, y, radius * 0.75, x, y, radius * 1.3);
 
-    gradient.addColorStop(0, rgba(r, g, b, 0.150342 * 5));
-    gradient.addColorStop(0.33, rgba(r, g, b, 0.059912 * 5));
-    gradient.addColorStop(0.66, rgba(r, g, b, 0.003765 * 5));
+    gradient.addColorStop(0, rgba(r, g, b, 1));
+    gradient.addColorStop(0.33, rgba(r, g, b, 0.7));
+    gradient.addColorStop(0.66, rgba(r, g, b, 0.4));
     gradient.addColorStop(1, rgba(r, g, b, 0));
 
     ctx.fillStyle = gradient;

@@ -94,7 +94,12 @@ let boardWidth = NaN,
     boardLeft = NaN,
     boardTop = NaN;
 
-const boardWidthToHeightRatio = 812 / 345;
+const boardWidthToHeightRatio = 2607 / 1025;
+
+const xBorderRatio = 0.065,
+      yBorderRatio = 0.03;
+
+const tileWidthRatio = 0.6;
 
 function resetBoard() {
 
@@ -107,10 +112,13 @@ function redrawBoard() {
 
     ctx.save();
 
+    const imWidth = boardWidth,
+          imHeight = boardHeight;
+
     // The board image is horizontal, we want it to be vertical
     ctx.translate(boardWidth / 2, boardHeight / 2);
     ctx.rotate(Math.PI / 2);
-    ctx.drawImage(getImageResource("board", boardWidth), -boardHeight / 2, -boardWidth / 2, boardHeight, boardWidth);
+    ctx.drawImage(getImageResource("board", imWidth), -imHeight / 2, -imWidth / 2, imHeight, imWidth);
 
     ctx.restore();
 }
@@ -135,12 +143,6 @@ function isTileOnBoard(x, y) {
 
     return x === 1 || (y !== 4 && y !== 5);
 }
-
-const xBorderRatio = 0.095,
-      yBorderRatio = 0.5 - (TILES_HEIGHT * (1 - 2 * xBorderRatio)) / (2 * boardWidthToHeightRatio * TILES_WIDTH),
-      offboardXOffsetRatio = xBorderRatio * 0.25;
-
-const tileWidthRatio = 0.6;
 
 function getTileWidth() {
     if(isNaN(boardWidth))
@@ -589,8 +591,8 @@ function redrawTiles() {
 }
 
 function getTileImage(owner, width) {
-    if(owner == TILE_DARK) return getImageResource("darkTile", width);
-    if(owner == TILE_LIGHT)  return getImageResource("lightTile", width);
+    if(owner === TILE_DARK) return getImageResource("darkTile", width);
+    if(owner === TILE_LIGHT)  return getImageResource("lightTile", width);
     return null;
 }
 
@@ -840,7 +842,7 @@ function redrawScores() {
 const diceCanvas = document.getElementById("dice"),
       diceCtx = diceCanvas.getContext("2d");
 
-const diceWidthRatio = 0.75;
+const diceWidthRatio = 1.4;
 
 let diceLeft = NaN,
     diceTop = NaN,
@@ -955,8 +957,8 @@ function redrawDice() {
         }
     }
 
-    const space = getTileWidth() / diceWidthRatio,
-          width = space * 0.8;
+    const space = getTileWidth() * diceWidthRatio,
+          width = space * 0.9;
 
     diceCtx.clearRect(0, 0, diceWidth, diceHeight);
 
@@ -1415,7 +1417,7 @@ function resize() {
 
     // RESIZE DICE
     {
-        const space = Math.round(getTileWidth() / diceWidthRatio);
+        const space = Math.round(getTileWidth() * diceWidthRatio);
 
         diceWidth = 4 * space;
         diceHeight = 3 * space;

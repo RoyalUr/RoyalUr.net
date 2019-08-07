@@ -3,5 +3,6 @@
 /.htaccess
 /.idea
 /res
+/dev_res
 /favicon.png
 /sync.sh
