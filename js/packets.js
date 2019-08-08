@@ -76,6 +76,7 @@ function readStatePacket(packet) {
         dark: packet.nextPlayerState(),
         board: packet.nextBoard(),
 
+        isGameWon: packet.nextBool(),
         currentPlayer: packet.nextPlayer(),
         hasRoll: packet.nextBool()
     };
