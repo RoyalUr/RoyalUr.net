@@ -586,17 +586,11 @@ function redrawTiles() {
         location[0] = clamp(location[0], width, tilesWidth - width);
         location[1] = clamp(location[1], width, tilesHeight - width);
 
-        const tileLocation = canvasToTile(location);
-
-        const shadowRed = (endHovered || false ? 0 : 255),
-              shadowGreen = (endHovered || false ? 150 : 255),
-              shadowBlue = (endHovered || false ? 0 : 255);
-
         const draggedOnBoard = isTileOnBoard(canvasToTile(mouseX, mouseY)),
               draggedWidth = width * (draggedOnBoard ? hoverWidthRatio : 1),
               draggedShadowWidth = width * (draggedOnBoard ? shadowWidthRatio : 1);
 
-        paintTile(ctx, location[0], location[1], draggedWidth, draggedShadowWidth, owner, shadowRed, shadowGreen, shadowBlue);
+        paintTile(ctx, location[0], location[1], draggedWidth, draggedShadowWidth, owner, 255);
     }
 }
 
@@ -972,34 +966,30 @@ function redrawDice() {
 
     diceCtx.clearRect(0, 0, diceWidth, diceHeight);
 
+    const diceFallTime = 0.15;
+
     for(let index = 0; index < 4; ++index) {
         const timeToSelect = (0.5 + index * 0.25) - selectTime + 0.25;
 
-        let sizeModifier = (diceRolling ? 1 : 0);
-
-        let down = false;
+        let sizeModifier = (diceRolling ? 1 : 0),
+            down = false;
         
         if(timeToSelect > 0 && timeToSelect < 0.5) {
             const t = 1 - 2 * timeToSelect;
 
             sizeModifier = 1 - easeInSine(t);
         } else if(timeToSelect <= 0) {
-            const a = 0.15;
+            down = true;
 
-            if(timeToSelect > -a) {
-                down = true;
-                const t = timeToSelect / (-a);
+            if(timeToSelect > -diceFallTime) {
+                const t = timeToSelect / (-diceFallTime);
 
                 sizeModifier = 0.2 * easeOutSine(t);
-            } else if(timeToSelect > -2 * a) {
-                down = true;
-                
-                const t = (timeToSelect + a) / (-a);
+            } else if(timeToSelect > -2 * diceFallTime) {
+                const t = (timeToSelect + diceFallTime) / (-diceFallTime);
 
                 sizeModifier = 0.2 * (1 - easeInSine(t));
             } else {
-                down = true;
-                
                 sizeModifier = 0;
             }
         } else if(animTime < 0.5) {
@@ -1011,15 +1001,18 @@ function redrawDice() {
               diceImage = getDiceImageFromValue(diceValue, diceWidth),
               diceHighlighted = (index < diceSelected && diceValue <= 3);
 
-        if(down && !diceDown[index]) {
+        if(down && !diceDown[index] && timeToSelect >= -2 * diceFallTime) {
             playSound("dice_hit");
         }
         diceDown[index] = down;
         
         if(diceValue !== lastDice[index] && (time - lastDiceSound) > 0.1) {
-            playSound("dice_click");
             lastDice[index] = diceValue;
             lastDiceSound = time;
+
+            if (diceRolling || (timeToSelect >= -diceFallTime && timeToSelect <= diceFallTime)) {
+                playSound("dice_click");
+            }
         }
         
         paintDice(diceCtx, diceImage, diceWidth, (index + 0.5) * space, 1.5 * space, diceHighlighted);
@@ -1174,21 +1167,45 @@ const messageContainerElement = document.getElementById("message-container"),
 
 const message = {
     message: "",
+    message_set_time: 0,
+    typewriter: 0,
+    typewriter_last_length: 0,
     fade: createFade(0)
 };
 
 const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
-      DEFAULT_MESSAGE_STAY_DURATION     = 1.5,
+      DEFAULT_MESSAGE_STAY_DURATION     = 2,
+      DEFAULT_TYPEWRITER_CHAR_DURATION  = 0.09;
       DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
 
-function setMessageText(statusMessage) {
+function setMessageText(statusMessage, typewriter) {
+    if (!typewriter) {
+        typewriter = 0;
+    }
+
     message.message = statusMessage;
-    messageElement.textContent = statusMessage;
+    message.message_set_time = getTime();
+    message.typewriter = typewriter;
 }
 
 function setMessageAndFade(statusMessage, fade) {
     setMessageText(statusMessage);
     message.fade = fade;
+}
+
+function setMessageTypewriter(statusMessage, typewriter, fadeInDuration, stayDuration, fadeOutDuration) {
+    if (typewriter === undefined) {
+        typewriter = DEFAULT_TYPEWRITER_CHAR_DURATION * statusMessage.length;
+    }
+
+    // We don't want the message to disappear before its completely shown
+    if (stayDuration === undefined) {
+        stayDuration = max(DEFAULT_MESSAGE_STAY_DURATION, typewriter);
+    }
+
+    setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration);
+
+    message.typewriter = typewriter;
 }
 
 function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
@@ -1202,6 +1219,36 @@ function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration
 }
 
 function redrawMessage() {
+    let messageText = message.message;
+
+    if (message.typewriter) {
+        const percentPerKey = 1 / messageText.length;
+
+        const percentUnclamped = (getTime() - message.message_set_time) / message.typewriter,
+              percent = clamp(percentUnclamped, 0, 1);
+
+        const characters = Math.floor(percent * messageText.length);
+
+        if (characters !== message.typewriter_last_length) {
+            message.typewriter_last_length = characters;
+
+            if (characters === messageText.length) {
+                // If the tab has been closed/reopened we don't want to play the 'ding'
+                if (percentUnclamped < 1 + 2 * percentPerKey) {
+                    playSound("typewriter_end");
+                }
+
+                message.typewriter_last_length = 0;
+                message.typewriter = 0;
+            } else if (messageText[characters - 1] !== ' ') {
+                playSound("typewriter_key");
+            }
+        }
+
+        messageText = messageText.substr(0, characters);
+    }
+
+    messageElement.textContent = messageText;
     messageContainerElement.style.opacity = message.fade.get();
 }
 

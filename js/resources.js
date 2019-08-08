@@ -73,6 +73,17 @@ const audioResources = [
         url: "res/audio/dice_select.mp3",
         volume: 0.3,
         instances: 4
+    },
+
+    // Sounds when a message pops up
+    {
+        key: "typewriter_key",
+        url: "res/audio/typewriter_key.wav",
+        instances: 4
+    },
+    {
+        key: "typewriter_end",
+        url: "res/audio/typewriter_end.wav",
     }
 ];
 
@@ -138,7 +149,11 @@ function isAudioPlaying(element) {
             && element.readyState > 2;
 }
 
-function playSound(key, onComplete) {
+function playSound(key, onComplete, overrideTabActive) {
+    // We usually don't want to play any sounds if the tab is not active
+    if (document.hidden && !overrideTabActive)
+        return;
+
     if(audioPacks[key]) {
         const pack = audioPacks[key];
 
