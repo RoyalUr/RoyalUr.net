@@ -94,33 +94,25 @@ let boardWidth = NaN,
     boardLeft = NaN,
     boardTop = NaN;
 
-const boardWidthToHeightRatio = 2607 / 1025;
-
-const xBorderRatio = 0.065,
-      yBorderRatio = 0.03;
-
-const tileWidthRatio = 0.6;
-
 function resetBoard() {
 
 }
 
+/**
+ * Called when the board is resized.
+ */
+function resizeBoard() {
+
+}
+
+/**
+ * Called to redraw the board.
+ */
 function redrawBoard() {
     const ctx = boardCtx;
 
     ctx.clearRect(0, 0, boardWidth, boardHeight);
-
-    ctx.save();
-
-    const imWidth = boardWidth,
-          imHeight = boardHeight;
-
-    // The board image is horizontal, we want it to be vertical
-    ctx.translate(boardWidth / 2, boardHeight / 2);
-    ctx.rotate(Math.PI / 2);
-    ctx.drawImage(getImageResource("board", imWidth), -imHeight / 2, -imWidth / 2, imHeight, imWidth);
-
-    ctx.restore();
+    ctx.drawImage(getImageResource("board", boardWidth), 0, 0, boardWidth, boardHeight);
 }
 
 function isTileValid(x, y) {
@@ -144,11 +136,117 @@ function isTileOnBoard(x, y) {
     return x === 1 || (y !== 4 && y !== 5);
 }
 
-function getTileWidth() {
-    if(isNaN(boardWidth))
-        return 1;
+const tileWidthRatio = 0.75;
 
-    return Math.round((1 - 2 * xBorderRatio) / TILES_WIDTH * boardWidth * tileWidthRatio);
+let boardWithToHeightRatio = null,
+    boardTileRegions = null,
+    boardTilePositions = null,
+    tileWidth = null;
+
+function getTileWidth() {
+    if (isNaN(boardWidth))
+        return 1;
+    if (tileWidth)
+        return Math.round(tileWidth * boardWidth);
+
+    const regions = getBoardTileRegions();
+
+    let cumulativeTileWidth = 0,
+        tilesRecordedCount = 0;
+
+    for (let x = 0; x < TILES_WIDTH; ++x) {
+        for (let y = 0; y < TILES_HEIGHT; ++y) {
+            if (!isTileOnBoard(x, y))
+                continue;
+
+            cumulativeTileWidth += regions[x + y * TILES_WIDTH][2];
+            tilesRecordedCount += 1;
+        }
+    }
+
+    tileWidth = tileWidthRatio * cumulativeTileWidth / tilesRecordedCount;
+
+    return Math.round(tileWidth * boardWidth);
+}
+
+function getBoardWidthToHeightRatio() {
+    if (boardWithToHeightRatio)
+        return boardWithToHeightRatio;
+
+    const boardImage = getRawImageResource("board");
+    if (!boardImage)
+        throw "Missing board image";
+
+    boardWithToHeightRatio = boardImage.height / boardImage.width;
+}
+
+/**
+ * @returns An array of length 4 arrays representing the [x, y, width, height] regions of
+ *          each tile as a percentage across the board image in the range [0, 1].
+ */
+function getBoardTileRegions() {
+    if (boardTileRegions)
+        return boardTileRegions;
+
+    const boardImage = getRawImageResource("board"),
+          tileRegions = getImageAnnotation("board");
+
+    if (!boardImage)
+        throw "Missing board image";
+    if (!tileRegions)
+        throw "Missing board tile annotations";
+    if (tileRegions.length !== TILES_COUNT)
+        throw "Invalid board tile annotations : invalid length, expected " + TILES_COUNT + ", received " + tileRegions.length
+
+    const boardImgWidth = boardImage.width,
+          boardImgHeight = boardImage.height;
+
+    boardTileRegions = [];
+
+    for (let index = 0; index < tileRegions.length; ++index) {
+        const region = tileRegions[index],
+            x = region[0],
+            y = region[1],
+            width = region[2],
+            height = region[3];
+
+        boardTileRegions.push([
+            x / boardImgWidth,
+            y / boardImgHeight,
+            width / boardImgWidth,
+            height / boardImgHeight
+        ]);
+    }
+
+    return boardTileRegions;
+}
+
+/**
+ * @returns An array of length 2 arrays representing the [x, y] positions of
+ *          each tile as a percentage across the board image in the range [0, 1].
+ */
+function getBoardTilePositions() {
+    if (boardTilePositions)
+        return boardTilePositions;
+
+    const tileRegions = getBoardTileRegions();
+
+    boardTilePositions = [];
+
+    for (let index = 0; index < tileRegions.length; ++index) {
+        const region = tileRegions[index],
+              x = region[0],
+              y = region[1],
+              width = region[2],
+              height = region[3];
+
+        boardTilePositions.push([
+            x + width / 2,
+            y + height / 2
+        ]);
+    }
+
+    return boardTilePositions;
 }
 
 function tileToCanvas(x, y) {
@@ -157,21 +255,23 @@ function tileToCanvas(x, y) {
         x = x[0];
     }
 
+    // If we're flipping the board
     if(ownPlayer === darkPlayer) {
         x = TILES_WIDTH - x - 1;
     }
 
-    const xBorder = xBorderRatio * boardWidth,
-          yBorder = yBorderRatio * boardHeight,
-          xStep = (1 - 2 * xBorderRatio) / TILES_WIDTH * boardWidth,
-          yStep = (1 - 2 * yBorderRatio) / TILES_HEIGHT * boardHeight,
-          xOffset = xBorder + xStep / 2 + tilesLeftOffset,
-          yOffset = yBorder + yStep / 2;
+    if (x < 0 || y < 0 || x >= TILES_WIDTH || y >= TILES_HEIGHT)
+        return null;
 
-    return [
-        xOffset + x * xStep,
-        yOffset + y * yStep
-    ];
+    const tilesXOffset = (tilesWidth - boardWidth) / 2,
+          tilePositions = getBoardTilePositions(),
+          index = x + y * TILES_WIDTH;
+
+    const position = tilePositions[index],
+          canvas_x = position[0] * boardWidth + tilesXOffset,
+          canvas_y = position[1] * boardHeight;
+
+    return [canvas_x, canvas_y];
 }
 
 function canvasToTile(x, y) {
@@ -180,28 +280,43 @@ function canvasToTile(x, y) {
         x = x[0];
     }
 
-    const xBorder = xBorderRatio * boardWidth,
-          yBorder = yBorderRatio * boardHeight,
-          xStep = (1 - 2 * xBorderRatio) / TILES_WIDTH * boardWidth,
-          yStep = (1 - 2 * yBorderRatio) / TILES_HEIGHT * boardHeight,
-          xOffset = xBorder + xStep / 2 + tilesLeftOffset,
-          yOffset = yBorder + yStep / 2;
+    // The tiles canvas is bigger than the board canvas
+    x -= (tilesWidth - boardWidth) / 2;
 
-    let tileX = (x - xOffset) / xStep,
-        tileY = (y - yOffset) / yStep;
+    let prop_x = x / boardWidth,
+        prop_y = y / boardHeight;
 
-    if(ownPlayer === darkPlayer) {
-        tileX = TILES_WIDTH - tileX - 1;
+    if (prop_x < 0 || prop_x >= 1 || prop_y < 0 || prop_y >= 1)
+        return [-1, -1];
+
+    if (ownPlayer === darkPlayer) {
+        prop_x = 1 - prop_x;
     }
 
-    const tile = [
-        Math.round(tileX),
-        Math.round(tileY)
+    let closest_index = -1,
+        closest_dist = -1;
+
+    const tilePositions = getBoardTilePositions();
+
+    for (let index = 0; index < tilePositions.length; ++index) {
+        const pos = tilePositions[index],
+              pos_x = pos[0],
+              pos_y = pos[1],
+              dx = pos_x - prop_x,
+              dy = pos_y - prop_y,
+              dist_sq = dx*dx + dy*dy;
+
+        if (closest_index === -1 || dist_sq < closest_dist) {
+            closest_index = index;
+            closest_dist = dist_sq;
+        }
+    }
+
+    return [
+        closest_index % TILES_WIDTH,
+        Math.floor(closest_index / TILES_WIDTH)
     ];
-
-    return (isTileValid(tile) ? tile : [-1, -1]);
 }
-
 
 
 
@@ -554,10 +669,10 @@ function redrawTiles() {
 
         const crossSize = width / 6;
 
-        ctx.moveTo(end[0] - crossSize, end[1] - crossSize)
+        ctx.moveTo(end[0] - crossSize, end[1] - crossSize);
         ctx.lineTo(end[0] + crossSize, end[1] + crossSize);
 
-        ctx.moveTo(end[0] - crossSize, end[1] + crossSize)
+        ctx.moveTo(end[0] - crossSize, end[1] + crossSize);
         ctx.lineTo(end[0] + crossSize, end[1] - crossSize);
 
         ctx.stroke();
@@ -1341,10 +1456,11 @@ function setupElements() {
     });
     
     addTwitterButton();
+    resize();
 }
 
 function addTwitterButton() {
-    document.getElementById("twitter-button").innerHTML ='<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+    document.getElementById("twitter-button").innerHTML ='<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
 }
 
 let fps_start = new Date().getTime(),
@@ -1408,7 +1524,7 @@ function resize() {
     // RESIZE BOARD
     {
         boardHeight = height;
-        boardWidth = Math.round(height / boardWidthToHeightRatio);
+        boardWidth = Math.round(height / getBoardWidthToHeightRatio());
         boardLeft = centreLeft - Math.round(boardWidth / 2);
         boardTop = centreTop - Math.round(boardHeight / 2);
 
@@ -1427,12 +1543,13 @@ function resize() {
         tilesCanvas.height = tilesHeight;
         tilesCanvas.style.left = tilesLeft + "px";
         tilesCanvas.style.top = tilesTop + "px";
+
+        resizeBoard();
     }
 
     // RESIZE SCORE
     {
-        const tileWidth = getTileWidth(),
-              tileSpace = Math.round(tileWidth / tileWidthRatio);
+        const tileWidth = getTileWidth();
 
         scoreWidth = 7 * tileWidth;
         scoreHeight = tileWidth;
@@ -1440,7 +1557,7 @@ function resize() {
         const tilesCountWidth = scoreWidth,
               tilesCountHeight = scoreHeight * 2;
 
-        const verticalPadding = Math.round(yBorderRatio * boardHeight),
+        const verticalPadding = Math.round(0.05 * boardHeight),
               tilesCountTop = boardTop + verticalPadding,
               scoreTop = boardTop + boardHeight - scoreHeight - verticalPadding,
               p1Left = boardLeft - scoreWidth,

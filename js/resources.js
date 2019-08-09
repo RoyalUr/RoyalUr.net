@@ -266,8 +266,8 @@ function loadAudio(onComplete) {
 // IMAGES
 //
 
-const imageURLS = {
-    "board": "res/board.png",
+const imageResources = {
+    "board": "res/board_light.png",
     "darkTile": "res/darkTile.png",
     "lightTile": "res/lightTile.png",
     "diceUp1": "res/diceUp1.png",
@@ -280,15 +280,48 @@ const imageURLS = {
     "diceLightShadow": "res/diceLightShadow.png"
 };
 
-const imageResources = {};
+const loadedImageResources = {};
+let loadedImageAnnotations = {};
+
+function loadImageAnnotations(onComplete) {
+    const client = new XMLHttpRequest();
+    client.onreadystatechange = function() {
+        if (this.readyState !== 4)
+            return;
+
+        if (this.status !== 200) {
+            error("Error " + this.status + " loading image annotations: " + this.responseText);
+            onComplete();
+            return;
+        }
+
+        loadedImageAnnotations = JSON.parse(this.responseText);
+        onComplete();
+    }.bind(client);
+    client.open('GET', '/res/annotations.json');
+    client.send();
+}
 
 function loadImages(onComplete) {
     const countdown = {
         count: 0
     };
 
-    for(let key in imageURLS) {
-        if(!imageURLS.hasOwnProperty(key))
+    // Used to countdown until all image resources have been loaded
+    const countdown_fn = () => {
+        setTimeout(function() {
+            countdown.count -= 1;
+            if(countdown.count === 0) {
+                onComplete();
+            }
+        }, 0);
+    };
+
+    countdown.count += 1;
+    loadImageAnnotations(countdown_fn);
+
+    for(let key in imageResources) {
+        if(!imageResources.hasOwnProperty(key))
             continue;
 
         countdown.count += 1;
@@ -303,8 +336,6 @@ function loadImages(onComplete) {
         imageResource.scaled.push(imageResource.image);
 
         imageResource.image.onload = function() {
-            countdown.count -= 1;
-
             imageResource.width = this.width;
             imageResource.height = this.height;
 
@@ -312,23 +343,31 @@ function loadImages(onComplete) {
                 error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", invalid width or height"
                       + " (" + imageResource.width + " x " + imageResource.height + ")");
 
-                imageResources[imageResource.key] = undefined;
+                loadedImageResources[imageResource.key] = undefined;
                 return;
             }
 
             setTimeout(function() {
                 createScaledImageVersions(imageResource);
-
-                if(countdown.count === 0) {
-                    onComplete();
-                }
+                countdown_fn();
             }, 0);
         };
 
-        imageResource.image.src = imageURLS[key];
-        imageResources[key] = imageResource;
+        imageResource.image.src = imageResources[key];
+        loadedImageResources[key] = imageResource;
     }
 
+}
+
+function getImageAnnotation(key) {
+    const imageAnnotation = loadedImageAnnotations[key];
+
+    if(!imageAnnotation) {
+        error("Cannot find image annotation with key \"" + key + "\"");
+        return null;
+    }
+
+    return imageAnnotation;
 }
 
 function createScaledImageVersions(imageResource) {
@@ -336,13 +375,21 @@ function createScaledImageVersions(imageResource) {
     getImageResource(imageResource.key, imageResource.width / Math.pow(2, 6));
 }
 
-function getImageResource(key, width) {
-    const imageResource = imageResources[key];
+function getRawImageResource(key) {
+    const imageResource = loadedImageResources[key];
 
     if(!imageResource) {
         error("Cannot find image with key \"" + key + "\"");
         return null;
     }
+
+    return imageResource;
+}
+
+function getImageResource(key, width) {
+    const imageResource = getRawImageResource(key);
+    if(!imageResource)
+        return null;
 
     const scaledowns = Math.floor(Math.log(imageResource.width / width) / Math.log(2)) - 1;
 
@@ -369,7 +416,7 @@ function getImageResource(key, width) {
 }
 
 function getImageResourceFromHeight(key, height) {
-    const imageResource = imageResources[key];
+    const imageResource = loadedImageResources[key];
 
     if(!imageResource) {
         error("Cannot find image with key \"" + key + "\"");
@@ -383,6 +430,9 @@ function getImageResourceFromHeight(key, height) {
 }
 
 function renderResource(width, height, renderFunction) {
+    if (width < 1 || height < 1)
+        throw "Width and height must both be at least 1, was given " + width + "x" + height;
+
     const canvas = document.createElement("canvas"),
           ctx = canvas.getContext("2d");
 
