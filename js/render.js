@@ -38,7 +38,9 @@ function setInGame(inGame) {
 
     if (inGame) {
         setMessageText("Found your Game");
-        message.fade.fadeOut();
+        if (message.fade) {
+            message.fade.fadeOut();
+        }
 
         setTimeout(() => {
             if (menuState.inGame) {
@@ -87,22 +89,27 @@ const TILES_WIDTH = 3,
       TILES_COUNT = TILES_WIDTH * TILES_HEIGHT;
 
 const boardCanvas = document.getElementById("board"),
-      boardCtx = boardCanvas.getContext("2d");
+      boardCtx = boardCanvas.getContext("2d"),
+      boardPadding = 30;
 
-let boardWidth = NaN,
-    boardHeight = NaN,
-    boardLeft = NaN,
-    boardTop = NaN;
+let boardCanvasWidth = NaN,
+    boardCanvasHeight = NaN,
+    boardCanvasLeft = NaN,
+    boardCanvasTop = NaN,
+    boardX = NaN,
+    boardY = NaN,
+    boardWidth = NaN,
+    boardHeight = NaN;
 
 function resetBoard() {
 
 }
 
-/**
- * Called when the board is resized.
- */
 function resizeBoard() {
-
+    boardX = boardPadding;
+    boardY = boardPadding;
+    boardWidth = boardCanvasWidth - 2 * boardPadding;
+    boardHeight = boardCanvasHeight - 2 * boardPadding;
 }
 
 /**
@@ -111,8 +118,11 @@ function resizeBoard() {
 function redrawBoard() {
     const ctx = boardCtx;
 
-    ctx.clearRect(0, 0, boardWidth, boardHeight);
-    ctx.drawImage(getImageResource("board", boardWidth), 0, 0, boardWidth, boardHeight);
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 30;
+
+    ctx.clearRect(0, 0, boardCanvasWidth, boardCanvasHeight);
+    ctx.drawImage(getImageResource("board", boardCanvasWidth), boardX, boardY, boardWidth, boardHeight);
 }
 
 function isTileValid(x, y) {
@@ -144,7 +154,7 @@ let boardWithToHeightRatio = null,
     tileWidth = null;
 
 function getTileWidth() {
-    if (isNaN(boardWidth))
+    if (isNaN(boardCanvasWidth))
         return 1;
     if (tileWidth)
         return Math.round(tileWidth * boardWidth);
@@ -196,7 +206,7 @@ function getBoardTileRegions() {
     if (!tileRegions)
         throw "Missing board tile annotations";
     if (tileRegions.length !== TILES_COUNT)
-        throw "Invalid board tile annotations : invalid length, expected " + TILES_COUNT + ", received " + tileRegions.length
+        throw "Invalid board tile annotations : invalid length, expected " + TILES_COUNT + ", received " + tileRegions.length;
 
     const boardImgWidth = boardImage.width,
           boardImgHeight = boardImage.height;
@@ -263,13 +273,14 @@ function tileToCanvas(x, y) {
     if (x < 0 || y < 0 || x >= TILES_WIDTH || y >= TILES_HEIGHT)
         return null;
 
-    const tilesXOffset = (tilesWidth - boardWidth) / 2,
+    const tilesXOffset = boardX + (tilesWidth - boardCanvasWidth) / 2,
+          tilesYOffset = boardY,
           tilePositions = getBoardTilePositions(),
           index = x + y * TILES_WIDTH;
 
     const position = tilePositions[index],
           canvas_x = position[0] * boardWidth + tilesXOffset,
-          canvas_y = position[1] * boardHeight;
+          canvas_y = position[1] * boardHeight + tilesYOffset;
 
     return [canvas_x, canvas_y];
 }
@@ -281,7 +292,10 @@ function canvasToTile(x, y) {
     }
 
     // The tiles canvas is bigger than the board canvas
-    x -= (tilesWidth - boardWidth) / 2;
+    x -= (tilesWidth - boardCanvasWidth) / 2;
+
+    x -= boardX;
+    y -= boardY;
 
     let prop_x = x / boardWidth,
         prop_y = y / boardHeight;
@@ -536,9 +550,10 @@ function isValidMoveFrom(x, y) {
     const toOwner = getTile(to),
           fromOwner = (isStartTile(x, y) ? getActivePlayer().playerNo : getTile(x, y));
 
+    if (fromOwner === TILE_EMPTY || fromOwner === otherPlayer.playerNo)
+        return false;
     if(toOwner === fromOwner)
         return false;
-
     if(toOwner === TILE_EMPTY)
         return true;
 
@@ -745,7 +760,8 @@ function paintTile(ctx, centreLeft, centreTop, width, shadowWidth, owner, shadow
 // SCORES
 //
 
-const scoreTileRatio = 0.8;
+const scoreTileSpaceRatio = 0.9,
+      scoreTileRatio = 0.8;
 
 const leftPlayerRenderTarget = initPlayerRenderTarget("left"),
       rightPlayerRenderTarget = initPlayerRenderTarget("right");
@@ -861,95 +877,88 @@ function resetScores() {
 
 }
 
-function redrawScores() {
-    const tileSpace = getTileWidth(),
-          tileWidth = tileSpace * scoreTileRatio;
+function drawName(player, isActive) {
+    return renderResource(scoreWidth, scoreHeight, function(ctx) {
+        // Render the text on another canvas, and then onto this one so that the alpha stacks correctly
+        const text = renderResource(scoreWidth, scoreHeight, function(ctx) {
+            const tileWidth = getTileWidth(),
+                  offset = 0.01 * tileWidth;
 
-    function drawTiles(ctx, owner, left, top, tileCount) {
-        ctx.clearRect(0, 0, scoreWidth, scoreHeight * 2);
-        for(let index = 0; index < tileCount; ++index) {
-            const tileLeft = left + (index + 0.5) * tileSpace;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = Math.round(tileWidth * 0.75) + "px KorraFont";
 
-            paintTile(ctx, tileLeft, top, tileWidth, tileWidth, owner);
-        }
-    }
-
-    function drawPlayer(player, tilesLeft, scoreLeft) {
-        const tilesCtx = player.renderTarget.tilesCtx,
-              scoreCtx = player.renderTarget.scoreCtx;
-
-        drawTiles(tilesCtx, player.playerNo, tilesLeft, tileSpace * 1.5, player.tiles.current);
-        drawTiles(scoreCtx, player.playerNo, scoreLeft, tileSpace * 0.5, player.score.current);
-
-        if(player.renderedIdleName === null || scoreWidth !== player.renderedIdleName.width) {
-            function initFont(ctx) {
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.font = Math.round(tileSpace * 0.75) + "px KorraFont";
+            if (isActive) {
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = rgb(255, 255, 255);
+                ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
+                ctx.shadowBlur = 0;
+                ctx.shadowBlur = rgba(0);
             }
 
-            player.renderedIdleName = renderResource(scoreWidth, scoreHeight, function(ctx) {
-                initFont(ctx);
+            ctx.fillStyle = rgba(255, 255, 255, 0.3);
+            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth + offset);
 
-                const text = renderResource(scoreWidth, scoreHeight, function(ctx) {
-                    initFont(ctx);
-                    const offset = 0.01 * tileSpace;
+            ctx.fillStyle = rgba(0, 0, 0, 0.7);
+            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth - offset);
 
-                    ctx.fillStyle = rgba(255, 255, 255, 0.3);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace + offset);
+            ctx.fillStyle = rgb(0);
+            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
+        });
 
-                    ctx.fillStyle = rgba(0, 0, 0, 0.7);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace - offset);
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(text, 0, 0);
+    });
+}
 
-                    ctx.fillStyle = rgb(0);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace);
-                });
+function redrawPlayerScores(player, tilesLeft, scoreLeft) {
+    const tileWidth = getTileWidth(),
+          tilePaintWidth = tileWidth * scoreTileRatio;
 
-                ctx.globalAlpha = 0.5;
-                ctx.drawImage(text, 0, 0);
-            });
+    function drawTiles(ctx, owner, left, top, tileCount, highlightStartTile) {
+        ctx.clearRect(0, 0, scoreWidth, scoreHeight * 2);
+        for(let index = 0; index < tileCount; ++index) {
+            const tileLeft = left + (index + 0.5) * tileWidth,
+                  shadowShade = (highlightStartTile && index === 0 ? 255 : 0);
 
-            player.renderedActiveName = renderResource(scoreWidth, scoreHeight, function(ctx) {
-                initFont(ctx);
-
-                const text = renderResource(scoreWidth, scoreHeight, function(ctx) {
-                    initFont(ctx);
-                    const offset = 0.01 * tileSpace;
-
-                    ctx.shadowBlur = 5;
-                    ctx.shadowColor = rgb(255, 255, 255);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace);
-                    ctx.shadowBlur = 0;
-                    ctx.shadowBlur = rgba(0, 0);
-
-                    ctx.fillStyle = rgba(255, 255, 255, 0.3);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace + offset);
-
-                    ctx.fillStyle = rgba(0, 0, 0, 0.7);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace - offset);
-
-                    ctx.fillStyle = rgb(0);
-                    ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileSpace);
-                });
-
-                ctx.globalAlpha = 0.5;
-                ctx.drawImage(text, 0, 0);
-            });
+            paintTile(ctx, tileLeft, top, tilePaintWidth, tilePaintWidth, owner, shadowShade);
         }
-
-        tilesCtx.save();
-
-        const renderedName = (player.active ? player.renderedActiveName : player.renderedIdleName);
-        tilesCtx.drawImage(renderedName, 0, 0);
-
-        tilesCtx.restore();
     }
 
-    const p1TilesLeft = (7 - ownPlayer.tiles.current) * tileSpace,
-          p1ScoreLeft = (7 - ownPlayer.score.current) * tileSpace;
+    const tilesCtx = player.renderTarget.tilesCtx,
+          scoreCtx = player.renderTarget.scoreCtx,
+          startTile = getStartTile();
 
-    drawPlayer(ownPlayer, p1TilesLeft, p1ScoreLeft);
-    drawPlayer(otherPlayer, 0, 0);
+    const highlightStartTile = (
+        player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !diceRolling
+        && (locEquals(startTile, hoveredTile) || (isTileSelected(startTile) && !isValidMoveFrom(hoveredTile)))
+    );
+
+    drawTiles(
+        tilesCtx, player.playerNo, tilesLeft, tileWidth * 1.5,
+        player.tiles.current, highlightStartTile,
+    );
+    drawTiles(
+        scoreCtx, player.playerNo, scoreLeft, tileWidth * 0.5,
+        player.score.current, false
+    );
+
+    if(player.renderedIdleName === null || scoreWidth !== player.renderedIdleName.width) {
+        player.renderedIdleName = drawName(player, false);
+        player.renderedActiveName = drawName(player, true);
+    }
+
+    const renderedName = (player.active ? player.renderedActiveName : player.renderedIdleName);
+    tilesCtx.drawImage(renderedName, 0, 0);
+}
+
+function redrawScores() {
+    const tileWidth = getTileWidth(),
+          p1TilesLeft = (7 - ownPlayer.tiles.current) * tileWidth,
+          p1ScoreLeft = (7 - ownPlayer.score.current) * tileWidth;
+
+    redrawPlayerScores(ownPlayer, p1TilesLeft, p1ScoreLeft);
+    redrawPlayerScores(otherPlayer, 0, 0);
 }
 
 
@@ -1021,9 +1030,9 @@ function resetDice() {
 
 function layoutDice() {
     if(ownPlayer.active) {
-        diceLeft = boardLeft - diceWidth;
+        diceLeft = boardCanvasLeft - diceWidth;
     } else {
-        diceLeft = boardLeft + boardWidth;
+        diceLeft = boardCanvasLeft + boardCanvasWidth;
     }
 
     diceTop = centreTop - diceHeight / 2;
@@ -1460,7 +1469,7 @@ function setupElements() {
 }
 
 function addTwitterButton() {
-    document.getElementById("twitter-button").innerHTML ='<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
+    document.getElementById("twitter-button").innerHTML = '<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
 }
 
 let fps_start = new Date().getTime(),
@@ -1523,21 +1532,21 @@ function resize() {
 
     // RESIZE BOARD
     {
-        boardHeight = height;
-        boardWidth = Math.round(height / getBoardWidthToHeightRatio());
-        boardLeft = centreLeft - Math.round(boardWidth / 2);
-        boardTop = centreTop - Math.round(boardHeight / 2);
+        boardCanvasHeight = height;
+        boardCanvasWidth = Math.round((height - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
+        boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
+        boardCanvasTop = centreTop - Math.round(boardCanvasHeight / 2);
 
-        boardCanvas.width = boardWidth;
-        boardCanvas.height = boardHeight;
-        boardCanvas.style.left = boardLeft + "px";
-        boardCanvas.style.top = boardTop + "px";
+        boardCanvas.width = boardCanvasWidth;
+        boardCanvas.height = boardCanvasHeight;
+        boardCanvas.style.left = boardCanvasLeft + "px";
+        boardCanvas.style.top = boardCanvasTop + "px";
 
-        tilesHeight = boardHeight;
-        tilesWidth = boardWidth * 1.5;
+        tilesHeight = boardCanvasHeight;
+        tilesWidth = boardCanvasWidth * 1.5;
         tilesLeft = centreLeft - Math.round(tilesWidth / 2);
         tilesTop = centreTop - Math.round(tilesHeight / 2);
-        tilesLeftOffset = Math.round((tilesWidth - boardWidth) / 2);
+        tilesLeftOffset = Math.round((tilesWidth - boardCanvasWidth) / 2);
 
         tilesCanvas.width = tilesWidth;
         tilesCanvas.height = tilesHeight;
@@ -1557,11 +1566,11 @@ function resize() {
         const tilesCountWidth = scoreWidth,
               tilesCountHeight = scoreHeight * 2;
 
-        const verticalPadding = Math.round(0.05 * boardHeight),
-              tilesCountTop = boardTop + verticalPadding,
-              scoreTop = boardTop + boardHeight - scoreHeight - verticalPadding,
-              p1Left = boardLeft - scoreWidth,
-              p2Left = boardLeft + boardWidth;
+        const verticalPadding = Math.round(0.05 * boardCanvasHeight),
+              tilesCountTop = boardCanvasTop + verticalPadding,
+              scoreTop = boardCanvasTop + boardCanvasHeight - scoreHeight - verticalPadding,
+              p1Left = boardCanvasLeft - scoreWidth,
+              p2Left = boardCanvasLeft + boardCanvasWidth;
 
         const leftTiles = leftPlayerRenderTarget.tilesCanvas,
               leftScore = leftPlayerRenderTarget.scoreCanvas,
