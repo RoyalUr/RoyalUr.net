@@ -11,7 +11,9 @@ const menuState = {
     inGame: false,
 
     menuFade: createFade(0.5),
-    boardFade: createFade(1)
+    boardFade: createFade(1),
+
+    gameSearchFade: createFade(2, 0.5)
 };
 menuState.menuFade.visible();
 
@@ -24,12 +26,17 @@ function setOnMenu(onMenu, hasty) {
         menuState.menuFade.fadeIn(fadeOverride);
     } else {
         menuState.menuFade.fadeOut(fadeOverride);
+        setMessageAndFade("", menuState.gameSearchFade.invisible());
 
-        setTimeout(() => {
-            if (!menuState.onMenu) {
-                message.fade = createFade(2, 0.5).fadeIn();
-            }
-        }, (hasty ? 0 : 500))
+        if (hasty) {
+            menuState.gameSearchFade.fadeIn();
+        } else {
+            setTimeout(() => {
+                if (!menuState.onMenu) {
+                    menuState.gameSearchFade.fadeIn();
+                }
+            }, 500)
+        }
     }
 }
 
@@ -37,10 +44,8 @@ function setInGame(inGame) {
     menuState.inGame = inGame;
 
     if (inGame) {
-        setMessageText("Found your Game");
-        if (message.fade) {
-            message.fade.fadeOut();
-        }
+        setMessageAndFade("Found your Game", menuState.gameSearchFade);
+        menuState.gameSearchFade.fadeOut();
 
         setTimeout(() => {
             if (menuState.inGame) {
@@ -58,10 +63,10 @@ function redrawMenu() {
 
     if (!menuState.onMenu && !menuState.inGame) {
         if (networkStatus.connected) {
-            setMessageText("Searching for a Game" + createDots());
+            setMessageAndFade("Searching for a Game" + createDots(), menuState.gameSearchFade);
         } else {
             networkStatus.hidden = true;
-            setMessageText(getNetworkStatus());
+            setMessageAndFade(getNetworkStatus(), menuState.gameSearchFade);
         }
     }
 
@@ -1302,44 +1307,35 @@ const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
       DEFAULT_TYPEWRITER_CHAR_DURATION  = 0.09;
       DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
 
-function setMessageText(statusMessage, typewriter) {
-    if (!typewriter) {
-        typewriter = 0;
-    }
-
+function setMessageAndFade(statusMessage, fade, typewriterDuration) {
     message.message = statusMessage;
     message.message_set_time = getTime();
-    message.typewriter = typewriter;
-}
-
-function setMessageAndFade(statusMessage, fade) {
-    setMessageText(statusMessage);
+    message.typewriter = (typewriterDuration ? typewriterDuration : 0);
     message.fade = fade;
 }
 
-function setMessageTypewriter(statusMessage, typewriter, fadeInDuration, stayDuration, fadeOutDuration) {
-    if (typewriter === undefined) {
-        typewriter = DEFAULT_TYPEWRITER_CHAR_DURATION * statusMessage.length;
+function setMessageTypewriter(statusMessage, typewriterDuration, fadeInDuration, stayDuration, fadeOutDuration) {
+    if (typewriterDuration === undefined) {
+        typewriterDuration = DEFAULT_TYPEWRITER_CHAR_DURATION * statusMessage.length;
     }
 
     // We don't want the message to disappear before its completely shown
     if (stayDuration === undefined) {
-        stayDuration = max(DEFAULT_MESSAGE_STAY_DURATION, typewriter);
+        stayDuration = max(DEFAULT_MESSAGE_STAY_DURATION, typewriterDuration);
     }
 
-    setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration);
-
-    message.typewriter = typewriter;
+    setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration);
 }
 
-function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
-    fadeInDuration  = (fadeInDuration !== undefined  ? fadeInDuration  : DEFAULT_MESSAGE_FADE_IN_DURATION);
-    stayDuration    = (stayDuration !== undefined    ? stayDuration    : DEFAULT_MESSAGE_STAY_DURATION);
-    fadeOutDuration = (fadeOutDuration !== undefined ? fadeOutDuration : DEFAULT_MESSAGE_FADE_OUT_DURATION);
+function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration) {
+    fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_DURATION);
+    stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_DURATION);
+    fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_DURATION);
+    typewriterDuration = (typewriterDuration !== undefined ? typewriterDuration : 0);
 
     const fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
 
-    setMessageAndFade(statusMessage, fade);
+    setMessageAndFade(statusMessage, fade, typewriterDuration);
 }
 
 function redrawMessage() {
