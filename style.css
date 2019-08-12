@@ -35,26 +35,23 @@ canvas {
  *  MENU
  */
 
-#menu-container {
-    position: relative;
+#menu-outer {
+    display: flex;
     width: 100%;
     height: 100%;
 }
 
 #menu {
-    z-index: 5;
+    /* The Javascript will decide when to display the menu */
     display: none;
-    position: absolute;
-    max-width: 600px;
-    margin-top: 200px;
 
-    left: 50%;
-    -ms-transform: translate(-50%, 0);
-    transform: translate(-50%, 0);
+    z-index: 5;
+    margin: auto;
+    max-width: 470px;
 }
 
 #title {
-    font-size: 60px;
+    font-size: 75px;
     text-align: center;
     
     padding: 20px;
@@ -62,22 +59,67 @@ canvas {
 }
 
 .menu-button {
+    padding: 4px;
+    padding-top: 12px;
+    margin-bottom: 20px;
+    height: 50px;
+    line-height: 50px;
+
     color: black;
     font-size: 40px;
     text-align: center;
+    text-decoration: none;
 
-    padding: 4px;
-    padding-top: 12px;
-    margin-bottom: 10px;
-
-    background: url("res/wood.png") repeat;
-    border-radius: 20px;
+    border-radius: 10px;
     box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+    background: url(res/wood.png) repeat;
+}
+
+#play {
+    font-size: 50px;
+    padding: 0;
+    height: 80px;
+    line-height: 80px;
+
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+
+    margin-bottom: 50px;
+}
+
+#play span {
+    padding-top: 20px;
+    padding-bottom: 12px;
+    padding-left: 50px;
+    padding-right: 50px;
+
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+    background: url(res/wood.png) repeat;
 }
 
 .menu-button:hover {
     color: beige;
     cursor: pointer;
+}
+
+.menu-button img {
+    height: 70px;
+    width: auto;
+    vertical-align: middle;
+    margin-left: 20px;
+    margin-right: 20px;
+
+    transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
+}
+
+.menu-button:hover img {
+    height: 80px;
+    margin-left: 15px;
+    margin-right: 15px;
+
+    transition: all 0.2s ease-in-out;
 }
 
 
