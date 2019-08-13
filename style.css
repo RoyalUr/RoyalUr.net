@@ -266,39 +266,34 @@ canvas {
 /*
  *  EXIT BUTTON
  */
-.exit-div {
-    width: 50px;
-    height: 50px;
+
+#exit {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+
+    direction: rtl;
+    overflow: hidden;
+
+    width: 60px;
+    height: 60px;
 
     transition: width 0.2s ease-in-out;
 }
 
-.exit-div:hover {
+#exit:hover {
     cursor: pointer;
     width: 270px;
 
     transition: width 0.2s ease-in-out;
 }
 
-.exit-outer, .exit-inner {
-    border-radius: 25px;
-}
-
-.exit-outer {
-    margin: 10px;
-    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
-}
-
-.exit-inner {
-    background: rgb(220, 50, 50);
-    box-shadow: inset 0 0 25px 0 rgba(0, 0, 0, 0.6);
-    overflow: hidden;
-}
-
 .exit-content {
     width: 270px;
-    height: 50px;
-    line-height: 50px;
+    height: 60px;
+    line-height: 60px;
 }
 
 .exit-content svg, .exit-content span {
@@ -307,15 +302,15 @@ canvas {
 }
 
 .exit-content svg {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     vertical-align: top;
 }
 
 .exit-content span {
-    padding-top: 4px;
-    margin-left: 12px;
-    margin-right: 12px;
+    padding-top: 2px;
+    margin-left: 4px;
+    margin-right: 4px;
     font-size: 34px;
     font-weight: 700;
     color: black;
@@ -327,27 +322,14 @@ canvas {
 }
 
 .exit-content svg line {
-    stroke: rgb(50, 0, 0);
-    stroke-width: 20;
+    stroke: black;
     stroke-linecap: round;
-    transition: all 0.2s ease-in-out;
+
+    stroke-width: 25;
+    transition: stroke-width 0.2s ease-in-out;
 }
 
 .exit-content:hover svg line {
-    stroke: black;
-    stroke-width: 25;
-    transition: all 0.2s ease-in-out;
-}
-
-.exit-outer.exit-tl {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-.exit-outer.exit-tr {
-    position: absolute;
-    direction: rtl;
-    right: 0;
-    top: 0;
+    stroke-width: 30;
+    transition: stroke-width 0.2s ease-in-out;
 }

@@ -4,7 +4,8 @@
 
 const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
-      learnButton = document.getElementById("learn");
+      learnButton = document.getElementById("learn"),
+      exitButton = document.getElementById("exit");
 
 function redrawMenu() {
     menuDiv.style.opacity = menuState.menuFade.get();
@@ -26,6 +27,7 @@ function redrawMenu() {
     boardCanvas.style.opacity = one;
     tilesCanvas.style.opacity = one;
     diceCanvas.style.opacity = two;
+    exitButton.style.opacity = two;
     leftPlayerRenderTarget.scoreCanvas.style.opacity = two;
     leftPlayerRenderTarget.tilesCanvas.style.opacity = two;
     rightPlayerRenderTarget.scoreCanvas.style.opacity = two;
@@ -984,7 +986,7 @@ function redraw() {
     redrawMessage();
 
     updateElementVisibilities([
-        menuDiv, boardCanvas, tilesCanvas,
+        menuDiv, boardCanvas, tilesCanvas, exitButton,
         leftPlayerRenderTarget.tilesCanvas,
         leftPlayerRenderTarget.scoreCanvas,
         rightPlayerRenderTarget.tilesCanvas,

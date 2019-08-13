@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="style.css">
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.png"/>
     </head>
-    <a>
+    <body>
         <!-- MENU -->
         <div id="menu-outer">
             <div id="menu">
@@ -49,16 +49,6 @@
             <div id="message" class="message"></div>
         </div>
 
-        <!-- SCRIPTS -->
-        <script src="js/lib/reconnecting-websocket.min.js"></script>
-        <script src="js/utils.js"></script>
-        <script src="js/resources.js"></script>
-        <script src="js/model.js"></script>
-        <script src="js/render.js"></script>
-        <script src="js/client.js"></script>
-        <script src="js/packets.js"></script>
-        <script src="js/network.js"></script>
-
         <!-- CREDITS -->
         <div id="credits">
             <!-- Twitter button will be placed here after other content is loaded -->
@@ -70,11 +60,21 @@
             </div>
         </div>
 
-        <!-- TOP-RIGHT EXIT BUTTON -->
-        <a href="#"><div class="exit-div exit-outer exit-tr"><div class="exit-div exit-inner"><div class="exit-content">
+        <!-- EXIT BUTTON -->
+        <a href="#"><div id="exit"><div class="exit-content">
             <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='-70 -70 240 240'>
                 <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
             </svg><span>Exit Game</span>
-        </div></div></div></a>
+        </div></div></a>
+
+        <!-- SCRIPTS -->
+        <script src="js/lib/reconnecting-websocket.min.js"></script>
+        <script src="js/utils.js"></script>
+        <script src="js/resources.js"></script>
+        <script src="js/model.js"></script>
+        <script src="js/render.js"></script>
+        <script src="js/client.js"></script>
+        <script src="js/packets.js"></script>
+        <script src="js/network.js"></script>
     </body>
 </html>
