@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="style.css">
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.png"/>
     </head>
-    <body>
+    <a>
         <!-- MENU -->
         <div id="menu-outer">
             <div id="menu">
@@ -20,9 +20,11 @@
                     <img src="res/darkTile.png"  alt="play"/>
                 </div>
 
-                <div id="learn" class="menu-button">Learn</div>
+                <a href="https://youtu.be/WZskjLq040I?t=222" target="_blank" style="text-decoration: none;">
+                    <div id="learn" class="menu-button">Learn</div>
+                </a>
 
-                <a href="https://www.youtube.com/watch?v=WZskjLq040I" target="_blank" style="text-decoration: none;">
+                <a href="https://youtu.be/WZskjLq040I" target="_blank" style="text-decoration: none;">
                     <div id="watch" class="menu-button">Watch</div>
                 </a>
             </div>
@@ -51,6 +53,7 @@
         <script src="js/lib/reconnecting-websocket.min.js"></script>
         <script src="js/utils.js"></script>
         <script src="js/resources.js"></script>
+        <script src="js/model.js"></script>
         <script src="js/render.js"></script>
         <script src="js/client.js"></script>
         <script src="js/packets.js"></script>
@@ -66,5 +69,12 @@
                 <a href="https://twitter.com/soth_dev">Paddy Lamont</a>
             </div>
         </div>
+
+        <!-- TOP-RIGHT EXIT BUTTON -->
+        <a href="#"><div class="exit-div exit-outer exit-tr"><div class="exit-div exit-inner"><div class="exit-content">
+            <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='-70 -70 240 240'>
+                <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
+            </svg><span>Exit Game</span>
+        </div></div></div></a>
     </body>
 </html>

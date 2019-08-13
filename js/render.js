@@ -6,57 +6,6 @@ const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
       learnButton = document.getElementById("learn");
 
-const menuState = {
-    onMenu: true,
-    inGame: false,
-
-    menuFade: createFade(0.5),
-    boardFade: createFade(1),
-
-    gameSearchFade: createFade(2, 0.5)
-};
-menuState.menuFade.visible();
-
-function setOnMenu(onMenu, hasty) {
-    menuState.onMenu = onMenu;
-
-    const fadeOverride = (hasty ? 0 : undefined);
-
-    if (onMenu) {
-        menuState.menuFade.fadeIn(fadeOverride);
-    } else {
-        menuState.menuFade.fadeOut(fadeOverride);
-        setMessageAndFade("", menuState.gameSearchFade.invisible());
-
-        if (hasty) {
-            menuState.gameSearchFade.fadeIn();
-        } else {
-            setTimeout(() => {
-                if (!menuState.onMenu) {
-                    menuState.gameSearchFade.fadeIn();
-                }
-            }, 500)
-        }
-    }
-}
-
-function setInGame(inGame) {
-    menuState.inGame = inGame;
-
-    if (inGame) {
-        setMessageAndFade("Found your Game", menuState.gameSearchFade);
-        menuState.gameSearchFade.fadeOut();
-
-        setTimeout(() => {
-            if (menuState.inGame) {
-                menuState.boardFade.fadeIn();
-            }
-        }, 500)
-    } else {
-        menuState.boardFade.fadeOut();
-    }
-}
-
 function redrawMenu() {
     menuDiv.style.opacity = menuState.menuFade.get();
     networkStatus.hidden = false;
@@ -89,10 +38,6 @@ function redrawMenu() {
 // BOARD
 //
 
-const TILES_WIDTH = 3,
-      TILES_HEIGHT = 8,
-      TILES_COUNT = TILES_WIDTH * TILES_HEIGHT;
-
 const boardCanvas = document.getElementById("board"),
       boardCtx = boardCanvas.getContext("2d"),
       boardPadding = 30;
@@ -106,9 +51,12 @@ let boardCanvasWidth = NaN,
     boardWidth = NaN,
     boardHeight = NaN;
 
-function resetBoard() {
+const tileWidthRatio = 0.75;
 
-}
+let boardWithToHeightRatio = null,
+    boardTileRegions = null,
+    boardTilePositions = null,
+    tileWidth = null;
 
 function resizeBoard() {
     boardX = boardPadding;
@@ -129,34 +77,6 @@ function redrawBoard() {
     ctx.clearRect(0, 0, boardCanvasWidth, boardCanvasHeight);
     ctx.drawImage(getImageResource("board", boardCanvasWidth), boardX, boardY, boardWidth, boardHeight);
 }
-
-function isTileValid(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return x >= 0 && y >= 0 && x < TILES_WIDTH && y < TILES_HEIGHT;
-}
-
-function isTileOnBoard(x, y) {
-    if(!isTileValid(x, y))
-        return false;
-
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return x === 1 || (y !== 4 && y !== 5);
-}
-
-const tileWidthRatio = 0.75;
-
-let boardWithToHeightRatio = null,
-    boardTileRegions = null,
-    boardTilePositions = null,
-    tileWidth = null;
 
 function getTileWidth() {
     if (isNaN(boardCanvasWidth))
@@ -343,72 +263,6 @@ function canvasToTile(x, y) {
 // TILES
 //
 
-const TILE_EMPTY = 0,
-      TILE_DARK = 1,
-      TILE_LIGHT = 2;
-
-const LIGHT_PATH = [
-    [0, 4],
-    [0, 3],
-    [0, 2],
-    [0, 1],
-    [0, 0],
-    [1, 0],
-    [1, 1],
-    [1, 2],
-    [1, 3],
-    [1, 4],
-    [1, 5],
-    [1, 6],
-    [1, 7],
-    [0, 7],
-    [0, 6],
-    [0, 5]
-];
-
-const DARK_PATH = [
-    [2, 4],
-    [2, 3],
-    [2, 2],
-    [2, 1],
-    [2, 0],
-    [1, 0],
-    [1, 1],
-    [1, 2],
-    [1, 3],
-    [1, 4],
-    [1, 5],
-    [1, 6],
-    [1, 7],
-    [2, 7],
-    [2, 6],
-    [2, 5]
-];
-
-const LIGHT_START = LIGHT_PATH[0],
-      LIGHT_END = LIGHT_PATH[LIGHT_PATH.length - 1],
-      DARK_START = DARK_PATH[0],
-      DARK_END = DARK_PATH[DARK_PATH.length - 1];
-
-const LOCUS_LOCATIONS = [
-    [0, 0],
-    [2, 0],
-    [1, 3],
-    [0, 6],
-    [2, 6]
-];
-
-const tiles = [];
-{
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        const row = [];
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            row.push(0);
-        }
-        tiles.push(row);
-    }
-}
-
 const tilesCanvas = document.getElementById("tiles"),
       tilesCtx = tilesCanvas.getContext("2d");
 
@@ -418,159 +272,8 @@ let tilesWidth = NaN,
     tilesTop = NaN,
     tilesLeftOffset = NaN;
 
-let selectedTile = [-1, -1];
-
-function getTile(x, y) {
-    if(x.constructor === Array) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(x < 0 || y < 0 || x >= TILES_WIDTH || y >= TILES_HEIGHT)
-        return TILE_EMPTY;
-
-    return tiles[x][y];
-}
-
-function setTile(x, y, owner) {
-    if(x.constructor === Array) {
-        owner = y;
-        y = x[1];
-        x = x[0];
-    }
-
-    tiles[x][y] = owner;
-}
-
-function loadTileState(tileArray) {
-    assert(tileArray.length === TILES_COUNT, "Expected " + TILES_COUNT + " tiles, found " + tileArray.length);
-
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            const tile = tileArray[x + y * TILES_WIDTH];
-
-            assert(tile >= 0 && tile <= 2, "invalid tile value at (" + x + ", " + y + "). Expected 0, 1 or 2, found " + tile);
-
-            tiles[x][y] = tile;
-        }
-    }
-}
-
-function clearTiles() {
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            tiles[x][y] = TILE_EMPTY;
-        }
-    }
-}
-
-function selectTile(x, y) {
-    if(!ownPlayer.active) {
-        unselectTile();
-        return;
-    }
-
-    if(x.constructor === Array) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(x < 0 || x >= TILES_WIDTH || y < 0 || y >= TILES_HEIGHT || tiles[x][y] === TILE_EMPTY) {
-        unselectTile();
-        return;
-    }
-
-    selectedTile = [x, y];
-}
-
-function unselectTile() {
-    selectedTile = [-1, -1];
-}
-
-function isTileSelected(x, y) {
-    if(x !== undefined && y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(selectedTile[0] === -1 && selectedTile[1] === -1)
-        return false;
-
-    if(x === undefined && y === undefined)
-        return true;
-
-    return locEquals([x, y], selectedTile);
-}
-
-function getTilePath() {
-    return (lightPlayer.active ? LIGHT_PATH : DARK_PATH);
-}
-
-function getTileStart() {
-    return (lightPlayer.active ? LIGHT_START : DARK_START);
-}
-
-function getTileMoveToLocation(x, y) {
-    const path = getTilePath(),
-          diceValue = getDiceUp(),
-          index = locIndexOf(path, x, y);
-
-    if(index === -1 || index + diceValue >= path.length)
-        return null;
-
-    return path[index + diceValue];
-}
-
-function isLocusTile(x, y) {
-    return locContains(LOCUS_LOCATIONS, x, y);
-}
-
-function isStartTile(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return locEquals([x, y], getStartTile());
-}
-
-function getStartTile() {
-    return (getActivePlayer() === lightPlayer ? LIGHT_START : DARK_START);
-}
-
-function isValidMoveFrom(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(getDiceUp() === 0)
-        return false;
-
-    const to = getTileMoveToLocation(x, y);
-
-    if(to === null)
-        return false;
-
-    const toOwner = getTile(to),
-          fromOwner = (isStartTile(x, y) ? getActivePlayer().playerNo : getTile(x, y));
-
-    if (fromOwner === TILE_EMPTY || fromOwner === otherPlayer.playerNo)
-        return false;
-    if(toOwner === fromOwner)
-        return false;
-    if(toOwner === TILE_EMPTY)
-        return true;
-
-    return !isLocusTile(to);
-}
-
 const hoverWidthRatio = 1.1,
       shadowWidthRatio = hoverWidthRatio * 1.05;
-
-function resetTiles() {
-    clearTiles();
-}
 
 let tilePathAnchorTime = 0,
     tilePathLastMouseDownTime = LONG_TIME_AGO;
@@ -771,69 +474,8 @@ const scoreTileSpaceRatio = 0.9,
 const leftPlayerRenderTarget = initPlayerRenderTarget("left"),
       rightPlayerRenderTarget = initPlayerRenderTarget("right");
 
-const darkPlayer = initPlayer(1, "Dark", leftPlayerRenderTarget),
-      lightPlayer = initPlayer(2, "Light", rightPlayerRenderTarget);
-
-let ownPlayer = darkPlayer,
-    otherPlayer = lightPlayer;
-
 let scoreWidth = NaN,
     scoreHeight = NaN;
-
-function initPlayer(playerNo, name, renderTarget) {
-    return {
-        renderTarget: renderTarget,
-        renderedIdleName: null,
-        renderedActiveName: null,
-
-        playerNo: playerNo,
-        name: name,
-
-        requiresRedraw: false,
-
-        active: (playerNo === 1),
-        connected: true,
-
-        tiles: {
-            current: 7,
-            added: [],
-            removed: []
-        },
-
-        score: {
-            current: 0,
-            added: [],
-            removed: []
-        },
-
-        diceRolling: true,
-    };
-}
-
-function updatePlayerState(player, tiles, score, active) {
-    while(player.tiles.current < tiles) addTile(player);
-    while(player.tiles.current > tiles) takeTile(player);
-    while(player.score.current < score) addScore(player);
-
-    player.tiles.current = tiles;
-    player.score.current = score;
-    player.active = active;
-}
-
-function addTile(player) {
-    player.tiles.current += 1;
-    player.tiles.added.push(getTime());
-}
-
-function takeTile(player) {
-    player.tiles.current -= 1;
-    player.tiles.removed.push(getTime());
-}
-
-function addScore(player) {
-    player.score.current += 1;
-    player.score.added.push(getTime());
-}
 
 function initPlayerRenderTarget(side) {
     const tilesCanvas = document.getElementById(side + "-tiles"),
@@ -849,37 +491,15 @@ function initPlayerRenderTarget(side) {
         tilesCtx: tilesCtx,
 
         scoreCanvas: scoreCanvas,
-        scoreCtx: scoreCtx
+        scoreCtx: scoreCtx,
+
+        renderedIdleName: null,
+        renderedActiveName: null
     };
 }
 
-function setOwnPlayer(player) {
-    if(player === "light") {
-        ownPlayer = lightPlayer;
-        otherPlayer = darkPlayer;
-    } else {
-        ownPlayer = darkPlayer;
-        otherPlayer = lightPlayer;
-    }
-
-    ownPlayer.renderTarget = leftPlayerRenderTarget;
-    otherPlayer.renderTarget = rightPlayerRenderTarget;
-}
-
-function getActivePlayer() {
-    return (lightPlayer.active ? lightPlayer : darkPlayer);
-}
-
-function getPlayerState(player) {
-    return (player === "light" ? lightPlayer : darkPlayer);
-}
-
-function isAwaitingMove() {
-    return !diceActive && !diceRolling && ownPlayer.active;
-}
-
-function resetScores() {
-
+function getPlayerRenderTarget(player) {
+    return (player === ownPlayer ? leftPlayerRenderTarget : rightPlayerRenderTarget);
 }
 
 function drawName(player, isActive) {
@@ -930,8 +550,9 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
         }
     }
 
-    const tilesCtx = player.renderTarget.tilesCtx,
-          scoreCtx = player.renderTarget.scoreCtx,
+    const renderTarget = getPlayerRenderTarget(player),
+          tilesCtx = renderTarget.tilesCtx,
+          scoreCtx = renderTarget.scoreCtx,
           startTile = getStartTile();
 
     const highlightStartTile = (
@@ -948,12 +569,12 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
         player.score.current, false
     );
 
-    if(player.renderedIdleName === null || scoreWidth !== player.renderedIdleName.width) {
-        player.renderedIdleName = drawName(player, false);
-        player.renderedActiveName = drawName(player, true);
+    if(renderTarget.renderedIdleName === null || scoreWidth !== renderTarget.renderedIdleName.width) {
+        renderTarget.renderedIdleName = drawName(player, false);
+        renderTarget.renderedActiveName = drawName(player, true);
     }
 
-    const renderedName = (player.active ? player.renderedActiveName : player.renderedIdleName);
+    const renderedName = (player.active ? renderTarget.renderedActiveName : renderTarget.renderedIdleName);
     tilesCtx.drawImage(renderedName, 0, 0);
 }
 
@@ -982,56 +603,11 @@ let diceLeft = NaN,
     diceWidth = NaN,
     diceHeight = NaN;
 
-let diceActive = false,
-    diceRolling = false,
-    diceCallback = null,
-    diceValues = null;
+const lastDice = [0, 0, 0, 0],
+      diceDown = [true, true, true, true];
 
-let diceHovered = false,
-    diceRollStart = LONG_TIME_AGO,
-    diceSelectTime = LONG_TIME_AGO,
-    diceRollingValues = null,
-    diceLastChange = LONG_TIME_AGO,
-    diceSelected = 0;
-
-function startRolling(callback) {
-    diceRolling = true;
-    diceCallback = callback;
-    diceRollStart = getTime();
-    diceSelectTime = getTime() + 0.75;
-    diceValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
-    diceUpCount = 0;
-}
-
-function setWaitingForDiceRoll() {
-    diceActive = true;
-    diceHovered = false;
-    diceRolling = false;
-    diceRollStart = LONG_TIME_AGO;
-    diceSelectTime = LONG_TIME_AGO;
-    diceRollingValues = diceValues;
-    diceValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
-}
-
-function setDiceValues(values) {
-    diceActive = false;
-    diceValues = values;
-}
-
-function resetDice() {
-    diceHovered = false;
-    diceRolling = false;
-    diceRollStart = LONG_TIME_AGO;
-    diceSelectTime = LONG_TIME_AGO;
-    diceValues = null;
-    diceRollingValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
-}
+let lastDiceSound = 0,
+    lastDiceSelected = 0;
 
 function layoutDice() {
     if(ownPlayer.active) {
@@ -1045,11 +621,6 @@ function layoutDice() {
     diceCanvas.style.top = diceTop + "px";
     diceCanvas.style.left = diceLeft + "px";
 }
-
-const lastDice = [0,0,0,0],
-      diceDown = [true,true,true,true];
-let lastDiceSound = 0,
-    lastDiceSelected = 0;
 
 function redrawDice() {
     const active = (diceActive && !diceRolling && ownPlayer.active);
@@ -1189,26 +760,6 @@ function getDiceImageFromValue(diceValue, width) {
     }
 }
 
-function getDiceUp(values) {
-    if(values === undefined) {
-        values = diceValues;
-    }
-
-    if(values === undefined || values === null)
-        return 0;
-
-    let diceUp = 0;
-
-    for(let index = 0; index < values.length; ++index) {
-        if(values[index] > 3)
-            continue;
-
-        diceUp += 1;
-    }
-
-    return diceUp;
-}
-
 function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
     ctx.save();
 
@@ -1228,57 +779,6 @@ function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
 
 const networkStatusElement = document.getElementById("network-status");
 
-const networkStatus = {
-    status: "",
-    connected: false,
-
-    fade: createFade(1.0),
-    hidden: false,
-
-    dots: false,
-    lastChange: 0
-};
-
-networkStatus.fadeIn = networkStatus.fade.fadeIn;
-networkStatus.fadeOut = networkStatus.fade.fadeOut;
-
-function setNetworkStatus(status, dots) {
-    networkStatus.status = status;
-    networkStatus.connected = (status === "Connected");
-    networkStatus.fade.visible();
-    networkStatus.dots = dots;
-    networkStatus.lastChange = getTime();
-
-    return networkStatus;
-}
-
-function resetNetworkStatus() {
-    networkStatus.status = "";
-    networkStatus.fade.invisible();
-    networkStatus.dots = false;
-    networkStatus.lastChange = 0;
-}
-
-function createDots() {
-    const time = getTime() - networkStatus.lastChange,
-          dotCount = Math.floor((time * 3) % 3) + 1;
-
-    let dots = "";
-    for(let i=0; i < dotCount; ++i) {
-        dots += ".";
-    }
-
-    return dots;
-}
-
-function getNetworkStatus() {
-    let status = networkStatus.status;
-    if(networkStatus.dots) {
-        status += createDots();
-    }
-    return status;
-}
-
 function redrawNetworkStatus() {
     networkStatusElement.style.display = (networkStatus.hidden ? "none" : "block");
     networkStatusElement.style.opacity = networkStatus.fade.get();
@@ -1293,50 +793,6 @@ function redrawNetworkStatus() {
 
 const messageContainerElement = document.getElementById("message-container"),
       messageElement = document.getElementById("message");
-
-const message = {
-    message: "",
-    message_set_time: 0,
-    typewriter: 0,
-    typewriter_last_length: 0,
-    fade: createFade(0)
-};
-
-const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
-      DEFAULT_MESSAGE_STAY_DURATION     = 2,
-      DEFAULT_TYPEWRITER_CHAR_DURATION  = 0.09;
-      DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
-
-function setMessageAndFade(statusMessage, fade, typewriterDuration) {
-    message.message = statusMessage;
-    message.message_set_time = getTime();
-    message.typewriter = (typewriterDuration ? typewriterDuration : 0);
-    message.fade = fade;
-}
-
-function setMessageTypewriter(statusMessage, typewriterDuration, fadeInDuration, stayDuration, fadeOutDuration) {
-    if (typewriterDuration === undefined) {
-        typewriterDuration = DEFAULT_TYPEWRITER_CHAR_DURATION * statusMessage.length;
-    }
-
-    // We don't want the message to disappear before its completely shown
-    if (stayDuration === undefined) {
-        stayDuration = max(DEFAULT_MESSAGE_STAY_DURATION, typewriterDuration);
-    }
-
-    setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration);
-}
-
-function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration) {
-    fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_DURATION);
-    stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_DURATION);
-    fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_DURATION);
-    typewriterDuration = (typewriterDuration !== undefined ? typewriterDuration : 0);
-
-    const fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
-
-    setMessageAndFade(statusMessage, fade, typewriterDuration);
-}
 
 function redrawMessage() {
     let messageText = message.message;
@@ -1479,10 +935,8 @@ function updateFPS() {
 }
 
 function resetGame() {
-    resetBoard();
     resetTiles();
     resetDice();
-    resetScores();
     resetNetworkStatus();
 }
 
