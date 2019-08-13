@@ -298,7 +298,7 @@ function redrawTiles() {
 
     const width = getTileWidth(),
           path = getTilePath(),
-          diceValue = getDiceUp();
+          diceValue = countDiceUp();
 
     let pathTile = (isTileSelected(draggedTile) || getTile(hoveredTile) !== ownPlayer.playerNo ? selectedTile : hoveredTile);
 
@@ -468,8 +468,7 @@ function paintTile(ctx, centreLeft, centreTop, width, shadowWidth, owner, shadow
 // SCORES
 //
 
-const scoreTileSpaceRatio = 0.9,
-      scoreTileRatio = 0.8;
+const scoreTileRatio = 0.8;
 
 const leftPlayerRenderTarget = initPlayerRenderTarget("left"),
       rightPlayerRenderTarget = initPlayerRenderTarget("right");
@@ -556,7 +555,7 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
           startTile = getStartTile();
 
     const highlightStartTile = (
-        player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !diceRolling
+        player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !dice.rolling
         && (locEquals(startTile, hoveredTile) || (isTileSelected(startTile) && !isValidMoveFrom(hoveredTile)))
     );
 
@@ -593,6 +592,22 @@ function redrawScores() {
 // DICE
 //
 
+/**
+ * The time between changing the value of the rolling dice.
+ */
+const ROLLING_DICE_CHANGE_INTERVAL = 0.1;
+
+/**
+ * The time taken to select all dice.
+ */
+const DICE_SELECT_DURATION = 1;
+
+/**
+ * The time it takes for the dice to hit the ground after falling from being rolled.
+ */
+const DICE_FALL_DURATION = 0.15;
+
+
 const diceCanvas = document.getElementById("dice"),
       diceCtx = diceCanvas.getContext("2d");
 
@@ -606,7 +621,8 @@ let diceLeft = NaN,
 const lastDice = [0, 0, 0, 0],
       diceDown = [true, true, true, true];
 
-let lastDiceSound = 0,
+let diceHovered = false,
+    lastDiceSound = 0,
     lastDiceSelected = 0;
 
 function layoutDice() {
@@ -623,9 +639,9 @@ function layoutDice() {
 }
 
 function redrawDice() {
-    const active = (diceActive && !diceRolling && ownPlayer.active);
+    const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
 
-    if(active) {
+    if(canBeRolled) {
         diceCanvas.style.cursor = "pointer";
     } else {
         diceCanvas.style.cursor = "";
@@ -634,30 +650,35 @@ function redrawDice() {
     diceCtx.save();
 
     let time = getTime(),
-        animTime = time - diceRollStart,
-        selectTime = time - diceSelectTime;
+        animTime = time - dice.rollStartTime,
+        selectTime = time - dice.selectTime,
+        rollingChangeTime = time - dice.rollingValuesChangeTime;
 
-    if(diceValues === null && selectTime > 0) {
-        diceSelectTime = diceLastChange + diceRollStart;
-        diceSelected = 0;
+    // If we haven't received dice values yet, just keep waiting before selecting them
+    if(dice.values === null && selectTime > 0) {
+        dice.selectTime = dice.rollingValuesChangeTime + ROLLING_DICE_CHANGE_INTERVAL;
+        dice.selected = 0;
         selectTime = 0;
     }
 
-    if(diceRollingValues === null || (diceRolling && animTime - diceLastChange > 0.1)) {
-        diceLastChange = animTime;
-        diceSelected = clamp(Math.floor(4 * selectTime), 0, 4);
-        diceRollingValues = [randInt(1, 6), randInt(1, 6), randInt(1, 6), randInt(1, 6)];
+    // Update the values of the rolling dice, and check whether to select any dice
+    if(dice.rollingValues === null || (dice.rolling && rollingChangeTime > ROLLING_DICE_CHANGE_INTERVAL)) {
+        randomiseRollingDice();
 
-        if(lastDiceSelected !== diceSelected) {
-            lastDiceSelected = diceSelected;
-            if(diceRolling && diceSelected > 0 && diceValues[diceSelected - 1] <= 3) {
+        dice.selected = clamp(Math.floor(4 * selectTime / DICE_SELECT_DURATION), 0, 4);
+
+        // If we've selected another dice that's up, play a sound
+        if(lastDiceSelected !== dice.selected) {
+            lastDiceSelected = dice.selected;
+            if(dice.rolling && dice.selected > 0 && isDiceUp(dice.values[dice.selected - 1])) {
                 playSound("dice_select");
             }
         }
-        
-        if(diceSelected === 4) {
-            diceRolling = false;
-            diceCallback();
+
+        // If we've selected all the dice
+        if(dice.selected === 4) {
+            dice.rolling = false;
+            dice.callback();
         }
     }
 
@@ -666,12 +687,10 @@ function redrawDice() {
 
     diceCtx.clearRect(0, 0, diceWidth, diceHeight);
 
-    const diceFallTime = 0.15;
-
     for(let index = 0; index < 4; ++index) {
         const timeToSelect = (0.5 + index * 0.25) - selectTime + 0.25;
 
-        let sizeModifier = (diceRolling ? 1 : 0),
+        let sizeModifier = (dice.rolling ? 1 : 0),
             down = false;
         
         if(timeToSelect > 0 && timeToSelect < 0.5) {
@@ -681,12 +700,12 @@ function redrawDice() {
         } else if(timeToSelect <= 0) {
             down = true;
 
-            if(timeToSelect > -diceFallTime) {
-                const t = timeToSelect / (-diceFallTime);
+            if(timeToSelect > -DICE_FALL_DURATION) {
+                const t = timeToSelect / (-DICE_FALL_DURATION);
 
                 sizeModifier = 0.2 * easeOutSine(t);
-            } else if(timeToSelect > -2 * diceFallTime) {
-                const t = (timeToSelect + diceFallTime) / (-diceFallTime);
+            } else if(timeToSelect > -2 * DICE_FALL_DURATION) {
+                const t = (timeToSelect + DICE_FALL_DURATION) / (-DICE_FALL_DURATION);
 
                 sizeModifier = 0.2 * (1 - easeInSine(t));
             } else {
@@ -697,11 +716,13 @@ function redrawDice() {
         }
         
         const diceWidth = (1 + 0.2 * sizeModifier) * width,
-              diceValue = (index < diceSelected ? diceValues[index] : diceRollingValues[index]),
+              diceIsSelected = (index < dice.selected),
+              diceValue = (diceIsSelected ? dice.values[index] : dice.rollingValues[index]),
               diceImage = getDiceImageFromValue(diceValue, diceWidth),
-              diceHighlighted = (index < diceSelected && diceValue <= 3);
+              diceHighlighted = (diceIsSelected && isDiceUp(diceValue));
 
-        if(down && !diceDown[index] && timeToSelect >= -2 * diceFallTime) {
+        // Play a sound to indicate the dice has hit the ground
+        if(down && !diceDown[index] && timeToSelect >= -2 * DICE_FALL_DURATION) {
             playSound("dice_hit");
         }
         diceDown[index] = down;
@@ -710,7 +731,7 @@ function redrawDice() {
             lastDice[index] = diceValue;
             lastDiceSound = time;
 
-            if (diceRolling || (timeToSelect >= -diceFallTime && timeToSelect <= diceFallTime)) {
+            if (dice.rolling || (timeToSelect >= -DICE_FALL_DURATION && timeToSelect <= DICE_FALL_DURATION)) {
                 playSound("dice_click");
             }
         }
@@ -723,7 +744,7 @@ function redrawDice() {
     diceCtx.shadowColor = rgb(0);
     diceCtx.shadowBlur = 10;
 
-    if(active) {
+    if(canBeRolled) {
         if(diceHovered) {
             diceCtx.fillStyle = "#ddbe8f";
         } else {
@@ -733,10 +754,10 @@ function redrawDice() {
         diceCtx.fillStyle = rgb(200);
     }
 
-    diceCtx.font = (active && diceHovered ? (space * 0.6) + "px KorraFont" : (space * 0.5) + "px KorraFont");
+    diceCtx.font = (canBeRolled && diceHovered ? (space * 0.6) + "px KorraFont" : (space * 0.5) + "px KorraFont");
     diceCtx.fillText("Roll", diceWidth / 2, 0.75 * space);
 
-    const diceUpCount = (diceValues === null ? 0 : getDiceUp(diceValues.slice(0, diceSelected)));
+    const diceUpCount = (dice.values === null ? 0 : countDiceUp(dice.values.slice(0, dice.selected)));
 
     diceCtx.fillStyle = "white";
     diceCtx.font = (space * 0.8) + "px KorraFont";
@@ -795,12 +816,12 @@ const messageContainerElement = document.getElementById("message-container"),
       messageElement = document.getElementById("message");
 
 function redrawMessage() {
-    let messageText = message.message;
+    let messageText = message.text;
 
     if (message.typewriter) {
         const percentPerKey = 1 / messageText.length;
 
-        const percentUnclamped = (getTime() - message.message_set_time) / message.typewriter,
+        const percentUnclamped = (getTime() - message.text_set_time) / message.typewriter,
               percent = clamp(percentUnclamped, 0, 1);
 
         const characters = Math.floor(percent * messageText.length);

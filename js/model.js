@@ -6,12 +6,11 @@ const menuState = {
     onMenu: true,
     inGame: false,
 
-    menuFade: createFade(0.5),
+    menuFade: createFade(0.5).visible(),
     boardFade: createFade(1),
 
     gameSearchFade: createFade(2, 0.5)
 };
-menuState.menuFade.visible();
 
 function setOnMenu(onMenu, hasty) {
     menuState.onMenu = onMenu;
@@ -250,7 +249,7 @@ function getTileStart() {
 
 function getTileMoveToLocation(x, y) {
     const path = getTilePath(),
-        diceValue = getDiceUp(),
+        diceValue = countDiceUp(),
         index = locIndexOf(path, x, y);
 
     if(index === -1 || index + diceValue >= path.length)
@@ -282,7 +281,7 @@ function isValidMoveFrom(x, y) {
         x = x[0];
     }
 
-    if(getDiceUp() === 0)
+    if(countDiceUp() === 0)
         return false;
 
     const to = getTileMoveToLocation(x, y);
@@ -323,8 +322,6 @@ function initPlayer(playerNo, name) {
     return {
         playerNo: playerNo,
         name: name,
-
-        requiresRedraw: false,
 
         active: (playerNo === 1),
         connected: true,
@@ -389,7 +386,7 @@ function getPlayerState(player) {
 }
 
 function isAwaitingMove() {
-    return !diceActive && !diceRolling && ownPlayer.active;
+    return !dice.active && !dice.rolling && ownPlayer.active;
 }
 
 
@@ -398,72 +395,86 @@ function isAwaitingMove() {
 // DICE
 //
 
-let diceActive = false,
-    diceRolling = false,
-    diceCallback = null,
-    diceValues = null,
-    diceHovered = false,
-    diceRollStart = LONG_TIME_AGO,
-    diceSelectTime = LONG_TIME_AGO,
-    diceRollingValues = null,
-    diceLastChange = LONG_TIME_AGO,
-    diceSelected = 0;
+/**
+ * The time to roll the dice for before selecting their values.
+ */
+const DEFAULT_DICE_SELECT_DELAY = 0.75;
 
-function startRolling(callback) {
-    diceRolling = true;
-    diceCallback = callback;
-    diceRollStart = getTime();
-    diceSelectTime = getTime() + 0.75;
-    diceValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
+const dice = {
+    active: false,
+    rolling: false,
+
+    values: null,
+    valuesSelected: 0,
+
+    rollStartTime: LONG_TIME_AGO,
+    selectTime: LONG_TIME_AGO,
+
+    rollingValues: null,
+    rollingValuesChangeTime: LONG_TIME_AGO,
+
+    callback: null
+};
+
+function startRolling(selectDelay) {
+    selectDelay = (selectDelay !== undefined ? selectDelay : DEFAULT_DICE_SELECT_DELAY);
+
+    dice.rolling = true;
+    dice.values = null;
+    dice.valuesSelected = 0;
+    dice.rollStartTime = getTime();
+    dice.selectTime = getTime() + selectDelay;
+    dice.rollingValuesChangeTime = LONG_TIME_AGO;
 }
 
 function setWaitingForDiceRoll() {
-    diceActive = true;
-    diceHovered = false;
-    diceRolling = false;
-    diceRollStart = LONG_TIME_AGO;
-    diceSelectTime = LONG_TIME_AGO;
-    diceRollingValues = diceValues;
-    diceValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
+    dice.active = true;
+    dice.rolling = false;
+    dice.rollStartTime = LONG_TIME_AGO;
+    dice.selectTime = LONG_TIME_AGO;
+    dice.rollingValues = dice.values;
+    dice.values = null;
+    dice.valuesSelected = 0;
+    dice.rollingValuesChangeTime = LONG_TIME_AGO;
 }
 
 function setDiceValues(values) {
-    diceActive = false;
-    diceValues = values;
+    dice.active = false;
+    dice.values = values;
 }
 
 function resetDice() {
-    diceHovered = false;
-    diceRolling = false;
-    diceRollStart = LONG_TIME_AGO;
-    diceSelectTime = LONG_TIME_AGO;
-    diceValues = null;
-    diceRollingValues = null;
-    diceLastChange = LONG_TIME_AGO;
-    diceSelected = 0;
+    dice.active = false;
+    dice.rolling = false;
+    dice.values = null;
+    dice.valuesSelected = 0;
+    dice.rollStartTime = LONG_TIME_AGO;
+    dice.selectTime = LONG_TIME_AGO;
+    dice.rollingValues = null;
+    dice.rollingValuesChangeTime = LONG_TIME_AGO;
+    dice.callback = null;
 }
 
-function getDiceUp(values) {
-    if(values === undefined) {
-        values = diceValues;
-    }
+function randomiseRollingDice() {
+    dice.rollingValues = [randInt(1, 6), randInt(1, 6), randInt(1, 6), randInt(1, 6)];
+    dice.rollingValuesChangeTime = getTime();
+}
 
-    if(values === undefined || values === null)
+function isDiceUp(value) {
+    return value <= 3;
+}
+
+function countDiceUp(values) {
+    values = (values !== undefined ? values : dice.values);
+    if(values === null)
         return 0;
 
     let diceUp = 0;
-
     for(let index = 0; index < values.length; ++index) {
-        if(values[index] > 3)
-            continue;
-
-        diceUp += 1;
+        if(isDiceUp(values[index])) {
+            diceUp += 1;
+        }
     }
-
     return diceUp;
 }
 
@@ -484,16 +495,12 @@ const networkStatus = {
     lastChange: 0
 };
 
-networkStatus.fadeIn = networkStatus.fade.fadeIn;
-networkStatus.fadeOut = networkStatus.fade.fadeOut;
-
 function setNetworkStatus(status, dots) {
     networkStatus.status = status;
     networkStatus.connected = (status === "Connected");
     networkStatus.fade.visible();
     networkStatus.dots = dots;
     networkStatus.lastChange = getTime();
-
     return networkStatus;
 }
 
@@ -502,6 +509,14 @@ function resetNetworkStatus() {
     networkStatus.fade.invisible();
     networkStatus.dots = false;
     networkStatus.lastChange = 0;
+}
+
+function fadeNetworkStatusIn() {
+    networkStatus.fade.fadeIn();
+}
+
+function fadeNetworkStatusOut() {
+    networkStatus.fade.fadeOut();
 }
 
 function createDots() {
@@ -530,22 +545,22 @@ function getNetworkStatus() {
 // MESSAGES
 //
 
-const message = {
-    message: "",
-    message_set_time: 0,
-    typewriter: 0,
-    typewriter_last_length: 0,
-    fade: createFade(0)
-};
-
 const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
       DEFAULT_MESSAGE_STAY_DURATION     = 2,
       DEFAULT_TYPEWRITER_CHAR_DURATION  = 0.09,
       DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
 
+const message = {
+    text: "",
+    text_set_time: 0,
+    typewriter: 0,
+    typewriter_last_length: 0,
+    fade: createFade(0)
+};
+
 function setMessageAndFade(statusMessage, fade, typewriterDuration) {
-    message.message = statusMessage;
-    message.message_set_time = getTime();
+    message.text = statusMessage;
+    message.text_set_time = getTime();
     message.typewriter = (typewriterDuration ? typewriterDuration : 0);
     message.fade = fade;
 }

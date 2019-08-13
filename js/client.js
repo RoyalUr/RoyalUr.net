@@ -35,6 +35,7 @@ function onLearnClick() {
 }
 
 
+
 //
 // NETWORK : CONNECTING
 //
@@ -49,7 +50,8 @@ function onNetworkConnecting() {
 function onNetworkConnected() {
     resetGame();
 
-    setNetworkStatus("Connected", false).fadeOut();
+    setNetworkStatus("Connected", false);
+    fadeNetworkStatusOut();
 
     const gameID = getGameID();
     if (gameID !== null) {
@@ -60,14 +62,9 @@ function onNetworkConnected() {
 }
 
 function onNetworkDisconnect() {
-    setNetworkStatus("Lost connection", true).fadeIn();
+    setNetworkStatus("Lost connection", true);
+    fadeNetworkStatusIn();
 }
-
-
-
-//
-// NETWORK : FINDING GAME
-//
 
 
 
@@ -124,9 +121,13 @@ function onPacketState(state) {
 
     if(!state.isGameWon) {
         if(state.hasRoll) {
-            startRolling(function() {
+            if (!dice.rolling) {
+                startRolling();
+            }
+
+            dice.callback = function() {
                 setupStartTiles();
-            });
+            };
 
             setDiceValues(state.roll);
         } else {
@@ -290,7 +291,7 @@ function setupStartTiles() {
 //
 
 function onDiceClick() {
-    if(!diceActive || diceRolling || !ownPlayer.active)
+    if(!dice.active || dice.rolling || !ownPlayer.active)
         return;
 
     startRolling();

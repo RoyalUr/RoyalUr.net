@@ -66,7 +66,7 @@ function readGamePacket(packet) {
 
 function readMessagePacket(packet) {
     return {
-        message: packet.nextVarString()
+        text: packet.nextVarString()
     };
 }
 
