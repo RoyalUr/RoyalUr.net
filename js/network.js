@@ -79,21 +79,25 @@ function connectSocket() {
         console.info("Connection lost, attempting to reconnect...");
     }.bind(socket);
 
-    socket.onmessage = function() {
-        debug("Recieved packet length " + event.data.length + ": " + event.data);
-
-        const packet = readPacket(event.data);
-
-        if(packet.type in packetHandlers) {
-            packetHandlers[packet.type](packet);
-        } else {
-            console.log("Unhandled " + packet.type + " packet " + event.data);
-        }
+    socket.onmessage = function(event) {
+        receiveMessage(event.data);
     }.bind(socket);
 
     socket.onerror = function() {
 
     }.bind(socket);
+}
+
+function receiveMessage(message) {
+    const packet = readPacket(message);
+
+    debug("Recieved packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
+
+    if (packet.type in packetHandlers) {
+        packetHandlers[packet.type](packet);
+    } else {
+        console.log("Unhandled " + packet.type + " packet " + message);
+    }
 }
 
 

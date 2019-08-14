@@ -852,6 +852,214 @@ function redrawMessage() {
 }
 
 
+
+//
+// OVERLAY
+//
+
+const overlayCanvas = document.getElementById("overlay"),
+      overlayCtx = overlayCanvas.getContext("2d");
+
+function redrawOverlay() {
+    overlayCtx.clearRect(0, 0, width / 2, height / 2);
+
+    simulateFireworks();
+    simulateParticles();
+    drawParticles(overlayCtx);
+}
+
+function resizeOverlay() {
+    overlayCanvas.width = width / 3;
+    overlayCanvas.height = height / 3;
+    redrawOverlay();
+}
+
+
+
+//
+// PARTICLES
+//
+
+let particlesLastSimTime = 0;
+const particleBirthTime = [],
+      particleLifetime = [],
+      particleRadius = [],
+      particleX = [],
+      particleY = [],
+      particleVX = [],
+      particleVY = [],
+      particleAX = [],
+      particleAY = [],
+      particleR = [],
+      particleG = [],
+      particleB = [];
+
+function addParticle(lifetime, radius, x, y, vx, vy, ax, ay, r, g, b) {
+    particleBirthTime.push(getTime());
+    particleLifetime.push(lifetime);
+    particleRadius.push(radius);
+    particleX.push(x);
+    particleY.push(y);
+    particleVX.push(vx);
+    particleVY.push(vy);
+    particleAX.push(ax);
+    particleAY.push(ay);
+    particleR.push(r);
+    particleG.push(g);
+    particleB.push(b);
+}
+
+function createParticleExplosion(particleCount, x, y, speed, lifetime, red, green, blue, sphere, gravity) {
+    for (let index=0; index < particleCount; ++index) {
+        const angle = (index + Math.random()) * 360 / particleCount,
+            vl = speed * (sphere ? Math.sqrt(Math.random()) : Math.random()),
+            vx = Math.cos(angle) * vl,
+            vy = Math.sin(angle) * vl,
+            r = red + 200 * (Math.random() - 0.5),
+            g = green + 200 * (Math.random() - 0.5),
+            b = blue + 200 * (Math.random() - 0.5);
+
+        addParticle(lifetime, 1, x, y, vx, vy, 0, (gravity ? 200 : 0), r, g, b);
+    }
+}
+
+function removeParticle(index) {
+    particleBirthTime.splice(index, 1);
+    particleLifetime.splice(index, 1);
+    particleRadius.splice(index, 1);
+    particleX.splice(index, 1);
+    particleY.splice(index, 1);
+    particleVX.splice(index, 1);
+    particleVY.splice(index, 1);
+    particleAX.splice(index, 1);
+    particleAY.splice(index, 1);
+    particleR.splice(index, 1);
+    particleG.splice(index, 1);
+    particleB.splice(index, 1);
+}
+
+function simulateParticles() {
+    const time = getTime(),
+          dt = time - particlesLastSimTime;
+
+    particlesLastSimTime = time;
+
+    let index = particleBirthTime.length;
+    while (index > 0) {
+        index -= 1;
+
+        const age = (time - particleBirthTime[index]) / particleLifetime[index];
+        if (age > 1) {
+            removeParticle(index);
+            continue;
+        }
+
+        const x = particleX[index] + dt * particleVX[index],
+              y = particleY[index] + dt * particleVY[index],
+              vx = particleVX[index] + dt * particleAX[index],
+              vy = particleVY[index] + dt * particleAY[index];
+
+        particleX[index] = x;
+        particleY[index] = y;
+        particleVX[index] = vx;
+        particleVY[index] = vy;
+    }
+}
+
+function drawParticles(ctx) {
+    const time = getTime();
+
+    for (let index = 0; index < particleBirthTime.length; ++index) {
+        const age = (time - particleBirthTime[index]) / particleLifetime[index],
+            x = particleX[index],
+            y = particleY[index],
+            radius = particleRadius[index],
+            red = particleR[index],
+            green = particleG[index],
+            blue = particleB[index];
+
+        if (age > 1)
+            continue;
+
+        ctx.fillStyle = "rgba(" + red + ", " + green + ", " + blue + ", " + Math.sqrt(1 - age) + ")";
+        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }
+}
+
+
+
+//
+// FIREWORKS
+//
+
+let fireworksLastSimTime = 0,
+    fireworks = [];
+
+function createFirework(x1, y1, x2, y2, speed, r, g, b) {
+    const dx = x2 - x1,
+        dy = y2 - y1,
+        dl = Math.sqrt(dx*dx + dy*dy);
+
+    fireworks.push({
+        createTime: getTime(),
+        lifetime: dl / speed,
+        x: x1,
+        y: y1,
+        dx: x2 - x1,
+        dy: y2 - y1,
+        r: r,
+        g: g,
+        b: b
+    });
+}
+
+function removeFirework(index) {
+    fireworks.splice(index, 1);
+}
+
+function simulateFireworks() {
+    const time = getTime();
+
+    let index = fireworks.length;
+    while (index > 0) {
+        index -= 1;
+
+        const firework = fireworks[index],
+            age = (time - firework.createTime) / firework.lifetime,
+            lastAge = (fireworksLastSimTime - firework.createTime) / firework.lifetime,
+            x = firework.x + age * firework.dx,
+            y = firework.y + age * firework.dy,
+            dx = (age - lastAge) * firework.dx,
+            dy = (age - lastAge) * firework.dy,
+            dl = Math.sqrt(dx*dx + dy*dy);
+
+        if (age > 1) {
+            createParticleExplosion(
+                360, x, y,
+                150, 1.5,
+                firework.r, firework.g, firework.b,
+                true, true
+            );
+            removeFirework(index);
+            continue;
+        }
+
+        for (let index = dl - 1; index >= 0; --index) {
+            const prop = index / dl;
+            createParticleExplosion(
+                2, x - prop * dx, y - prop * dy,
+                30, 0.5,
+                255, 255, 255,
+                false, false
+            );
+        }
+    }
+
+    fireworksLastSimTime = time;
+}
+
+
+
 //
 // GAME SETUP
 //
@@ -984,6 +1192,7 @@ function redraw() {
     redrawScores();
     redrawNetworkStatus();
     redrawMessage();
+    redrawOverlay();
 
     updateElementVisibilities([
         menuDiv, boardCanvas, tilesCanvas, exitButton,
@@ -1084,5 +1293,6 @@ function resize() {
         layoutDice();
     }
 
+    resizeOverlay();
     redrawBoard();
 }

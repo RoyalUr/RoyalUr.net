@@ -91,9 +91,9 @@ function onPacketGame(game) {
 }
 
 function onPacketMessage(data) {
-    console.log("message: " + data.message);
+    console.log("message: " + data.text);
 
-    setMessageTypewriter(data.message);
+    setMessageTypewriter(data.text);
 }
 
 function onPacketMove(move) {
