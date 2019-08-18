@@ -198,9 +198,15 @@ function playSound(key, onComplete, overrideTabActive) {
         element.onended = onComplete;
         const playPromise = element.play();
         
-        // It can sometimes be stopped from playing on page load
+        // It can sometimes be stopped from playing randomly
         if (playPromise !== undefined) {
-            playPromise.catch(onComplete);
+            playPromise.catch(() => {
+                element.play().catch(() => {
+                    if (onComplete) {
+                        onComplete();
+                    }
+                });
+            });
         }
         return element;
     }
