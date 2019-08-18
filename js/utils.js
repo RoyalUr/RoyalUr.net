@@ -183,6 +183,10 @@ function clamp(num, min, max) {
     return (num < min ? min : (num > max ? max : num));
 }
 
+function randElement(array) {
+    return array[randInt(array.length)];
+}
+
 function rand(min, max) {
     if(min === undefined)
         return Math.random();

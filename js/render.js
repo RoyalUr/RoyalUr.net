@@ -494,6 +494,7 @@ function initPlayerRenderTarget(side) {
         scoreCanvas: scoreCanvas,
         scoreCtx: scoreCtx,
 
+        renderedNameString: null,
         renderedIdleName: null,
         renderedActiveName: null
     };
@@ -515,26 +516,42 @@ function drawName(player, isActive) {
             ctx.font = Math.round(tileWidth * 0.75) + "px KorraFont";
 
             if (isActive) {
+                // ctx.shadowBlur = 5;
+                // ctx.shadowColor = rgb(255, 255, 255);
+                ctx.save();
                 ctx.shadowBlur = 5;
-                ctx.shadowColor = rgb(255, 255, 255);
+                ctx.shadowColor = rgba(255, 255, 255, 0.7);
                 ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
-                ctx.shadowBlur = 0;
-                ctx.shadowBlur = rgba(0);
+                ctx.restore();
             }
 
-            ctx.fillStyle = rgba(255, 255, 255, 0.3);
-            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth + offset);
+            // ctx.fillStyle = rgba(255, 255, 255, 0.3);
+            // ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth + offset);
+            //
+            // ctx.fillStyle = rgba(0, 0, 0, 0.7);
+            // ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth - offset);
 
-            ctx.fillStyle = rgba(0, 0, 0, 0.7);
-            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth - offset);
-
-            ctx.fillStyle = rgb(0);
+            ctx.fillStyle = rgb(255);
             ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
         });
 
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = (isActive ? 1.0 : 0.8);
         ctx.drawImage(text, 0, 0);
     });
+}
+
+function getRenderedPlayerName(player) {
+    const renderTarget = getPlayerRenderTarget(player);
+
+    if(renderTarget.renderedIdleName === null || renderTarget.renderedActiveName === null
+        || scoreWidth !== renderTarget.renderedIdleName.width || player.name !== renderTarget.renderedNameString) {
+
+        renderTarget.renderedIdleName = drawName(player, false);
+        renderTarget.renderedActiveName = drawName(player, true);
+        renderTarget.renderedNameString = player.name;
+    }
+
+    return (player.active ? renderTarget.renderedActiveName : renderTarget.renderedIdleName);
 }
 
 function redrawPlayerScores(player, tilesLeft, scoreLeft) {
@@ -570,13 +587,7 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
         player.score.current, false
     );
 
-    if(renderTarget.renderedIdleName === null || scoreWidth !== renderTarget.renderedIdleName.width) {
-        renderTarget.renderedIdleName = drawName(player, false);
-        renderTarget.renderedActiveName = drawName(player, true);
-    }
-
-    const renderedName = (player.active ? renderTarget.renderedActiveName : renderTarget.renderedIdleName);
-    tilesCtx.drawImage(renderedName, 0, 0);
+    tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
 }
 
 function redrawScores() {
@@ -860,8 +871,11 @@ function redrawMessage() {
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
 
+let overlayWidth = NaN,
+    overlayHeight = NaN;
+
 function redrawOverlay() {
-    overlayCtx.clearRect(0, 0, width / 2, height / 2);
+    overlayCtx.clearRect(0, 0, overlayWidth, overlayHeight);
 
     simulateFireworks();
     simulateParticles();
@@ -869,9 +883,64 @@ function redrawOverlay() {
 }
 
 function resizeOverlay() {
-    overlayCanvas.width = width / 3;
-    overlayCanvas.height = height / 3;
+    overlayWidth = Math.round(width / 3);
+    overlayHeight = Math.round(height / 3);
+
+    overlayCanvas.width = overlayWidth;
+    overlayCanvas.height = overlayHeight;
+
     redrawOverlay();
+}
+
+
+
+//
+// WIN SCREEN
+//
+
+const MIN_WIN_FIREWORK_PERIOD = 2.0,
+      MAX_WIN_FIREWORK_PERIOD = 4.0,
+      WIN_FIREWORK_REGIONS = [
+          {"min_x": 0.15, "max_x": 0.35, "min_y": 0.15, "max_y": 0.5},
+          {"min_x": 0.65, "max_x": 0.85, "min_y": 0.15, "max_y": 0.5}
+      ],
+      WIN_FIREWORK_SPEED = 300;
+
+const nextFireworkTimes = []; {
+    for (let index = 0; index < WIN_FIREWORK_REGIONS.length; ++index) {
+        nextFireworkTimes.push(0);
+    }
+}
+
+function redrawWinScreen() {
+    if (menuState.isGameWon) {
+        spawnWinFireworks();
+    }
+}
+
+function spawnWinFireworks() {
+    for (let index = 0; index < WIN_FIREWORK_REGIONS.length; ++index) {
+        const timeToFirework = nextFireworkTimes[index] - getTime();
+
+        if (timeToFirework > 0)
+            continue;
+
+        const timeToNext = rand(MIN_WIN_FIREWORK_PERIOD, MAX_WIN_FIREWORK_PERIOD);
+        nextFireworkTimes[index] = getTime() + timeToNext;
+
+        const region = WIN_FIREWORK_REGIONS[index],
+              x1 = overlayWidth * rand(region.min_x, region.max_x),
+              y1 = overlayHeight,
+              x2 = overlayWidth * rand(region.min_x, region.max_x),
+              y2 = overlayHeight * rand(region.min_y, region.max_y);
+
+        // We want to cut out hues from 0.61 to 0.78 as they are too dark
+        let hue = rand(1 - (0.78 - 0.61));
+        hue = (hue <= 0.61 ? hue : hue + (0.78 - 0.61));
+        const colour = convertHSVtoRGB(hue, 1, 1);
+
+        createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED, colour.r, colour.g, colour.b);
+    }
 }
 
 
@@ -879,6 +948,8 @@ function resizeOverlay() {
 //
 // PARTICLES
 //
+
+const MAX_DT = 0.2;
 
 let particlesLastSimTime = 0;
 const particleBirthTime = [],
@@ -912,14 +983,11 @@ function addParticle(lifetime, radius, x, y, vx, vy, ax, ay, r, g, b) {
 function createParticleExplosion(particleCount, x, y, speed, lifetime, red, green, blue, sphere, gravity) {
     for (let index=0; index < particleCount; ++index) {
         const angle = (index + Math.random()) * 360 / particleCount,
-            vl = speed * (sphere ? Math.sqrt(Math.random()) : Math.random()),
-            vx = Math.cos(angle) * vl,
-            vy = Math.sin(angle) * vl,
-            r = red + 200 * (Math.random() - 0.5),
-            g = green + 200 * (Math.random() - 0.5),
-            b = blue + 200 * (Math.random() - 0.5);
+              vl = speed * (sphere ? Math.sqrt(Math.random()) : Math.random()),
+              vx = Math.cos(angle) * vl,
+              vy = Math.sin(angle) * vl;
 
-        addParticle(lifetime, 1, x, y, vx, vy, 0, (gravity ? 200 : 0), r, g, b);
+        addParticle(lifetime * (0.6 * rand() + 0.7) , 1, x, y, vx, vy, 0, (gravity ? 200 : 0), red, green, blue);
     }
 }
 
@@ -940,29 +1008,27 @@ function removeParticle(index) {
 
 function simulateParticles() {
     const time = getTime(),
-          dt = time - particlesLastSimTime;
+          dt = min(MAX_DT, time - particlesLastSimTime);
 
     particlesLastSimTime = time;
+
+    let removed = 0;
 
     let index = particleBirthTime.length;
     while (index > 0) {
         index -= 1;
 
         const age = (time - particleBirthTime[index]) / particleLifetime[index];
-        if (age > 1) {
+        if (age >= 1) {
+            removed += 1;
             removeParticle(index);
             continue;
         }
 
-        const x = particleX[index] + dt * particleVX[index],
-              y = particleY[index] + dt * particleVY[index],
-              vx = particleVX[index] + dt * particleAX[index],
-              vy = particleVY[index] + dt * particleAY[index];
-
-        particleX[index] = x;
-        particleY[index] = y;
-        particleVX[index] = vx;
-        particleVY[index] = vy;
+        particleX[index] = particleX[index] + dt * particleVX[index];
+        particleY[index] = particleY[index] + dt * particleVY[index];
+        particleVX[index] =  particleVX[index] + dt * particleAX[index];
+        particleVY[index] = particleVY[index] + dt * particleAY[index];
     }
 }
 
@@ -971,17 +1037,19 @@ function drawParticles(ctx) {
 
     for (let index = 0; index < particleBirthTime.length; ++index) {
         const age = (time - particleBirthTime[index]) / particleLifetime[index],
-            x = particleX[index],
-            y = particleY[index],
-            radius = particleRadius[index],
-            red = particleR[index],
-            green = particleG[index],
-            blue = particleB[index];
+              x = particleX[index],
+              y = particleY[index],
+              radius = particleRadius[index],
+              red = particleR[index],
+              green = particleG[index],
+              blue = particleB[index];
 
         if (age > 1)
             continue;
 
-        ctx.fillStyle = "rgba(" + red + ", " + green + ", " + blue + ", " + Math.sqrt(1 - age) + ")";
+        const alpha = (0.25 * Math.cos(12 * Math.PI * age * age * age * age) + 0.75) * Math.sqrt(1 - age);
+
+        ctx.fillStyle = rgba(red, green, blue, alpha);
         ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
     }
 }
@@ -1009,7 +1077,8 @@ function createFirework(x1, y1, x2, y2, speed, r, g, b) {
         dy: y2 - y1,
         r: r,
         g: g,
-        b: b
+        b: b,
+        rocket_sound: playSound("firework_rocket")
     });
 }
 
@@ -1034,9 +1103,15 @@ function simulateFireworks() {
             dl = Math.sqrt(dx*dx + dy*dy);
 
         if (age > 1) {
+            playSound("firework_explode");
+            if (firework.rocket_sound && isAudioPlaying(firework.rocket_sound)) {
+                firework.rocket_sound.pause();
+                firework.rocket_sound.currentTime = 0;
+            }
+
             createParticleExplosion(
                 360, x, y,
-                150, 1.5,
+                120, 1,
                 firework.r, firework.g, firework.b,
                 true, true
             );
@@ -1192,6 +1267,7 @@ function redraw() {
     redrawScores();
     redrawNetworkStatus();
     redrawMessage();
+    redrawWinScreen();
     redrawOverlay();
 
     updateElementVisibilities([

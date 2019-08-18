@@ -5,15 +5,14 @@ const ZERO_CHAR_CODE = "0".charCodeAt(0),
 // INCOMING
 //
 
-const incomingPackets = [
+const incomingPacketTypes = [
     "error",
     "setid",
     "invalid_game",
     "game",
     "message",
     "state",
-    "move",
-    "win"
+    "move"
 ];
 
 const incomingPacketReaders = {
@@ -23,8 +22,7 @@ const incomingPacketReaders = {
     "game": readGamePacket,
     "message": readMessagePacket,
     "state": readStatePacket,
-    "move": readMovePacket,
-    "win": readWinPacket
+    "move": readMovePacket
 };
 
 function readPacket(data) {
@@ -101,20 +99,14 @@ function readMovePacket(packet) {
     };
 }
 
-function readWinPacket(packet) {
-    return {
-        winner: packet.nextPlayer()
-    };
-}
-
 function PacketIn(data) {
-    assert(data.length > 0, "data must contain initial type character")
+    assert(data.length > 0, "data must contain initial type character");
 
     const typeId = data.charCodeAt(0) - ZERO_CHAR_CODE;
 
-    assert(typeId >= 0 && typeId <= incomingPackets.length, "invalid typeId " + typeId + "(" + data.charAt(0) + ")");
+    assert(typeId >= 0 && typeId <= incomingPacketTypes.length, "invalid typeId " + typeId + "(" + data.charAt(0) + ")");
 
-    this.type = incomingPackets[typeId];
+    this.type = incomingPacketTypes[typeId];
     this.data = data;
     this.index = 1;
 
@@ -123,7 +115,7 @@ function PacketIn(data) {
         this.index = this.data.length;
 
         return this.data.substring(from, this.index);
-    }
+    };
 
     this.nextChar = function() {
         assert(this.index < this.data.length, "there are no characters left in the packet");
@@ -224,7 +216,7 @@ function PacketIn(data) {
 // OUTGOING
 //
 
-const outgoingPackets = [
+const outgoingPacketTypes = [
     "open",
     "reopen",
     "join_game",
@@ -235,7 +227,7 @@ const outgoingPackets = [
 ];
 
 function PacketOut(type) {
-    const typeId = outgoingPackets.indexOf(type);
+    const typeId = outgoingPacketTypes.indexOf(type);
 
     assert(typeId >= 0, "unknown type " + type);
 
@@ -247,7 +239,7 @@ function PacketOut(type) {
     }.bind(this);
 
     this.writeDigit = function(digit) {
-        assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive")
+        assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive");
 
         this.write(digit);
     }.bind(this);
@@ -286,7 +278,7 @@ function writeDiceRollPacket() {
 }
 
 function writeMovePacket(from) {
-    assert(from.length === 2, "from must be a length 2 array")
+    assert(from.length === 2, "from must be a length 2 array");
 
     const packet = new PacketOut("move");
 

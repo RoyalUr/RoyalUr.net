@@ -114,8 +114,7 @@ const packetHandlers = {
     "game": onPacketGame,
     "message": onPacketMessage,
     "state": onPacketState,
-    "move": onPacketMove,
-    "win": onPacketWin
+    "move": onPacketMove
 };
 
 function onPacketError(data) {

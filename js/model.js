@@ -5,6 +5,7 @@
 const menuState = {
     onMenu: true,
     inGame: false,
+    isGameWon: false,
 
     menuFade: createFade(0.5).visible(),
     boardFade: createFade(1),
@@ -18,6 +19,7 @@ function setOnMenu(onMenu, hasty) {
     const fadeOverride = (hasty ? 0 : undefined);
 
     if (onMenu) {
+        setIsGameWon(false);
         menuState.menuFade.fadeIn(fadeOverride);
     } else {
         menuState.menuFade.fadeOut(fadeOverride);
@@ -48,8 +50,13 @@ function setInGame(inGame) {
             }
         }, 500)
     } else {
+        setIsGameWon(false);
         menuState.boardFade.fadeOut();
     }
+}
+
+function setIsGameWon(isGameWon) {
+    menuState.isGameWon = isGameWon;
 }
 
 

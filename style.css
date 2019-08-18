@@ -14,7 +14,8 @@
 body, html {
     width: 100%;
     height: 100%;
-    background: url("res/wood-dark.png") repeat;
+    background: url("res/wood-blue-1.png") repeat;
+    background-size: 300px;
 }
 
 html {
@@ -56,6 +57,9 @@ canvas {
     
     padding: 20px;
     margin-bottom: 20px;
+
+    color: white;
+    text-shadow: black 5px 5px 5px;
 }
 
 .menu-button {
@@ -72,7 +76,7 @@ canvas {
 
     border-radius: 10px;
     box-shadow: 0 0 10px 0 rgb(0, 0, 0);
-    background: url(res/wood.png) repeat;
+    background: url(res/old-wood-light.png) repeat;
 }
 
 #play {
@@ -96,7 +100,7 @@ canvas {
 
     border-radius: 10px;
     box-shadow: 0 0 10px 0 rgb(0, 0, 0);
-    background: url(res/wood.png) repeat;
+    background: url(res/old-wood-light.png) repeat;
 }
 
 .menu-button:hover {
@@ -138,7 +142,7 @@ canvas {
  */
 
 #tiles {
-    z-index: 4;
+    z-index: 3;
 }
 
 
@@ -158,7 +162,7 @@ canvas {
  */
 
 #dice {
-    z-index: 3;
+    z-index: 4;
 }
 
 
@@ -250,19 +254,14 @@ canvas {
     padding-bottom: 6px;
 
     font-family: KorraFont, sans-serif;
-    color: white;
-
-    background: url("res/wood.png") repeat;
-    border-top-right-radius: 10px;
-    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
+    font-size: 20px;
+    text-shadow: black 0 0 10px;
 }
 
 #created-by a {
     display: inline-block;
-    margin-left: 2px;
-
     text-decoration: none;
-    color: rgb(85, 26, 139);
+    color: white;
     cursor: pointer;
 }
 
@@ -331,16 +330,16 @@ canvas {
     margin-right: 4px;
     font-size: 34px;
     font-weight: 700;
-    color: black;
+    color: white;
     user-select: none;
 }
 
 .exit-content:active span {
-    color: rgb(80, 20, 20);
+    color: rgb(200, 200, 255);
 }
 
 .exit-content svg line {
-    stroke: black;
+    stroke: white;
     stroke-linecap: round;
 
     stroke-width: 25;

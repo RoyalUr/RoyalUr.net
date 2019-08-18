@@ -84,6 +84,19 @@ const audioResources = [
     {
         key: "typewriter_end",
         url: "res/audio/typewriter_end.wav",
+    },
+
+    // Firework sounds
+    {
+        key: "firework_explode",
+        url: "res/audio/firework_explode.wav",
+        instances: 4
+    },
+    {
+        key: "firework_rocket",
+        url: "res/audio/firework_rocket.wav",
+        volume: 0.1,
+        instances: 4
     }
 ];
 
@@ -178,7 +191,7 @@ function playSound(key, onComplete, overrideTabActive) {
         }
 
         if(element === undefined) {
-            error("Ran out of audio instances to play the sound \"" + key + "\"");
+            console.error("Ran out of audio instances to play the sound \"" + key + "\"");
             return;
         }
         
@@ -187,9 +200,9 @@ function playSound(key, onComplete, overrideTabActive) {
         
         // It can sometimes be stopped from playing on page load
         if (playPromise !== undefined) {
-            playPromise.catch(() => {element.play();});
+            playPromise.catch(onComplete);
         }
-        return;
+        return element;
     }
 
     error("Unable to find the sound \"" + key + "\"");

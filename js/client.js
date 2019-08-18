@@ -119,6 +119,8 @@ function onPacketState(state) {
     updatePlayerState(darkPlayer, state.dark.tiles, state.dark.score, state.currentPlayer === "dark");
     updatePlayerState(lightPlayer, state.light.tiles, state.light.score, state.currentPlayer === "light");
 
+    setIsGameWon(state.isGameWon);
+
     if(!state.isGameWon) {
         if(state.hasRoll) {
             if (!dice.rolling) {
@@ -133,6 +135,13 @@ function onPacketState(state) {
         } else {
             setWaitingForDiceRoll();
         }
+    } else {
+        const player = (state.currentPlayer === "light" ? lightPlayer : darkPlayer);
+
+        setMessageTypewriter(
+            player.name + " wins!", undefined,
+            0.25, -1, -1
+        );
     }
 
     layoutDice();
@@ -148,6 +157,8 @@ function onPacketWin(data) {
         player.name + " wins!", undefined,
         0.25, -1, -1
     );
+
+    setIsGameWon(true);
 }
 
 
