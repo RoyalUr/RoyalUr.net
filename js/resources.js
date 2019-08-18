@@ -8,34 +8,34 @@ const audioResources = [
     // Sounds when moving a tile
     {
         key: "place_1",
-        url: "res/audio/place_1.mp3"
+        url: "res/audio/place_1.mp4"
     }, {
         key: "place_2",
-        url: "res/audio/place_2.mp3"
+        url: "res/audio/place_2.mp4"
     }, {
         key: "place_3",
-        url: "res/audio/place_3.mp3"
+        url: "res/audio/place_3.mp4"
     }, {
         key: "place_4",
-        url: "res/audio/place_4.mp3"
+        url: "res/audio/place_4.mp4"
     },
 
     // Sounds when selecting a tile
     {
         key: "pickup_1",
-        url: "res/audio/pickup_1.mp3"
+        url: "res/audio/pickup_1.mp4"
     }, {
         key: "pickup_2",
-        url: "res/audio/pickup_2.mp3"
+        url: "res/audio/pickup_2.mp4"
     }, {
         key: "pickup_3",
-        url: "res/audio/pickup_3.mp3"
+        url: "res/audio/pickup_3.mp4"
     },
     
     // Sound when trying to pick up a tile that cannot be moved
     {
         key: "error",
-        url: "res/audio/error.wav",
+        url: "res/audio/error.mp4",
         volume: 0.5,
         instances: 3
     },
@@ -43,14 +43,14 @@ const audioResources = [
     // Sound when taking out an enemy tile
     {
         key: "kill",
-        url: "res/audio/kill.wav",
+        url: "res/audio/kill.mp4",
         volume: 0.5
     },
     
     // Sound when hovering over tiles
     {
         key: "hover",
-        url: "res/audio/hover.wav",
+        url: "res/audio/hover.mp4",
         volume: 0.5,
         instances: 3
     },
@@ -58,19 +58,19 @@ const audioResources = [
     // Sounds when rolling dice
     {
         key: "dice_click",
-        url: "res/audio/dice_click.mp3",
+        url: "res/audio/dice_click.mp4",
         volume: 0.5,
         instances: 5
     },
     {
         key: "dice_hit",
-        url: "res/audio/dice_hit.wav",
+        url: "res/audio/dice_hit.mp4",
         volume: 0.3,
         instances: 4
     },
     {
         key: "dice_select",
-        url: "res/audio/dice_select.mp3",
+        url: "res/audio/dice_select.mp4",
         volume: 0.3,
         instances: 4
     },
@@ -78,24 +78,25 @@ const audioResources = [
     // Sounds when a message pops up
     {
         key: "typewriter_key",
-        url: "res/audio/typewriter_key.wav",
+        url: "res/audio/typewriter_key.mp4",
         instances: 4
     },
     {
         key: "typewriter_end",
-        url: "res/audio/typewriter_end.wav",
+        url: "res/audio/typewriter_end.mp4",
     },
 
     // Firework sounds
     {
         key: "firework_explode",
-        url: "res/audio/firework_explode.wav",
+        url: "res/audio/firework_explode.mp4",
+        volume: 0.5,
         instances: 4
     },
     {
         key: "firework_rocket",
-        url: "res/audio/firework_rocket.wav",
-        volume: 0.1,
+        url: "res/audio/firework_rocket.mp4",
+        volume: 0.05,
         instances: 4
     }
 ];
@@ -257,23 +258,24 @@ function loadAudio(onComplete) {
         resource.elements = [];
         
         let instances = (resource.instances !== undefined ? resource.instances : 1);
-        countdown.count += instances;
-        
-        for(let instance = 0; instance < instances; ++instance) {
-            const element = document.createElement("audio");
+        countdown.count += 1;
+
+        const element = document.createElement("audio");
+
+        element.preload = "auto";
+        element.onloadeddata = function() {
+            countdown.count -= 1;
 
             resource.elements.push(element);
+            for (let index = 1; index < instances; ++index) {
+                resource.elements.push(element.cloneNode());
+            }
 
-            element.preload = "auto";
-            element.onloadeddata = function() {
-                countdown.count -= 1;
-
-                if(countdown.count === 0) {
-                    onComplete();
-                }
-            };
-            element.src = resource.url;
-        }
+            if(countdown.count === 0) {
+                onComplete();
+            }
+        };
+        element.src = resource.url;
     }
     
     updateAudioVolumes();

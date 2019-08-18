@@ -140,8 +140,8 @@ function onPacketState(state) {
     } else {
         const player = (state.currentPlayer === "light" ? lightPlayer : darkPlayer);
 
-        setMessageTypewriter(
-            player.name + " wins!", undefined,
+        setMessage(
+            player.name + " wins!",
             0.25, -1, -1
         );
     }
@@ -150,17 +150,6 @@ function onPacketState(state) {
 
     unselectTile();
     loadTileState(state.board);
-}
-
-function onPacketWin(data) {
-    const player = getPlayerState(data.winner);
-
-    setMessageTypewriter(
-        player.name + " wins!", undefined,
-        0.25, -1, -1
-    );
-
-    setIsGameWon(true);
 }
 
 

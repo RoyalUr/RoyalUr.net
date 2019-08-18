@@ -957,7 +957,7 @@ function spawnWinFireworks() {
 // PARTICLES
 //
 
-const MAX_DT = 0.2;
+const MAX_DT = 0.1;
 
 let particlesLastSimTime = 0;
 const particleBirthTime = [],
@@ -1103,11 +1103,12 @@ function simulateFireworks() {
 
         const firework = fireworks[index],
             age = (time - firework.createTime) / firework.lifetime,
+            effectiveAge = min(1, age),
             lastAge = (fireworksLastSimTime - firework.createTime) / firework.lifetime,
-            x = firework.x + age * firework.dx,
-            y = firework.y + age * firework.dy,
-            dx = (age - lastAge) * firework.dx,
-            dy = (age - lastAge) * firework.dy,
+            x = firework.x + effectiveAge * firework.dx,
+            y = firework.y + effectiveAge * firework.dy,
+            dx = (effectiveAge - lastAge) * firework.dx,
+            dy = (effectiveAge - lastAge) * firework.dy,
             dl = Math.sqrt(dx*dx + dy*dy);
 
         if (age > 1) {
