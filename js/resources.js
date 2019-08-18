@@ -167,10 +167,9 @@ function playSound(key, onComplete, overrideTabActive) {
     if (document.hidden && !overrideTabActive)
         return;
 
+    // Allow random choice of sound from packs
     if(audioPacks[key]) {
-        const pack = audioPacks[key];
-
-        key = pack[randInt(pack.length)];
+        key = randElement(audioPacks[key]);
     }
 
     for(let index = 0; index < audioResources.length; ++index) {
@@ -200,8 +199,9 @@ function playSound(key, onComplete, overrideTabActive) {
         
         // It can sometimes be stopped from playing randomly
         if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                element.play().catch(() => {
+            playPromise.catch((error1) => {
+                element.play().catch((error2) => {
+                    console.error("Unable to play sound " + key + " : " + error2);
                     if (onComplete) {
                         onComplete();
                     }
@@ -366,10 +366,7 @@ function loadImages(onComplete) {
                 return;
             }
 
-            setTimeout(function() {
-                createScaledImageVersions(imageResource);
-                countdown_fn();
-            }, 0);
+            setTimeout(countdown_fn, 0);
         };
 
         imageResource.image.src = imageResources[key];
@@ -387,11 +384,6 @@ function getImageAnnotation(key) {
     }
 
     return imageAnnotation;
-}
-
-function createScaledImageVersions(imageResource) {
-    // Create 6 initial down-scaled versions of the image resource
-    getImageResource(imageResource.key, imageResource.width / Math.pow(2, 6));
 }
 
 function getRawImageResource(key) {
@@ -426,7 +418,7 @@ function getImageResource(key, width) {
                 ctx.drawImage(current, 0, 0, canvas.width, canvas.height);
             });
 
-            imageResource.scaled[scaledownsDone] = next;
+            imageResource.scaled.push(next);
             current = next;
         }
     }

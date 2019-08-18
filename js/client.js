@@ -2,6 +2,8 @@
 // CLIENT
 //
 
+const debugClient = (window.location.hostname === "localhost");
+
 function getGameID() {
     if (!window.location.hash || window.location.hash === "")
         return null;
