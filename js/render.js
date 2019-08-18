@@ -1104,7 +1104,7 @@ function simulateFireworks() {
         const firework = fireworks[index],
             age = (time - firework.createTime) / firework.lifetime,
             effectiveAge = min(1, age),
-            lastAge = (fireworksLastSimTime - firework.createTime) / firework.lifetime,
+            lastAge = max(0, (fireworksLastSimTime - firework.createTime) / firework.lifetime),
             x = firework.x + effectiveAge * firework.dx,
             y = firework.y + effectiveAge * firework.dy,
             dx = (effectiveAge - lastAge) * firework.dx,
