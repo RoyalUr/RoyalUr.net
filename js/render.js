@@ -875,6 +875,14 @@ let overlayWidth = NaN,
     overlayHeight = NaN;
 
 function redrawOverlay() {
+    // If we don't have to draw to the canvas, just don't display it at all
+    if (fireworks.length === 0 && particleBirthTime.length === 0) {
+        overlayCanvas.style.display = "none";
+        return;
+    } else {
+        overlayCanvas.style.display = "";
+    }
+
     overlayCtx.clearRect(0, 0, overlayWidth, overlayHeight);
 
     simulateFireworks();
