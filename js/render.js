@@ -11,7 +11,7 @@ function redrawMenu() {
     menuDiv.style.opacity = menuState.menuFade.get();
     networkStatus.hidden = false;
 
-    if (!menuState.onMenu && !menuState.inGame) {
+    if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {
             setMessageAndFade("Searching for a Game" + createDots(), menuState.gameSearchFade);
         } else {
@@ -293,7 +293,14 @@ function updateTilePathAnchorTime() {
     tilePathAnchorTime = (tilePathAnchorTime % period) + (tilePathAnchorTime < 0 ? period : 0);
 }
 
+let lastTilesWidth = NaN;
+
 function redrawTiles() {
+    // Avoid redrawing if we don't have to
+    if (!isOnScreen(SCREEN_GAME) && lastTilesWidth === tilesWidth)
+        return;
+    lastTilesWidth = tilesWidth;
+
     const ctx = tilesCtx;
 
     ctx.clearRect(0, 0, tilesWidth, tilesHeight);
@@ -590,7 +597,14 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
     tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
 }
 
+let lastScoresWidth = NaN;
+
 function redrawScores() {
+    // Avoid redrawing if we don't have to
+    if (!isOnScreen(SCREEN_GAME) && lastScoresWidth === scoreWidth)
+        return;
+    lastScoresWidth = scoreWidth;
+
     const tileWidth = getTileWidth(),
           p1TilesLeft = (7 - ownPlayer.tiles.current) * tileWidth,
           p1ScoreLeft = (7 - ownPlayer.score.current) * tileWidth;
@@ -651,7 +665,14 @@ function layoutDice() {
     diceCanvas.style.left = diceLeft + "px";
 }
 
+let lastDiceWidth = NaN;
+
 function redrawDice() {
+    // Avoid redrawing if we don't have to
+    if (!isOnScreen(SCREEN_GAME) && lastDiceWidth === diceWidth)
+        return;
+    lastDiceWidth = diceWidth;
+
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
 
     if(canBeRolled) {
@@ -921,7 +942,7 @@ const nextFireworkTimes = []; {
 }
 
 function redrawWinScreen() {
-    if (menuState.isGameWon) {
+    if (isOnScreen(SCREEN_WIN)) {
         spawnWinFireworks();
     }
 }

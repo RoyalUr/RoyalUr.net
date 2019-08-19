@@ -2,61 +2,120 @@
 // MENU
 //
 
+const SCREEN_MENU = "menu",
+      SCREEN_CONNECTING = "connecting",
+      SCREEN_GAME = "game",
+      SCREEN_WIN = "win";
+
+const enterScreenHandlers = {};
+enterScreenHandlers[SCREEN_MENU] = onEnterMenuScreen;
+enterScreenHandlers[SCREEN_CONNECTING] = onEnterConnectingScreen;
+enterScreenHandlers[SCREEN_GAME] = onEnterGameScreen;
+enterScreenHandlers[SCREEN_WIN] = onEnterWinScreen;
+
+const exitScreenHandlers = {};
+exitScreenHandlers[SCREEN_MENU] = onExitMenuScreen;
+exitScreenHandlers[SCREEN_CONNECTING] = onExitConnectingScreen;
+exitScreenHandlers[SCREEN_GAME] = onExitGameScreen;
+exitScreenHandlers[SCREEN_WIN] = onExitWinScreen;
+
 const menuState = {
-    onMenu: true,
-    inGame: false,
-    isGameWon: false,
+    screen: SCREEN_MENU,
 
     menuFade: createFade(0.5).visible(),
-    boardFade: createFade(1),
+    boardFade: createFade(0.5),
 
     gameSearchFade: createFade(2, 0.5)
 };
 
-function setOnMenu(onMenu, hasty) {
-    menuState.onMenu = onMenu;
-
-    const fadeOverride = (hasty ? 0 : undefined);
-
-    if (onMenu) {
-        setIsGameWon(false);
-        menuState.menuFade.fadeIn(fadeOverride);
-    } else {
-        menuState.menuFade.fadeOut(fadeOverride);
-        setMessageAndFade("", menuState.gameSearchFade.invisible());
-
-        if (hasty) {
-            menuState.gameSearchFade.fadeIn();
-        } else {
-            setTimeout(() => {
-                if (!menuState.onMenu) {
-                    menuState.gameSearchFade.fadeIn();
-                }
-            }, 500)
-        }
-    }
+function getCurrentScreen() {
+    return menuState.screen;
 }
 
-function setInGame(inGame) {
-    menuState.inGame = inGame;
+function isOnScreen(screen) {
+    return menuState.screen === screen;
+}
 
-    if (inGame) {
-        setMessageAndFade("Found your Game", menuState.gameSearchFade);
-        menuState.gameSearchFade.fadeOut();
+function switchToScreen(screen, hasty) {
+    hasty = (!hasty ? false : hasty);
 
-        setTimeout(() => {
-            if (menuState.inGame) {
-                menuState.boardFade.fadeIn();
-            }
-        }, 500)
-    } else {
-        setIsGameWon(false);
+    // Already on the given screen
+    if (menuState.screen === screen)
+        return;
+
+    const exitHandler = exitScreenHandlers[menuState.screen],
+          enterHandler = enterScreenHandlers[screen];
+
+    if (!exitHandler)
+        throw "Could not find screen exit handler for screen " + menuState.screen;
+    if (!enterHandler)
+        throw "Could not find screen enter handler for screen " + screen;
+
+    menuState.screen = screen;
+
+    exitHandler(hasty);
+    enterHandler(hasty);
+}
+
+function onEnterMenuScreen(hasty) {
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_MENU)) {
+            menuState.menuFade.fadeIn(hasty ? 0 : undefined);
+        }
+    }, (hasty ? 0 : 500));
+}
+
+function onExitMenuScreen(hasty) {
+    menuState.menuFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterConnectingScreen(hasty) {
+    setMessageAndFade("", menuState.gameSearchFade.invisible());
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_CONNECTING)) {
+            menuState.gameSearchFade.fadeIn();
+        }
+    }, (hasty ? 0 : 500));
+}
+
+function onExitConnectingScreen(hasty) {
+    menuState.gameSearchFade.fadeOut();
+}
+
+function onEnterGameScreen(hasty) {
+    setMessageAndFade("Found your Game", menuState.gameSearchFade);
+    onEnterGameOrWinScreen(hasty);
+}
+
+function onExitGameScreen(hasty) {
+    onExitGameOrWinScreen(hasty);
+}
+
+function onEnterWinScreen(hasty) {
+    onEnterGameOrWinScreen(hasty);
+    setMessage(
+        getActivePlayer().name + " wins!",
+        0.25, -1, -1
+    );
+}
+
+function onExitWinScreen(hasty) {
+    onExitGameOrWinScreen(hasty);
+    setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
+}
+
+function onEnterGameOrWinScreen(hasty) {
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_GAME) || isOnScreen(SCREEN_WIN)) {
+            menuState.boardFade.fadeIn();
+        }
+    }, (hasty ? 0 : 500))
+}
+
+function onExitGameOrWinScreen(hasty) {
+    if (!isOnScreen(SCREEN_GAME) && !isOnScreen(SCREEN_WIN)) {
         menuState.boardFade.fadeOut();
     }
-}
-
-function setIsGameWon(isGameWon) {
-    menuState.isGameWon = isGameWon;
 }
 
 

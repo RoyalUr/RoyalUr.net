@@ -28,7 +28,7 @@ function onHashChange() {
 //
 
 function onPlayClick(hasty) {
-    setOnMenu(false, hasty);
+    switchToScreen(SCREEN_CONNECTING, hasty);
     connect();
 }
 
@@ -77,8 +77,7 @@ function onNetworkDisconnect() {
 function onPacketInvalidGame() {
     disconnect();
     resetNetworkStatus();
-    setInGame(false);
-    setOnMenu(true, true);
+    switchToScreen(SCREEN_MENU, true);
 
     history.pushState(null, "Royal Ur", "#");
     setMessage("Game could not be found", 0, 2, 1)
@@ -86,8 +85,8 @@ function onPacketInvalidGame() {
 
 function onPacketGame(game) {
     history.pushState(game.gameID, "Royal Ur Game", "#" + game.gameID);
-    
-    setInGame(true);
+
+    switchToScreen(SCREEN_GAME);
     setOwnPlayer(game.ownPlayer);
     otherPlayer.name = game.opponentName;
 }
@@ -121,7 +120,9 @@ function onPacketState(state) {
     updatePlayerState(darkPlayer, state.dark.tiles, state.dark.score, state.currentPlayer === "dark");
     updatePlayerState(lightPlayer, state.light.tiles, state.light.score, state.currentPlayer === "light");
 
-    setIsGameWon(state.isGameWon);
+    layoutDice();
+    unselectTile();
+    loadTileState(state.board);
 
     if(!state.isGameWon) {
         if(state.hasRoll) {
@@ -138,18 +139,10 @@ function onPacketState(state) {
             setWaitingForDiceRoll();
         }
     } else {
-        const player = (state.currentPlayer === "light" ? lightPlayer : darkPlayer);
-
-        setMessage(
-            player.name + " wins!",
-            0.25, -1, -1
-        );
+        // One last redraw to make sure all the game state is drawn correctly
+        redraw();
+        switchToScreen(SCREEN_WIN);
     }
-
-    layoutDice();
-
-    unselectTile();
-    loadTileState(state.board);
 }
 
 
@@ -243,7 +236,6 @@ function onTileRelease(x, y) {
 
     if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && locEquals([x, y], getTileMoveToLocation(draggedTile))) {
         sendMove();
-        return;
     }
 }
 
