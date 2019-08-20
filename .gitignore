@@ -1,8 +1,7 @@
 .DS_Store
-/.syncignore
 /.htaccess
 /.idea
 /res
-/dev_res
+/compiled
 /favicon.png
 /sync.sh

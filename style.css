@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url(https://fonts.googleapis.com/css?family=Nunito);
 
 @font-face {
     font-family: KorraFont;
-    src: url("res/Cool-BoldDuranGo.ttf");
+    src: url(res/Cool-BoldDuranGo.ttf);
 }
 
 * {
@@ -14,7 +14,7 @@
 body, html {
     width: 100%;
     height: 100%;
-    background: url("res/wood-blue-1.png") repeat;
+    background: url(res/wood-blue-1.png) repeat;
     background-size: 300px;
 }
 

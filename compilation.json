@@ -1,0 +1,63 @@
+{
+  "javascript": [
+    "js/lib/reconnecting-websocket.min.js",
+    "js/utils.js",
+    "js/resources.js",
+    "js/model.js",
+    "js/render.js",
+    "js/client.js",
+    "js/packets.js",
+    "js/network.js"
+  ],
+
+  "resources": [
+    ".htaccess",
+    "index.html",
+    "lost.html",
+    "style.css",
+    "favicon.png",
+
+    "res/Cool-BoldDuranGo.ttf",
+    "res/wood-blue-1.png",
+    "res/old-wood-light.png",
+
+    "res/board_light.png",
+    "res/darkTile.png",
+    "res/lightTile.png",
+    "res/diceUp1.png",
+    "res/diceUp2.png",
+    "res/diceUp3.png",
+    "res/diceDown1.png",
+    "res/diceDown2.png",
+    "res/diceDown3.png",
+    "res/diceDarkShadow.png",
+    "res/diceLightShadow.png",
+
+    "res/audio/place_1.mp4",
+    "res/audio/place_2.mp4",
+    "res/audio/place_3.mp4",
+    "res/audio/place_4.mp4",
+
+    "res/audio/pickup_1.mp4",
+    "res/audio/pickup_2.mp4",
+    "res/audio/pickup_3.mp4",
+
+    "res/audio/error.mp4",
+    "res/audio/kill.mp4",
+    "res/audio/hover.mp4",
+
+    "res/audio/dice_click.mp4",
+    "res/audio/dice_hit.mp4",
+    "res/audio/dice_select.mp4",
+
+    "res/audio/typewriter_key.mp4",
+    "res/audio/typewriter_end.mp4",
+
+    "res/audio/firework_explode.mp4",
+    "res/audio/firework_rocket.mp4"
+  ],
+
+  "annotations": {
+    "board": "res/board_annotation.json"
+  }
+}

@@ -15,7 +15,7 @@ import json
 
 if len(sys.argv) != 4:
     print("Usage:")
-    print("  python -m annotation_reformatter <annotation file> <output name> <output file>")
+    print("  python -m annotation_reformatter <annotation file> <output file>")
     sys.exit(1)
 
 annotation_file = sys.argv[1]
@@ -60,6 +60,4 @@ with open(annotation_file, 'r') as f:
 #
 
 with open(output_file, 'w') as f:
-    json.dump({
-        output_name: regions
-    }, f, separators=(',', ':'))
+    json.dump(regions, f, separators=(',', ':'))
