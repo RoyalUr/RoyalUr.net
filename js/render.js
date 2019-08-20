@@ -8,19 +8,19 @@ const menuDiv = document.getElementById("menu"),
       exitButton = document.getElementById("exit");
 
 function redrawMenu() {
-    menuDiv.style.opacity = menuState.menuFade.get();
+    menuDiv.style.opacity = screenState.menuFade.get();
     networkStatus.hidden = false;
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {
-            setMessageAndFade("Searching for a Game" + createDots(), menuState.gameSearchFade);
+            setMessageAndFade("Searching for a Game" + createDots(), screenState.connectionFade);
         } else {
             networkStatus.hidden = true;
-            setMessageAndFade(getNetworkStatus(), menuState.gameSearchFade);
+            setMessageAndFade(getNetworkStatus(), screenState.connectionFade);
         }
     }
 
-    const boardFade = menuState.boardFade.get(),
+    const boardFade = screenState.boardFade.get(),
           one = clamp(boardFade * 2, 0, 1),
           two = clamp(boardFade * 2 - 1, 0, 1);
 

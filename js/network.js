@@ -19,18 +19,25 @@ function sendPacket(packet) {
     socket.send(packet.data);
 }
 
-function connect() {
-    onNetworkConnecting();
+function reconnect() {
+    disconnect();
+    connect();
+}
 
-    // If we're debugging networking, fake a delay in the connection to the socket
-    if (debugNetwork) {
-        setTimeout(() => connectSocket(), 1000);
-    } else {
-        connectSocket();
-    }
+function connect() {
+    // Already connected
+    if (socket)
+        return;
+
+    onNetworkConnecting();
+    connectSocket();
 }
 
 function disconnect() {
+    // Already disconnected
+    if (!socket)
+        return;
+
     const prevSocket = socket;
     socket = null;
     prevSocket.close();

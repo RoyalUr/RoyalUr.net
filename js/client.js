@@ -4,7 +4,7 @@
 
 const debugClient = (window.location.hostname === "localhost");
 
-function getGameID() {
+function getHashGameID() {
     if (!window.location.hash || window.location.hash === "")
         return null;
 
@@ -18,7 +18,135 @@ function getGameID() {
 }
 
 function onHashChange() {
-    console.log("hash changed to " + window.location.hash);
+    if (getHashGameID() !== null) {
+        connectToGame();
+    } else {
+        switchToScreen(SCREEN_MENU);
+    }
+}
+
+
+
+//
+// SCREENS
+//
+
+const SCREEN_MENU = "menu",
+      SCREEN_CONNECTING = "connecting",
+      SCREEN_GAME = "game",
+      SCREEN_WIN = "win";
+
+const enterScreenHandlers = {};
+enterScreenHandlers[SCREEN_MENU] = onEnterMenuScreen;
+enterScreenHandlers[SCREEN_CONNECTING] = onEnterConnectingScreen;
+enterScreenHandlers[SCREEN_GAME] = onEnterGameScreen;
+enterScreenHandlers[SCREEN_WIN] = onEnterWinScreen;
+
+const exitScreenHandlers = {};
+exitScreenHandlers[SCREEN_MENU] = onExitMenuScreen;
+exitScreenHandlers[SCREEN_CONNECTING] = onExitConnectingScreen;
+exitScreenHandlers[SCREEN_GAME] = onExitGameScreen;
+exitScreenHandlers[SCREEN_WIN] = onExitWinScreen;
+
+const screenState = {
+    screen: SCREEN_MENU,
+
+    menuFade: createFade(0.5).visible(),
+    boardFade: createFade(0.5),
+
+    connectionFade: createFade(2, 0.5)
+};
+
+function getCurrentScreen() {
+    return screenState.screen;
+}
+
+function isOnScreen(screen) {
+    return screenState.screen === screen;
+}
+
+function switchToScreen(screen, hasty) {
+    hasty = (!hasty ? false : hasty);
+
+    // Already on the given screen
+    if (screenState.screen === screen)
+        return;
+
+    const exitHandler = exitScreenHandlers[screenState.screen],
+        enterHandler = enterScreenHandlers[screen];
+
+    if (!exitHandler)
+        throw "Could not find screen exit handler for screen " + screenState.screen;
+    if (!enterHandler)
+        throw "Could not find screen enter handler for screen " + screen;
+
+    screenState.screen = screen;
+
+    exitHandler(hasty);
+    enterHandler(hasty);
+}
+
+function onEnterMenuScreen(hasty) {
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_MENU)) {
+            screenState.menuFade.fadeIn(hasty ? 0 : undefined);
+        }
+    }, (hasty ? 0 : 500));
+}
+
+function onExitMenuScreen(hasty) {
+    screenState.menuFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterConnectingScreen(hasty) {
+    reconnect();
+    setMessageAndFade("", screenState.connectionFade.invisible());
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_CONNECTING)) {
+            screenState.connectionFade.fadeIn();
+        }
+    }, (hasty ? 0 : 500));
+}
+
+function onExitConnectingScreen(hasty) {
+    screenState.connectionFade.fadeOut();
+}
+
+function onEnterGameScreen(hasty) {
+    setMessageAndFade("Found your Game", screenState.connectionFade);
+    onEnterGameOrWinScreen(hasty);
+}
+
+function onExitGameScreen(hasty) {
+    disconnect();
+    onExitGameOrWinScreen(hasty);
+}
+
+function onEnterWinScreen(hasty) {
+    onEnterGameOrWinScreen(hasty);
+    setMessage(
+        getActivePlayer().name + " wins!",
+        0.25, -1, -1
+    );
+}
+
+function onExitWinScreen(hasty) {
+    onExitGameOrWinScreen(hasty);
+    setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
+}
+
+function onEnterGameOrWinScreen(hasty) {
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_GAME) || isOnScreen(SCREEN_WIN)) {
+            screenState.boardFade.fadeIn();
+        }
+    }, (hasty ? 0 : 500))
+}
+
+function onExitGameOrWinScreen(hasty) {
+    if (!isOnScreen(SCREEN_GAME) && !isOnScreen(SCREEN_WIN)) {
+        screenState.boardFade.fadeOut();
+    }
 }
 
 
@@ -28,12 +156,15 @@ function onHashChange() {
 //
 
 function onPlayClick(hasty) {
-    switchToScreen(SCREEN_CONNECTING, hasty);
-    connect();
+    connectToGame(hasty);
 }
 
 function onLearnClick() {
     console.log("learn");
+}
+
+function connectToGame(hasty) {
+    switchToScreen(SCREEN_CONNECTING, hasty);
 }
 
 
@@ -55,7 +186,7 @@ function onNetworkConnected() {
     setNetworkStatus("Connected", false);
     fadeNetworkStatusOut();
 
-    const gameID = getGameID();
+    const gameID = getHashGameID();
     if (gameID !== null) {
         sendPacket(writeJoinGamePacket(gameID));
     } else {
@@ -306,8 +437,8 @@ function setup() {
     setupElements();
 
     window.onhashchange = onHashChange;
-    if (getGameID() !== null) {
-        onPlayClick(true);
+    if (getHashGameID() !== null) {
+        connectToGame(true);
     }
 
     loadAudio(function() {
