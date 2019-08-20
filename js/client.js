@@ -1,3 +1,12 @@
+// TODO : Make it more obvious when the client disconnects
+// TODO : Make the "No moves" notice quicker
+// TODO : Add a timer so people have to move
+// TODO : Make fireworks speed/size, and the exit button's size based on the size of the viewport
+// TODO : Make which move the opponent picked more obvious (i.e. their tile moves along the path quickly)
+// TODO : Mobile Support
+
+
+
 //
 // CLIENT
 //
