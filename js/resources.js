@@ -1,4 +1,27 @@
 //
+// RESOURCES
+//
+
+function loadResources(onComplete) {
+    const countdown = {
+        count: 0
+    };
+
+    function doCountdown() {
+        countdown.count -= 1;
+        if (countdown.count === 0) {
+            onComplete();
+        }
+    }
+
+    countdown.count += 2;
+    loadImages(doCountdown);
+    loadAudio(doCountdown);
+}
+
+
+
+//
 // AUDIO
 //
 

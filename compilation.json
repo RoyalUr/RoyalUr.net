@@ -17,9 +17,11 @@
     "style.css",
     "favicon.png",
 
-    "res/Cool-BoldDuranGo.ttf",
     "res/wood-blue-1.png",
     "res/old-wood-light.png",
+
+    "res/font/DuranGo.ttf",
+    "res/font/Nunito.woff2",
 
     "res/board_light.png",
     "res/darkTile.png",

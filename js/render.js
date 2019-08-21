@@ -535,7 +535,7 @@ function drawName(player, isActive) {
 
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = Math.round(tileWidth * 0.75) + "px KorraFont";
+            ctx.font = Math.round(tileWidth * 0.75) + "px DuranGo";
 
             if (isActive) {
                 // ctx.shadowBlur = 5;
@@ -803,13 +803,13 @@ function redrawDice() {
         diceCtx.fillStyle = rgb(200);
     }
 
-    diceCtx.font = (canBeRolled && diceHovered ? (space * 0.6) + "px KorraFont" : (space * 0.5) + "px KorraFont");
+    diceCtx.font = (canBeRolled && diceHovered ? (space * 0.6) + "px DuranGo" : (space * 0.5) + "px DuranGo");
     diceCtx.fillText("Roll", diceWidth / 2, 0.75 * space);
 
     const diceUpCount = (dice.values === null ? 0 : countDiceUp(dice.values.slice(0, dice.selected)));
 
     diceCtx.fillStyle = "white";
-    diceCtx.font = (space * 0.8) + "px KorraFont";
+    diceCtx.font = (space * 0.8) + "px DuranGo";
     diceCtx.fillText("" + diceUpCount, diceWidth / 2, 2.3 * space);
 
     diceCtx.restore();

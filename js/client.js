@@ -440,24 +440,19 @@ function onDiceClick() {
 // GAME SETUP
 //
 
-let gameLoaded = false;
-
-loadImages(setup);
+loadResources(setup);
 
 function setup() {
     setupElements();
+    setInterval(updateFPS, 1000);
+
+    updateAudioVolumes();
+    playSong();
+
+    switchToScreen(SCREEN_MENU);
 
     window.onhashchange = onHashChange;
     if (getHashGameID() !== null) {
         connectToGame(true);
     }
-
-    loadAudio(function() {
-        updateAudioVolumes();
-        playSong();
-    });
-
-    setInterval(updateFPS, 1000);
-
-    switchToScreen(SCREEN_MENU);
 }

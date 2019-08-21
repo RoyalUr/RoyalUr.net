@@ -59,13 +59,13 @@ def executePipedCommands(*commands, **kwargs):
             print >>sys.stderr, prefix + "STDERR", stderr
 
         if retCode < 0:
-            print >>sys.stderr, prefix + "Execution of", str(command), " was terminated by signal:", -retCode
+            print >>sys.stderr, prefix + "Execution of", command[0], "was terminated by signal:", -retCode
         elif retCode != 0:
-            print >>sys.stderr, prefix + "Command", str(command), " resulted in the non-zero return code:", retCode
+            print >>sys.stderr, prefix + "Command", command[0], "resulted in the non-zero return code:", retCode
 
         return retCode == 0
     except OSError as error:
-        print >>sys.stderr, prefix + "Execution of", str(command), "failed:", error
+        print >>sys.stderr, prefix + "Execution of", command[0], "failed:", error
         return False
 
 

@@ -1,14 +1,21 @@
-@import url(https://fonts.googleapis.com/css?family=Nunito);
+@font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Nunito Regular'), local('Nunito-Regular'), url(res/font/Nunito.woff2) format('woff2');
+}
 
 @font-face {
-    font-family: KorraFont;
-    src: url(res/Cool-BoldDuranGo.ttf);
+    font-family: 'DuranGo';
+    font-style: normal;
+    font-weight: 400;
+    src: url(res/font/DuranGo.ttf) format('truetype');
 }
 
 * {
     padding: 0;
     margin: 0;
-    font-family: KorraFont, sans-serif;
+    font-family: DuranGo, sans-serif;
 }
 
 body, html {
@@ -347,7 +354,7 @@ canvas {
     padding: 10px;
     padding-bottom: 6px;
 
-    font-family: KorraFont, sans-serif;
+    font-family: DuranGo, sans-serif;
     font-size: 20px;
     text-shadow: black 0 0 10px;
 }
