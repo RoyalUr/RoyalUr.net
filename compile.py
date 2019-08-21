@@ -8,6 +8,11 @@ import json
 import subprocess
 
 
+
+#
+# Utility Functions
+#
+
 def executeCommand(*command, **kwargs):
     """
     Shorthand to execute a single command.
@@ -64,41 +69,137 @@ def executePipedCommands(*commands, **kwargs):
         return False
 
 
-# Load the compilation spec
-with open("compilation.json", 'r') as f:
-    compilation_specs = json.load(f)
-    javascript_files = compilation_specs["javascript"]
-    resource_files = compilation_specs["resources"]
-    annotation_files = compilation_specs["annotations"]
+
+#
+# Perform Compilation
+#
+
+def loadCompilationSpec(spec_file="compilation.json"):
+    """
+    Load the specification for this compilation.
+    """
+    with open(spec_file, 'r') as f:
+        compilation_specs = json.load(f)
+        javascript_files = compilation_specs["javascript"]
+        resource_files = compilation_specs["resources"]
+        annotation_files = compilation_specs["annotations"]
+        return javascript_files, resource_files, annotation_files
 
 
-cmd_prefix = " .. "
+def requiresReleaseBuild(target_folder, resource_files, prefix=""):
+    """
+    Check whether all resource files exist in the compiled directory.
+    Does not check if any annotations or resource file contents have changed.
+    """
+    for file in [""] + resource_files:
+        if not os.path.exists(target_folder + "/" + file):
+            return True
+    if not os.path.exists(target_folder + "/res/annotations.json"):
+        return True
+    return False
 
-# Delete the old compiled folder, and recreate it
-print "\n1. Clean"
-assert executeCommand("rm", "-rf", "compiled", prefix=cmd_prefix)
-assert executeCommand("mkdir", "compiled", prefix=cmd_prefix)
 
-# Concatenate all javascript files into one file
-print "\n2. Combine & Minify Javascript"
-assert executePipedCommands(
-    ["uglifyjs"] + javascript_files + ["--compress", "--mangle"], "compiled/index.js",
-    prefix=cmd_prefix
-)
+def clean(target_folder, prefix=""):
+    """
+    Completely empty the compilation folder.
+    """
+    assert executeCommand("rm", "-rf", target_folder, prefix=prefix)
+    assert executeCommand("mkdir", target_folder, prefix=prefix)
 
-# Copy all resource files
-print "\n3. Copy Resource Files"
-assert executePipedCommands(["rsync", "-R"] + resource_files + ["compiled"], prefix=cmd_prefix)
 
-# Combine all annotations into a single annotations file
-print "\n4. Create Annotations File"
-annotations = {}
-for key, file in annotation_files.items():
-    with open(file, "r") as f:
-        annotations[key] = json.load(f)
+def combineJS(target_folder, javascript_files, prefix=""):
+    """
+    Concatenate all javascript into a single source file.
+    """
+    assert executePipedCommands(["cat"] + javascript_files, target_folder + "/index.js", prefix=prefix)
 
-with open("compiled/res/annotations.json", 'w') as f:
-    json.dump(annotations, f, separators=(',', ':'))
 
-# Done!
-print "Done!"
+def combineMinifyJS(target_folder, javascript_files, prefix=""):
+    """
+    Concatenate all javascript into a single source file, and minify it.
+    """
+    assert executePipedCommands(
+        ["uglifyjs"] + javascript_files + ["--compress", "--mangle"], target_folder + "/index.js",
+        prefix=prefix
+    )
+
+
+def copyResourceFiles(target_folder, resource_files, prefix=""):
+    """
+    Copy all the resource files for the page into the target folder.
+    """
+    assert executePipedCommands(["rsync", "-R"] + resource_files + [target_folder], prefix=prefix)
+
+
+def combineAnnotations(target_folder, annotation_files, prefix=""):
+    """
+    Combine all resource annotations into their own file.
+    """
+    annotations = {}
+    for key, file in annotation_files.items():
+        with open(file, "r") as f:
+            annotations[key] = json.load(f)
+
+    with open(target_folder + "/res/annotations.json", 'w') as f:
+        json.dump(annotations, f, separators=(',', ':'))
+
+
+def createReleaseBuild(target_folder):
+    print "\nCompiling Release Build"
+    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+
+    print "\n1. Clean"
+    clean(target_folder, prefix=" .. ")
+
+    print "\n2. Combine & Minify Javascript"
+    combineMinifyJS(target_folder, javascript_files, prefix=" .. ")
+
+    print "\n3. Copy Resource Files"
+    copyResourceFiles(target_folder, resource_files, prefix=" .. ")
+
+    print "\n4. Create Annotations File"
+    combineAnnotations(target_folder, annotation_files, prefix=" .. ")
+
+    print "\nDone!\n"
+
+
+def createDevBuild(target_folder):
+    print "\nCompiling Development Build"
+    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+
+    print "\n1. Check whether to revert to a Release Build"
+    if requiresReleaseBuild(target_folder, resource_files):
+        print >>sys.stderr, " .. ERROR : Release build is required\n"
+        createReleaseBuild(target_folder)
+        return
+
+    print "\n2. Combine Javascript"
+    combineJS(target_folder, javascript_files, prefix=" .. ")
+
+    print "\nDone!\n"
+
+
+#
+# Run the Compilation
+#
+DEV_MODE = "dev"
+RELEASE_MODE = "release"
+
+if len(sys.argv) != 2:
+    print "Usage:"
+    print "  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">"
+    sys.exit(1)
+
+compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
+
+if compilation_mode == RELEASE_MODE:
+    createReleaseBuild("compiled")
+elif compilation_mode == DEV_MODE:
+    createDevBuild("compiled")
+else:
+    if compilation_mode != "":
+        print "Invalid compilation mode", compilation_mode
+
+    print "Usage:"
+    print "  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">"
+    sys.exit(1)

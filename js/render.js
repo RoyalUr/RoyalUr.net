@@ -1,4 +1,19 @@
 //
+// LOADING SCREEN
+//
+
+const loadingDiv = document.getElementById("loading"),
+      loadingFade = createFade(0.5).visible();
+
+function redrawLoading() {
+    const opacity = loadingFade.get();
+    loadingDiv.style.opacity = opacity;
+    loadingDiv.style.display = (opacity === 0 ? "none" : "")
+}
+
+
+
+//
 // MENU
 //
 
@@ -1291,6 +1306,7 @@ function updateElementVisibilities(elements) {
 function redraw() {
     ++fps_redraws;
 
+    redrawLoading();
     redrawMenu();
     redrawTiles();
     redrawDice();

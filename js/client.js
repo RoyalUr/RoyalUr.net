@@ -1,12 +1,3 @@
-// TODO : Make it more obvious when the client disconnects
-// TODO : Make the "No moves" notice quicker
-// TODO : Add a timer so people have to move
-// TODO : Make fireworks speed/size, and the exit button's size based on the size of the viewport
-// TODO : Make which move the opponent picked more obvious (i.e. their tile moves along the path quickly)
-// TODO : Mobile Support
-
-
-
 //
 // CLIENT
 //
@@ -40,27 +31,30 @@ function onHashChange() {
 // SCREENS
 //
 
-const SCREEN_MENU = "menu",
+const SCREEN_LOADING = "loading",
+      SCREEN_MENU = "menu",
       SCREEN_CONNECTING = "connecting",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
 const enterScreenHandlers = {};
+enterScreenHandlers[SCREEN_LOADING] = onEnterLoadingScreen;
 enterScreenHandlers[SCREEN_MENU] = onEnterMenuScreen;
 enterScreenHandlers[SCREEN_CONNECTING] = onEnterConnectingScreen;
 enterScreenHandlers[SCREEN_GAME] = onEnterGameScreen;
 enterScreenHandlers[SCREEN_WIN] = onEnterWinScreen;
 
 const exitScreenHandlers = {};
+exitScreenHandlers[SCREEN_LOADING] = onExitLoadingScreen;
 exitScreenHandlers[SCREEN_MENU] = onExitMenuScreen;
 exitScreenHandlers[SCREEN_CONNECTING] = onExitConnectingScreen;
 exitScreenHandlers[SCREEN_GAME] = onExitGameScreen;
 exitScreenHandlers[SCREEN_WIN] = onExitWinScreen;
 
 const screenState = {
-    screen: SCREEN_MENU,
+    screen: SCREEN_LOADING,
 
-    menuFade: createFade(0.5).visible(),
+    menuFade: createFade(0.5),
     boardFade: createFade(0.5),
 
     connectionFade: createFade(2, 0.5)
@@ -93,6 +87,14 @@ function switchToScreen(screen, hasty) {
 
     exitHandler(hasty);
     enterHandler(hasty);
+}
+
+function onEnterLoadingScreen(hasty) {
+    loadingFade.fadeIn(hasty ? 0 : undefined);
+}
+
+function onExitLoadingScreen(hasty) {
+    loadingFade.fadeOut(hasty ? 0 : undefined);
 }
 
 function onEnterMenuScreen(hasty) {
@@ -456,4 +458,6 @@ function setup() {
     });
 
     setInterval(updateFPS, 1000);
+
+    switchToScreen(SCREEN_MENU);
 }
