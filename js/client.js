@@ -236,7 +236,13 @@ function onPacketGame(game) {
 function onPacketMessage(data) {
     console.log("message: " + data.text);
 
-    setMessageTypewriter(data.text);
+    if (data.text === "No moves") {
+        setMessage(data.text, DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION);
+        setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+        return;
+    }
+
+    setMessage(data.text);
 }
 
 function onPacketMove(move) {

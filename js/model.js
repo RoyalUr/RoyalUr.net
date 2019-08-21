@@ -516,7 +516,7 @@ function setMessageTypewriter(statusMessage, typewriterDuration, fadeInDuration,
 
     // We don't want the message to disappear before its completely shown
     if (stayDuration === undefined) {
-        stayDuration = max(DEFAULT_MESSAGE_STAY_DURATION, typewriterDuration);
+        stayDuration = typewriterDuration;
     }
 
     setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration);

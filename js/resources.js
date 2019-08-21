@@ -8,10 +8,12 @@ function loadResources(onComplete) {
     };
 
     function doCountdown() {
-        countdown.count -= 1;
-        if (countdown.count === 0) {
-            onComplete();
-        }
+        setTimeout(() => {
+            countdown.count -= 1;
+            if (countdown.count === 0) {
+                onComplete();
+            }
+        }, 0);
     }
 
     countdown.count += 2;
