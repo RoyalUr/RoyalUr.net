@@ -104,7 +104,7 @@ function receiveMessage(message) {
     if (packet.type in packetHandlers) {
         packetHandlers[packet.type](packet);
     } else {
-        console.log("Unhandled " + packet.type + " packet " + message);
+        console.error("Unhandled " + packet.type + " packet " + message + " - " + JSON.stringify(packet));
     }
 }
 

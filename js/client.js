@@ -306,8 +306,6 @@ function onPacketGame(game) {
 }
 
 function onPacketMessage(data) {
-    console.log("message: " + data.text);
-
     if (data.text === "No moves") {
         setMessage(data.text, DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION);
         setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
@@ -318,8 +316,6 @@ function onPacketMessage(data) {
 }
 
 function onPacketMove(move) {
-    console.log("move: " + JSON.stringify(move));
-    
     const tile = getTile(move.from),
           replaced = getTile(move.to);
     if(tile !== TILE_EMPTY) {
@@ -335,8 +331,6 @@ function onPacketMove(move) {
 }
 
 function onPacketState(state) {
-    console.log("state: " + JSON.stringify(state));
-
     updatePlayerState(darkPlayer, state.dark.tiles, state.dark.score, state.currentPlayer === "dark");
     updatePlayerState(lightPlayer, state.light.tiles, state.light.score, state.currentPlayer === "light");
 
@@ -518,7 +512,7 @@ function onDiceClick() {
 // GAME SETUP
 //
 
-console.log("Curious how the client works? Check out the source code: https://github.com/Sothatsit/RoyalUrClient");
+console.log("\nCurious how the client works? Check out the source: https://github.com/Sothatsit/RoyalUrClient\n ");
 
 loadResources(setup);
 

@@ -395,23 +395,23 @@ canvas {
     direction: rtl;
     overflow: hidden;
 
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
 
     transition: width 0.2s ease-in-out;
 }
 
 #exit:hover {
     cursor: pointer;
-    width: 270px;
+    width: 225px;
 
     transition: width 0.2s ease-in-out;
 }
 
 .exit-content {
-    width: 270px;
-    height: 60px;
-    line-height: 60px;
+    width: 225px;
+    height: 50px;
+    line-height: 50px;
 }
 
 .exit-content svg, .exit-content span {
@@ -420,8 +420,8 @@ canvas {
 }
 
 .exit-content svg {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     vertical-align: top;
 }
 
@@ -429,7 +429,7 @@ canvas {
     padding-top: 2px;
     margin-left: 4px;
     margin-right: 4px;
-    font-size: 34px;
+    font-size: 28px;
     font-weight: 700;
     color: white;
     user-select: none;
@@ -443,11 +443,11 @@ canvas {
     stroke: white;
     stroke-linecap: round;
 
-    stroke-width: 25;
+    stroke-width: 21;
     transition: stroke-width 0.2s ease-in-out;
 }
 
 .exit-content:hover svg line {
-    stroke-width: 30;
+    stroke-width: 25;
     transition: stroke-width 0.2s ease-in-out;
 }

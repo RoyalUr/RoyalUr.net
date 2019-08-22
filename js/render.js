@@ -948,7 +948,7 @@ const MIN_WIN_FIREWORK_PERIOD = 2.0,
           {"min_x": 0.15, "max_x": 0.35, "min_y": 0.15, "max_y": 0.5},
           {"min_x": 0.65, "max_x": 0.85, "min_y": 0.15, "max_y": 0.5}
       ],
-      WIN_FIREWORK_SPEED = 300;
+      WIN_FIREWORK_SPEED = 300 / 2560;
 
 const nextFireworkTimes = []; {
     for (let index = 0; index < WIN_FIREWORK_REGIONS.length; ++index) {
@@ -983,7 +983,7 @@ function spawnWinFireworks() {
         hue = (hue <= 0.61 ? hue : hue + (0.78 - 0.61));
         const colour = convertHSVtoRGB(hue, 1, 1);
 
-        createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED, colour.r, colour.g, colour.b);
+        createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED * width, colour.r, colour.g, colour.b);
     }
 }
 
@@ -993,12 +993,15 @@ function spawnWinFireworks() {
 // PARTICLES
 //
 
-const MAX_DT = 0.1;
+const MAX_DT = 0.1,
+      PARTICLE_RADIUS = 2 / 2560,
+      MIN_PARTICLE_RADIUS = 0.8,
+      MAX_PARTICLE_RADIUS = 1.5,
+      PARTICLE_GRAVITY = 200 / 2560;
 
 let particlesLastSimTime = 0;
 const particleBirthTime = [],
       particleLifetime = [],
-      particleRadius = [],
       particleX = [],
       particleY = [],
       particleVX = [],
@@ -1009,10 +1012,9 @@ const particleBirthTime = [],
       particleG = [],
       particleB = [];
 
-function addParticle(lifetime, radius, x, y, vx, vy, ax, ay, r, g, b) {
+function addParticle(lifetime, x, y, vx, vy, ax, ay, r, g, b) {
     particleBirthTime.push(getTime());
     particleLifetime.push(lifetime);
-    particleRadius.push(radius);
     particleX.push(x);
     particleY.push(y);
     particleVX.push(vx);
@@ -1031,14 +1033,19 @@ function createParticleExplosion(particleCount, x, y, speed, lifetime, red, gree
               vx = Math.cos(angle) * vl,
               vy = Math.sin(angle) * vl;
 
-        addParticle(lifetime * (0.6 * rand() + 0.7) , 1, x, y, vx, vy, 0, (gravity ? 200 : 0), red, green, blue);
+        addParticle(
+            lifetime * (0.6 * rand() + 0.7) ,
+            x, y,
+            vx, vy,
+            0, (gravity ? PARTICLE_GRAVITY * width : 0),
+            red, green, blue
+        );
     }
 }
 
 function removeParticle(index) {
     particleBirthTime.splice(index, 1);
     particleLifetime.splice(index, 1);
-    particleRadius.splice(index, 1);
     particleX.splice(index, 1);
     particleY.splice(index, 1);
     particleVX.splice(index, 1);
@@ -1083,10 +1090,10 @@ function drawParticles(ctx) {
         const age = (time - particleBirthTime[index]) / particleLifetime[index],
               x = particleX[index],
               y = particleY[index],
-              radius = particleRadius[index],
               red = particleR[index],
               green = particleG[index],
-              blue = particleB[index];
+              blue = particleB[index],
+              radius = clamp(PARTICLE_RADIUS * width, MIN_PARTICLE_RADIUS, MAX_PARTICLE_RADIUS);
 
         if (age > 1)
             continue;
@@ -1103,6 +1110,9 @@ function drawParticles(ctx) {
 //
 // FIREWORKS
 //
+
+const FIREWORK_EXPLODE_PARTICLE_SPEED = 120 / 2560,
+      FIREWORK_TRAIL_PARTICLE_SPEED = 30 / 2560;
 
 let fireworksLastSimTime = 0,
     fireworks = [];
@@ -1156,7 +1166,8 @@ function simulateFireworks() {
 
             createParticleExplosion(
                 360, x, y,
-                120, 1,
+                FIREWORK_EXPLODE_PARTICLE_SPEED * width,
+                1,
                 firework.r, firework.g, firework.b,
                 true, true
             );
@@ -1168,7 +1179,8 @@ function simulateFireworks() {
             const prop = index / dl;
             createParticleExplosion(
                 2, x - prop * dx, y - prop * dy,
-                30, 0.5,
+                FIREWORK_TRAIL_PARTICLE_SPEED * width,
+                0.5,
                 255, 255, 255,
                 false, false
             );
