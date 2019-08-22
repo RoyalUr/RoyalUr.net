@@ -24,6 +24,7 @@ const menuDiv = document.getElementById("menu"),
 
 function redrawMenu() {
     menuDiv.style.opacity = screenState.menuFade.get();
+    exitButton.style.opacity = screenState.exitFade.get();
     networkStatus.hidden = false;
 
     if (isOnScreen(SCREEN_CONNECTING)) {
@@ -42,7 +43,6 @@ function redrawMenu() {
     boardCanvas.style.opacity = one;
     tilesCanvas.style.opacity = one;
     diceCanvas.style.opacity = two;
-    exitButton.style.opacity = two;
     leftPlayerRenderTarget.scoreCanvas.style.opacity = two;
     leftPlayerRenderTarget.tilesCanvas.style.opacity = two;
     rightPlayerRenderTarget.scoreCanvas.style.opacity = two;
@@ -1206,7 +1206,7 @@ function setupElements() {
     startTime = getTime();
 
     playButton.addEventListener("click", onPlayClick);
-    learnButton.addEventListener("click", onLearnClick);
+    exitButton.addEventListener("click", onExitClick);
 
     diceCanvas.addEventListener("click", onDiceClick);
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });

@@ -1,16 +1,27 @@
 //
-// CLIENT
+// GAME HASH
 //
 
-const debugClient = (window.location.hostname === "localhost");
+function getHashRaw() {
+    if (!window.location.hash)
+        return "";
+    return window.location.hash.substr(1);
+}
+
+function setHash(hash) {
+    if (getHashRaw() === hash)
+        return;
+    history.pushState(null, "Royal Ur", "#" + hash);
+}
+
+function resetHash() {
+    setHash("");
+}
 
 function getHashGameID() {
-    if (!window.location.hash || window.location.hash === "")
-        return null;
-
-    const gameID = window.location.hash.substr(1);
+    const gameID = getHashRaw();
     if (gameID.length !== GAME_ID_LENGTH) {
-        history.pushState(null, "Royal Ur", "#");
+        resetHash();
         return null;
     }
 
@@ -28,7 +39,7 @@ function onHashChange() {
 
 
 //
-// SCREENS
+// SCREEN MANAGEMENT
 //
 
 const SCREEN_LOADING = "loading",
@@ -37,31 +48,59 @@ const SCREEN_LOADING = "loading",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
-const enterScreenHandlers = {};
-enterScreenHandlers[SCREEN_LOADING] = onEnterLoadingScreen;
-enterScreenHandlers[SCREEN_MENU] = onEnterMenuScreen;
-enterScreenHandlers[SCREEN_CONNECTING] = onEnterConnectingScreen;
-enterScreenHandlers[SCREEN_GAME] = onEnterGameScreen;
-enterScreenHandlers[SCREEN_WIN] = onEnterWinScreen;
-
-const exitScreenHandlers = {};
-exitScreenHandlers[SCREEN_LOADING] = onExitLoadingScreen;
-exitScreenHandlers[SCREEN_MENU] = onExitMenuScreen;
-exitScreenHandlers[SCREEN_CONNECTING] = onExitConnectingScreen;
-exitScreenHandlers[SCREEN_GAME] = onExitGameScreen;
-exitScreenHandlers[SCREEN_WIN] = onExitWinScreen;
-
 const screenState = {
     screen: SCREEN_LOADING,
 
+    enterHandlers: [],
+    exitHandlers: [],
+
     menuFade: createFade(0.5),
     boardFade: createFade(0.5),
-
+    exitFade: createFade(0.25),
     connectionFade: createFade(2, 0.5)
 };
 
-function getCurrentScreen() {
-    return screenState.screen;
+function registerScreenHandler(screens, handler, handlersList) {
+    // Screens should be an array
+    if (typeof screens === 'string' || screens instanceof String) {
+        screens = [screens];
+    }
+
+    handlersList.push({
+        screens: screens,
+        handlerFn: handler
+    });
+}
+
+function registerScreenEnterHandler(screens, handler) {
+    registerScreenHandler(screens, handler, screenState.enterHandlers);
+}
+
+function registerScreenExitHandler(screens, handler) {
+    registerScreenHandler(screens, handler, screenState.exitHandlers);
+}
+
+function registerScreenTransitionHandlers(screens, enterHandler, exitHandler) {
+    registerScreenEnterHandler(screens, enterHandler);
+    registerScreenExitHandler(screens, exitHandler);
+}
+
+function fireScreenHandlers(fromScreen, toScreen, hasty) {
+    function fireMatchingScreenHandlers(inScreen, outScreen, handlersList) {
+        for (let index = 0; index < handlersList.length; ++index) {
+            const handler = handlersList[index];
+
+            if (!handler.screens.includes(inScreen))
+                continue;
+            if (handler.screens.includes(outScreen))
+                continue;
+
+            handler.handlerFn(hasty);
+        }
+    }
+
+    fireMatchingScreenHandlers(toScreen, fromScreen, screenState.enterHandlers);
+    fireMatchingScreenHandlers(fromScreen, toScreen, screenState.exitHandlers);
 }
 
 function isOnScreen(screen) {
@@ -71,23 +110,43 @@ function isOnScreen(screen) {
 function switchToScreen(screen, hasty) {
     hasty = (!hasty ? false : hasty);
 
+    const fromScreen = screenState.screen;
+
     // Already on the given screen
-    if (screenState.screen === screen)
+    if (fromScreen === screen)
         return;
 
-    const exitHandler = exitScreenHandlers[screenState.screen],
-        enterHandler = enterScreenHandlers[screen];
-
-    if (!exitHandler)
-        throw "Could not find screen exit handler for screen " + screenState.screen;
-    if (!enterHandler)
-        throw "Could not find screen enter handler for screen " + screen;
-
     screenState.screen = screen;
-
-    exitHandler(hasty);
-    enterHandler(hasty);
+    fireScreenHandlers(fromScreen, screen, hasty);
 }
+
+
+
+//
+// SCREEN TRANSITIONS
+//
+
+registerScreenTransitionHandlers(SCREEN_LOADING,    onEnterLoadingScreen,    onExitLoadingScreen);
+registerScreenTransitionHandlers(SCREEN_MENU,       onEnterMenuScreen,       onExitMenuScreen);
+registerScreenTransitionHandlers(SCREEN_CONNECTING, onEnterConnectingScreen, onExitConnectingScreen);
+registerScreenTransitionHandlers(SCREEN_GAME,       onEnterGameScreen,       onExitGameScreen);
+registerScreenTransitionHandlers(SCREEN_WIN,        onEnterWinScreen,        onExitWinScreen);
+
+// Screens where the game should connect to the server
+registerScreenTransitionHandlers(
+    [SCREEN_CONNECTING, SCREEN_GAME], onEnterServerScreen, onExitServerScreen
+);
+
+// Screens where the game board should be shown
+registerScreenTransitionHandlers(
+    [SCREEN_GAME, SCREEN_WIN], onEnterBoardScreen, onExitBoardScreen
+);
+
+// Screens where the exit button should be shown
+registerScreenTransitionHandlers(
+    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN], onEnterExitableScreen, onExitExitableScreen
+);
+
 
 function onEnterLoadingScreen(hasty) {
     loadingFade.fadeIn(hasty ? 0 : undefined);
@@ -98,6 +157,7 @@ function onExitLoadingScreen(hasty) {
 }
 
 function onEnterMenuScreen(hasty) {
+    resetHash();
     setTimeout(() => {
         if (isOnScreen(SCREEN_MENU)) {
             screenState.menuFade.fadeIn(hasty ? 0 : undefined);
@@ -125,16 +185,13 @@ function onExitConnectingScreen(hasty) {
 
 function onEnterGameScreen(hasty) {
     setMessageAndFade("Found your Game", screenState.connectionFade);
-    onEnterGameOrWinScreen(hasty);
 }
 
 function onExitGameScreen(hasty) {
-    disconnect();
-    onExitGameOrWinScreen(hasty);
+    // Nothing to do
 }
 
 function onEnterWinScreen(hasty) {
-    onEnterGameOrWinScreen(hasty);
     setMessage(
         getActivePlayer().name + " wins!",
         0.25, -1, -1
@@ -142,22 +199,35 @@ function onEnterWinScreen(hasty) {
 }
 
 function onExitWinScreen(hasty) {
-    onExitGameOrWinScreen(hasty);
     setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
 }
 
-function onEnterGameOrWinScreen(hasty) {
+function onEnterServerScreen(hasty) {
+    connect();
+}
+
+function onExitServerScreen(hasty) {
+    disconnect();
+}
+
+function onEnterBoardScreen(hasty) {
     setTimeout(() => {
         if (isOnScreen(SCREEN_GAME) || isOnScreen(SCREEN_WIN)) {
-            screenState.boardFade.fadeIn();
+            screenState.boardFade.fadeIn(hasty ? 0 : undefined);
         }
     }, (hasty ? 0 : 500))
 }
 
-function onExitGameOrWinScreen(hasty) {
-    if (!isOnScreen(SCREEN_GAME) && !isOnScreen(SCREEN_WIN)) {
-        screenState.boardFade.fadeOut();
-    }
+function onExitBoardScreen(hasty) {
+    screenState.boardFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterExitableScreen(hasty) {
+    screenState.exitFade.fadeIn(hasty ? 0 : undefined);
+}
+
+function onExitExitableScreen(hasty) {
+    screenState.exitFade.fadeOut(hasty ? 0 : undefined);
 }
 
 
@@ -170,8 +240,8 @@ function onPlayClick(hasty) {
     connectToGame(hasty);
 }
 
-function onLearnClick() {
-    console.log("learn");
+function onExitClick() {
+    switchToScreen(SCREEN_MENU);
 }
 
 function connectToGame(hasty) {
@@ -205,9 +275,14 @@ function onNetworkConnected() {
     }
 }
 
-function onNetworkDisconnect() {
+function onNetworkLoseConnection() {
     setNetworkStatus("Lost connection", true);
     fadeNetworkStatusIn();
+}
+
+function onNetworkDisconnect() {
+    resetNetworkStatus();
+    fadeNetworkStatusOut();
 }
 
 
@@ -220,14 +295,11 @@ function onPacketInvalidGame() {
     disconnect();
     resetNetworkStatus();
     switchToScreen(SCREEN_MENU, true);
-
-    history.pushState(null, "Royal Ur", "#");
     setMessage("Game could not be found", 0, 2, 1)
 }
 
 function onPacketGame(game) {
-    history.pushState(game.gameID, "Royal Ur Game", "#" + game.gameID);
-
+    setHash(game.gameID);
     switchToScreen(SCREEN_GAME);
     setOwnPlayer(game.ownPlayer);
     otherPlayer.name = game.opponentName;
@@ -446,6 +518,8 @@ function onDiceClick() {
 // GAME SETUP
 //
 
+console.log("Curious how the client works? Check out the source code: https://github.com/Sothatsit/RoyalUrClient");
+
 loadResources(setup);
 
 function setup() {
@@ -455,10 +529,10 @@ function setup() {
     updateAudioVolumes();
     playSong();
 
-    switchToScreen(SCREEN_MENU);
-
     window.onhashchange = onHashChange;
     if (getHashGameID() !== null) {
         connectToGame(true);
+    } else {
+        switchToScreen(SCREEN_MENU);
     }
 }

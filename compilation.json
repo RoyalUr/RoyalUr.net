@@ -5,9 +5,9 @@
     "js/resources.js",
     "js/model.js",
     "js/render.js",
-    "js/client.js",
     "js/packets.js",
-    "js/network.js"
+    "js/network.js",
+    "js/client.js"
   ],
 
   "resources": [

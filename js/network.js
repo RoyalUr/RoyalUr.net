@@ -38,6 +38,7 @@ function disconnect() {
     if (!socket)
         return;
 
+    onNetworkDisconnect();
     const prevSocket = socket;
     socket = null;
     prevSocket.close();
@@ -82,7 +83,7 @@ function connectSocket() {
         if(socket !== this || lastState !== "opened")
             return;
 
-        onNetworkDisconnect();
+        onNetworkLoseConnection();
         console.info("Connection lost, attempting to reconnect...");
     }.bind(socket);
 

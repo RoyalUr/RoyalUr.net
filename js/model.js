@@ -34,8 +34,8 @@ function isTileOnBoard(x, y) {
 //
 
 const TILE_EMPTY = 0,
-    TILE_DARK = 1,
-    TILE_LIGHT = 2;
+      TILE_DARK = 1,
+      TILE_LIGHT = 2;
 
 const LIGHT_PATH = [
     [0, 4],
@@ -76,9 +76,7 @@ const DARK_PATH = [
 ];
 
 const LIGHT_START = LIGHT_PATH[0],
-      LIGHT_END = LIGHT_PATH[LIGHT_PATH.length - 1],
-      DARK_START = DARK_PATH[0],
-      DARK_END = DARK_PATH[DARK_PATH.length - 1];
+      DARK_START = DARK_PATH[0];
 
 const LOCUS_LOCATIONS = [
     [0, 0],
@@ -323,10 +321,6 @@ function setOwnPlayer(player) {
 
 function getActivePlayer() {
     return (lightPlayer.active ? lightPlayer : darkPlayer);
-}
-
-function getPlayerState(player) {
-    return (player === "light" ? lightPlayer : darkPlayer);
 }
 
 function isAwaitingMove() {
