@@ -518,7 +518,7 @@ loadResources(setup);
 
 function setup() {
     setupElements();
-    setInterval(updateFPS, 1000);
+    setInterval(updateStatistics, 1000);
 
     updateAudioVolumes();
     playSong();

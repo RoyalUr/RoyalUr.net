@@ -1,11 +1,145 @@
 //
+// STATS
+//
+
+const STATS_OVERALL = "overall",
+      STATS_BOARD = "board",
+      STATS_LOADING = "loading",
+      STATS_MENU = "menu",
+      STATS_TILES = "tiles",
+      STATS_DICE = "dice",
+      STATS_SCORES = "scores",
+      STATS_NETWORK_STATUS = "network_status",
+      STATS_MESSAGE = "message",
+      STATS_WIN_SCREEN = "win_screen",
+      STATS_OVERLAY = "overlay";
+
+const statCounters = {
+    start: getTime(),
+    stats: {}
+};
+
+let lastStatsSummary = {},
+    fps = 0;
+
+function getStatistic(statistic) {
+    const summary = lastStatsSummary[statistic];
+    if (summary !== undefined)
+        return summary;
+
+    return {
+        totalCalls: 0,
+        cumulativeTime: 0,
+
+        callsPerSecond: 0,
+        averageTime: 0,
+        percentTime: 0
+    };
+}
+
+function registerCallStats(statistic, duration) {
+    let counter = statCounters.stats[statistic];
+    if (counter === undefined) {
+        counter = {
+            calls: 0,
+            cumulativeTime: 0
+        };
+        statCounters.stats[statistic] = counter;
+    }
+
+    counter.calls += 1;
+    counter.cumulativeTime += duration;
+}
+
+function recordCallStatistics(statistic, func) {
+    const start = getTime();
+
+    { // Call the function
+        func();
+    }
+
+    const end = getTime();
+
+    registerCallStats(statistic, end - start);
+}
+
+function updateStatistics() {
+    const time = getTime(),
+          duration = time - statCounters.start,
+          summary = {};
+
+    statCounters.start = time;
+
+    for (let key in statCounters.stats) {
+        if (!statCounters.stats.hasOwnProperty(key))
+            continue;
+
+        const statsEntry = statCounters.stats[key];
+
+        summary[key] = {
+            totalCalls: statsEntry.calls,
+            cumulativeTime: statsEntry.cumulativeTime,
+
+            callsPerSecond: statsEntry.calls / duration,
+            averageTime: statsEntry.cumulativeTime / statsEntry.calls,
+            percentTime: statsEntry.cumulativeTime / duration
+        };
+    }
+
+    // Reset all stat counters
+    statCounters.stats = {};
+
+    lastStatsSummary = summary;
+    fps = getStatistic(STATS_OVERALL).calls / duration;
+}
+
+function reportStatistics() {
+    let summaries = [];
+    for (let key in lastStatsSummary) {
+        if (!lastStatsSummary.hasOwnProperty(key))
+            continue;
+        summaries.push({
+            statistic: key,
+            summary: lastStatsSummary[key]
+        });
+    }
+
+    if (summaries.length === 0) {
+        console.log("No statistics recorded");
+        return;
+    }
+
+    summaries.sort((a, b) => {
+        const x = a.summary.percentTime,
+              y = b.summary.percentTime;
+        return (x < y) ? 1 : ((x > y) ? -1 : 0);
+    });
+
+    let report = "Statistics:\n";
+    for (let index = 0; index < summaries.length; ++index) {
+        const entry = summaries[index],
+              statistic = entry.statistic,
+              summary = entry.summary;
+
+        report += "  " + statistic + " : " + Math.round(summary.percentTime * 1000) / 10 + "%";
+        report += " - " + Math.round(summary.averageTime * 1000 * 100) / 100 + "ms per call";
+        report += ", " + summary.totalCalls + " calls";
+        report += "\n";
+    }
+
+    console.log(report);
+}
+
+
+
+//
 // LOADING SCREEN
 //
 
 const loadingDiv = document.getElementById("loading"),
       loadingFade = createFade(0.5).visible();
 
-function redrawLoading() {
+function redrawLoading(forceRedraw) {
     const opacity = loadingFade.get();
     loadingDiv.style.opacity = opacity;
     loadingDiv.style.display = (opacity === 0 ? "none" : "")
@@ -19,10 +153,9 @@ function redrawLoading() {
 
 const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
-      learnButton = document.getElementById("learn"),
       exitButton = document.getElementById("exit");
 
-function redrawMenu() {
+function redrawMenu(forceRedraw) {
     menuDiv.style.opacity = screenState.menuFade.get();
     exitButton.style.opacity = screenState.exitFade.get();
     networkStatus.hidden = false;
@@ -70,7 +203,7 @@ let boardCanvasWidth = NaN,
 
 const tileWidthRatio = 0.75;
 
-let boardWithToHeightRatio = null,
+let boardWidthToHeightRatio = null,
     boardTileRegions = null,
     boardTilePositions = null,
     tileWidth = null;
@@ -82,10 +215,11 @@ function resizeBoard() {
     boardHeight = boardCanvasHeight - 2 * boardPadding;
 }
 
-/**
- * Called to redraw the board.
- */
-function redrawBoard() {
+function redrawBoard(forceRedraw) {
+    // We only want to redraw the board when we have to
+    if (!forceRedraw)
+        return;
+
     const ctx = boardCtx;
 
     ctx.shadowColor = 'black';
@@ -122,14 +256,15 @@ function getTileWidth() {
 }
 
 function getBoardWidthToHeightRatio() {
-    if (boardWithToHeightRatio)
-        return boardWithToHeightRatio;
+    if (boardWidthToHeightRatio)
+        return boardWidthToHeightRatio;
 
     const boardImage = getRawImageResource("board");
     if (!boardImage)
         throw "Missing board image";
 
-    boardWithToHeightRatio = boardImage.height / boardImage.width;
+    boardWidthToHeightRatio = boardImage.height / boardImage.width;
+    return boardWidthToHeightRatio;
 }
 
 /**
@@ -310,9 +445,9 @@ function updateTilePathAnchorTime() {
 
 let lastTilesWidth = NaN;
 
-function redrawTiles() {
+function redrawTiles(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!isOnScreen(SCREEN_GAME) && lastTilesWidth === tilesWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastTilesWidth === tilesWidth)
         return;
     lastTilesWidth = tilesWidth;
 
@@ -614,9 +749,9 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
 
 let lastScoresWidth = NaN;
 
-function redrawScores() {
+function redrawScores(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!isOnScreen(SCREEN_GAME) && lastScoresWidth === scoreWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastScoresWidth === scoreWidth)
         return;
     lastScoresWidth = scoreWidth;
 
@@ -682,9 +817,9 @@ function layoutDice() {
 
 let lastDiceWidth = NaN;
 
-function redrawDice() {
+function redrawDice(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!isOnScreen(SCREEN_GAME) && lastDiceWidth === diceWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastDiceWidth === diceWidth)
         return;
     lastDiceWidth = diceWidth;
 
@@ -849,7 +984,7 @@ function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
 
 const networkStatusElement = document.getElementById("network-status");
 
-function redrawNetworkStatus() {
+function redrawNetworkStatus(forceRedraw) {
     networkStatusElement.style.display = (networkStatus.hidden ? "none" : "block");
     networkStatusElement.style.opacity = networkStatus.fade.get();
     networkStatusElement.textContent = getNetworkStatus();
@@ -864,7 +999,7 @@ function redrawNetworkStatus() {
 const messageContainerElement = document.getElementById("message-container"),
       messageElement = document.getElementById("message");
 
-function redrawMessage() {
+function redrawMessage(forceRedraw) {
     let messageText = message.text;
 
     if (message.typewriter) {
@@ -910,7 +1045,7 @@ const overlayCanvas = document.getElementById("overlay"),
 let overlayWidth = NaN,
     overlayHeight = NaN;
 
-function redrawOverlay() {
+function redrawOverlay(forceRedraw) {
     // If we don't have to draw to the canvas, just don't display it at all
     if (fireworks.length === 0 && particleBirthTime.length === 0) {
         overlayCanvas.style.display = "none";
@@ -956,7 +1091,7 @@ const nextFireworkTimes = []; {
     }
 }
 
-function redrawWinScreen() {
+function redrawWinScreen(forceRedraw) {
     if (isOnScreen(SCREEN_WIN)) {
         spawnWinFireworks();
     }
@@ -1262,7 +1397,6 @@ function setupElements() {
 
     document.body.onmousedown = function(event) {
         updateMouse(mouseX, mouseY, true);
-
         onTileClick(hoveredTile);
 
         event.preventDefault();
@@ -1270,31 +1404,19 @@ function setupElements() {
 
     document.onmouseup = function(event) {
         onTileRelease(hoveredTile);
-
         updateMouse(mouseX, mouseY, false);
     };
 
     window.requestAnimationFrame(function() {
         resize();
-        redraw();
+        redrawLoop();
     });
     
     addTwitterButton();
-    resize();
 }
 
 function addTwitterButton() {
     document.getElementById("twitter-button").innerHTML = '<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
-}
-
-let fps_start = new Date().getTime(),
-    fps_redraws = 0,
-    fps = 0;
-
-function updateFPS() {
-    fps = Math.round(fps_redraws / (new Date().getTime() - fps_start) * 1000);
-    fps_start = new Date().getTime();
-    fps_redraws = 0;
 }
 
 function resetGame() {
@@ -1315,28 +1437,43 @@ function updateElementVisibilities(elements) {
     }
 }
 
-function redraw() {
-    ++fps_redraws;
+function redrawLoop() {
+    redraw(false);
+    window.requestAnimationFrame(redrawLoop);
+}
 
-    redrawLoading();
-    redrawMenu();
-    redrawTiles();
-    redrawDice();
-    redrawScores();
-    redrawNetworkStatus();
-    redrawMessage();
-    redrawWinScreen();
-    redrawOverlay();
+/**
+ * @param forceRedraw Whether to ignore any attempts to avoid redrawing elements.
+ */
+function redraw(forceRedraw) {
+    forceRedraw = !!forceRedraw;
 
-    updateElementVisibilities([
-        menuDiv, boardCanvas, tilesCanvas, exitButton,
-        leftPlayerRenderTarget.tilesCanvas,
-        leftPlayerRenderTarget.scoreCanvas,
-        rightPlayerRenderTarget.tilesCanvas,
-        rightPlayerRenderTarget.scoreCanvas
-    ]);
+    function callRedraw(statistic, redrawFn) {
+        recordCallStatistics(statistic, () => {
+            redrawFn(forceRedraw);
+        });
+    }
 
-    window.requestAnimationFrame(redraw);
+    recordCallStatistics(STATS_OVERALL, () => {
+        callRedraw(STATS_BOARD, redrawBoard);
+        callRedraw(STATS_LOADING, redrawLoading);
+        callRedraw(STATS_MENU, redrawMenu);
+        callRedraw(STATS_TILES, redrawTiles);
+        callRedraw(STATS_DICE, redrawDice);
+        callRedraw(STATS_SCORES, redrawScores);
+        callRedraw(STATS_NETWORK_STATUS, redrawNetworkStatus);
+        callRedraw(STATS_MESSAGE, redrawMessage);
+        callRedraw(STATS_WIN_SCREEN, redrawWinScreen);
+        callRedraw(STATS_OVERLAY, redrawOverlay);
+
+        updateElementVisibilities([
+            menuDiv, boardCanvas, tilesCanvas, exitButton,
+            leftPlayerRenderTarget.tilesCanvas,
+            leftPlayerRenderTarget.scoreCanvas,
+            rightPlayerRenderTarget.tilesCanvas,
+            rightPlayerRenderTarget.scoreCanvas
+        ]);
+    });
 }
 
 function resize() {
@@ -1428,5 +1565,5 @@ function resize() {
     }
 
     resizeOverlay();
-    redrawBoard();
+    redraw(true);
 }
