@@ -443,13 +443,10 @@ function updateTilePathAnchorTime() {
     tilePathAnchorTime = (tilePathAnchorTime % period) + (tilePathAnchorTime < 0 ? period : 0);
 }
 
-let lastTilesWidth = NaN;
-
 function redrawTiles(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastTilesWidth === tilesWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
-    lastTilesWidth = tilesWidth;
 
     const ctx = tilesCtx;
 
@@ -747,13 +744,10 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
     tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
 }
 
-let lastScoresWidth = NaN;
-
 function redrawScores(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastScoresWidth === scoreWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
-    lastScoresWidth = scoreWidth;
 
     const tileWidth = getTileWidth(),
           p1TilesLeft = (7 - ownPlayer.tiles.current) * tileWidth,
@@ -815,13 +809,10 @@ function layoutDice() {
     diceCanvas.style.left = diceLeft + "px";
 }
 
-let lastDiceWidth = NaN;
-
 function redrawDice(forceRedraw) {
     // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME) && lastDiceWidth === diceWidth)
+    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
-    lastDiceWidth = diceWidth;
 
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
 
