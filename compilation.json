@@ -5,6 +5,7 @@
     "js/stats.js",
     "js/resources.js",
     "js/model.js",
+    "js/layout.js",
     "js/render.js",
     "js/packets.js",
     "js/network.js",

@@ -1,3 +1,7 @@
+//
+// This file manages the connection to the game server.
+//
+
 const address = "ws://" + window.location.hostname + ":9113",
       debugNetwork = (window.location.hostname === "localhost");
 

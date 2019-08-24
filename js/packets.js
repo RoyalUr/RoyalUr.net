@@ -1,5 +1,11 @@
+//
+// This file manages the reading and writing of packets to the game server.
+//
+
 const ZERO_CHAR_CODE = "0".charCodeAt(0),
       GAME_ID_LENGTH = 6;
+
+
 
 //
 // INCOMING

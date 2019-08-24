@@ -1,4 +1,34 @@
 //
+// This file mediates interactions between the client, the server, the model, and the rendering of the game.
+//
+
+console.log("\nCurious how the client works? Check out the source: https://github.com/Sothatsit/RoyalUrClient\n ");
+
+loadResources(setup);
+
+function setup() {
+    setupElements();
+    setInterval(updateStatistics, 1000);
+
+    updateAudioVolumes();
+    playSong();
+
+    window.onhashchange = onHashChange;
+    if (getHashGameID() !== null) {
+        connectToGame(true);
+    } else {
+        switchToScreen(SCREEN_MENU);
+    }
+
+    window.requestAnimationFrame(function() {
+        resize();
+        redrawLoop();
+    });
+}
+
+
+
+//
 // GAME HASH
 //
 
@@ -504,29 +534,4 @@ function onDiceClick() {
 
     startRolling();
     sendPacket(writeDiceRollPacket());
-}
-
-
-
-//
-// GAME SETUP
-//
-
-console.log("\nCurious how the client works? Check out the source: https://github.com/Sothatsit/RoyalUrClient\n ");
-
-loadResources(setup);
-
-function setup() {
-    setupElements();
-    setInterval(updateStatistics, 1000);
-
-    updateAudioVolumes();
-    playSong();
-
-    window.onhashchange = onHashChange;
-    if (getHashGameID() !== null) {
-        connectToGame(true);
-    } else {
-        switchToScreen(SCREEN_MENU);
-    }
 }

@@ -1,4 +1,22 @@
 //
+// This file contains non-game-specific utility functions.
+//
+
+function def(value, defaultValue) {
+    return (value === undefined ? defaultValue : value);
+}
+
+function callListeners(listeners) {
+    const args = Array.prototype.slice.call(arguments, 1);
+
+    for(let index = 0; index < listeners.length; ++index) {
+        listeners[index].apply(this, args);
+    }
+}
+
+
+
+//
 // COMPATIBILITY
 //
 
@@ -411,7 +429,7 @@ function locEquals(x1, y1, x2, y2) {
         x1 = x1[0];
     }
 
-    return x1 == x2 && y1 == y2;
+    return x1 === x2 && y1 === y2;
 }
 
 function locMidpoint(x1, y1, x2, y2) {
@@ -472,22 +490,4 @@ function locIndexOf(locations, x, y) {
 
 function locContains(locations, x, y) {
     return locIndexOf(locations, x, y) !== -1;
-}
-
-
-
-//
-// USEFUL THINGS
-//
-
-function def(value, defaultValue) {
-    return (value === undefined ? defaultValue : value);
-}
-
-function callListeners(listeners) {
-    const args = Array.prototype.slice.call(arguments, 1);
-
-    for(let index = 0; index < listeners.length; ++index) {
-        listeners[index].apply(this, args);
-    }
 }

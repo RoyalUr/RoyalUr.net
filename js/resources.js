@@ -1,5 +1,5 @@
 //
-// RESOURCES
+// This file manages the loading of resources such as audio and images that the client needs.
 //
 
 function loadResources(onComplete) {

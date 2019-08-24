@@ -1,4 +1,16 @@
 //
+// This file stores and manages the state of the game.
+//
+
+function resetGame() {
+    resetTiles();
+    resetDice();
+    resetNetworkStatus();
+}
+
+
+
+//
 // BOARD
 //
 
