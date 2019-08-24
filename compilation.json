@@ -2,6 +2,7 @@
   "javascript": [
     "js/lib/reconnecting-websocket.min.js",
     "js/utils.js",
+    "js/stats.js",
     "js/resources.js",
     "js/model.js",
     "js/render.js",
