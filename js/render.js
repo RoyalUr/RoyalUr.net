@@ -676,7 +676,7 @@ function redrawMessage(forceRedraw) {
 
 function redrawOverlay(forceRedraw) {
     // If we don't have to draw to the canvas, just don't display it at all
-    if (fireworks.length === 0 && particleBirthTime.length === 0) {
+    if (fireworks.length === 0 && particles.birthTime.length === 0) {
         overlayCanvas.style.display = "none";
         return;
     } else {
@@ -686,7 +686,7 @@ function redrawOverlay(forceRedraw) {
     overlayCtx.clearRect(0, 0, overlayWidth, overlayHeight);
 
     simulateFireworks();
-    simulateParticles();
+    removeDeadParticles();
     drawParticles(overlayCtx);
 }
 

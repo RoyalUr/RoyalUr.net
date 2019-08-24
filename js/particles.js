@@ -2,37 +2,37 @@
 // PARTICLES
 //
 
-const MAX_DT = 0.1,
-      PARTICLE_RADIUS = 2 / 2560,
+const PARTICLE_RADIUS = 2 / 2560,
       MIN_PARTICLE_RADIUS = 0.8,
       MAX_PARTICLE_RADIUS = 1.5,
       PARTICLE_GRAVITY = 200 / 2560;
 
-let particlesLastSimTime = 0;
-const particleBirthTime = [],
-      particleLifetime = [],
-      particleX = [],
-      particleY = [],
-      particleVX = [],
-      particleVY = [],
-      particleAX = [],
-      particleAY = [],
-      particleR = [],
-      particleG = [],
-      particleB = [];
+const particles = {
+    birthTime: [],
+    lifetime: [],
+    x: [],
+    y: [],
+    vx: [],
+    vy: [],
+    ax: [],
+    ay: [],
+    r: [],
+    g: [],
+    b: []
+};
 
 function addParticle(lifetime, x, y, vx, vy, ax, ay, r, g, b) {
-    particleBirthTime.push(getTime());
-    particleLifetime.push(lifetime);
-    particleX.push(x);
-    particleY.push(y);
-    particleVX.push(vx);
-    particleVY.push(vy);
-    particleAX.push(ax);
-    particleAY.push(ay);
-    particleR.push(r);
-    particleG.push(g);
-    particleB.push(b);
+    particles.birthTime.push(getTime());
+    particles.lifetime.push(lifetime);
+    particles.x.push(x);
+    particles.y.push(y);
+    particles.vx.push(vx);
+    particles.vy.push(vy);
+    particles.ax.push(ax);
+    particles.ay.push(ay);
+    particles.r.push(r);
+    particles.g.push(g);
+    particles.b.push(b);
 }
 
 function createParticleExplosion(particleCount, x, y, speed, lifetime, red, green, blue, sphere, gravity) {
@@ -53,56 +53,45 @@ function createParticleExplosion(particleCount, x, y, speed, lifetime, red, gree
 }
 
 function removeParticle(index) {
-    particleBirthTime.splice(index, 1);
-    particleLifetime.splice(index, 1);
-    particleX.splice(index, 1);
-    particleY.splice(index, 1);
-    particleVX.splice(index, 1);
-    particleVY.splice(index, 1);
-    particleAX.splice(index, 1);
-    particleAY.splice(index, 1);
-    particleR.splice(index, 1);
-    particleG.splice(index, 1);
-    particleB.splice(index, 1);
+    particles.birthTime.splice(index, 1);
+    particles.lifetime.splice(index, 1);
+    particles.x.splice(index, 1);
+    particles.y.splice(index, 1);
+    particles.vx.splice(index, 1);
+    particles.vy.splice(index, 1);
+    particles.ax.splice(index, 1);
+    particles.ay.splice(index, 1);
+    particles.r.splice(index, 1);
+    particles.g.splice(index, 1);
+    particles.b.splice(index, 1);
 }
 
-function simulateParticles() {
-    const time = getTime(),
-        dt = min(MAX_DT, time - particlesLastSimTime);
+function removeDeadParticles() {
+    const time = getTime();
 
-    particlesLastSimTime = time;
-
-    let removed = 0;
-
-    let index = particleBirthTime.length;
+    let index = particles.birthTime.length;
     while (index > 0) {
         index -= 1;
 
-        const age = (time - particleBirthTime[index]) / particleLifetime[index];
+        const age = (time - particles.birthTime[index]) / particles.lifetime[index];
         if (age >= 1) {
-            removed += 1;
             removeParticle(index);
-            continue;
         }
-
-        particleX[index] = particleX[index] + dt * particleVX[index];
-        particleY[index] = particleY[index] + dt * particleVY[index];
-        particleVX[index] =  particleVX[index] + dt * particleAX[index];
-        particleVY[index] = particleVY[index] + dt * particleAY[index];
     }
 }
 
 function drawParticles(ctx) {
     const time = getTime();
 
-    for (let index = 0; index < particleBirthTime.length; ++index) {
-        const age = (time - particleBirthTime[index]) / particleLifetime[index],
-            x = particleX[index],
-            y = particleY[index],
-            red = particleR[index],
-            green = particleG[index],
-            blue = particleB[index],
-            radius = clamp(PARTICLE_RADIUS * width, MIN_PARTICLE_RADIUS, MAX_PARTICLE_RADIUS);
+    for (let index = 0; index < particles.birthTime.length; ++index) {
+        const ageSecs = (time - particles.birthTime[index]),
+              age = ageSecs / particles.lifetime[index],
+              x = particles.x[index] + particles.vx[index] * ageSecs + 0.5 * particles.ax[index] * ageSecs * ageSecs,
+              y = particles.y[index] + particles.vy[index] * ageSecs + 0.5 * particles.ay[index] * ageSecs * ageSecs,
+              red = particles.r[index],
+              green = particles.g[index],
+              blue = particles.b[index],
+              radius = clamp(PARTICLE_RADIUS * width, MIN_PARTICLE_RADIUS, MAX_PARTICLE_RADIUS);
 
         if (age > 1)
             continue;
