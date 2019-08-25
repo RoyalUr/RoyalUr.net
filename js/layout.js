@@ -2,6 +2,27 @@
 // This file stores the logic for laying out the elements in the client.
 //
 
+const menuDiv = document.getElementById("menu"),
+      playButton = document.getElementById("play"),
+      exitButton = document.getElementById("exit");
+
+const loadingDiv = document.getElementById("loading");
+
+const boardCanvas = document.getElementById("board"),
+      boardCtx = boardCanvas.getContext("2d");
+
+const tilesCanvas = document.getElementById("tiles"),
+      tilesCtx = tilesCanvas.getContext("2d");
+
+const networkStatusElement = document.getElementById("network-status");
+
+const messageContainerElement = document.getElementById("message-container"),
+      messageElement = document.getElementById("message");
+
+const overlayCanvas = document.getElementById("overlay"),
+      overlayCtx = overlayCanvas.getContext("2d");
+
+
 let width = NaN,
     height = NaN,
     viewport = null,
@@ -74,13 +95,25 @@ function setupElements() {
         updateMouse(mouseX, mouseY, false);
     };
 
-    addTwitterButton();
+    // addTwitterButton();
 }
 
 function addTwitterButton() {
-    document.getElementById("twitter-button").innerHTML = '<a class="twitter-follow-button" href="https://twitter.com/soth_dev" data-show-count="false"></a><script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>';
-}
+    const button = document.getElementById("twitter-button"),
+          link = document.createElement("a"),
+          script = document.createElement("script");
 
+    link.setAttribute("href", "https://twitter.com/soth_dev?ref_src=twsrc%5Etfw");
+    link.setAttribute("class", "twitter-follow-button");
+    link.setAttribute("data-show-count", "false");
+
+    button.appendChild(link);
+
+    script.setAttribute("charset", "utf-8");
+    script.setAttribute("src", "https://platform.twitter.com/widgets.js");
+
+    button.appendChild(script);
+}
 
 function resize() {
     viewport = document.body.getBoundingClientRect();
@@ -89,108 +122,13 @@ function resize() {
     width = viewport.right - viewport.left;
     height = viewport.bottom - viewport.top;
 
-    // RESIZE BOARD
-    {
-        boardCanvasHeight = height;
-        boardCanvasWidth = Math.round((height - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
-        boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
-        boardCanvasTop = centreTop - Math.round(boardCanvasHeight / 2);
-
-        boardCanvas.width = boardCanvasWidth;
-        boardCanvas.height = boardCanvasHeight;
-        boardCanvas.style.left = boardCanvasLeft + "px";
-        boardCanvas.style.top = boardCanvasTop + "px";
-
-        tilesHeight = boardCanvasHeight;
-        tilesWidth = boardCanvasWidth * 1.5;
-        tilesLeft = centreLeft - Math.round(tilesWidth / 2);
-        tilesTop = centreTop - Math.round(tilesHeight / 2);
-        tilesLeftOffset = Math.round((tilesWidth - boardCanvasWidth) / 2);
-
-        tilesCanvas.width = tilesWidth;
-        tilesCanvas.height = tilesHeight;
-        tilesCanvas.style.left = tilesLeft + "px";
-        tilesCanvas.style.top = tilesTop + "px";
-
-        resizeBoard();
-    }
-
-    // RESIZE SCORE
-    {
-        const tileWidth = getTileWidth();
-
-        scoreWidth = 7 * tileWidth;
-        scoreHeight = tileWidth;
-
-        const tilesCountWidth = scoreWidth,
-            tilesCountHeight = scoreHeight * 2;
-
-        const verticalPadding = Math.round(0.05 * boardCanvasHeight),
-            tilesCountTop = boardCanvasTop + verticalPadding,
-            scoreTop = boardCanvasTop + boardCanvasHeight - scoreHeight - verticalPadding,
-            p1Left = boardCanvasLeft - scoreWidth,
-            p2Left = boardCanvasLeft + boardCanvasWidth;
-
-        const leftTiles = leftPlayerRenderTarget.tilesCanvas,
-            leftScore = leftPlayerRenderTarget.scoreCanvas,
-            rightTiles = rightPlayerRenderTarget.tilesCanvas,
-            rightScore = rightPlayerRenderTarget.scoreCanvas;
-
-        leftTiles.width = tilesCountWidth;
-        leftTiles.height = tilesCountHeight;
-        leftTiles.style.top = tilesCountTop + "px";
-        leftTiles.style.left = p1Left + "px";
-
-        rightTiles.width = tilesCountWidth;
-        rightTiles.height = tilesCountHeight;
-        rightTiles.style.top = tilesCountTop + "px";
-        rightTiles.style.left = p2Left + "px";
-
-        leftScore.width = scoreWidth;
-        leftScore.height = scoreHeight;
-        leftScore.style.top = scoreTop + "px";
-        leftScore.style.left = p1Left + "px";
-
-        rightScore.width = scoreWidth;
-        rightScore.height = scoreHeight;
-        rightScore.style.top = scoreTop + "px";
-        rightScore.style.left = p2Left + "px";
-    }
-
-    // RESIZE DICE
-    {
-        const space = Math.round(getTileWidth() * diceWidthRatio);
-
-        diceWidth = 4 * space;
-        diceHeight = 3 * space;
-
-        diceCanvas.width = diceWidth;
-        diceCanvas.height = diceHeight;
-
-        layoutDice();
-    }
-
+    resizeBoard();
+    resizeScores();
+    resizeDice();
     resizeOverlay();
+
     redraw(true);
 }
-
-
-
-//
-// LOADING SCREEN
-//
-
-const loadingDiv = document.getElementById("loading");
-
-
-
-//
-// MENU
-//
-
-const menuDiv = document.getElementById("menu"),
-      playButton = document.getElementById("play"),
-      exitButton = document.getElementById("exit");
 
 
 
@@ -198,9 +136,8 @@ const menuDiv = document.getElementById("menu"),
 // BOARD
 //
 
-const boardCanvas = document.getElementById("board"),
-      boardCtx = boardCanvas.getContext("2d"),
-      boardPadding = 30;
+const boardPadding = 30,
+      tileWidthRatio = 0.75;
 
 let boardCanvasWidth = NaN,
     boardCanvasHeight = NaN,
@@ -211,7 +148,11 @@ let boardCanvasWidth = NaN,
     boardWidth = NaN,
     boardHeight = NaN;
 
-const tileWidthRatio = 0.75;
+let tilesWidth = NaN,
+    tilesHeight = NaN,
+    tilesLeft = NaN,
+    tilesTop = NaN,
+    tilesLeftOffset = NaN;
 
 let boardWidthToHeightRatio = null,
     boardTileRegions = null,
@@ -219,6 +160,27 @@ let boardWidthToHeightRatio = null,
     tileWidth = null;
 
 function resizeBoard() {
+    boardCanvasHeight = height;
+    boardCanvasWidth = Math.round((height - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
+    boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
+    boardCanvasTop = centreTop - Math.round(boardCanvasHeight / 2);
+
+    boardCanvas.width = boardCanvasWidth;
+    boardCanvas.height = boardCanvasHeight;
+    boardCanvas.style.left = boardCanvasLeft + "px";
+    boardCanvas.style.top = boardCanvasTop + "px";
+
+    tilesHeight = boardCanvasHeight;
+    tilesWidth = boardCanvasWidth * 1.5;
+    tilesLeft = centreLeft - Math.round(tilesWidth / 2);
+    tilesTop = centreTop - Math.round(tilesHeight / 2);
+    tilesLeftOffset = Math.round((tilesWidth - boardCanvasWidth) / 2);
+
+    tilesCanvas.width = tilesWidth;
+    tilesCanvas.height = tilesHeight;
+    tilesCanvas.style.left = tilesLeft + "px";
+    tilesCanvas.style.top = tilesTop + "px";
+
     boardX = boardPadding;
     boardY = boardPadding;
     boardWidth = boardCanvasWidth - 2 * boardPadding;
@@ -347,9 +309,9 @@ function tileToCanvas(x, y) {
         return null;
 
     const tilesXOffset = boardX + (tilesWidth - boardCanvasWidth) / 2,
-        tilesYOffset = boardY,
-        tilePositions = getBoardTilePositions(),
-        index = x + y * TILES_WIDTH;
+          tilesYOffset = boardY,
+          tilePositions = getBoardTilePositions(),
+          index = x + y * TILES_WIDTH;
 
     const position = tilePositions[index],
         canvas_x = position[0] * boardWidth + tilesXOffset,
@@ -408,21 +370,6 @@ function canvasToTile(x, y) {
 
 
 //
-// TILES
-//
-
-const tilesCanvas = document.getElementById("tiles"),
-      tilesCtx = tilesCanvas.getContext("2d");
-
-let tilesWidth = NaN,
-    tilesHeight = NaN,
-    tilesLeft = NaN,
-    tilesTop = NaN,
-    tilesLeftOffset = NaN;
-
-
-
-//
 // SCORES
 //
 
@@ -458,6 +405,47 @@ function getPlayerRenderTarget(player) {
     return (player === ownPlayer ? leftPlayerRenderTarget : rightPlayerRenderTarget);
 }
 
+function resizeScores() {
+    const tileWidth = getTileWidth();
+
+    scoreWidth = 7 * tileWidth;
+    scoreHeight = tileWidth;
+
+    const tilesCountWidth = scoreWidth,
+        tilesCountHeight = scoreHeight * 2;
+
+    const verticalPadding = Math.round(0.05 * boardCanvasHeight),
+        tilesCountTop = boardCanvasTop + verticalPadding,
+        scoreTop = boardCanvasTop + boardCanvasHeight - scoreHeight - verticalPadding,
+        p1Left = boardCanvasLeft - scoreWidth,
+        p2Left = boardCanvasLeft + boardCanvasWidth;
+
+    const leftTiles = leftPlayerRenderTarget.tilesCanvas,
+        leftScore = leftPlayerRenderTarget.scoreCanvas,
+        rightTiles = rightPlayerRenderTarget.tilesCanvas,
+        rightScore = rightPlayerRenderTarget.scoreCanvas;
+
+    leftTiles.width = tilesCountWidth;
+    leftTiles.height = tilesCountHeight;
+    leftTiles.style.top = tilesCountTop + "px";
+    leftTiles.style.left = p1Left + "px";
+
+    rightTiles.width = tilesCountWidth;
+    rightTiles.height = tilesCountHeight;
+    rightTiles.style.top = tilesCountTop + "px";
+    rightTiles.style.left = p2Left + "px";
+
+    leftScore.width = scoreWidth;
+    leftScore.height = scoreHeight;
+    leftScore.style.top = scoreTop + "px";
+    leftScore.style.left = p1Left + "px";
+
+    rightScore.width = scoreWidth;
+    rightScore.height = scoreHeight;
+    rightScore.style.top = scoreTop + "px";
+    rightScore.style.left = p2Left + "px";
+}
+
 
 
 //
@@ -465,14 +453,21 @@ function getPlayerRenderTarget(player) {
 //
 
 const diceCanvas = document.getElementById("dice"),
-    diceCtx = diceCanvas.getContext("2d");
+      diceCtx = diceCanvas.getContext("2d");
 
 let diceLeft = NaN,
     diceTop = NaN,
     diceWidth = NaN,
     diceHeight = NaN;
 
-function layoutDice() {
+function resizeDice() {
+    const space = Math.round(getTileWidth() * diceWidthRatio);
+
+    diceWidth = 4 * space;
+    diceHeight = 3 * space;
+    diceCanvas.width = diceWidth;
+    diceCanvas.height = diceHeight;
+
     if(ownPlayer.active) {
         diceLeft = boardCanvasLeft - diceWidth;
     } else {
@@ -488,28 +483,8 @@ function layoutDice() {
 
 
 //
-// NETWORK STATUS
-//
-
-const networkStatusElement = document.getElementById("network-status");
-
-
-
-//
-// MESSAGES
-//
-
-const messageContainerElement = document.getElementById("message-container"),
-      messageElement = document.getElementById("message");
-
-
-
-//
 // OVERLAY
 //
-
-const overlayCanvas = document.getElementById("overlay"),
-      overlayCtx = overlayCanvas.getContext("2d");
 
 let overlayWidth = NaN,
     overlayHeight = NaN;
@@ -520,6 +495,4 @@ function resizeOverlay() {
 
     overlayCanvas.width = overlayWidth;
     overlayCanvas.height = overlayHeight;
-
-    redrawOverlay();
 }
