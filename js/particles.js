@@ -1,5 +1,5 @@
 //
-// PARTICLES
+// This file adds particle and firework simulation.
 //
 
 const PARTICLE_RADIUS = 2 / 2560,

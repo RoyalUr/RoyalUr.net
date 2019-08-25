@@ -702,7 +702,7 @@ const MIN_WIN_FIREWORK_PERIOD = 2.0,
           {"min_x": 0.15, "max_x": 0.35, "min_y": 0.15, "max_y": 0.5},
           {"min_x": 0.65, "max_x": 0.85, "min_y": 0.15, "max_y": 0.5}
       ],
-      WIN_FIREWORK_SPEED = 300 / 2560;
+      WIN_FIREWORK_SPEED = 300 / 1280;
 
 const nextFireworkTimes = []; {
     for (let index = 0; index < WIN_FIREWORK_REGIONS.length; ++index) {
@@ -737,6 +737,6 @@ function spawnWinFireworks() {
         hue = (hue <= 0.61 ? hue : hue + (0.78 - 0.61));
         const colour = convertHSVtoRGB(hue, 1, 1);
 
-        createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED * width, colour.r, colour.g, colour.b);
+        createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED * height, colour.r, colour.g, colour.b);
     }
 }
