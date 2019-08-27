@@ -424,7 +424,7 @@ function onTileClick(x, y) {
     if(isTileSelected()) {
         const to = getTileMoveToLocation(selectedTile);
 
-        if(locEquals([x, y], to)) {
+        if(vecEquals([x, y], to)) {
             sendMove();
             return;
         }
@@ -461,7 +461,7 @@ function onTileRelease(x, y) {
         x = x[0];
     }
 
-    if(getTime() - lastReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && locEquals([x, y], lastReleaseTile)
+    if(getTime() - lastReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals([x, y], lastReleaseTile)
        && isAwaitingMove() && getTile(x, y) === ownPlayer.playerNo &&  isValidMoveFrom(x, y)) {
         sendMove();
         return;
@@ -478,7 +478,7 @@ function onTileRelease(x, y) {
         return;
     }
 
-    if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && locEquals([x, y], getTileMoveToLocation(draggedTile))) {
+    if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && vecEquals([x, y], getTileMoveToLocation(draggedTile))) {
         sendMove();
     }
 }
@@ -490,7 +490,7 @@ function sendMove() {
     setTile(to, getTile(selectedTile));
     setTile(selectedTile, TILE_EMPTY);
 
-    if(locEquals(selectedTile, getTileStart())) {
+    if(vecEquals(selectedTile, getTileStart())) {
         takeTile(getActivePlayer());
     }
 

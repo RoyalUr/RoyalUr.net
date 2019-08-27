@@ -418,10 +418,10 @@ function pad(value, length, prefix) {
 
 
 //
-// LOCATIONS
+// VECTORS
 //
 
-function locEquals(x1, y1, x2, y2) {
+function vecAdd(x1, y1, x2, y2) {
     if(x2 === undefined) {
         x2 = y1[0];
         y2 = y1[1];
@@ -429,10 +429,64 @@ function locEquals(x1, y1, x2, y2) {
         x1 = x1[0];
     }
 
-    return x1 === x2 && y1 === y2;
+    return [x1 + x2, y1 + y2];
 }
 
-function locMidpoint(x1, y1, x2, y2) {
+function vecSub(x1, y1, x2, y2) {
+    if(x2 === undefined) {
+        x2 = y1[0];
+        y2 = y1[1];
+        y1 = x1[1];
+        x1 = x1[0];
+    }
+
+    return [x1 - x2, y1 - y2];
+}
+
+function vecMul(mul, x, y) {
+    if (y === undefined) {
+        y = x[1];
+        x = x[0];
+    }
+
+    return [mul * x, mul * y];
+}
+
+function vecLin(t, x1, y1, x2, y2) {
+    if(x2 === undefined) {
+        x2 = y1[0];
+        y2 = y1[1];
+        y1 = x1[1];
+        x1 = x1[0];
+    }
+
+    return [
+        (1 - t) * x1 + t * x2,
+        (1 - t) * y1 + t * y2
+    ];
+}
+
+function vecLen(x, y) {
+    if (y === undefined) {
+        y = x[1];
+        x = x[0];
+    }
+
+    return Math.sqrt(x*x + y*y);
+}
+
+function vecProject(x1, y1, x2, y2) {
+    if(x2 === undefined) {
+        x2 = y1[0];
+        y2 = y1[1];
+        y1 = x1[1];
+        x1 = x1[0];
+    }
+
+    return (x1 * x2 + y1 * y2) / vecLen(x2, y2);
+}
+
+function vecMidpoint(x1, y1, x2, y2) {
     if(x2 === undefined) {
         x2 = y1[0];
         y2 = y1[1];
@@ -446,7 +500,18 @@ function locMidpoint(x1, y1, x2, y2) {
     ];
 }
 
-function locDistance(x1, y1, x2, y2) {
+function vecEquals(x1, y1, x2, y2) {
+    if(x2 === undefined) {
+        x2 = y1[0];
+        y2 = y1[1];
+        y1 = x1[1];
+        x1 = x1[0];
+    }
+
+    return x1 === x2 && y1 === y2;
+}
+
+function vecDist(x1, y1, x2, y2) {
     if(x2 === undefined) {
         x2 = y1[0];
         y2 = y1[1];
@@ -460,34 +525,20 @@ function locDistance(x1, y1, x2, y2) {
     return Math.sqrt(dx*dx + dy*dy);
 }
 
-function locAdd(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return [
-        x1 + x2,
-        y1 + y2
-    ];
-}
-
-function locIndexOf(locations, x, y) {
+function vecListIndexOf(locations, x, y) {
     if(y === undefined) {
         y = x[1];
         x = x[0];
     }
 
     for(let index = 0; index < locations.length; ++index) {
-        if(locEquals([x, y], locations[index]))
+        if(vecEquals([x, y], locations[index]))
             return index;
     }
 
     return -1;
 }
 
-function locContains(locations, x, y) {
-    return locIndexOf(locations, x, y) !== -1;
+function vecListContains(locations, x, y) {
+    return vecListIndexOf(locations, x, y) !== -1;
 }

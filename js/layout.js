@@ -52,7 +52,7 @@ function setupElements() {
         mouseY = y;
 
         const newHoveredTile = canvasToTile(x, y);
-        if(!locEquals(hoveredTile, newHoveredTile)) {
+        if(!vecEquals(hoveredTile, newHoveredTile)) {
             onTileHover(newHoveredTile);
         }
         hoveredTile = newHoveredTile;
@@ -468,6 +468,10 @@ function resizeDice() {
     diceCanvas.width = diceWidth;
     diceCanvas.height = diceHeight;
 
+    layoutDice();
+}
+
+function layoutDice() {
     if(ownPlayer.active) {
         diceLeft = boardCanvasLeft - diceWidth;
     } else {

@@ -7,6 +7,7 @@
     "js/model.js",
     "js/layout.js",
     "js/particles.js",
+    "js/curves.js",
     "js/render.js",
     "js/packets.js",
     "js/network.js",

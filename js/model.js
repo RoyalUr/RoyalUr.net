@@ -190,7 +190,7 @@ function isTileSelected(x, y) {
     if(x === undefined && y === undefined)
         return true;
 
-    return locEquals([x, y], selectedTile);
+    return vecEquals([x, y], selectedTile);
 }
 
 function getTilePath() {
@@ -204,7 +204,7 @@ function getTileStart() {
 function getTileMoveToLocation(x, y) {
     const path = getTilePath(),
         diceValue = countDiceUp(),
-        index = locIndexOf(path, x, y);
+        index = vecListIndexOf(path, x, y);
 
     if(index === -1 || index + diceValue >= path.length)
         return null;
@@ -213,7 +213,7 @@ function getTileMoveToLocation(x, y) {
 }
 
 function isLocusTile(x, y) {
-    return locContains(LOCUS_LOCATIONS, x, y);
+    return vecListContains(LOCUS_LOCATIONS, x, y);
 }
 
 function isStartTile(x, y) {
@@ -222,7 +222,7 @@ function isStartTile(x, y) {
         x = x[0];
     }
 
-    return locEquals([x, y], getStartTile());
+    return vecEquals([x, y], getStartTile());
 }
 
 function getStartTile() {
