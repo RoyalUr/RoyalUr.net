@@ -197,11 +197,18 @@ function redrawTiles(forceRedraw) {
           time = getTime() - tilePathAnchorTime,
           owner = ownPlayer.playerNo;
 
-    const dragLoc = vecAdd(tileToCanvas(pathTile), [mouseX - mouseDownX, mouseY - mouseDownY]);
-    dragLoc[0] = clamp(dragLoc[0], tileWidth, tilesWidth - tileWidth);
-    dragLoc[1] = clamp(dragLoc[1], tileWidth, tilesHeight - tileWidth);
+    // Find the location of the dragged tile
+    let dragLoc = null;
+    if (draggingTile) {
+        dragLoc = vecAdd(tileToCanvas(pathTile), [mouseX - mouseDownX, mouseY - mouseDownY]);
+        dragLoc[0] = clamp(dragLoc[0], tileWidth, tilesWidth - tileWidth);
+        dragLoc[1] = clamp(dragLoc[1], tileWidth, tilesHeight - tileWidth);
+    }
 
-    drawPath(ctx, time, owner, path[startIndex], path[endIndex], path, isValidMove, (draggingTile ? dragLoc : undefined));
+    // Convert the tile path to a canvas location curve
+    const curve = computePathCurve(startIndex, endIndex);
+
+    drawPath(ctx, time, path[endIndex], curve, isValidMove, dragLoc);
 
     const endHovered = vecEquals(hoveredTile, to),
           tileHoverWidth = tileWidth * hoverWidthRatio,
@@ -226,7 +233,20 @@ function redrawTiles(forceRedraw) {
     }
 }
 
-function drawPath(ctx, time, owner, startTile, endTile, path, isValidMove, dragLoc) {
+function computePathCurve(startIndex, endIndex, playerNo) {
+    playerNo = (playerNo !== undefined ? playerNo : getActivePlayer().playerNo);
+
+    const tilePath = getTilePath(playerNo),
+        locPath = [];
+
+    for (let index = startIndex; index <= endIndex; ++index) {
+        locPath.push(tileToCanvas(tilePath[index]));
+    }
+
+    return createBezierCurveFromPath(locPath);
+}
+
+function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
     const tileWidth = getTileWidth();
 
     ctx.save();
@@ -255,31 +275,21 @@ function drawPath(ctx, time, owner, startTile, endTile, path, isValidMove, dragL
     }
     ctx.lineDashOffset = dashOffset;
 
-    // Convert the tile path to a location bezier curve
-    let startIndex = vecListIndexOf(path, startTile),
-        endIndex = vecListIndexOf(path, endTile);
-
-    const locPath = [];
-    for (let index = startIndex; index <= endIndex; ++index) {
-        locPath.push(tileToCanvas(path[index]));
-    }
-    const bezierCurve = createBezierCurveFromPath(locPath);
-
     // Defines what section of the curve we're gonna draw
     let startCurveIndex = 0,
-        endCurveIndex = bezierCurve.length - 1;
+        endCurveIndex = curve.length - 1;
 
-    if (dragLoc !== undefined) {
+    if (dragLoc !== null) {
         // We only want to consider connecting to a point within this distance,
         // otherwise we'll just connect straight to the end of the path.
         let closestDist = tileWidth / 2,
             closestIndex = NaN;
 
         for (let index = startCurveIndex; index < endCurveIndex; ++index) {
-            const loc = bezierCurve[index],
+            const loc = curve[index],
                   dist = vecDist(dragLoc, loc);
 
-            if (dist < closestDist && !isPointAheadInPath(dragLoc, bezierCurve, index)) {
+            if (dist < closestDist && !isPointAheadInPath(dragLoc, curve, index)) {
                 closestIndex = index;
                 closestDist = dist;
             }
@@ -288,17 +298,17 @@ function drawPath(ctx, time, owner, startTile, endTile, path, isValidMove, dragL
         startCurveIndex = (!isNaN(closestIndex) ? closestIndex : endCurveIndex);
     }
 
-    const endLoc = bezierCurve[endCurveIndex];
+    const endLoc = curve[endCurveIndex];
 
     // Draw the path backwards so that the dashes don't move due to dragging the tile
     ctx.moveTo(endLoc[0], endLoc[1]);
-    for (let index = bezierCurve.length - 2; index >= startCurveIndex; --index) {
-        const point = bezierCurve[index];
+    for (let index = curve.length - 2; index >= startCurveIndex; --index) {
+        const point = curve[index];
         ctx.lineTo(point[0], point[1]);
     }
 
     // Line straight to the drag location
-    if (dragLoc !== undefined) {
+    if (dragLoc !== null) {
         ctx.lineTo(dragLoc[0], dragLoc[1]);
     }
 

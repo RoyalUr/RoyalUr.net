@@ -22,7 +22,7 @@ function findBezierCurveIndexFromPathIndex(path, curve, pathIndex) {
         return curve.length - 1;
 
     const resolution = (curve.length - 2) / (path.length - 2);
-    return Math.round(1 + (pathIndex - 0.5) * resolution);
+    return Math.round(1 + pathIndex * resolution);
 }
 
 /**
@@ -31,7 +31,7 @@ function findBezierCurveIndexFromPathIndex(path, curve, pathIndex) {
  * @param path       A list of locations to construct the bezier curve from.
  * @param resolution The number of points to place between each point in the given path.
  *
- * @returns A list of locations that make up the curve
+ * @returns [[]] A list of locations that make up the curve
  */
 function createBezierCurveFromPath(path, resolution) {
     resolution = (resolution !== undefined ? resolution : 30);

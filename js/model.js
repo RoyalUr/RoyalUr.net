@@ -193,8 +193,13 @@ function isTileSelected(x, y) {
     return vecEquals([x, y], selectedTile);
 }
 
-function getTilePath() {
-    return (lightPlayer.active ? LIGHT_PATH : DARK_PATH);
+function getTilePath(playerNo) {
+    playerNo = (playerNo !== undefined ? playerNo : getActivePlayer().playerNo);
+    if (playerNo === lightPlayer.playerNo)
+        return LIGHT_PATH;
+    if (playerNo === darkPlayer.playerNo)
+        return DARK_PATH;
+    throw "Unknown playerNo " + playerNo;
 }
 
 function getTileStart() {
