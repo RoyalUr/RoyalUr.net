@@ -249,7 +249,7 @@ function descending(num1, num2) {
 }
 
 function easeInOutSine(value) {
-    return (Math.sin((value - 0.5) * (0.5 * Math.PI)) + 1) / 2;
+    return (1 - Math.cos(value * Math.PI)) / 2;
 }
 
 function easeOutSine(value) {

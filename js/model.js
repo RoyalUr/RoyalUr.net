@@ -193,6 +193,15 @@ function isTileSelected(x, y) {
     return vecEquals([x, y], selectedTile);
 }
 
+function isTileHovered(x, y) {
+    if (y === undefined) {
+        y = x[1];
+        x = x[0];
+    }
+
+    return vecEquals([x, y], hoveredTile);
+}
+
 function getTilePath(playerNo) {
     playerNo = (playerNo !== undefined ? playerNo : getActivePlayer().playerNo);
     if (playerNo === lightPlayer.playerNo)

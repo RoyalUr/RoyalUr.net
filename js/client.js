@@ -348,15 +348,11 @@ function onPacketMessage(data) {
 function onPacketMove(move) {
     const tile = getTile(move.from),
           replaced = getTile(move.to);
+
     if(tile !== TILE_EMPTY) {
+        animateTileMove(move.from, move.to);
         setTile(move.to, tile);
         setTile(move.from, TILE_EMPTY);
-        
-        if(replaced !== TILE_EMPTY) {
-            playSound("kill");
-        } else {
-            playSound("place");
-        }
     }
 }
 
@@ -487,6 +483,7 @@ function sendMove() {
     const to = getTileMoveToLocation(selectedTile),
           replaced = getTile(to);
 
+    animateTileMove(selectedTile, to);
     setTile(to, getTile(selectedTile));
     setTile(selectedTile, TILE_EMPTY);
 
@@ -498,12 +495,6 @@ function sendMove() {
 
     unselectTile();
     ownPlayer.active = false;
-    
-    if(replaced !== TILE_EMPTY) {
-        playSound("kill");
-    } else {
-        playSound("place");
-    }
 }
 
 function setupStartTiles() {

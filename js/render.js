@@ -126,10 +126,19 @@ function redrawBoard(forceRedraw) {
 // TILES
 //
 
-const hoverWidthRatio = 1.1,
-      shadowWidthRatio = hoverWidthRatio * 1.05;
+const TILE_MOVE_DURATIONS = [0, 0.3, 0.6, 0.7, 0.8],
+      HOVER_WIDTH_RATIO = 1.1,
+      SHADOW_WIDTH_RATIO = HOVER_WIDTH_RATIO * 1.05;
 
 let tilePathAnchorTime = 0;
+
+const tileMove = {
+    owner: TILE_EMPTY,
+    replacingOwner: TILE_EMPTY,
+    fromTile: [-1, -1],
+    toTile: [-1, -1],
+    startTime: LONG_TIME_AGO
+};
 
 function updateTilePathAnchorTime() {
     const duration = getTime() - mouseDownTime,
@@ -144,12 +153,55 @@ function updateTilePathAnchorTime() {
     tilePathAnchorTime = (tilePathAnchorTime % period) + (tilePathAnchorTime < 0 ? period : 0);
 }
 
+function animateTileMove(fromTile, toTile) {
+    const owner = getTile(fromTile);
+    if (owner === TILE_EMPTY)
+        return;
+
+    tileMove.owner = owner;
+    tileMove.replacingOwner = getTile(toTile);
+    tileMove.fromTile = fromTile;
+    tileMove.toTile = toTile;
+    tileMove.startTime = getTime();
+
+    const path = getTilePath(owner),
+          moveLength = vecListIndexOf(path, toTile) - vecListIndexOf(path, fromTile);
+    tileMove.duration = TILE_MOVE_DURATIONS[moveLength];
+}
+
+function clearTileMove() {
+    tileMove.owner = TILE_EMPTY;
+    tileMove.replacingOwner = TILE_EMPTY;
+    tileMove.fromTile = [-1, -1];
+    tileMove.toTile = [-1, -1];
+    tileMove.startTime = LONG_TIME_AGO;
+    tileMove.duration = -1;
+}
+
+function updateTileMove(time) {
+    // If there is no current tile moving
+    if (!isTileValid(tileMove.fromTile))
+        return;
+
+    const age = (time - tileMove.startTime) / tileMove.duration;
+    if (age < 1)
+        return;
+
+    clearTileMove();
+    if (tileMove.replacingOwner !== TILE_EMPTY) {
+        playSound("kill");
+    } else {
+        playSound("place");
+    }
+}
+
 function redrawTiles(forceRedraw) {
     // Avoid redrawing if we don't have to
     if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
 
-    const ctx = tilesCtx;
+    const ctx = tilesCtx,
+          time = getTime();
 
     ctx.clearRect(0, 0, tilesWidth, tilesHeight);
 
@@ -157,87 +209,130 @@ function redrawTiles(forceRedraw) {
           path = getTilePath(),
           diceValue = countDiceUp();
 
-    let pathTile = (isTileSelected(draggedTile) || getTile(hoveredTile) !== ownPlayer.playerNo ? selectedTile : hoveredTile);
-
-    if(!isAwaitingMove() || !isTileValid(pathTile) || getTile(pathTile) !== ownPlayer.playerNo) {
-        pathTile = [-1, -1];
-    }
-
-    let startIndex = vecListIndexOf(path, pathTile),
+    // Get the tile to draw a path for
+    let pathTile = getDrawPotentialMoveTile(),
+        startIndex = vecListIndexOf(path, pathTile),
         endIndex = (startIndex >= 0 ? min(startIndex + diceValue, path.length - 1) : -1),
-        to = (endIndex >= 0 ? path[endIndex] : [-1, -1]);
+        endTile = (endIndex >= 0 ? path[endIndex] : [-1, -1]);
 
     if(startIndex === endIndex) {
         pathTile = [-1, -1];
-        to = [-1, -1];
+        endTile = [-1, -1];
     }
 
+    // Get the tile we are currently moving
+    updateTileMove(time);
+    const moveFrom = tileMove.fromTile,
+          moveTo = tileMove.toTile;
+
+    // Tiles we will draw later
+    const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo];
+
+    // Draw all tiles not part of a drawn path
     for(let x = 0; x < TILES_WIDTH; ++x) {
         for(let y = 0; y < TILES_HEIGHT; ++y) {
             if(tiles[x][y] === TILE_EMPTY)
                 continue;
 
-            if(vecEquals([x, y], pathTile) || vecEquals([x, y], to))
+            const loc = [x, y];
+            if (vecListContains(ignoreDrawTiles, loc))
                 continue;
 
-            const hovered = vecEquals([x, y], hoveredTile),
-                  selected = isTileSelected(x, y),
-                  tileDrawWidth = tileWidth * (hovered ? hoverWidthRatio : 1),
-                  shadowColour = (selected ? 255 : 0);
+            const tileDrawWidth = tileWidth * (isTileHovered(loc) ? HOVER_WIDTH_RATIO : 1),
+                  shadowColour = (isTileSelected(loc) ? 255 : 0);
 
-            renderTile(ctx, [x, y], tileDrawWidth, tileDrawWidth, tiles[x][y], shadowColour);
+            renderTile(ctx, loc, tileDrawWidth, tileDrawWidth, tiles[x][y], shadowColour);
         }
     }
 
-    if(!isTileValid(pathTile))
+    // Draw a potential move
+    if(isTileValid(pathTile)) {
+        const isValidMove = isValidMoveFrom(pathTile),
+              draggingTile = isTileSelected(draggedTile),
+              owner = ownPlayer.playerNo;
+
+        // Find the location of the dragged tile
+        let dragLoc = null;
+        if (draggingTile) {
+            dragLoc = vecAdd(tileToCanvas(pathTile), [mouseX - mouseDownX, mouseY - mouseDownY]);
+            dragLoc[0] = clamp(dragLoc[0], tileWidth, tilesWidth - tileWidth);
+            dragLoc[1] = clamp(dragLoc[1], tileWidth, tilesHeight - tileWidth);
+        }
+
+        // Convert the tile path to a canvas location curve
+        const curve = computePathCurve(startIndex, endIndex);
+
+        drawPath(ctx, time - tilePathAnchorTime, path[endIndex], curve, isValidMove, dragLoc);
+
+        const endHovered = isTileHovered(endTile),
+              tileHoverWidth = tileWidth * HOVER_WIDTH_RATIO,
+              cyclicWidthMul = 1 + 0.03 * Math.cos(5 * time),
+              tileCyclicWidth = tileHoverWidth * cyclicWidthMul;
+
+        if(getTile(endTile) !== TILE_EMPTY) {
+            const tileWidth = (isValidMove ? tileCyclicWidth : tileHoverWidth);
+            renderTile(ctx, endTile, tileWidth, tileWidth, getTile(endTile), (endHovered ? 255 : 0));
+        } else if(isValidMove) {
+            renderTile(ctx, endTile, tileCyclicWidth, tileCyclicWidth, owner, (endHovered ? 255 : 0));
+        }
+
+        if(!draggingTile) {
+            renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, (isTileSelected(pathTile) ? 255 : 0));
+        } else {
+            const draggedOnBoard = isTileOnBoard(canvasToTile(mouseX, mouseY)),
+                draggedWidth = tileWidth * (draggedOnBoard ? HOVER_WIDTH_RATIO : 1),
+                draggedShadowWidth = tileWidth * (draggedOnBoard ? SHADOW_WIDTH_RATIO : 1);
+
+            paintTile(ctx, dragLoc[0], dragLoc[1], draggedWidth, draggedShadowWidth, owner, 255);
+        }
+    }
+
+    // Draw a moving tile
+    drawMovingTile(ctx, time, tileWidth);
+}
+
+function drawMovingTile(ctx, time, tileWidth) {
+    // There is no moving tile
+    if (!isTileValid(tileMove.fromTile))
         return;
 
-    const isValidMove = isValidMoveFrom(pathTile),
-          draggingTile = isTileSelected(draggedTile),
-          time = getTime() - tilePathAnchorTime,
-          owner = ownPlayer.playerNo;
+    const path = getTilePath(tileMove.owner),
+          startIndex = vecListIndexOf(path, tileMove.fromTile),
+          endIndex = vecListIndexOf(path, tileMove.toTile),
+          curve = computePathCurve(startIndex, endIndex, tileMove.owner);
 
-    // Find the location of the dragged tile
-    let dragLoc = null;
-    if (draggingTile) {
-        dragLoc = vecAdd(tileToCanvas(pathTile), [mouseX - mouseDownX, mouseY - mouseDownY]);
-        dragLoc[0] = clamp(dragLoc[0], tileWidth, tilesWidth - tileWidth);
-        dragLoc[1] = clamp(dragLoc[1], tileWidth, tilesHeight - tileWidth);
+    const age = (time - tileMove.startTime) / tileMove.duration,
+          startCurveIndex = min(curve.length - 1, Math.floor(easeInOutSine(age) * curve.length)),
+          startLoc = curve[startCurveIndex],
+          endLoc = curve[curve.length - 1];
+
+    if (tileMove.replacingOwner !== TILE_EMPTY) {
+        paintTile(ctx, endLoc[0], endLoc[1], tileWidth, tileWidth, tileMove.replacingOwner, 0);
     }
 
-    // Convert the tile path to a canvas location curve
-    const curve = computePathCurve(startIndex, endIndex);
+    const tileMovingWidth = tileWidth * (1 + 0.1 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5)));
 
-    drawPath(ctx, time, path[endIndex], curve, isValidMove, dragLoc);
+    paintTile(ctx, startLoc[0], startLoc[1], tileMovingWidth, tileMovingWidth, tileMove.owner, 0);
+}
 
-    const endHovered = vecEquals(hoveredTile, to),
-          tileHoverWidth = tileWidth * hoverWidthRatio,
-          cyclicWidthMul = 1 + 0.03 * Math.cos(5 * time),
-          tileCyclicWidth = tileHoverWidth * cyclicWidthMul;
+function getDrawPotentialMoveTile() {
+    if (!isAwaitingMove())
+        return [-1, -1];
 
-    if(getTile(to) !== TILE_EMPTY) {
-        const tileWidth = (isValidMove ? tileCyclicWidth : tileHoverWidth);
-        renderTile(ctx, to, tileWidth, tileWidth, getTile(to), (endHovered ? 255 : 0));
-    } else if(isValidMove) {
-        renderTile(ctx, to, tileCyclicWidth, tileCyclicWidth, owner, (endHovered ? 255 : 0));
-    }
+    if (getTile(hoveredTile) === ownPlayer.playerNo)
+        return hoveredTile;
 
-    if(!draggingTile) {
-        renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, (isTileSelected(pathTile) ? 255 : 0));
-    } else {
-        const draggedOnBoard = isTileOnBoard(canvasToTile(mouseX, mouseY)),
-              draggedWidth = tileWidth * (draggedOnBoard ? hoverWidthRatio : 1),
-              draggedShadowWidth = tileWidth * (draggedOnBoard ? shadowWidthRatio : 1);
+    if (isTileSelected(draggedTile))
+        return selectedTile;
 
-        paintTile(ctx, dragLoc[0], dragLoc[1], draggedWidth, draggedShadowWidth, owner, 255);
-    }
+    return [-1, -1];
 }
 
 function computePathCurve(startIndex, endIndex, playerNo) {
     playerNo = (playerNo !== undefined ? playerNo : getActivePlayer().playerNo);
 
     const tilePath = getTilePath(playerNo),
-        locPath = [];
+          locPath = [];
 
     for (let index = startIndex; index <= endIndex; ++index) {
         locPath.push(tileToCanvas(tilePath[index]));
@@ -253,7 +348,7 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
     ctx.beginPath();
 
     if (isValidMove) {
-        ctx.strokeStyle = (vecEquals(hoveredTile, endTile) ? rgb(100, 255, 100) : rgb(255));
+        ctx.strokeStyle = (isTileHovered(endTile) ? rgb(100, 255, 100) : rgb(255));
     } else {
         ctx.strokeStyle = rgb(255, 70, 70);
     }
@@ -342,8 +437,8 @@ function getTileImage(owner, width) {
 
 function renderTile(ctx, location, width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue) {
     if(!isTileOnBoard(location)) {
-        width /= hoverWidthRatio;
-        shadowWidth /= shadowWidthRatio;
+        width /= HOVER_WIDTH_RATIO;
+        shadowWidth /= SHADOW_WIDTH_RATIO;
     }
 
     const loc = tileToCanvas(location);
@@ -351,6 +446,7 @@ function renderTile(ctx, location, width, shadowWidth, owner, shadowRed, shadowG
     paintTile(ctx, loc[0], loc[1], width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue);
 }
 
+// TODO : paintTile should take a location array, not left, top
 function paintTile(ctx, centreLeft, centreTop, width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue) {
     const left = centreLeft - width / 2,
           top = centreTop - width / 2,
@@ -435,7 +531,7 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
 
     const highlightStartTile = (
         player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !dice.rolling
-        && (vecEquals(startTile, hoveredTile) || (isTileSelected(startTile) && !isValidMoveFrom(hoveredTile)))
+        && (isTileHovered(startTile) || (isTileSelected(startTile) && !isValidMoveFrom(hoveredTile)))
     );
 
     drawTiles(
