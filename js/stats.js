@@ -121,7 +121,7 @@ function reportStatistics() {
             statistic = entry.statistic,
             summary = entry.summary;
 
-        report += "  " + statistic + " : " + Math.round(summary.percentTime * 1000) / 10 + "%";
+        report += "  " + Math.round(summary.percentTime * 1000) / 10 + "% : " + statistic;
         report += " - " + Math.round(summary.averageTime * 1000 * 100) / 100 + "ms per call";
         report += ", " + Math.round(summary.callsPerSecond) + " calls per second";
         report += "\n";
