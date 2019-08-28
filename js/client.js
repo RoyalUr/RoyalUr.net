@@ -4,9 +4,15 @@
 
 console.log("\nCurious how the client works? Check out the source: https://github.com/Sothatsit/RoyalUrClient\n ");
 
+const clientStartTime = getTime();
+let resourcesLoadedTime = LONG_TIME_AGO,
+    clientFinishSetupTime = LONG_TIME_AGO;
+
 loadResources(setup);
 
 function setup() {
+    resourcesLoadedTime = getTime();
+
     setupElements();
     setInterval(updateStatistics, 1000);
 
@@ -23,7 +29,34 @@ function setup() {
     window.requestAnimationFrame(function() {
         resize();
         redrawLoop();
+        finishSetup();
     });
+}
+
+function finishSetup() {
+    clientFinishSetupTime = getTime();
+
+    if (debugNetwork) {
+        reportStartupPerformance();
+    }
+}
+
+function reportStartupPerformance() {
+    const startupDuration = clientFinishSetupTime - clientStartTime,
+          resourceLoadDuration = resourcesLoadedTime - clientStartTime,
+          setupDuration = clientFinishSetupTime - resourcesLoadedTime,
+          resourceLoadPercentage = resourceLoadDuration / startupDuration,
+          setupPercentage = setupDuration / startupDuration;
+
+    let report = "\nClient startup took " + (Math.round(startupDuration * 1000 * 10) / 10) + "ms\n";
+
+    report += "  " + (Math.round(resourceLoadPercentage * 1000) / 10) + "% - Resource Loading ";
+    report += "(" + (Math.round(resourceLoadDuration * 1000 * 10) / 10) + "ms)\n";
+
+    report += "  " + (Math.round(setupPercentage * 1000) / 10) + "% - Setup ";
+    report += "(" + (Math.round(setupDuration * 1000 * 10) / 10) + "ms)\n ";
+
+    console.log(report);
 }
 
 
