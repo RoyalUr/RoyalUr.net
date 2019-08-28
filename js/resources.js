@@ -2,23 +2,61 @@
 // This file manages the loading of resources such as audio and images that the client needs.
 //
 
+const resourcesLoading = [],
+      resourcesLoaded = [];
+let onAllResourcesLoadedFn = null;
+
 function loadResources(onComplete) {
-    const countdown = {
-        count: 0
-    };
+    onAllResourcesLoadedFn = onComplete;
 
-    function doCountdown() {
-        setTimeout(() => {
-            countdown.count -= 1;
-            if (countdown.count === 0) {
-                onComplete();
-            }
-        }, 0);
-    }
+    loadImages();
+    loadAudio();
+}
 
-    countdown.count += 2;
-    loadImages(doCountdown);
-    loadAudio(doCountdown);
+function markResourceLoading(name) {
+    resourcesLoading.push(name);
+}
+
+function markResourceLoaded(name) {
+    // We only want to countdown in an animation frame for consistency
+    window.requestAnimationFrame(() => {
+        const index = resourcesLoading.indexOf(name);
+        if (index < 0)
+            throw "Resource \"" + name + "\" was not marked as loading";
+
+        resourcesLoading.splice(index, 1);
+        resourcesLoaded.push(name);
+        redrawLoadingBar();
+
+        // If all resources have been loaded
+        if (resourcesLoading.length === 0) {
+            if (onAllResourcesLoadedFn === null)
+                throw "Completed loading resources, but there is no onAllResourcesLoadedFn";
+
+            const onCompleteFn = onAllResourcesLoadedFn;
+            onAllResourcesLoadedFn = null;
+
+            onCompleteFn();
+        }
+    });
+}
+
+
+//
+// LOADING BAR
+//
+
+const loadingBarElement = document.getElementById("loading-bar");
+
+function getPercentageLoaded() {
+    if (resourcesLoading.length === 0 && resourcesLoaded.length === 0)
+        return 0;
+
+    return resourcesLoaded.length / (resourcesLoading.length + resourcesLoaded.length);
+}
+
+function redrawLoadingBar() {
+    loadingBarElement.style.width = (getPercentageLoaded() * 100) + "%";
 }
 
 
@@ -272,33 +310,26 @@ function playSong() {
     lastSong = resource;
 }
 
-function loadAudio(onComplete) {
-    const countdown = {
-        count: 0
-    };
-
+function loadAudio() {
     for(let index = 0; index < audioResources.length; ++index) {
-        const resource = audioResources[index];
-        
-        resource.elements = [];
-        
-        let instances = (resource.instances !== undefined ? resource.instances : 1);
-        countdown.count += 1;
+        const resource = audioResources[index],
+              resourceName = "audio(" + resource.key + ")";
 
-        const element = document.createElement("audio");
+        markResourceLoading(resourceName);
+        
+        const instances = (resource.instances !== undefined ? resource.instances : 1),
+              element = document.createElement("audio");
+
+        // The list we are going to fill with the loaded audio elements
+        resource.elements = [];
 
         element.preload = "auto";
-        element.onloadeddata = function() {
-            countdown.count -= 1;
-
+        element.onloadeddata = () => {
             resource.elements.push(element);
             for (let index = 1; index < instances; ++index) {
                 resource.elements.push(element.cloneNode());
             }
-
-            if(countdown.count === 0) {
-                onComplete();
-            }
+            markResourceLoaded(resourceName)
         };
         element.src = resource.url;
     }
@@ -329,7 +360,10 @@ const imageResources = {
 const loadedImageResources = {};
 let loadedImageAnnotations = {};
 
-function loadImageAnnotations(onComplete) {
+function loadImageAnnotations() {
+    const resourceName = "imageAnnotations";
+    markResourceLoading(resourceName);
+
     const client = new XMLHttpRequest();
     client.onreadystatechange = function() {
         if (this.readyState !== 4)
@@ -337,40 +371,26 @@ function loadImageAnnotations(onComplete) {
 
         if (this.status !== 200) {
             error("Error " + this.status + " loading image annotations: " + this.responseText);
-            onComplete();
+            markResourceLoaded(resourceName);
             return;
         }
 
         loadedImageAnnotations = JSON.parse(this.responseText);
-        onComplete();
+        markResourceLoaded(resourceName);
     }.bind(client);
     client.open('GET', '/res/annotations.json');
     client.send();
 }
 
-function loadImages(onComplete) {
-    const countdown = {
-        count: 0
-    };
-
-    // Used to countdown until all image resources have been loaded
-    const countdown_fn = () => {
-        setTimeout(function() {
-            countdown.count -= 1;
-            if(countdown.count === 0) {
-                onComplete();
-            }
-        }, 0);
-    };
-
-    countdown.count += 1;
-    loadImageAnnotations(countdown_fn);
+function loadImages() {
+    loadImageAnnotations();
 
     for(let key in imageResources) {
         if(!imageResources.hasOwnProperty(key))
             continue;
 
-        countdown.count += 1;
+        const resourceName = "image(" + key + ")";
+        markResourceLoading(resourceName);
 
         const imageResource = {
             key: key,
@@ -386,14 +406,15 @@ function loadImages(onComplete) {
             imageResource.height = this.height;
 
             if(!imageResource.width || !imageResource.height) {
-                error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", invalid width or height"
-                      + " (" + imageResource.width + " x " + imageResource.height + ")");
+                error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", "
+                      + "invalid width or height (" + imageResource.width + " x " + imageResource.height + ")");
 
+                markResourceLoaded(resourceName);
                 loadedImageResources[imageResource.key] = undefined;
                 return;
             }
 
-            setTimeout(countdown_fn, 0);
+            markResourceLoaded(resourceName);
         };
 
         imageResource.image.src = imageResources[key];

@@ -43,6 +43,15 @@ canvas {
  *  LOADING SCREEN
  */
 
+#loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 10px;
+    background-color: white;
+}
+
 #loading svg {
     position: fixed;
     top: 50%;
