@@ -14,7 +14,7 @@ function setup() {
     resourcesLoadedTime = getTime();
 
     setupElements();
-    setInterval(updateStatistics, 1000);
+    setInterval(updateRenderStatistics, 1000);
 
     updateAudioVolumes();
     playSong();

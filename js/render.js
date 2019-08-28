@@ -26,22 +26,22 @@ function redraw(forceRedraw) {
     forceRedraw = !!forceRedraw;
 
     function callRedraw(statistic, redrawFn) {
-        recordCallStatistics(statistic, () => {
+        recordRenderCallStatistics(statistic, () => {
             redrawFn(forceRedraw);
         });
     }
 
-    recordCallStatistics(STATS_OVERALL, () => {
-        callRedraw(STATS_BOARD, redrawBoard);
-        callRedraw(STATS_LOADING, redrawLoading);
-        callRedraw(STATS_MENU, redrawMenu);
-        callRedraw(STATS_TILES, redrawTiles);
-        callRedraw(STATS_DICE, redrawDice);
-        callRedraw(STATS_SCORES, redrawScores);
-        callRedraw(STATS_NETWORK_STATUS, redrawNetworkStatus);
-        callRedraw(STATS_MESSAGE, redrawMessage);
-        callRedraw(STATS_WIN_SCREEN, redrawWinScreen);
-        callRedraw(STATS_OVERLAY, redrawOverlay);
+    recordRenderCallStatistics(STAT_OVERALL, () => {
+        callRedraw(STAT_BOARD, redrawBoard);
+        callRedraw(STAT_LOADING, redrawLoading);
+        callRedraw(STAT_MENU, redrawMenu);
+        callRedraw(STAT_TILES, redrawTiles);
+        callRedraw(STAT_DICE, redrawDice);
+        callRedraw(STAT_SCORES, redrawScores);
+        callRedraw(STAT_NETWORK_STATUS, redrawNetworkStatus);
+        callRedraw(STAT_MESSAGE, redrawMessage);
+        callRedraw(STAT_WIN_SCREEN, redrawWinScreen);
+        callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
             menuDiv, boardCanvas, tilesCanvas, exitButton,

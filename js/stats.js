@@ -2,28 +2,28 @@
 // This file is used to record statistics about the performance of rendering.
 //
 
-const STATS_OVERALL = "overall",
-      STATS_BOARD = "board",
-      STATS_LOADING = "loading",
-      STATS_MENU = "menu",
-      STATS_TILES = "tiles",
-      STATS_DICE = "dice",
-      STATS_SCORES = "scores",
-      STATS_NETWORK_STATUS = "network_status",
-      STATS_MESSAGE = "message",
-      STATS_WIN_SCREEN = "win_screen",
-      STATS_OVERLAY = "overlay";
+const STAT_OVERALL = "overall",
+      STAT_BOARD = "board",
+      STAT_LOADING = "loading",
+      STAT_MENU = "menu",
+      STAT_TILES = "tiles",
+      STAT_DICE = "dice",
+      STAT_SCORES = "scores",
+      STAT_NETWORK_STATUS = "network_status",
+      STAT_MESSAGE = "message",
+      STAT_WIN_SCREEN = "win_screen",
+      STAT_OVERLAY = "overlay";
 
-const statCounters = {
+const renderStatCounters = {
     start: getTime(),
     stats: {}
 };
 
-let lastStatsSummary = {},
+let lastRenderStatsSummary = {},
     fps = 0;
 
-function getStatistic(statistic) {
-    const summary = lastStatsSummary[statistic];
+function getRenderStatistic(statistic) {
+    const summary = lastRenderStatsSummary[statistic];
     if (summary !== undefined)
         return summary;
 
@@ -37,21 +37,21 @@ function getStatistic(statistic) {
     };
 }
 
-function registerCallStats(statistic, duration) {
-    let counter = statCounters.stats[statistic];
+function registerRenderCallStats(statistic, duration) {
+    let counter = renderStatCounters.stats[statistic];
     if (counter === undefined) {
         counter = {
             calls: 0,
             cumulativeTime: 0
         };
-        statCounters.stats[statistic] = counter;
+        renderStatCounters.stats[statistic] = counter;
     }
 
     counter.calls += 1;
     counter.cumulativeTime += duration;
 }
 
-function recordCallStatistics(statistic, func) {
+function recordRenderCallStatistics(statistic, func) {
     const start = getTime();
 
     { // Call the function
@@ -60,21 +60,21 @@ function recordCallStatistics(statistic, func) {
 
     const end = getTime();
 
-    registerCallStats(statistic, end - start);
+    registerRenderCallStats(statistic, end - start);
 }
 
-function updateStatistics() {
+function updateRenderStatistics() {
     const time = getTime(),
-        duration = time - statCounters.start,
+        duration = time - renderStatCounters.start,
         summary = {};
 
-    statCounters.start = time;
+    renderStatCounters.start = time;
 
-    for (let key in statCounters.stats) {
-        if (!statCounters.stats.hasOwnProperty(key))
+    for (let key in renderStatCounters.stats) {
+        if (!renderStatCounters.stats.hasOwnProperty(key))
             continue;
 
-        const statsEntry = statCounters.stats[key];
+        const statsEntry = renderStatCounters.stats[key];
 
         summary[key] = {
             totalCalls: statsEntry.calls,
@@ -87,20 +87,20 @@ function updateStatistics() {
     }
 
     // Reset all stat counters
-    statCounters.stats = {};
+    renderStatCounters.stats = {};
 
-    lastStatsSummary = summary;
-    fps = getStatistic(STATS_OVERALL).callsPerSecond;
+    lastRenderStatsSummary = summary;
+    fps = getRenderStatistic(STAT_OVERALL).callsPerSecond;
 }
 
-function reportStatistics() {
+function reportRenderStatistics() {
     let summaries = [];
-    for (let key in lastStatsSummary) {
-        if (!lastStatsSummary.hasOwnProperty(key))
+    for (let key in lastRenderStatsSummary) {
+        if (!lastRenderStatsSummary.hasOwnProperty(key))
             continue;
         summaries.push({
             statistic: key,
-            summary: lastStatsSummary[key]
+            summary: lastRenderStatsSummary[key]
         });
     }
 
@@ -115,7 +115,9 @@ function reportStatistics() {
         return (x < y) ? 1 : ((x > y) ? -1 : 0);
     });
 
-    let report = "Statistics:\n";
+    const roundedFPS = Math.round(fps);
+
+    let report = "Render Statistics (" + roundedFPS + " fps):\n";
     for (let index = 0; index < summaries.length; ++index) {
         const entry = summaries[index],
             statistic = entry.statistic,
@@ -123,7 +125,11 @@ function reportStatistics() {
 
         report += "  " + Math.round(summary.percentTime * 1000) / 10 + "% : " + statistic;
         report += " - " + Math.round(summary.averageTime * 1000 * 100) / 100 + "ms per call";
-        report += ", " + Math.round(summary.callsPerSecond) + " calls per second";
+
+        if (roundedFPS !== Math.round(summary.callsPerSecond)) {
+            report += ", " + Math.round(summary.callsPerSecond) + " calls per second";
+        }
+
         report += "\n";
     }
 
