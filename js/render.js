@@ -128,7 +128,8 @@ function redrawBoard(forceRedraw) {
 
 const TILE_MOVE_DURATIONS = [0, 0.3, 0.6, 0.7, 0.8],
       HOVER_WIDTH_RATIO = 1.1,
-      SHADOW_WIDTH_RATIO = HOVER_WIDTH_RATIO * 1.05;
+      SHADOW_WIDTH_RATIO = HOVER_WIDTH_RATIO * 1.05,
+      DRAG_DIRECT_LINE_TILE_WIDTHS = 0.25;
 
 let tilePathAnchorTime = 0;
 
@@ -370,41 +371,19 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
     }
     ctx.lineDashOffset = dashOffset;
 
-    // Defines what section of the curve we're gonna draw
-    let startCurveIndex = 0,
-        endCurveIndex = curve.length - 1;
 
-    if (dragLoc !== null) {
-        // We only want to consider connecting to a point within this distance,
-        // otherwise we'll just connect straight to the end of the path.
-        let closestDist = tileWidth / 2,
-            closestIndex = NaN;
-
-        for (let index = startCurveIndex; index < endCurveIndex; ++index) {
-            const loc = curve[index],
-                  dist = vecDist(dragLoc, loc);
-
-            if (dist < closestDist && !isPointAheadInPath(dragLoc, curve, index)) {
-                closestIndex = index;
-                closestDist = dist;
-            }
-        }
-
-        startCurveIndex = (!isNaN(closestIndex) ? closestIndex : endCurveIndex);
-    }
-
-    const endLoc = curve[endCurveIndex];
-
-    // Draw the path backwards so that the dashes don't move due to dragging the tile
+    const endLoc = curve[curve.length - 1];
     ctx.moveTo(endLoc[0], endLoc[1]);
-    for (let index = curve.length - 2; index >= startCurveIndex; --index) {
-        const point = curve[index];
-        ctx.lineTo(point[0], point[1]);
-    }
 
-    // Line straight to the drag location
-    if (dragLoc !== null) {
+    if (dragLoc !== null && vecDist(dragLoc, curve[0]) > DRAG_DIRECT_LINE_TILE_WIDTHS * tileWidth) {
+        // Just draw a direct line to the end point
         ctx.lineTo(dragLoc[0], dragLoc[1]);
+    } else {
+        // Draw the path curve
+        for (let index = curve.length - 2; index >= 0; --index) {
+            const point = curve[index];
+            ctx.lineTo(point[0], point[1]);
+        }
     }
 
     ctx.stroke();
