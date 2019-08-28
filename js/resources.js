@@ -2,8 +2,7 @@
 // This file manages the loading of resources such as audio and images that the client needs.
 //
 
-const resourcesLoading = [],
-      resourcesLoaded = [];
+const resourceStats = {};
 let onAllResourcesLoadedFn = null;
 
 function loadResources(onComplete) {
@@ -13,23 +12,66 @@ function loadResources(onComplete) {
     loadAudio();
 }
 
+function getResourceStats(name) {
+    if (!resourceStats.hasOwnProperty(name)) {
+        resourceStats[name] = {
+            name: name,
+            loaded: false,
+            startLoadTime: LONG_TIME_AGO,
+            endLoadTime: LONG_TIME_AGO,
+            loadDuration: NaN
+        };
+    }
+
+    return resourceStats[name];
+}
+
+function getResourcesLoading() {
+    const loading = [];
+    for (let key in resourceStats) {
+        if (!resourceStats.hasOwnProperty(key))
+            continue;
+
+        const stats = resourceStats[key];
+        if (stats.loaded)
+            continue;
+
+        loading.push(stats);
+    }
+    return loading;
+}
+
+function getResourcesLoaded() {
+    const loaded = [];
+    for (let key in resourceStats) {
+        if (!resourceStats.hasOwnProperty(key))
+            continue;
+
+        const stats = resourceStats[key];
+        if (!stats.loaded)
+            continue;
+
+        loaded.push(stats);
+    }
+    return loaded;
+}
+
 function markResourceLoading(name) {
-    resourcesLoading.push(name);
+    getResourceStats(name).startLoadTime = getTime();
 }
 
 function markResourceLoaded(name) {
     // We only want to countdown in an animation frame for consistency
     window.requestAnimationFrame(() => {
-        const index = resourcesLoading.indexOf(name);
-        if (index < 0)
-            throw "Resource \"" + name + "\" was not marked as loading";
+        const stats = getResourceStats(name);
 
-        resourcesLoading.splice(index, 1);
-        resourcesLoaded.push(name);
+        stats.loaded = true;
+        stats.endLoadTime = getTime();
+        stats.loadDuration = stats.endLoadTime - stats.startLoadTime;
         redrawLoadingBar();
 
         // If all resources have been loaded
-        if (resourcesLoading.length === 0) {
+        if (getResourcesLoading().length === 0) {
             if (onAllResourcesLoadedFn === null)
                 throw "Completed loading resources, but there is no onAllResourcesLoadedFn";
 
@@ -41,6 +83,39 @@ function markResourceLoaded(name) {
     });
 }
 
+function reportResourceLoadingStatistics() {
+    const loading = getResourcesLoading(),
+          loaded = getResourcesLoaded();
+
+    if (loading.length === 0 && loaded.length === 0) {
+        console.log("No resource loading statistics recorded");
+        return;
+    }
+
+    loaded.sort((a, b) => {
+        const x = a.loadDuration,
+              y = b.loadDuration;
+        return (x < y) ? 1 : ((x > y) ? -1 : 0);
+    });
+
+    let report = "Resource Loading Statistics:\n";
+    for (let index = 0; index < loading.length; ++index) {
+        const entry = loading[index];
+
+        report += "  Loading : " + entry.name;
+        report += "\n";
+    }
+
+    for (let index = 0; index < loaded.length; ++index) {
+        const entry = loaded[index];
+
+        report += "  " + Math.round(entry.loadDuration * 10000) / 10 + "ms : " + entry.name;
+        report += "\n";
+    }
+
+    console.log(report);
+}
+
 
 //
 // LOADING BAR
@@ -49,10 +124,13 @@ function markResourceLoaded(name) {
 const loadingBarElement = document.getElementById("loading-bar");
 
 function getPercentageLoaded() {
-    if (resourcesLoading.length === 0 && resourcesLoaded.length === 0)
+    const loaded = getResourcesLoaded(),
+          loading = getResourcesLoading();
+
+    if (loading.length === 0 && loaded.length === 0)
         return 0;
 
-    return resourcesLoaded.length / (resourcesLoading.length + resourcesLoaded.length);
+    return loaded.length / (loading.length + loaded.length);
 }
 
 function redrawLoadingBar() {

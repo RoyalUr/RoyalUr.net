@@ -1,5 +1,5 @@
 //
-// This file is used to record statistics about the performance of the client.
+// This file is used to record statistics about the performance of rendering.
 //
 
 const STATS_OVERALL = "overall",
