@@ -311,7 +311,7 @@ function drawMovingTile(ctx, time, tileWidth) {
         paintTile(ctx, endLoc[0], endLoc[1], tileWidth, tileWidth, tileMove.replacingOwner, 0);
     }
 
-    const tileMovingWidth = tileWidth * (1 + 0.1 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5)));
+    const tileMovingWidth = tileWidth * (1 + 0.2 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5)));
 
     paintTile(ctx, startLoc[0], startLoc[1], tileMovingWidth, tileMovingWidth, tileMove.owner, 0);
 }

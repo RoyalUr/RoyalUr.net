@@ -13,28 +13,26 @@ function findQuadraticBezierPoint(prev, curr, next, t) {
     ];
 }
 
-function findBezierCurveIndexFromPathIndex(path, curve, pathIndex) {
-    if (pathIndex < 0 || pathIndex >= path.length)
-        return -1;
-    if (pathIndex === 0)
-        return 0;
-    if (pathIndex === path.length - 1)
-        return curve.length - 1;
-
-    const resolution = (curve.length - 2) / (path.length - 2);
-    return Math.round(1 + pathIndex * resolution);
+/**
+ * Does not include from and to, just the points in between.
+ */
+function pushLineToCurve(curve, from, to, resolution) {
+    const steps = Math.ceil(vecDist(from, to) / resolution);
+    for (let step = 1; step < steps; ++step) {
+        curve.push(vecLin(step / steps, from, to));
+    }
 }
 
 /**
  * Given the list of locations path, construct a quadratic bezier curve.
  *
  * @param path       A list of locations to construct the bezier curve from.
- * @param resolution The number of points to place between each point in the given path.
+ * @param resolution The maximum distance between consecutive points on the curve.
  *
  * @returns [[]] A list of locations that make up the curve
  */
 function createBezierCurveFromPath(path, resolution) {
-    resolution = (resolution !== undefined ? resolution : 30);
+    resolution = (resolution !== undefined ? resolution : 2);
 
     // Cannot create a curve with less than 2 points
     if (path.length < 2)
@@ -43,29 +41,44 @@ function createBezierCurveFromPath(path, resolution) {
     const curve = [];
 
     // Add a straight line from the start to the first midpoint
-    for (let t=0; t < resolution / 2; ++t) {
-        const point = vecLin(t / resolution, path[0], path[1]);
-        curve.push(point);
-    }
+    curve.push(path[0]);
+    pushLineToCurve(curve, path[0], vecMidpoint(path[0], path[1]), resolution);
 
     for (let index = 1; index < path.length - 1; ++index) {
         const curr = path[index],
               prev = vecMidpoint(curr, path[index - 1]),
               next = vecMidpoint(curr, path[index + 1]);
 
-        for (let t=0; t < resolution; ++t) {
-            const point = findQuadraticBezierPoint(prev, curr, next, t / resolution);
-            curve.push(point);
+        const curveIndex = curve.length;
+        curve.push(prev);
+        curve.push(next);
+
+        let dist = vecDist(next, prev);
+        while (dist > resolution) {
+            const oldCount = curve.length - curveIndex,
+                  newCount = 2 * oldCount - 1,
+                  splits = newCount - oldCount;
+
+            for (let splitIndex = 0; splitIndex < splits; ++splitIndex) {
+                const belowIndex = curveIndex + splitIndex * 2,
+                      below = curve[belowIndex],
+                      above = curve[belowIndex + 1],
+                      t = (splitIndex * 2 + 1) / (newCount - 1),
+                      point = findQuadraticBezierPoint(prev, curr, next, t);
+
+                curve.splice(belowIndex + 1, 0, point);
+                dist = min(dist, min(vecDist(point, below), vecDist(point, above)));
+            }
         }
     }
 
     // Add a straight line from the last midpoint to the end
-    for (let t=Math.ceil(resolution / 2); t < resolution; ++t) {
-        const point = vecLin(t / resolution, path[path.length - 2], path[path.length - 1]);
-        curve.push(point);
-    }
+    const from = path[path.length - 2],
+          to = path[path.length - 1];
 
-    curve.push(path[path.length - 1]);
+    pushLineToCurve(curve, vecMidpoint(from, to), to, resolution);
+    curve.push(to);
+
     return curve;
 }
 
