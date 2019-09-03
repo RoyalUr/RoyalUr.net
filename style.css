@@ -146,6 +146,31 @@ canvas {
  *  MENU
  */
 
+.shadow {
+    filter: url(#drop-shadow-black);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=6, OffY=6, Color='#444')";
+}
+
+.shadow:hover {
+    filter: url(#drop-shadow-white);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
+}
+
+#play img {
+    filter: url(#drop-shadow-black);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=6, OffY=6, Color='#444')";
+}
+
+#play span {
+    filter: url(#drop-shadow-black);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
+}
+
+#play:hover span {
+    filter: url(#drop-shadow-white);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
+}
+
 #menu-outer {
     display: flex;
     width: 100%;
@@ -158,82 +183,125 @@ canvas {
 
     z-index: 5;
     margin: auto;
-    max-width: 470px;
+    max-width: 700px;
 }
 
 #title {
-    font-size: 75px;
-    text-align: center;
-    
-    padding: 20px;
+    width: 100%;
     margin-bottom: 20px;
+    animation: bounce ease-in-out 2s infinite alternate;
+    -webkit-animation: bounce ease-in-out 2s infinite alternate;
+}
 
-    color: white;
-    text-shadow: black 5px 5px 5px;
+@keyframes bounce {
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(-15px);
+    }
+}
+@-webkit-keyframes bounce {
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(-15px);
+    }
 }
 
 .menu-button {
-    padding: 4px;
-    padding-top: 12px;
+    margin: auto;
     margin-bottom: 20px;
-    height: 50px;
-    line-height: 50px;
-
-    color: black;
-    font-size: 40px;
-    text-align: center;
-    text-decoration: none;
-
-    border-radius: 10px;
-    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
-    background: url(res/old-wood-light.png) repeat;
-}
-
-#play {
-    font-size: 50px;
-    padding: 0;
-    height: 80px;
-    line-height: 80px;
-
-    border-radius: 0;
-    box-shadow: none;
-    background: none;
-
-    margin-bottom: 50px;
-}
-
-#play span {
-    padding-top: 20px;
-    padding-bottom: 12px;
-    padding-left: 50px;
-    padding-right: 50px;
-
-    border-radius: 10px;
-    box-shadow: 0 0 10px 0 rgb(0, 0, 0);
-    background: url(res/old-wood-light.png) repeat;
+    height: 90px;
+    line-height: 90px;
 }
 
 .menu-button:hover {
-    color: beige;
     cursor: pointer;
 }
 
 .menu-button img {
-    height: 70px;
+    height: 80px;
     width: auto;
     vertical-align: middle;
     margin-left: 20px;
     margin-right: 20px;
 
     transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
+    animation: breathe ease-in-out 0.8s infinite alternate;
+    -webkit-animation: breathe ease-in-out 0.8s infinite alternate;
 }
 
-.menu-button:hover img {
-    height: 80px;
-    margin-left: 15px;
-    margin-right: 15px;
+@keyframes breathe {
+    from {
+        transform: translateX(-5px);
+    }
+    to {
+        transform: translateX(5px);
+    }
+}
+@-webkit-keyframes breathe {
+    from {
+        height: 75px;
+    }
+    to {
+        height: 85px;
+    }
+}
 
-    transition: all 0.2s ease-in-out;
+#play {
+    display: block;
+    padding: 0;
+    width: 550px;
+    height: 120px;
+    line-height: 120px;
+    margin-bottom: 40px;
+}
+
+#play span {
+    display: inline-block;
+    vertical-align: middle;
+    height: 120px;
+    width: 300px;
+
+    background: url(res/buttons/play.png) no-repeat center;
+    background-size: contain;
+}
+
+#play:hover span {
+    background: url(res/buttons/play_active.png) no-repeat center;
+    background-size: contain;
+}
+
+#learn {
+    display: block;
+    vertical-align: middle;
+    height: 90px;
+    width: 330px;
+
+    background: url(res/buttons/learn.png) no-repeat center;
+    background-size: contain;
+}
+
+#learn:hover {
+    background: url(res/buttons/learn_active.png) no-repeat center;
+    background-size: contain;
+}
+
+#watch {
+    display: block;
+    vertical-align: middle;
+    height: 90px;
+    width: 330px;
+
+    background: url(res/buttons/watch.png) no-repeat center;
+    background-size: contain;
+}
+
+#watch:hover {
+    background: url(res/buttons/watch_active.png) no-repeat center;
+    background-size: contain;
 }
 
 

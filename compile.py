@@ -167,6 +167,22 @@ def createDevBuild(target_folder):
     print "\nCompiling Development Build"
     javascript_files, resource_files, annotation_files = loadCompilationSpec()
 
+    print "\n1. Combine Javascript"
+    combineJS(target_folder, javascript_files, prefix=" .. ")
+
+    print "\n2. Copy Resource Files"
+    copyResourceFiles(target_folder, resource_files, prefix=" .. ")
+
+    print "\n3. Create Annotations File"
+    combineAnnotations(target_folder, annotation_files, prefix=" .. ")
+
+    print "\nDone!\n"
+
+
+def createJSDevBuild(target_folder):
+    print "\nCompiling Javascript Development Build"
+    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+
     print "\n1. Check whether to revert to a Release Build"
     if requiresReleaseBuild(target_folder, resource_files):
         print >>sys.stderr, " .. ERROR : Release build is required\n"
@@ -183,17 +199,20 @@ def createDevBuild(target_folder):
 # Run the Compilation
 #
 DEV_MODE = "dev"
+JS_DEV_MODE = "jsdev"
 RELEASE_MODE = "release"
 
 if len(sys.argv) != 2:
     print "Usage:"
-    print "  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">"
+    print "  python -m compile <" + DEV_MODE + ":" + JS_DEV_MODE + ":" + RELEASE_MODE + ">"
     sys.exit(1)
 
 compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
 
 if compilation_mode == RELEASE_MODE:
     createReleaseBuild("compiled")
+elif compilation_mode == JS_DEV_MODE:
+    createJSDevBuild("compiled")
 elif compilation_mode == DEV_MODE:
     createDevBuild("compiled")
 else:

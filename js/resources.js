@@ -422,17 +422,28 @@ function loadAudio() {
 //
 
 const imageResources = {
+    "logo": "res/logo.png",
     "board": "res/board_light.png",
     "darkTile": "res/darkTile.png",
     "lightTile": "res/lightTile.png",
-    "diceUp1": "res/diceUp1.png",
-    "diceUp2": "res/diceUp2.png",
-    "diceUp3": "res/diceUp3.png",
-    "diceDown1": "res/diceDown1.png",
-    "diceDown2": "res/diceDown2.png",
-    "diceDown3": "res/diceDown3.png",
-    "diceDarkShadow": "res/diceDarkShadow.png",
-    "diceLightShadow": "res/diceLightShadow.png"
+
+    "exit": "res/buttons/exit.png",
+    "exit_active": "res/buttons/exit_active.png",
+    "play": "res/buttons/play.png",
+    "play_active": "res/buttons/play_active.png",
+    "learn": "res/buttons/learn.png",
+    "learn_active": "res/buttons/learn_active.png",
+    "watch": "res/buttons/watch.png",
+    "watch_active": "res/buttons/watch_active.png",
+
+    "diceUp1": "res/dice/up1.png",
+    "diceUp2": "res/dice/up2.png",
+    "diceUp3": "res/dice/up3.png",
+    "diceDown1": "res/dice/down1.png",
+    "diceDown2": "res/dice/down2.png",
+    "diceDown3": "res/dice/down3.png",
+    "diceDarkShadow": "res/dice/darkShadow.png",
+    "diceLightShadow": "res/dice/lightShadow.png"
 };
 
 const loadedImageResources = {};

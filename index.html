@@ -21,22 +21,20 @@
         <!-- MENU -->
         <div id="menu-outer">
             <div id="menu">
-                <p id="title">
-                    The Royal Game of Ur
-                </p>
+                <img id="title" src="res/logo.png"  alt="Logo"/>
 
                 <div id="play" class="menu-button">
                     <img src="res/darkTile.png"  alt="play"/>
-                    <span>Play</span>
+                    <span></span>
                     <img src="res/darkTile.png"  alt="play"/>
                 </div>
 
                 <a href="https://youtu.be/WZskjLq040I?t=222" target="_blank" style="text-decoration: none;">
-                    <div id="learn" class="menu-button">Learn</div>
+                    <div id="learn" class="menu-button shadow"></div>
                 </a>
 
                 <a href="https://youtu.be/WZskjLq040I" target="_blank" style="text-decoration: none;">
-                    <div id="watch" class="menu-button">Watch</div>
+                    <div id="watch" class="menu-button shadow"></div>
                 </a>
             </div>
         </div>
@@ -79,6 +77,33 @@
                 <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
             </svg><span>Exit Game</span>
         </div></div>
+
+        <!-- SHADOW FILTERS -->
+        <svg height='0' xmlns='http://www.w3.org/2000/svg' style="display: none">
+            <filter id='drop-shadow-black' x='-40%' y='-40%' width='180%' height='180%'>
+                <feGaussianBlur in='SourceAlpha' stdDeviation='12'></feGaussianBlur>
+                <feOffset dx='6' dy='6' result='offsetblur'></feOffset>
+                <feFlood flood-color='rgb(0,0,0)'></feFlood>
+                <feComposite in2='offsetblur' operator='in'></feComposite>
+                <feMerge>
+                    <feMergeNode></feMergeNode>
+                    <feMergeNode in='SourceGraphic'></feMergeNode>
+                </feMerge>
+            </filter>
+        </svg>
+
+        <svg height='0' xmlns='http://www.w3.org/2000/svg' style="display: none">
+            <filter id='drop-shadow-white' x='-40%' y='-40%' width='180%' height='180%'>
+                <feGaussianBlur in='SourceAlpha' stdDeviation='12'></feGaussianBlur>
+                <feOffset dx='6' dy='6' result='offsetblur'></feOffset>
+                <feFlood flood-color='rgba(255, 255, 255, 0.2)'></feFlood>
+                <feComposite in2='offsetblur' operator='in'></feComposite>
+                <feMerge>
+                    <feMergeNode></feMergeNode>
+                    <feMergeNode in='SourceGraphic'></feMergeNode>
+                </feMerge>
+            </filter>
+        </svg>
 
         <!-- SCRIPTS -->
         <script src="index.js"></script>
