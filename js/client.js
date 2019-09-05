@@ -508,15 +508,18 @@ function onTileRelease(x, y) {
     }
 
     if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && vecEquals([x, y], getTileMoveToLocation(draggedTile))) {
-        sendMove();
+        sendMove(true);
     }
 }
 
-function sendMove() {
+function sendMove(noAnimation) {
     const to = getTileMoveToLocation(selectedTile),
           replaced = getTile(to);
 
-    animateTileMove(selectedTile, to);
+    if (!noAnimation) {
+        animateTileMove(selectedTile, to);
+    }
+
     setTile(to, getTile(selectedTile));
     setTile(selectedTile, TILE_EMPTY);
 
