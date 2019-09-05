@@ -229,25 +229,16 @@ canvas {
     margin-right: 20px;
 
     transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
-    animation: breathe ease-in-out 0.8s infinite alternate;
-    -webkit-animation: breathe ease-in-out 0.8s infinite alternate;
 }
 
-@keyframes breathe {
-    from {
-        transform: translateX(-5px);
-    }
-    to {
-        transform: translateX(5px);
-    }
-}
-@-webkit-keyframes breathe {
-    from {
-        height: 75px;
-    }
-    to {
-        height: 85px;
-    }
+.menu-button:hover img {
+    height: 90px;
+    width: auto;
+    vertical-align: middle;
+    margin-left: 15px;
+    margin-right: 15px;
+
+    transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
 }
 
 #play {
