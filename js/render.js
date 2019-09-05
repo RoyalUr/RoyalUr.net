@@ -126,7 +126,7 @@ function redrawBoard(forceRedraw) {
 // TILES
 //
 
-const TILE_MOVE_DURATIONS = [0, 0.3, 0.6, 0.7, 0.8],
+const TILE_MOVE_DURATIONS = [0, 0.3, 0.4, 0.5, 0.6],
       HOVER_WIDTH_RATIO = 1.1,
       SHADOW_WIDTH_RATIO = HOVER_WIDTH_RATIO * 1.05,
       DRAG_DIRECT_LINE_TILE_WIDTHS = 0.25;
