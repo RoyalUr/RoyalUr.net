@@ -415,10 +415,10 @@ function resizeScores() {
     const tileWidth = getTileWidth();
 
     scoreWidth = 7 * tileWidth;
-    scoreHeight = tileWidth;
+    scoreHeight = tileWidth * 1.75;
 
     const tilesCountWidth = scoreWidth,
-          tilesCountHeight = scoreHeight * 2;
+          tilesCountHeight = scoreHeight + tileWidth;
 
     const verticalPadding = Math.round(0.05 * boardCanvasHeight),
           tilesCountTop = boardCanvasTop + verticalPadding,

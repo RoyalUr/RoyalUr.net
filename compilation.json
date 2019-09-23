@@ -21,13 +21,11 @@
     "style.css",
     "favicon.png",
 
-    "res/wood-blue-1.png",
-    "res/old-wood-light.png",
-
     "res/font/DuranGo.ttf",
     "res/font/Nunito.woff2",
 
     "res/logo.png",
+    "res/wood-blue-1.png",
     "res/board_light.png",
     "res/darkTile.png",
     "res/lightTile.png",

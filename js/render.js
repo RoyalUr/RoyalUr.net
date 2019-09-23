@@ -447,32 +447,71 @@ function paintTile(ctx, centreLeft, centreTop, width, shadowWidth, owner, shadow
 
 const scoreTileRatio = 0.8;
 
-function drawName(player, isActive) {
-    return renderResource(scoreWidth, scoreHeight, function(ctx) {
+let renderedScoreText = {
+    width: NaN,
+    tiles: null,
+    score: null
+};
+
+function drawScoreText(text, isActive, scale) {
+    return renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
         // Render the text on another canvas, and then onto this one so that the alpha stacks correctly
-        const text = renderResource(scoreWidth, scoreHeight, function(ctx) {
+        const renderedText = renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
             const tileWidth = getTileWidth(),
-                  offset = 0.01 * tileWidth;
+                offset = 0.01 * tileWidth;
 
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = Math.round(tileWidth * 0.75) + "px DuranGo";
+            ctx.font = Math.round(tileWidth * 0.85 * scale) + "px DuranGo";
 
             if (isActive) {
                 ctx.save();
                 ctx.shadowBlur = 5;
                 ctx.shadowColor = rgba(255, 255, 255, 0.7);
-                ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
+                ctx.fillText(text, scoreWidth / 2, 0.5 * tileWidth);
                 ctx.restore();
             }
 
             ctx.fillStyle = rgb(255);
-            ctx.fillText(player.name, scoreWidth / 2, 0.5 * tileWidth);
+            ctx.fillText(text, scoreWidth / 2, 0.5 * tileWidth);
         });
 
         ctx.globalAlpha = (isActive ? 1.0 : 0.8);
-        ctx.drawImage(text, 0, 0);
+        ctx.drawImage(renderedText, 0, 0);
     });
+}
+
+function drawName(player, isActive) {
+    return drawScoreText(player.name, isActive, 1.0);
+}
+
+function checkForRenderedScoreTextResize() {
+    if (renderedScoreText.width === tilesWidth)
+        return;
+
+    renderedScoreText.tiles = null;
+    renderedScoreText.score = null;
+    renderedScoreText.width = tilesWidth;
+}
+
+function getRenderedTilesText() {
+    checkForRenderedScoreTextResize();
+
+    if (renderedScoreText.tiles === null) {
+        renderedScoreText.tiles = drawScoreText("Tiles", false, 0.5);
+        renderedScoreText.width = tilesWidth;
+    }
+    return renderedScoreText.tiles;
+}
+
+function getRenderedScoreText() {
+    checkForRenderedScoreTextResize();
+
+    if (renderedScoreText.score === null) {
+        renderedScoreText.score = drawScoreText("Score", false, 0.5);
+        renderedScoreText.width = tilesWidth;
+    }
+    return renderedScoreText.score;
 }
 
 function getRenderedPlayerName(player) {
@@ -489,17 +528,26 @@ function getRenderedPlayerName(player) {
     return (player.active ? renderTarget.renderedActiveName : renderTarget.renderedIdleName);
 }
 
-function redrawPlayerScores(player, tilesLeft, scoreLeft) {
+function redrawPlayerScores(player, drawFromLeft) {
     const tileWidth = getTileWidth(),
           tilePaintWidth = tileWidth * scoreTileRatio;
 
-    function drawTiles(ctx, owner, left, top, tileCount, highlightStartTile) {
+    function drawTiles(ctx, owner, top, tileCount, highlightStartTile) {
         ctx.clearRect(0, 0, scoreWidth, scoreHeight * 2);
-        for(let index = 0; index < tileCount; ++index) {
-            const tileLeft = left + (index + 0.5) * tileWidth,
-                  shadowShade = (highlightStartTile && index === 0 ? 255 : 0);
 
-            paintTile(ctx, tileLeft, top, tilePaintWidth, tilePaintWidth, owner, shadowShade);
+        const highlightIndex = (drawFromLeft ? tileCount - 1 : 7 - tileCount);
+        for(let index = 0; index < 7; ++index) {
+            const tileLeft = (index + 0.5) * tileWidth,
+                  shadowShade = (highlightStartTile && index === highlightIndex ? 255 : 0);
+
+            if ((drawFromLeft && index < tileCount) || (!drawFromLeft && index >= 7 - tileCount)) {
+                paintTile(ctx, tileLeft, top, tilePaintWidth, tilePaintWidth, owner, shadowShade);
+            } else {
+                ctx.save();
+                ctx.globalAlpha = 0.5;
+                drawCircularShadow(ctx, tileLeft, top, tilePaintWidth / 2, shadowShade);
+                ctx.restore();
+            }
         }
     }
 
@@ -514,15 +562,17 @@ function redrawPlayerScores(player, tilesLeft, scoreLeft) {
     );
 
     drawTiles(
-        tilesCtx, player.playerNo, tilesLeft, tileWidth * 1.5,
+        tilesCtx, player.playerNo, tileWidth * 2.25,
         player.tiles.current, highlightStartTile,
     );
     drawTiles(
-        scoreCtx, player.playerNo, scoreLeft, tileWidth * 0.5,
+        scoreCtx, player.playerNo, tileWidth * 1.25,
         player.score.current, false
     );
 
     tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
+    tilesCtx.drawImage(getRenderedTilesText(), 0, tileWidth);
+    scoreCtx.drawImage(getRenderedScoreText(), 0, 0);
 }
 
 function redrawScores(forceRedraw) {
@@ -530,12 +580,8 @@ function redrawScores(forceRedraw) {
     if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
 
-    const tileWidth = getTileWidth(),
-          p1TilesLeft = (7 - ownPlayer.tiles.current) * tileWidth,
-          p1ScoreLeft = (7 - ownPlayer.score.current) * tileWidth;
-
-    redrawPlayerScores(ownPlayer, p1TilesLeft, p1ScoreLeft);
-    redrawPlayerScores(otherPlayer, 0, 0);
+    redrawPlayerScores(ownPlayer, false);
+    redrawPlayerScores(otherPlayer, true);
 }
 
 
