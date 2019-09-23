@@ -74,6 +74,10 @@
     "res/audio/firework_rocket.mp4"
   ],
 
+  "sprites": {
+
+  },
+
   "annotations": {
     "board": "res/board_annotation.json"
   }

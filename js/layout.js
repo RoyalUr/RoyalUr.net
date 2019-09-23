@@ -2,6 +2,8 @@
 // This file stores the logic for laying out the elements in the client.
 //
 
+const maxWidthOnHeightRatio = 1.5;
+
 const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
       exitButton = document.getElementById("exit");
@@ -25,6 +27,8 @@ const overlayCanvas = document.getElementById("overlay"),
 
 let width = NaN,
     height = NaN,
+    useWidth = NaN,
+    useHeight = NaN,
     viewport = null,
     centreLeft = NaN,
     centreTop = NaN;
@@ -121,6 +125,8 @@ function resize() {
     centreTop = Math.round((viewport.top + viewport.bottom) / 2);
     width = viewport.right - viewport.left;
     height = viewport.bottom - viewport.top;
+    useWidth = width;
+    useHeight = min(useWidth / maxWidthOnHeightRatio, height);
 
     resizeBoard();
     resizeScores();
@@ -160,8 +166,8 @@ let boardWidthToHeightRatio = null,
     tileWidth = null;
 
 function resizeBoard() {
-    boardCanvasHeight = height;
-    boardCanvasWidth = Math.round((height - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
+    boardCanvasHeight = useHeight;
+    boardCanvasWidth = Math.round((useHeight - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
     boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
     boardCanvasTop = centreTop - Math.round(boardCanvasHeight / 2);
 
@@ -412,18 +418,18 @@ function resizeScores() {
     scoreHeight = tileWidth;
 
     const tilesCountWidth = scoreWidth,
-        tilesCountHeight = scoreHeight * 2;
+          tilesCountHeight = scoreHeight * 2;
 
     const verticalPadding = Math.round(0.05 * boardCanvasHeight),
-        tilesCountTop = boardCanvasTop + verticalPadding,
-        scoreTop = boardCanvasTop + boardCanvasHeight - scoreHeight - verticalPadding,
-        p1Left = boardCanvasLeft - scoreWidth,
-        p2Left = boardCanvasLeft + boardCanvasWidth;
+          tilesCountTop = boardCanvasTop + verticalPadding,
+          scoreTop = boardCanvasTop + boardCanvasHeight - scoreHeight - verticalPadding,
+          p1Left = boardCanvasLeft - scoreWidth,
+          p2Left = boardCanvasLeft + boardCanvasWidth;
 
     const leftTiles = leftPlayerRenderTarget.tilesCanvas,
-        leftScore = leftPlayerRenderTarget.scoreCanvas,
-        rightTiles = rightPlayerRenderTarget.tilesCanvas,
-        rightScore = rightPlayerRenderTarget.scoreCanvas;
+          leftScore = leftPlayerRenderTarget.scoreCanvas,
+          rightTiles = rightPlayerRenderTarget.tilesCanvas,
+          rightScore = rightPlayerRenderTarget.scoreCanvas;
 
     leftTiles.width = tilesCountWidth;
     leftTiles.height = tilesCountHeight;
