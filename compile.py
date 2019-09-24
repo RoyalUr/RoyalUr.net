@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import subprocess
+from PIL import Image
 
 
 
@@ -29,7 +30,7 @@ def executePipedCommands(*commands, **kwargs):
     prefix = kwargs.pop("prefix", "")
 
     output_file = None
-    if isinstance(commands[-1], basestring):
+    if isinstance(commands[-1], str):
         output_file = commands[-1]
         commands = commands[:-1]
 
@@ -43,7 +44,7 @@ def executePipedCommands(*commands, **kwargs):
             pipe_out = open(output_file, 'w')
             command_print += " > " + output_file
 
-        print prefix + command_print
+        print(prefix + command_print)
         if last_process is None:
             last_process = subprocess.Popen(command, stdout=pipe_out)
         else:
@@ -51,21 +52,23 @@ def executePipedCommands(*commands, **kwargs):
 
     try:
         stdout, stderr = last_process.communicate()
+        stdout = ("" if stdout is None else stdout.decode('utf-8'))
+        stderr = ("" if stderr is None else stderr.decode('utf-8'))
         retCode = last_process.returncode
 
-        if stdout is not None and stdout != "":
-            print prefix + "STDOUT:", stdout
-        if stderr is not None and stderr != "":
-            print >>sys.stderr, prefix + "STDERR", stderr
+        if stdout != "":
+            print(prefix + "STDOUT:", stdout)
+        if stderr != "":
+            print(prefix + "STDERR", stderr, file=sys.stderr)
 
         if retCode < 0:
-            print >>sys.stderr, prefix + "Execution of", command[0], "was terminated by signal:", -retCode
+            print(prefix + "Execution of", command[0], "was terminated by signal:", -retCode, file=sys.stderr)
         elif retCode != 0:
-            print >>sys.stderr, prefix + "Command", command[0], "resulted in the non-zero return code:", retCode
+            print(prefix + "Command", command[0], "resulted in the non-zero return code:", retCode, file=sys.stderr)
 
         return retCode == 0
     except OSError as error:
-        print >>sys.stderr, prefix + "Execution of", command[0], "failed:", error
+        print(prefix + "Execution of", command[0], "failed:", error, file=sys.stderr)
         return False
 
 
@@ -82,8 +85,9 @@ def loadCompilationSpec(spec_file="compilation.json"):
         compilation_specs = json.load(f)
         javascript_files = compilation_specs["javascript"]
         resource_files = compilation_specs["resources"]
+        sprite_groups = compilation_specs["sprites"]
         annotation_files = compilation_specs["annotations"]
-        return javascript_files, resource_files, annotation_files
+        return javascript_files, resource_files, sprite_groups, annotation_files
 
 
 def requiresReleaseBuild(target_folder, resource_files, prefix=""):
@@ -124,6 +128,49 @@ def combineMinifyJS(target_folder, javascript_files, prefix=""):
     )
 
 
+def createSprites(target_folder, sprite_groups, prefix=""):
+    """
+    Concatenate groups of images into a single image.
+    """
+    sprite_annotations = {}
+
+    for target_file, group in sprite_groups.items():
+        annotations = {}
+        images = []
+
+        total_width = 0
+        max_height = 0
+
+        for file in group:
+            image = Image.open(file)
+            images.append(image)
+
+            annotations[file] = {
+                "width": image.size[0],
+                "height": image.size[1],
+                "x_offset": total_width,
+                "y_offset": 0
+            }
+
+            total_width += image.size[0]
+            max_height = max(image.size[1], max_height)
+
+        sprite = Image.new('RGBA', (total_width, max_height))
+
+        x_offset = 0
+        for image in images:
+            sprite.paste(image, (x_offset, 0))
+            x_offset += image.size[0]
+
+        output_file = os.path.join(target_folder, target_file)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        sprite.save(output_file)
+
+        sprite_annotations[target_file] = annotations
+
+    return sprite_annotations
+
+
 def copyResourceFiles(target_folder, resource_files, prefix=""):
     """
     Copy all the resource files for the page into the target folder.
@@ -131,11 +178,11 @@ def copyResourceFiles(target_folder, resource_files, prefix=""):
     assert executePipedCommands(["rsync", "-R"] + resource_files + [target_folder], prefix=prefix)
 
 
-def combineAnnotations(target_folder, annotation_files, prefix=""):
+def combineAnnotations(target_folder, annotation_files, additional_annotations, prefix=""):
     """
     Combine all resource annotations into their own file.
     """
-    annotations = {}
+    annotations = {**additional_annotations}
     for key, file in annotation_files.items():
         with open(file, "r") as f:
             annotations[key] = json.load(f)
@@ -145,54 +192,64 @@ def combineAnnotations(target_folder, annotation_files, prefix=""):
 
 
 def createReleaseBuild(target_folder):
-    print "\nCompiling Release Build"
-    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+    print("\nCompiling Release Build")
+    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
 
-    print "\n1. Clean"
+    print("\n1. Clean")
     clean(target_folder, prefix=" .. ")
 
-    print "\n2. Combine & Minify Javascript"
+    print("\n2. Combine & Minify Javascript")
     combineMinifyJS(target_folder, javascript_files, prefix=" .. ")
 
-    print "\n3. Copy Resource Files"
+    print("\n3. Copy Resource Files")
     copyResourceFiles(target_folder, resource_files, prefix=" .. ")
 
-    print "\n4. Create Annotations File"
-    combineAnnotations(target_folder, annotation_files, prefix=" .. ")
+    print("\n4. Create Sprites")
+    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=" .. ")
 
-    print "\nDone!\n"
+    print("\n5. Create Annotations File")
+    combineAnnotations(target_folder, annotation_files, {
+        "sprites": sprite_annotations
+    }, prefix=" .. ")
+
+    print("\nDone!\n")
 
 
 def createDevBuild(target_folder):
-    print "\nCompiling Development Build"
-    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+    print("\nCompiling Development Build")
+    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
 
-    print "\n1. Combine Javascript"
+    print("\n1. Combine Javascript")
     combineJS(target_folder, javascript_files, prefix=" .. ")
 
-    print "\n2. Copy Resource Files"
+    print("\n2. Copy Resource Files")
     copyResourceFiles(target_folder, resource_files, prefix=" .. ")
 
-    print "\n3. Create Annotations File"
-    combineAnnotations(target_folder, annotation_files, prefix=" .. ")
+    print("\n3. Create Sprites")
+    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=" .. ")
 
-    print "\nDone!\n"
+    print("\n4. Create Annotations File")
+    combineAnnotations(target_folder, annotation_files, {
+        "sprites": sprite_annotations
+    }, prefix=" .. ")
+
+    print("\nDone!\n")
 
 
 def createJSDevBuild(target_folder):
-    print "\nCompiling Javascript Development Build"
-    javascript_files, resource_files, annotation_files = loadCompilationSpec()
+    print("\nCompiling Javascript Development Build")
+    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
 
-    print "\n1. Check whether to revert to a Release Build"
+    print("\n1. Check whether to revert to a Release Build")
     if requiresReleaseBuild(target_folder, resource_files):
         print >>sys.stderr, " .. ERROR : Release build is required\n"
         createReleaseBuild(target_folder)
         return
 
-    print "\n2. Combine Javascript"
+    print("\n2. Combine Javascript")
     combineJS(target_folder, javascript_files, prefix=" .. ")
 
-    print "\nDone!\n"
+    print("\nDone!\n")
 
 
 #
@@ -203,8 +260,8 @@ JS_DEV_MODE = "jsdev"
 RELEASE_MODE = "release"
 
 if len(sys.argv) != 2:
-    print "Usage:"
-    print "  python -m compile <" + DEV_MODE + ":" + JS_DEV_MODE + ":" + RELEASE_MODE + ">"
+    print("Usage:")
+    print("  python -m compile <" + DEV_MODE + ":" + JS_DEV_MODE + ":" + RELEASE_MODE + ">")
     sys.exit(1)
 
 compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
@@ -217,8 +274,8 @@ elif compilation_mode == DEV_MODE:
     createDevBuild("compiled")
 else:
     if compilation_mode != "":
-        print "Invalid compilation mode", compilation_mode
+        print("Invalid compilation mode", compilation_mode)
 
-    print "Usage:"
-    print "  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">"
+    print("Usage:")
+    print("  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">")
     sys.exit(1)
