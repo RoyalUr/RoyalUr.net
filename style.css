@@ -222,6 +222,7 @@ canvas {
 }
 
 .menu-button img {
+    display: inline-block;
     height: 80px;
     width: auto;
     vertical-align: middle;
@@ -242,7 +243,7 @@ canvas {
 }
 
 #play {
-    display: block;
+    display: inline-block;
     padding: 0;
     width: 550px;
     height: 120px;
@@ -250,49 +251,26 @@ canvas {
     margin-bottom: 40px;
 }
 
-#play span {
+#play canvas {
+    position: relative;
     display: inline-block;
     vertical-align: middle;
     height: 120px;
     width: 300px;
-
-    background: url(res/buttons/play.png) no-repeat center;
-    background-size: contain;
 }
 
-#play:hover span {
-    background: url(res/buttons/play_active.png) no-repeat center;
-    background-size: contain;
-}
-
-#learn {
+#learn, #learn canvas {
     display: block;
     vertical-align: middle;
     height: 90px;
     width: 330px;
-
-    background: url(res/buttons/learn.png) no-repeat center;
-    background-size: contain;
 }
 
-#learn:hover {
-    background: url(res/buttons/learn_active.png) no-repeat center;
-    background-size: contain;
-}
-
-#watch {
+#watch, #watch canvas {
     display: block;
     vertical-align: middle;
     height: 90px;
     width: 330px;
-
-    background: url(res/buttons/watch.png) no-repeat center;
-    background-size: contain;
-}
-
-#watch:hover {
-    background: url(res/buttons/watch_active.png) no-repeat center;
-    background-size: contain;
 }
 
 

@@ -73,10 +73,32 @@ function redrawLoading(forceRedraw) {
 // MENU
 //
 
+function redrawButton(buttonElem, canvasElem, ctx, unhoveredKey, hoveredKey) {
+    const box = buttonElem.getBoundingClientRect(),
+          width = Math.floor(box.width),
+          height = Math.floor(box.height),
+          hovered = buttonElem.matches(":hover"),
+          imageKey = (hovered ? hoveredKey : unhoveredKey),
+          buttonImage = getImageResource(imageKey, width);
+
+
+    canvasElem.width = width;
+    canvasElem.height = height;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(buttonImage, 0, 0, width, height);
+}
+
 function redrawMenu(forceRedraw) {
     menuDiv.style.opacity = screenState.menuFade.get();
     exitButton.style.opacity = screenState.exitFade.get();
     networkStatus.hidden = false;
+
+    if (isOnScreen(SCREEN_MENU)) {
+        redrawButton(playButton, playButtonCanvas, playButtonCtx, "play", "play_active");
+        redrawButton(learnButton, learnButtonCanvas, learnButtonCtx, "learn", "learn_active");
+        redrawButton(watchButton, watchButtonCanvas, watchButtonCtx, "watch", "watch_active");
+    }
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {

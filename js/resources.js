@@ -7,7 +7,10 @@ let onAllResourcesLoadedFn = null;
 
 function loadResources(onComplete) {
     onAllResourcesLoadedFn = function() {
+        markResourceLoading("sprite_splitting");
         splitSpritesIntoImages();
+        markResourceLoaded("sprite_splitting", true);
+
         onComplete();
     };
 
@@ -64,7 +67,7 @@ function markResourceLoading(name) {
     getResourceStats(name).startLoadTime = getTime();
 }
 
-function markResourceLoaded(name) {
+function markResourceLoaded(name, skipCompleteCheck) {
     // We only want to countdown in an animation frame for consistency
     window.requestAnimationFrame(() => {
         const stats = getResourceStats(name);
@@ -75,7 +78,7 @@ function markResourceLoaded(name) {
         redrawLoadingBar();
 
         // If all resources have been loaded
-        if (getResourcesLoading().length === 0) {
+        if (!skipCompleteCheck && getResourcesLoading().length === 0) {
             if (onAllResourcesLoadedFn === null)
                 throw "Completed loading resources, but there is no onAllResourcesLoadedFn";
 
@@ -426,38 +429,40 @@ function loadAudio() {
 //
 
 const sprites = {
-    "res/buttons/exit.png": {
+    "res/buttons.png": {
         "res/buttons/exit.png": "exit",
         "res/buttons/exit_active.png": "exit_active",
-    },
-    "res/buttons/play.png": {
+
         "res/buttons/play.png": "play",
         "res/buttons/play_active.png": "play_active",
-    },
-    "res/buttons/learn.png": {
+
         "res/buttons/learn.png": "learn",
         "res/buttons/learn_active.png": "learn_active",
-    },
-    "res/buttons/watch.png": {
+
         "res/buttons/watch.png": "watch",
         "res/buttons/watch_active.png": "watch_active",
+    },
+
+    "res/dice.png": {
+        "res/dice/up1.png": "diceUp1",
+        "res/dice/up2.png": "diceUp2",
+        "res/dice/up3.png": "diceUp3",
+        "res/dice/down1.png": "diceDown1",
+        "res/dice/down2.png": "diceDown2",
+        "res/dice/down3.png": "diceDown3",
+        "res/dice/darkShadow.png": "diceDarkShadow",
+        "res/dice/lightShadow.png": "diceLightShadow"
+    },
+
+    "res/tiles.png": {
+        "res/darkTile.png": "darkTile",
+        "res/lightTile.png": "lightTile"
     }
 };
 
 const imageResources = {
     "logo": "res/logo.png",
-    "board": "res/board_light.png",
-    "darkTile": "res/darkTile.png",
-    "lightTile": "res/lightTile.png",
-
-    "diceUp1": "res/dice/up1.png",
-    "diceUp2": "res/dice/up2.png",
-    "diceUp3": "res/dice/up3.png",
-    "diceDown1": "res/dice/down1.png",
-    "diceDown2": "res/dice/down2.png",
-    "diceDown3": "res/dice/down3.png",
-    "diceDarkShadow": "res/dice/darkShadow.png",
-    "diceLightShadow": "res/dice/lightShadow.png"
+    "board": "res/board_light.png"
 };
 
 const loadedImageResources = {};
