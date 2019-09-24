@@ -30,15 +30,6 @@
     "res/darkTile.png",
     "res/lightTile.png",
 
-    "res/dice/up1.png",
-    "res/dice/up2.png",
-    "res/dice/up3.png",
-    "res/dice/down1.png",
-    "res/dice/down2.png",
-    "res/dice/down3.png",
-    "res/dice/darkShadow.png",
-    "res/dice/lightShadow.png",
-
     "res/audio/place_1.mp4",
     "res/audio/place_2.mp4",
     "res/audio/place_3.mp4",
@@ -79,9 +70,6 @@
       "res/dice/down3.png",
       "res/dice/darkShadow.png",
       "res/dice/lightShadow.png"
-    ],
-    "res/tiles.png": [
-      "res/darkTile.png", "res/lightTile.png"
     ]
   },
 

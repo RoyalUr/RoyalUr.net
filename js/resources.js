@@ -452,17 +452,14 @@ const sprites = {
         "res/dice/down3.png": "diceDown3",
         "res/dice/darkShadow.png": "diceDarkShadow",
         "res/dice/lightShadow.png": "diceLightShadow"
-    },
-
-    "res/tiles.png": {
-        "res/darkTile.png": "darkTile",
-        "res/lightTile.png": "lightTile"
     }
 };
 
 const imageResources = {
     "logo": "res/logo.png",
-    "board": "res/board_light.png"
+    "board": "res/board_light.png",
+    "darkTile": "res/darkTile.png",
+    "lightTile": "res/lightTile.png",
 };
 
 const loadedImageResources = {};
