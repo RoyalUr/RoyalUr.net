@@ -211,14 +211,21 @@ function getTilePath(playerNo) {
     throw "Unknown playerNo " + playerNo;
 }
 
-function getTileStart() {
-    return (lightPlayer.active ? LIGHT_START : DARK_START);
+function getTileStart(playerNo) {
+    playerNo = (playerNo === undefined ? getActivePlayer().playerNo : playerNo);
+
+    if (playerNo === lightPlayer.playerNo)
+        return LIGHT_START;
+    if (playerNo === darkPlayer.playerNo)
+        return DARK_START;
+
+    throw "Unknown playerNo " + playerNo;
 }
 
 function getTileMoveToLocation(x, y) {
     const path = getTilePath(),
-        diceValue = countDiceUp(),
-        index = vecListIndexOf(path, x, y);
+          diceValue = countDiceUp(),
+          index = vecListIndexOf(path, x, y);
 
     if(index === -1 || index + diceValue >= path.length)
         return null;
@@ -243,11 +250,14 @@ function getStartTile() {
     return (getActivePlayer() === lightPlayer ? LIGHT_START : DARK_START);
 }
 
-function isValidMoveFrom(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
+function isValidMoveFrom(playerNo, loc) {
+    if (loc === undefined) {
+        loc = playerNo;
+        playerNo = ownPlayer.playerNo;
     }
+
+    const x = loc[0],
+          y = loc[1];
 
     if(countDiceUp() === 0)
         return false;
@@ -258,9 +268,9 @@ function isValidMoveFrom(x, y) {
         return false;
 
     const toOwner = getTile(to),
-        fromOwner = (isStartTile(x, y) ? getActivePlayer().playerNo : getTile(x, y));
+          fromOwner = (isStartTile(x, y) ? getActivePlayer().playerNo : getTile(x, y));
 
-    if (fromOwner === TILE_EMPTY || fromOwner === otherPlayer.playerNo)
+    if (fromOwner !== playerNo)
         return false;
     if(toOwner === fromOwner)
         return false;

@@ -437,7 +437,7 @@ function onTileHover(x, y) {
     if(isAwaitingMove()
        && !isTileSelected()
        && getTile(x, y) === ownPlayer.playerNo
-       && isValidMoveFrom(x, y)) {
+       && isValidMoveFrom([x, y])) {
         playSound("hover");
     }
 }
@@ -466,7 +466,7 @@ function onTileClick(x, y) {
     
     if(!isAwaitingMove()
        || tileOwner !== ownPlayer.playerNo
-       || !isValidMoveFrom(x, y)) {
+       || !isValidMoveFrom([x, y])) {
 
         if(tileOwner !== TILE_EMPTY) {
             playSound("error");
@@ -491,7 +491,7 @@ function onTileRelease(x, y) {
     }
 
     if(getTime() - lastReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals([x, y], lastReleaseTile)
-       && isAwaitingMove() && getTile(x, y) === ownPlayer.playerNo &&  isValidMoveFrom(x, y)) {
+       && isAwaitingMove() && getTile(x, y) === ownPlayer.playerNo &&  isValidMoveFrom([x, y])) {
         sendMove();
         return;
     }
@@ -539,14 +539,13 @@ function setupStartTiles() {
     if(activePlayer.tiles.current === 0)
         return;
 
-    const location = getTileStart(),
-          owner = activePlayer.playerNo,
-          potentialMove = getTileMoveToLocation(location);
+    const playerNo = activePlayer.playerNo,
+          location = getTileStart(playerNo);
 
-    if(!isValidMoveFrom(location))
+    if(!isValidMoveFrom(playerNo, location))
         return;
 
-    setTile(location, owner);
+    setTile(location, playerNo);
 }
 
 

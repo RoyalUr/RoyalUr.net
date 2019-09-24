@@ -535,20 +535,23 @@ function redrawPlayerScores(player, drawFromLeft) {
     function drawTiles(ctx, owner, top, tileCount, highlightStartTile) {
         ctx.clearRect(0, 0, scoreWidth, scoreHeight * 2);
 
+        const originalAlpha = ctx.globalAlpha;
+
         const highlightIndex = (drawFromLeft ? tileCount - 1 : 7 - tileCount);
         for(let index = 0; index < 7; ++index) {
             const tileLeft = (index + 0.5) * tileWidth,
                   shadowShade = (highlightStartTile && index === highlightIndex ? 255 : 0);
 
             if ((drawFromLeft && index < tileCount) || (!drawFromLeft && index >= 7 - tileCount)) {
+                ctx.globalAlpha = originalAlpha;
                 paintTile(ctx, tileLeft, top, tilePaintWidth, tilePaintWidth, owner, shadowShade);
             } else {
-                ctx.save();
-                ctx.globalAlpha = 0.5;
+                ctx.globalAlpha = 0.5 * originalAlpha;
                 drawCircularShadow(ctx, tileLeft, top, tilePaintWidth / 2, shadowShade);
-                ctx.restore();
             }
         }
+
+        ctx.globalAlpha = originalAlpha;
     }
 
     const renderTarget = getPlayerRenderTarget(player),
