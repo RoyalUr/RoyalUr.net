@@ -6,9 +6,13 @@ const resourceStats = {};
 let onAllResourcesLoadedFn = null;
 
 function loadResources(onComplete) {
-    onAllResourcesLoadedFn = onComplete;
+    onAllResourcesLoadedFn = function() {
+        splitSpritesIntoImages();
+        onComplete();
+    };
 
     loadImages();
+    loadSprites();
     loadAudio();
 }
 
@@ -421,20 +425,30 @@ function loadAudio() {
 // IMAGES
 //
 
+const sprites = {
+    "res/buttons/exit.png": {
+        "res/buttons/exit.png": "exit",
+        "res/buttons/exit_active.png": "exit_active",
+    },
+    "res/buttons/play.png": {
+        "res/buttons/play.png": "play",
+        "res/buttons/play_active.png": "play_active",
+    },
+    "res/buttons/learn.png": {
+        "res/buttons/learn.png": "learn",
+        "res/buttons/learn_active.png": "learn_active",
+    },
+    "res/buttons/watch.png": {
+        "res/buttons/watch.png": "watch",
+        "res/buttons/watch_active.png": "watch_active",
+    }
+};
+
 const imageResources = {
     "logo": "res/logo.png",
     "board": "res/board_light.png",
     "darkTile": "res/darkTile.png",
     "lightTile": "res/lightTile.png",
-
-    "exit": "res/buttons/exit.png",
-    "exit_active": "res/buttons/exit_active.png",
-    "play": "res/buttons/play.png",
-    "play_active": "res/buttons/play_active.png",
-    "learn": "res/buttons/learn.png",
-    "learn_active": "res/buttons/learn_active.png",
-    "watch": "res/buttons/watch.png",
-    "watch_active": "res/buttons/watch_active.png",
 
     "diceUp1": "res/dice/up1.png",
     "diceUp2": "res/dice/up2.png",
@@ -447,6 +461,7 @@ const imageResources = {
 };
 
 const loadedImageResources = {};
+const loadedSpriteResources = {};
 let loadedImageAnnotations = {};
 
 function loadImageAnnotations() {
@@ -471,8 +486,99 @@ function loadImageAnnotations() {
     client.send();
 }
 
+function loadSprites() {
+    for(let url in sprites) {
+        if(!sprites.hasOwnProperty(url))
+            continue;
+
+        const resourceName = "sprite(" + url + ")";
+        markResourceLoading(resourceName);
+
+        const spriteResource = {
+            url: url,
+            image: new Image(),
+            width: NaN,
+            height: NaN,
+            loaded: false
+        };
+
+        spriteResource.image.onload = function() {
+            spriteResource.width = this.width;
+            spriteResource.height = this.height;
+
+            if(!spriteResource.width || !spriteResource.height) {
+                error("[FATAL] Failed to load image resource \"" + spriteResource.url + "\", "
+                    + "invalid width or height (" + spriteResource.width + " x " + spriteResource.height + ")");
+
+                markResourceLoaded(resourceName);
+                loadedSpriteResources[spriteResource.url] = undefined;
+                return;
+            }
+
+            spriteResource.loaded = true;
+            markResourceLoaded(resourceName);
+        };
+
+        spriteResource.image.src = url;
+        loadedSpriteResources[url] = spriteResource;
+    }
+}
+
+function splitSpritesIntoImages() {
+    const spriteAnnotations = getImageAnnotation("sprites");
+
+    if (!spriteAnnotations) {
+        error("[FATAL] Sprite annotations are not loaded, and therefore sprites cannot be split");
+        return;
+    }
+
+    for(let url in sprites) {
+        const resource = loadedSpriteResources[url],
+              mappings = sprites[url],
+              annotations = spriteAnnotations[url];
+
+        if (!resource || !resource.loaded) {
+            error("[FATAL] Sprite " + url + " is not loaded, and therefore cannot be split");
+            return;
+        }
+
+        if (!annotations) {
+            error("[FATAL] Could not find sprite annotations for sprite " + url);
+            return;
+        }
+
+        for(let mappedURL in mappings) {
+            if (!mappings.hasOwnProperty(mappedURL))
+                continue;
+
+            const imageAnnotation = annotations[mappedURL],
+                  identifier = mappings[mappedURL];
+
+            if (!imageAnnotation) {
+                error("[FATAL] Could not find annotations for image " + mappedURL + " within sprite " + url);
+                return;
+            }
+
+            const image = renderResource(imageAnnotation["width"], imageAnnotation["height"], function(ctx) {
+                ctx.drawImage(resource.image, -imageAnnotation["x_offset"], -imageAnnotation["y_offset"]);
+            });
+
+            loadedImageResources[identifier] = {
+                key: identifier,
+                image: image,
+                loaded: true,
+                sprite: true,
+                width: image.width,
+                height: image.height,
+                scaled: [image]
+            };
+        }
+    }
+}
+
 function loadImages() {
     loadImageAnnotations();
+    loadSprites();
 
     for(let key in imageResources) {
         if(!imageResources.hasOwnProperty(key))
@@ -484,6 +590,7 @@ function loadImages() {
         const imageResource = {
             key: key,
             image: new Image(),
+            loaded: false,
             width: NaN,
             height: NaN,
             scaled: []
@@ -503,13 +610,13 @@ function loadImages() {
                 return;
             }
 
+            imageResource.loaded = true;
             markResourceLoaded(resourceName);
         };
 
         imageResource.image.src = imageResources[key];
         loadedImageResources[key] = imageResource;
     }
-
 }
 
 function getImageAnnotation(key) {
