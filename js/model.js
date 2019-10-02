@@ -11,6 +11,21 @@ function resetGame() {
 
 
 //
+// MENU
+//
+
+const BUTTON_STATE_INACTIVE = "inactive",
+      BUTTON_STATE_HOVERED = "hovered";
+
+const menuState = {
+    playButton: BUTTON_STATE_INACTIVE,
+    learnButton: BUTTON_STATE_INACTIVE,
+    watchButton: BUTTON_STATE_INACTIVE
+};
+
+
+
+//
 // BOARD
 //
 

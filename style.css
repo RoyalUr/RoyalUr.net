@@ -183,12 +183,10 @@ canvas {
 
     z-index: 5;
     margin: auto;
-    max-width: 700px;
 }
 
 #title {
     width: 100%;
-    margin-bottom: 20px;
     animation: bounce ease-in-out 2s infinite alternate;
     -webkit-animation: bounce ease-in-out 2s infinite alternate;
 }
@@ -198,7 +196,7 @@ canvas {
         transform: translateY(0px);
     }
     to {
-        transform: translateY(-15px);
+        transform: translateY(-2%);
     }
 }
 @-webkit-keyframes bounce {
@@ -206,70 +204,56 @@ canvas {
         transform: translateY(0px);
     }
     to {
-        transform: translateY(-15px);
+        transform: translateY(-2%);
     }
 }
 
 .menu-button {
     margin: auto;
-    margin-bottom: 20px;
-    height: 90px;
-    line-height: 90px;
 }
 
 .menu-button:hover {
     cursor: pointer;
 }
 
-.menu-button img {
-    display: inline-block;
-    height: 80px;
-    width: auto;
-    vertical-align: middle;
-    margin-left: 20px;
-    margin-right: 20px;
-
-    transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
-}
-
-.menu-button:hover img {
-    height: 90px;
-    width: auto;
-    vertical-align: middle;
-    margin-left: 15px;
-    margin-right: 15px;
-
-    transition: height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
+.menu-button canvas {
+    margin: auto;
+    position: relative;
 }
 
 #play {
     padding: 0;
-    width: 550px;
-    height: 120px;
-    line-height: 120px;
-    margin-bottom: 40px;
+
+    display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+    display: -ms-flexbox;  /* TWEENER - IE 10 */
+    display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+    display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
+
+    justify-content: center;
+    align-items: center;
 }
 
 #play canvas {
-    position: relative;
+    /*position: relative;*/
     display: inline-block;
     vertical-align: middle;
-    height: 120px;
-    width: 300px;
+}
+
+#play img {
+    display: inline-block;
+    vertical-align: middle;
+
+    transition: width 0.2s ease-in-out, height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
 }
 
 #learn, #learn canvas {
     display: block;
     vertical-align: middle;
-    height: 90px;
-    width: 330px;
 }
 
 #watch, #watch canvas {
     display: block;
     vertical-align: middle;
-    height: 90px;
-    width: 330px;
 }
 
 

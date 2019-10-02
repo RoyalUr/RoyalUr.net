@@ -8,6 +8,7 @@ const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
       playButtonCanvas = document.getElementById("play-canvas"),
       playButtonCtx = playButtonCanvas.getContext("2d"),
+      playButtonTiles = playButton.getElementsByTagName("img"),
       learnButton = document.getElementById("learn"),
       learnButtonCanvas = document.getElementById("learn-canvas"),
       learnButtonCtx = learnButtonCanvas.getContext("2d"),
@@ -58,6 +59,15 @@ function setupElements() {
     diceCanvas.addEventListener("click", onDiceClick);
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
     diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
+
+    playButton.addEventListener("mouseover", function() { menuState.playButton = BUTTON_STATE_HOVERED; });
+    playButton.addEventListener("mouseout", function() { menuState.playButton = BUTTON_STATE_INACTIVE; });
+
+    learnButton.addEventListener("mouseover", function() { menuState.learnButton = BUTTON_STATE_HOVERED; });
+    learnButton.addEventListener("mouseout", function() { menuState.learnButton = BUTTON_STATE_INACTIVE; });
+
+    watchButton.addEventListener("mouseover", function() { menuState.watchButton = BUTTON_STATE_HOVERED; });
+    watchButton.addEventListener("mouseout", function() { menuState.watchButton = BUTTON_STATE_INACTIVE; });
 
     function updateMouse(x, y, down) {
         mouseX = x;
@@ -136,12 +146,56 @@ function resize() {
     useWidth = width;
     useHeight = min(useWidth / maxWidthOnHeightRatio, height);
 
+    resizeMenu();
     resizeBoard();
     resizeScores();
     resizeDice();
     resizeOverlay();
 
     redraw(true);
+}
+
+
+
+//
+// MENU
+//
+
+const menuWidthOnHeightRatio = 760 / 840,
+      menuVerticalPadding = 0.05,
+      buttonMenuWidthPercentage = 0.5;
+
+function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWidth) {
+    const image = getImageResource(imageKey, buttonWidth),
+          height = calcImageHeight(image, buttonWidth);
+
+    buttonElem.style.width = menuWidth + "px";
+    buttonElem.style.height = height + "px";
+
+    canvasElem.width = buttonWidth;
+    canvasElem.height = height;
+    canvasElem.style.width = buttonWidth + "px";
+    canvasElem.style.height = height + "px";
+}
+
+function resizeMenu() {
+    let menuWidth = menuWidthOnHeightRatio * height * (1 - 2 * menuVerticalPadding);
+    if (menuWidth > width) {
+        menuWidth = width;
+    }
+
+    const buttonWidth = menuWidth * buttonMenuWidthPercentage;
+
+    menuDiv.style.width = menuWidth + "px";
+
+    layoutButton(playButton, playButtonCanvas, playButtonCtx, "play", menuWidth, buttonWidth);
+    layoutButton(learnButton, learnButtonCanvas, learnButtonCtx, "learn", menuWidth, buttonWidth);
+    layoutButton(watchButton, watchButtonCanvas, watchButtonCtx, "watch", menuWidth, buttonWidth);
+
+    // Set the spacing between the buttons and title
+    playButton.style.marginTop = 0.05 * buttonWidth + "px";
+    playButton.style.marginBottom = 0.1 * buttonWidth + "px";
+    learnButton.style.marginBottom = 0.05 * buttonWidth + "px";
 }
 
 

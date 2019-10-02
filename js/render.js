@@ -73,20 +73,14 @@ function redrawLoading(forceRedraw) {
 // MENU
 //
 
-function redrawButton(buttonElem, canvasElem, ctx, unhoveredKey, hoveredKey) {
-    const box = buttonElem.getBoundingClientRect(),
-          width = Math.floor(box.width),
-          height = Math.floor(box.height),
-          hovered = buttonElem.matches(":hover"),
-          imageKey = (hovered ? hoveredKey : unhoveredKey),
-          buttonImage = getImageResource(imageKey, width);
+const playTilesButtonMargin = 0.1,
+      playTilesHeightInactive = 0.6,
+      playTilesHeightActive = 0.75;
 
-
-    canvasElem.width = width;
-    canvasElem.height = height;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(buttonImage, 0, 0, width, height);
+function redrawButton(canvas, ctx, imageKey) {
+    const image = getImageResource(imageKey, canvas.width);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 }
 
 function redrawMenu(forceRedraw) {
@@ -94,10 +88,32 @@ function redrawMenu(forceRedraw) {
     exitButton.style.opacity = screenState.exitFade.get();
     networkStatus.hidden = false;
 
-    if (isOnScreen(SCREEN_MENU)) {
-        redrawButton(playButton, playButtonCanvas, playButtonCtx, "play", "play_active");
-        redrawButton(learnButton, learnButtonCanvas, learnButtonCtx, "learn", "learn_active");
-        redrawButton(watchButton, watchButtonCanvas, watchButtonCtx, "watch", "watch_active");
+    if (forceRedraw || isOnScreen(SCREEN_MENU)) {
+        const playButtonActive = (menuState.playButton !== BUTTON_STATE_INACTIVE),
+              learnButtonActive = (menuState.learnButton !== BUTTON_STATE_INACTIVE),
+              watchButtonActive = (menuState.watchButton !== BUTTON_STATE_INACTIVE);
+
+        redrawButton(playButtonCanvas, playButtonCtx, (playButtonActive ? "play_active" : "play"));
+        redrawButton(learnButtonCanvas, learnButtonCtx, (learnButtonActive ? "learn_active" : "learn"));
+        redrawButton(watchButtonCanvas, watchButtonCtx, (watchButtonActive ? "watch_active" : "watch"));
+
+        const playButtonHeight = playButton.getBoundingClientRect().height,
+              playMargin = playButtonHeight * playTilesButtonMargin,
+              tilesHeightActive = playButtonHeight * playTilesHeightActive,
+              tilesHeightInactive = playButtonHeight * playTilesHeightInactive,
+              tilesHeight =  (playButtonActive ? tilesHeightActive : tilesHeightInactive),
+              tilesMargin = (tilesHeightActive - tilesHeight) / 2;
+
+        playButtonCanvas.style.marginLeft = playMargin + "px";
+        playButtonCanvas.style.marginRight = playMargin + "px";
+
+        for (let index = 0; index < playButtonTiles.length; ++index) {
+            const tile = playButtonTiles[index];
+            tile.style.width = tilesHeight + "px";
+            tile.style.height = tilesHeight + "px";
+            tile.style.marginLeft = tilesMargin + "px";
+            tile.style.marginRight = tilesMargin + "px";
+        }
     }
 
     if (isOnScreen(SCREEN_CONNECTING)) {

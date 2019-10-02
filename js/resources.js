@@ -702,9 +702,9 @@ function renderResource(width, height, renderFunction) {
 }
 
 function calcImageWidth(image, height) {
-    return image.width / image.height * height;
+    return Math.ceil(image.width / image.height * height);
 }
 
 function calcImageHeight(image, width) {
-    return image.height / image.width * width;
+    return Math.ceil(image.height / image.width * width);
 }
