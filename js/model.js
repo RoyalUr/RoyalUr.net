@@ -2,7 +2,10 @@
 // This file stores and manages the state of the game.
 //
 
+let game = null;
+
 function resetGame() {
+    game = null;
     resetTiles();
     resetDice();
     resetNetworkStatus();
@@ -405,7 +408,7 @@ const dice = {
     callback: null
 };
 
-function startRolling(selectDelay) {
+function startRollingDice(selectDelay) {
     selectDelay = (selectDelay !== undefined ? selectDelay : DEFAULT_DICE_SELECT_DELAY);
 
     dice.rolling = true;

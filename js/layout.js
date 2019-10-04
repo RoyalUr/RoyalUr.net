@@ -73,7 +73,7 @@ function setupElements() {
     playOnlineButton.addEventListener("click", onPlayOnline);
     playComputerButton.addEventListener("click", onPlayComputer);
 
-    diceCanvas.addEventListener("click", onDiceClick);
+    diceCanvas.addEventListener("click", function() { game.onDiceClick(); });
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
     diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
 
@@ -92,7 +92,7 @@ function setupElements() {
 
         const newHoveredTile = canvasToTile(x, y);
         if(!vecEquals(hoveredTile, newHoveredTile)) {
-            onTileHover(newHoveredTile);
+            game.onTileHover(newHoveredTile);
         }
         hoveredTile = newHoveredTile;
 
@@ -119,18 +119,27 @@ function setupElements() {
     };
 
     document.onmousemove = function(event) {
+        if (!game)
+            return;
+
         updateMouse(event.clientX - tilesLeft, event.clientY - tilesTop);
     };
 
     document.body.onmousedown = function(event) {
+        if (!game)
+            return;
+
         updateMouse(mouseX, mouseY, true);
-        onTileClick(hoveredTile);
+        game.onTileClick(hoveredTile);
 
         event.preventDefault();
     };
 
     document.onmouseup = function(event) {
-        onTileRelease(hoveredTile);
+        if (!game)
+            return;
+
+        game.onTileRelease(hoveredTile);
         updateMouse(mouseX, mouseY, false);
     };
 

@@ -326,27 +326,21 @@ function onExitExitableScreen(hasty) {
 
 function onPlayClick(event) {
     event.stopPropagation();
-
-    // TODO : When we have a computer to play, then switch to the play select screen
-    connectToGame();
-    // switchToScreen(SCREEN_PLAY_SELECT);
+    switchToScreen(SCREEN_PLAY_SELECT);
 }
 
 function onPlayOnline(event) {
     event.stopPropagation();
-
     connectToGame();
 }
 
 function onPlayComputer(event) {
     event.stopPropagation();
-
     console.log("play the computer");
 }
 
 function onExitClick(event) {
     event.stopPropagation();
-
     switchToScreen(SCREEN_MENU);
 }
 
@@ -404,203 +398,22 @@ function onPacketInvalidGame() {
     setMessage("Game could not be found", 0, 2, 1)
 }
 
-function onPacketGame(game) {
-    setHash(game.gameID);
+function onPacketGame(gameInfo) {
+    game = new NetworkGame();
+    setHash(gameInfo.gameID);
     switchToScreen(SCREEN_GAME);
-    setOwnPlayer(game.ownPlayer);
-    otherPlayer.name = game.opponentName;
+    setOwnPlayer(gameInfo.ownPlayer);
+    otherPlayer.name = gameInfo.opponentName;
 }
 
 function onPacketMessage(data) {
-    if (data.text === "No moves") {
-        setMessage(data.text, DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION);
-        setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
-        return;
-    }
-
-    setMessage(data.text);
+    game.onPacketMessage(data);
 }
 
 function onPacketMove(move) {
-    const tile = getTile(move.from),
-          replaced = getTile(move.to);
-
-    if(tile !== TILE_EMPTY) {
-        animateTileMove(move.from, move.to);
-        setTile(move.to, tile);
-        setTile(move.from, TILE_EMPTY);
-    }
+    game.onPacketMove(move);
 }
 
 function onPacketState(state) {
-    updatePlayerState(darkPlayer, state.dark.tiles, state.dark.score, state.currentPlayer === "dark");
-    updatePlayerState(lightPlayer, state.light.tiles, state.light.score, state.currentPlayer === "light");
-
-    layoutDice();
-    unselectTile();
-    loadTileState(state.board);
-
-    if(!state.isGameWon) {
-        if(state.hasRoll) {
-            if (!dice.rolling) {
-                startRolling();
-            }
-
-            dice.callback = function() {
-                setupStartTiles();
-            };
-
-            setDiceValues(state.roll);
-        } else {
-            setWaitingForDiceRoll();
-        }
-    } else {
-        // One last redraw to make sure all the game state is drawn correctly
-        redraw();
-        switchToScreen(SCREEN_WIN);
-    }
-}
-
-
-
-//
-// BOARD
-//
-
-const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
-
-let lastTileClickWasSelect = false;
-
-function onTileHover(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-    
-    if(isAwaitingMove()
-       && !isTileSelected()
-       && getTile(x, y) === ownPlayer.playerNo
-       && isValidMoveFrom([x, y])) {
-        playSound("hover");
-    }
-}
-
-function onTileClick(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    lastTileClickWasSelect = false;
-
-    if(isTileSelected()) {
-        const to = getTileMoveToLocation(selectedTile);
-
-        if(vecEquals([x, y], to)) {
-            sendMove();
-            return;
-        }
-    }
-
-    if(isTileSelected(x, y))
-        return;
-
-    const tileOwner = getTile(x, y);
-    
-    if(!isAwaitingMove()
-       || tileOwner !== ownPlayer.playerNo
-       || !isValidMoveFrom([x, y])) {
-
-        if(tileOwner !== TILE_EMPTY) {
-            playSound("error");
-        }
-        
-        unselectTile();
-        return;
-    }
-
-    lastTileClickWasSelect = true;
-    selectTile(x, y);
-    playSound("pickup");
-}
-
-let lastReleaseTime = LONG_TIME_AGO,
-    lastReleaseTile = [-1, -1];
-
-function onTileRelease(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(getTime() - lastReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals([x, y], lastReleaseTile)
-       && isAwaitingMove() && getTile(x, y) === ownPlayer.playerNo &&  isValidMoveFrom([x, y])) {
-        sendMove();
-        return;
-    }
-
-    lastReleaseTime = getTime();
-    lastReleaseTile = [x, y];
-
-    updateTilePathAnchorTime();
-
-    if(!lastTileClickWasSelect && isTileSelected(x, y)) {
-        unselectTile();
-        playSound("place");
-        return;
-    }
-
-    if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && vecEquals([x, y], getTileMoveToLocation(draggedTile))) {
-        sendMove(true);
-    }
-}
-
-function sendMove(noAnimation) {
-    const to = getTileMoveToLocation(selectedTile),
-          replaced = getTile(to);
-
-    if (!noAnimation) {
-        animateTileMove(selectedTile, to);
-    }
-
-    setTile(to, getTile(selectedTile));
-    setTile(selectedTile, TILE_EMPTY);
-
-    if(vecEquals(selectedTile, getTileStart())) {
-        takeTile(getActivePlayer());
-    }
-
-    sendPacket(writeMovePacket(selectedTile));
-
-    unselectTile();
-    ownPlayer.active = false;
-}
-
-function setupStartTiles() {
-    const activePlayer = getActivePlayer();
-
-    if(activePlayer.tiles.current === 0)
-        return;
-
-    const playerNo = activePlayer.playerNo,
-          location = getTileStart(playerNo);
-
-    if(!isValidMoveFrom(playerNo, location))
-        return;
-
-    setTile(location, playerNo);
-}
-
-
-
-//
-// DICE
-//
-
-function onDiceClick() {
-    if(!dice.active || dice.rolling || !ownPlayer.active)
-        return;
-
-    startRolling();
-    sendPacket(writeDiceRollPacket());
+    game.onPacketState(state);
 }

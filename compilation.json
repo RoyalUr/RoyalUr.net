@@ -12,6 +12,7 @@
     "js/render.js",
     "js/packets.js",
     "js/network.js",
+    "js/gameControl.js",
     "js/client.js"
   ],
 
