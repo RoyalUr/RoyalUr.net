@@ -17,6 +17,10 @@ const menuDiv = document.getElementById("menu"),
       watchButtonCtx = watchButtonCanvas.getContext("2d"),
       exitButton = document.getElementById("exit");
 
+const playSelectDiv = document.getElementById("play-select"),
+      playOnlineButton = document.getElementById("play-online"),
+      playComputerButton = document.getElementById("play-computer");
+
 const loadingDiv = document.getElementById("loading");
 
 const boardCanvas = document.getElementById("board"),
@@ -55,6 +59,19 @@ let mouseDown = false,
 function setupElements() {
     playButton.addEventListener("click", onPlayClick);
     exitButton.addEventListener("click", onExitClick);
+
+    // Adjust the font sizes of the play select options to fit their bounding boxes
+    fitty(".play-select-text", {
+        // Ensure all play select options have the same font size
+        couplingGroup: "play-select-text",
+
+        // We don't want the text to take up the whole available space
+        padding: 0.05
+    });
+
+    playSelectDiv.addEventListener("click", onExitClick);
+    playOnlineButton.addEventListener("click", onPlayOnline);
+    playComputerButton.addEventListener("click", onPlayComputer);
 
     diceCanvas.addEventListener("click", onDiceClick);
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
@@ -162,7 +179,7 @@ function resize() {
 //
 
 const menuWidthOnHeightRatio = 760 / 840,
-      menuVerticalPadding = 0.05,
+      menuVerticalPadding = 0.1,
       buttonMenuWidthPercentage = 0.5;
 
 function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWidth) {
@@ -196,6 +213,18 @@ function resizeMenu() {
     playButton.style.marginTop = 0.05 * buttonWidth + "px";
     playButton.style.marginBottom = 0.1 * buttonWidth + "px";
     learnButton.style.marginBottom = 0.05 * buttonWidth + "px";
+
+    // Set the size and spacing of the play selection buttons
+    const playButtonWidth = min(buttonWidth, width / 2),
+          playButtonSpacing = min(playButtonWidth / 2, (width - playButtonWidth * 2) / 3),
+          onlineLeft = (width - playButtonSpacing) / 2 - playButtonWidth,
+          computerLeft = (width + playButtonSpacing) / 2;
+
+    playOnlineButton.style.width = playButtonWidth + "px";
+    playOnlineButton.style.left = onlineLeft + "px";
+
+    playComputerButton.style.width = playButtonWidth + "px";
+    playComputerButton.style.left = computerLeft + "px";
 }
 
 

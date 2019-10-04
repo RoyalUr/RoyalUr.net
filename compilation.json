@@ -1,6 +1,7 @@
 {
   "javascript": [
-    "js/lib/reconnecting-websocket.min.js",
+    "js/lib/reconnecting-websocket.js",
+    "js/lib/fitty.js",
     "js/utils.js",
     "js/stats.js",
     "js/resources.js",
@@ -29,6 +30,9 @@
     "res/board_light.png",
     "res/darkTile.png",
     "res/lightTile.png",
+
+    "res/buttons/play_online.png",
+    "res/buttons/play_computer.png",
 
     "res/audio/place_1.mp4",
     "res/audio/place_2.mp4",

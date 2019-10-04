@@ -460,6 +460,8 @@ const imageResources = {
     "board": "res/board_light.png",
     "darkTile": "res/darkTile.png",
     "lightTile": "res/lightTile.png",
+    "play_online": "res/buttons/play_online.png",
+    "play_computer": "res/buttons/play_computer.png",
 };
 
 const loadedImageResources = {};

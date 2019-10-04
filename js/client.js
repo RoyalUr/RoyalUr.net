@@ -107,6 +107,7 @@ function onHashChange() {
 
 const SCREEN_LOADING = "loading",
       SCREEN_MENU = "menu",
+      SCREEN_PLAY_SELECT = "play_select",
       SCREEN_CONNECTING = "connecting",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
@@ -118,6 +119,7 @@ const screenState = {
     exitHandlers: [],
 
     menuFade: createFade(0.5),
+    playSelectFade: createFade(0.5),
     boardFade: createFade(0.5),
     exitFade: createFade(0.25),
     connectionFade: createFade(2, 0.5)
@@ -189,11 +191,17 @@ function switchToScreen(screen, hasty) {
 // SCREEN TRANSITIONS
 //
 
-registerScreenTransitionHandlers(SCREEN_LOADING,    onEnterLoadingScreen,    onExitLoadingScreen);
-registerScreenTransitionHandlers(SCREEN_MENU,       onEnterMenuScreen,       onExitMenuScreen);
-registerScreenTransitionHandlers(SCREEN_CONNECTING, onEnterConnectingScreen, onExitConnectingScreen);
-registerScreenTransitionHandlers(SCREEN_GAME,       onEnterGameScreen,       onExitGameScreen);
-registerScreenTransitionHandlers(SCREEN_WIN,        onEnterWinScreen,        onExitWinScreen);
+registerScreenTransitionHandlers(SCREEN_LOADING,     onEnterLoadingScreen,    onExitLoadingScreen);
+registerScreenTransitionHandlers(SCREEN_MENU,        onEnterMenuScreen,       onExitMenuScreen);
+registerScreenTransitionHandlers(SCREEN_PLAY_SELECT, onEnterPlaySelectScreen, onExitPlaySelectScreen);
+registerScreenTransitionHandlers(SCREEN_CONNECTING,  onEnterConnectingScreen, onExitConnectingScreen);
+registerScreenTransitionHandlers(SCREEN_GAME,        onEnterGameScreen,       onExitGameScreen);
+registerScreenTransitionHandlers(SCREEN_WIN,         onEnterWinScreen,        onExitWinScreen);
+
+// Screens where the menu should be shown
+registerScreenTransitionHandlers(
+    [SCREEN_MENU, SCREEN_PLAY_SELECT], onEnterMenuScreens, onExitMenuScreens
+);
 
 // Screens where the game should connect to the server
 registerScreenTransitionHandlers(
@@ -220,15 +228,32 @@ function onExitLoadingScreen(hasty) {
 }
 
 function onEnterMenuScreen(hasty) {
+
+}
+
+function onExitMenuScreen(hasty) {
+
+}
+
+function onEnterPlaySelectScreen(hasty) {
+    fitty.fitAll();
+    screenState.playSelectFade.fadeIn(hasty ? 0 : undefined);
+}
+
+function onExitPlaySelectScreen(hasty) {
+    screenState.playSelectFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterMenuScreens(hasty) {
     resetHash();
     setTimeout(() => {
-        if (isOnScreen(SCREEN_MENU)) {
+        if (isOnScreen(SCREEN_MENU) || isOnScreen(SCREEN_PLAY_SELECT)) {
             screenState.menuFade.fadeIn(hasty ? 0 : undefined);
         }
     }, (hasty ? 0 : 500));
 }
 
-function onExitMenuScreen(hasty) {
+function onExitMenuScreens(hasty) {
     screenState.menuFade.fadeOut(hasty ? 0 : undefined);
 }
 
@@ -299,16 +324,34 @@ function onExitExitableScreen(hasty) {
 // MENU
 //
 
-function onPlayClick(hasty) {
-    connectToGame(hasty);
+function onPlayClick(event) {
+    event.stopPropagation();
+
+    // TODO : When we have a computer to play, then switch to the play select screen
+    connectToGame();
+    // switchToScreen(SCREEN_PLAY_SELECT);
 }
 
-function onExitClick() {
+function onPlayOnline(event) {
+    event.stopPropagation();
+
+    connectToGame();
+}
+
+function onPlayComputer(event) {
+    event.stopPropagation();
+
+    console.log("play the computer");
+}
+
+function onExitClick(event) {
+    event.stopPropagation();
+
     switchToScreen(SCREEN_MENU);
 }
 
-function connectToGame(hasty) {
-    switchToScreen(SCREEN_CONNECTING, hasty);
+function connectToGame() {
+    switchToScreen(SCREEN_CONNECTING);
 }
 
 

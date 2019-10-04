@@ -257,6 +257,63 @@ canvas {
 }
 
 
+
+/*
+ *  PLAY SELECTION SCREEN
+ */
+
+#play-select {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+
+    background-color: rgba(0, 0, 0, 0.85);
+    opacity: 0;
+
+    display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+    display: -ms-flexbox;  /* TWEENER - IE 10 */
+    display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+    display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
+
+    justify-content: center;
+    align-items: center;
+}
+
+.play-select-option {
+    position: absolute;
+    display: inline-block;
+    text-align: center;
+
+    top: 50%;
+    transform: translateY(-50%);
+
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.play-select-option:hover {
+    opacity: 1.0;
+}
+
+.play-select-text {
+    font-family: Nunito, sans-serif;
+    font-weight: 600;
+    font-size: 50px;
+    text-shadow: 0 0 20px rgb(0, 0, 0);
+    color: white;
+    white-space: pre;
+}
+
+.play-select-icon {
+    padding-top: 10%;
+    width: 75%;
+}
+
+
+
 /*
  *  BOARD
  */
@@ -325,10 +382,10 @@ canvas {
     height: 100%;
     z-index: 10;
 
+    background-color: rgba(0, 0, 0, 0.25);
     opacity: 0;
 
     pointer-events: none;
-    background-color: rgba(0, 0, 0, 0.25);
 
     display: table;
     text-align: center;
@@ -420,6 +477,7 @@ canvas {
     top: 0;
     right: 0;
     margin: 10px;
+    z-index: 20;
 
     direction: rtl;
     overflow: hidden;
@@ -432,13 +490,13 @@ canvas {
 
 #exit:hover {
     cursor: pointer;
-    width: 225px;
+    width: 300px;
 
     transition: width 0.2s ease-in-out;
 }
 
 .exit-content {
-    width: 225px;
+    width: 300px;
     height: 50px;
     line-height: 50px;
 }

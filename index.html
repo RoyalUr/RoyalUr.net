@@ -37,6 +37,19 @@
                 </a>
             </div>
         </div>
+
+        <!-- PLAY SELECTION SCREEN -->
+        <div id="play-select">
+            <div id="play-online" class="play-select-option">
+                <div class="play-select-text">Online</div>
+                <img src="res/buttons/play_online.png" class="play-select-icon" alt="play online" />
+            </div>
+
+            <div id="play-computer" class="play-select-option">
+                <div class="play-select-text">Computer</div>
+                <img src="res/buttons/play_computer.png" class="play-select-icon" alt="play computer" />
+            </div>
+        </div>
         
         <!-- BOARD -->
         <canvas id="board"></canvas>
@@ -74,7 +87,7 @@
         <div id="exit"><div class="exit-content">
             <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='-70 -70 240 240'>
                 <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
-            </svg><span>Exit Game</span>
+            </svg><span id="exit-text">Exit Game</span>
         </div></div>
 
         <!-- SHADOW FILTERS -->
