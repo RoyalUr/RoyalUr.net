@@ -106,7 +106,9 @@ const DARK_PATH = [
 ];
 
 const LIGHT_START = LIGHT_PATH[0],
-      DARK_START = DARK_PATH[0];
+      LIGHT_END = LIGHT_PATH[LIGHT_PATH.length - 1],
+      DARK_START = DARK_PATH[0],
+      DARK_END = DARK_PATH[DARK_PATH.length - 1];
 
 const LOCUS_LOCATIONS = [
     [0, 0],
@@ -240,6 +242,17 @@ function getTileStart(playerNo) {
     throw "Unknown playerNo " + playerNo;
 }
 
+function getTileEnd(playerNo) {
+    playerNo = (playerNo === undefined ? getActivePlayer().playerNo : playerNo);
+
+    if (playerNo === lightPlayer.playerNo)
+        return LIGHT_END;
+    if (playerNo === darkPlayer.playerNo)
+        return DARK_END;
+
+    throw "Unknown playerNo " + playerNo;
+}
+
 function getTileMoveToLocation(x, y) {
     const path = getTilePath(),
           diceValue = countDiceUp(),
@@ -286,7 +299,7 @@ function isValidMoveFrom(playerNo, loc) {
         return false;
 
     const toOwner = getTile(to),
-          fromOwner = (isStartTile(x, y) ? getActivePlayer().playerNo : getTile(x, y));
+          fromOwner = getTile(x, y);
 
     if (fromOwner !== playerNo)
         return false;
@@ -296,6 +309,21 @@ function isValidMoveFrom(playerNo, loc) {
         return true;
 
     return !isLocusTile(to);
+}
+
+function getAllValidMoveTiles(playerNo) {
+    const moves = [];
+
+    for(let x = 0; x < TILES_WIDTH; ++x) {
+        for(let y = 0; y < TILES_HEIGHT; ++y) {
+            if (!isValidMoveFrom(playerNo, [x, y]))
+                continue;
+
+            moves.push([x, y]);
+        }
+    }
+
+    return moves;
 }
 
 function resetTiles() {
@@ -332,9 +360,7 @@ function initPlayer(playerNo, name) {
             current: 0,
             added: [],
             removed: []
-        },
-
-        diceRolling: true,
+        }
     };
 }
 
@@ -371,6 +397,14 @@ function setOwnPlayer(player) {
         ownPlayer = darkPlayer;
         otherPlayer = lightPlayer;
     }
+}
+
+function getPlayer(playerNo) {
+    if (playerNo === lightPlayer.playerNo)
+        return lightPlayer;
+    if (playerNo === darkPlayer.playerNo)
+        return darkPlayer;
+    throw "Unknown playerNo " + playerNo;
 }
 
 function getActivePlayer() {
@@ -447,8 +481,12 @@ function resetDice() {
     dice.callback = null;
 }
 
+function generateRandomDiceValues() {
+    return [randInt(1, 7), randInt(1, 7), randInt(1, 7), randInt(1, 7)];
+}
+
 function randomiseRollingDice() {
-    dice.rollingValues = [randInt(1, 6), randInt(1, 6), randInt(1, 6), randInt(1, 6)];
+    dice.rollingValues = generateRandomDiceValues();
     dice.rollingValuesChangeTime = getTime();
 }
 

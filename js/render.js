@@ -177,7 +177,8 @@ const tileMove = {
     replacingOwner: TILE_EMPTY,
     fromTile: [-1, -1],
     toTile: [-1, -1],
-    startTime: LONG_TIME_AGO
+    startTime: LONG_TIME_AGO,
+    onComplete: null
 };
 
 function updateTilePathAnchorTime() {
@@ -193,10 +194,35 @@ function updateTilePathAnchorTime() {
     tilePathAnchorTime = (tilePathAnchorTime % period) + (tilePathAnchorTime < 0 ? period : 0);
 }
 
-function animateTileMove(fromTile, toTile) {
-    const owner = getTile(fromTile);
-    if (owner === TILE_EMPTY)
+function runOnTileMoveFinish(onComplete) {
+    // If there is no current tile moving
+    if (!isTileValid(tileMove.fromTile)) {
+        onComplete([-1, -1], [-1, -1]);
         return;
+    }
+
+    const previousOnComplete = tileMove.onComplete;
+
+    if (previousOnComplete !== null) {
+        tileMove.onComplete = function(fromTile, toTile) {
+            onComplete(fromTile, toTile);
+            previousOnComplete(fromTile, toTile);
+        };
+    } else {
+        tileMove.onComplete = onComplete;
+    }
+}
+
+function animateTileMove(fromTile, toTile, onComplete) {
+    onComplete = (!onComplete ? null : onComplete);
+
+    const owner = getTile(fromTile);
+    if (owner === TILE_EMPTY) {
+        if (onComplete !== null) {
+            onComplete([-1, -1], [-1, -1]);
+        }
+        return;
+    }
 
     tileMove.owner = owner;
     tileMove.replacingOwner = getTile(toTile);
@@ -206,7 +232,9 @@ function animateTileMove(fromTile, toTile) {
 
     const path = getTilePath(owner),
           moveLength = vecListIndexOf(path, toTile) - vecListIndexOf(path, fromTile);
+
     tileMove.duration = TILE_MOVE_DURATIONS[moveLength];
+    tileMove.onComplete = onComplete;
 }
 
 function clearTileMove() {
@@ -227,7 +255,16 @@ function updateTileMove(time) {
     if (age < 1)
         return;
 
+    const onComplete = tileMove.onComplete,
+          fromTile = tileMove.fromTile,
+          toTile = tileMove.toTile;
+
     clearTileMove();
+
+    if (onComplete !== null) {
+        onComplete(fromTile, toTile);
+    }
+
     if (tileMove.replacingOwner !== TILE_EMPTY) {
         playSound("kill");
     } else {

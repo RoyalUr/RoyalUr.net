@@ -62,6 +62,107 @@ function reportStartupPerformance() {
 
 
 //
+// MENU
+//
+
+function onPlayClick(event) {
+    event.stopPropagation();
+    switchToScreen(SCREEN_PLAY_SELECT);
+}
+
+function onPlayOnline(event) {
+    event.stopPropagation();
+    connectToGame();
+}
+
+function onPlayComputer(event) {
+    event.stopPropagation();
+    game = new ComputerGame();
+    switchToScreen(SCREEN_GAME);
+}
+
+function onExitClick(event) {
+    event.stopPropagation();
+    switchToScreen(SCREEN_MENU);
+}
+
+function connectToGame() {
+    switchToScreen(SCREEN_CONNECTING);
+}
+
+
+
+//
+// NETWORK : CONNECTING
+//
+
+function onNetworkConnecting() {
+    if(networkStatus.status === "Lost connection")
+        return;
+
+    setNetworkStatus("Connecting", true);
+}
+
+function onNetworkConnected() {
+    resetGame();
+
+    setNetworkStatus("Connected", false);
+    fadeNetworkStatusOut();
+
+    const gameID = getHashGameID();
+    if (gameID !== null) {
+        sendPacket(writeJoinGamePacket(gameID));
+    } else {
+        sendPacket(writeFindGamePacket())
+    }
+}
+
+function onNetworkLoseConnection() {
+    setNetworkStatus("Lost connection", true);
+    fadeNetworkStatusIn();
+}
+
+function onNetworkDisconnect() {
+    resetNetworkStatus();
+    fadeNetworkStatusOut();
+}
+
+
+
+//
+// NETWORK : GAME
+//
+
+function onPacketInvalidGame() {
+    disconnect();
+    resetNetworkStatus();
+    switchToScreen(SCREEN_MENU, true);
+    setMessage("Game could not be found", 0, 2, 1)
+}
+
+function onPacketGame(gameInfo) {
+    game = new OnlineGame();
+    setHash(gameInfo.gameID);
+    setOwnPlayer(gameInfo.ownPlayer);
+    otherPlayer.name = gameInfo.opponentName;
+    switchToScreen(SCREEN_GAME);
+}
+
+function onPacketMessage(data) {
+    game.onPacketMessage(data);
+}
+
+function onPacketMove(move) {
+    game.onPacketMove(move);
+}
+
+function onPacketState(state) {
+    game.onPacketState(state);
+}
+
+
+
+//
 // GAME HASH
 //
 
@@ -273,6 +374,8 @@ function onExitConnectingScreen(hasty) {
 
 function onEnterGameScreen(hasty) {
     setMessageAndFade("Found your Game", screenState.connectionFade);
+
+    game.init();
 }
 
 function onExitGameScreen(hasty) {
@@ -291,7 +394,7 @@ function onExitWinScreen(hasty) {
 }
 
 function onEnterServerScreen(hasty) {
-    connect();
+
 }
 
 function onExitServerScreen(hasty) {
@@ -316,104 +419,4 @@ function onEnterExitableScreen(hasty) {
 
 function onExitExitableScreen(hasty) {
     screenState.exitFade.fadeOut(hasty ? 0 : undefined);
-}
-
-
-
-//
-// MENU
-//
-
-function onPlayClick(event) {
-    event.stopPropagation();
-    switchToScreen(SCREEN_PLAY_SELECT);
-}
-
-function onPlayOnline(event) {
-    event.stopPropagation();
-    connectToGame();
-}
-
-function onPlayComputer(event) {
-    event.stopPropagation();
-    console.log("play the computer");
-}
-
-function onExitClick(event) {
-    event.stopPropagation();
-    switchToScreen(SCREEN_MENU);
-}
-
-function connectToGame() {
-    switchToScreen(SCREEN_CONNECTING);
-}
-
-
-
-//
-// NETWORK : CONNECTING
-//
-
-function onNetworkConnecting() {
-    if(networkStatus.status === "Lost connection")
-        return;
-
-    setNetworkStatus("Connecting", true);
-}
-
-function onNetworkConnected() {
-    resetGame();
-
-    setNetworkStatus("Connected", false);
-    fadeNetworkStatusOut();
-
-    const gameID = getHashGameID();
-    if (gameID !== null) {
-        sendPacket(writeJoinGamePacket(gameID));
-    } else {
-        sendPacket(writeFindGamePacket())
-    }
-}
-
-function onNetworkLoseConnection() {
-    setNetworkStatus("Lost connection", true);
-    fadeNetworkStatusIn();
-}
-
-function onNetworkDisconnect() {
-    resetNetworkStatus();
-    fadeNetworkStatusOut();
-}
-
-
-
-//
-// NETWORK : GAME
-//
-
-function onPacketInvalidGame() {
-    disconnect();
-    resetNetworkStatus();
-    switchToScreen(SCREEN_MENU, true);
-    setMessage("Game could not be found", 0, 2, 1)
-}
-
-function onPacketGame(gameInfo) {
-    game = new NetworkGame();
-    setHash(gameInfo.gameID);
-    switchToScreen(SCREEN_GAME);
-    setOwnPlayer(gameInfo.ownPlayer);
-    otherPlayer.name = gameInfo.opponentName;
-}
-
-function onPacketMessage(data) {
-    game.onPacketMessage(data);
-}
-
-function onPacketMove(move) {
-    game.onPacketMove(move);
-}
-
-function onPacketState(state) {
-    game.onPacketState(state);
 }

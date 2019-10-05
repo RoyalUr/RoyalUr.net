@@ -216,12 +216,13 @@ function rand(min, max) {
 }
 
 function randInt(min, max) {
-    if(max === undefined) {
+    if (min === undefined)
+        return -1;
+    if (max === undefined) {
         max = min;
         min = 0;
     }
-
-    return Math.floor(rand(min, max));
+    return clamp(Math.floor(rand(min, max)), min, max - 1);
 }
 
 function randBool() {
