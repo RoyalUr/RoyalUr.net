@@ -121,6 +121,11 @@ function Game() {
             setTile(location, TILE_EMPTY);
         }
     }.bind(this);
+
+    this.clearStartTiles = function() {
+        setTile(LIGHT_START, TILE_EMPTY);
+        setTile(DARK_START, TILE_EMPTY);
+    }.bind(this);
 }
 
 function OnlineGame() {
@@ -204,6 +209,8 @@ function OnlineGame() {
 
         unselectTile();
         ownPlayer.active = false;
+
+        this.clearStartTiles();
     }.bind(this);
 }
 
@@ -264,6 +271,7 @@ function ComputerGame() {
         }
 
         unselectTile();
+        this.clearStartTiles();
     }.bind(this);
 
     this.updateActivePlayer = function() {
@@ -350,5 +358,7 @@ function ComputerGame() {
         animateTileMove(from, to, this.onFinishMove);
         setTile(to, otherPlayer.playerNo);
         setTile(from, TILE_EMPTY);
+
+        this.clearStartTiles();
     }.bind(this);
 }
