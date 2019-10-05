@@ -209,7 +209,6 @@ function OnlineGame() {
 
         unselectTile();
         ownPlayer.active = false;
-
         this.clearStartTiles();
     }.bind(this);
 }
@@ -260,7 +259,10 @@ function ComputerGame() {
         if (!noAnimation) {
             animateTileMove(selectedTile, to, this.onFinishMove);
         } else {
-            setTimeout(this.onFinishMove);
+            const from = selectedTile;
+            setTimeout(function() {
+                this.onFinishMove(from, to);
+            }.bind(this));
         }
 
         setTile(to, getTile(selectedTile));
@@ -271,6 +273,7 @@ function ComputerGame() {
         }
 
         unselectTile();
+        ownPlayer.active = false;
         this.clearStartTiles();
     }.bind(this);
 
@@ -298,6 +301,8 @@ function ComputerGame() {
     this.onFinishMove = function(fromTile, toTile) {
         // If they've just taken a piece off the board, give them some score
         if (vecEquals(toTile, getTileEnd(this.turnPlayer.playerNo))) {
+            this.updateActivePlayer();
+
             addScore(this.turnPlayer);
             setTile(toTile, TILE_EMPTY);
 
@@ -358,6 +363,7 @@ function ComputerGame() {
         animateTileMove(from, to, this.onFinishMove);
         setTile(to, otherPlayer.playerNo);
         setTile(from, TILE_EMPTY);
+        otherPlayer.active = false;
 
         this.clearStartTiles();
     }.bind(this);
