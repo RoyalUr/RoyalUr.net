@@ -70,6 +70,7 @@ function setupElements() {
     });
 
     playSelectDiv.addEventListener("click", onExitClick);
+
     playOnlineButton.addEventListener("click", onPlayOnline);
     playComputerButton.addEventListener("click", onPlayComputer);
 

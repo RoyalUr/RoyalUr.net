@@ -379,7 +379,7 @@ function onEnterGameScreen(hasty) {
 }
 
 function onExitGameScreen(hasty) {
-    // Nothing to do
+    game = null;
 }
 
 function onEnterWinScreen(hasty) {
