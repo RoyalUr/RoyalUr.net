@@ -302,8 +302,8 @@ function redrawTiles(forceRedraw) {
     const moveFrom = tileMove.fromTile,
           moveTo = tileMove.toTile;
 
-    // Tiles we will draw later
-    const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo];
+    // Tiles we will draw later (or just don't want to draw)
+    const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo, getTileStart(otherPlayer.playerNo)];
 
     // Draw all tiles not part of a drawn path
     for(let x = 0; x < TILES_WIDTH; ++x) {
