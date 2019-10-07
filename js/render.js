@@ -175,8 +175,8 @@ let tilePathAnchorTime = 0;
 const tileMove = {
     owner: TILE_EMPTY,
     replacingOwner: TILE_EMPTY,
-    fromTile: [-1, -1],
-    toTile: [-1, -1],
+    fromTile: VEC_NEG1,
+    toTile: VEC_NEG1,
     startTime: LONG_TIME_AGO,
     onComplete: null
 };
@@ -184,7 +184,7 @@ const tileMove = {
 function updateTilePathAnchorTime() {
     const duration = getTime() - mouseDownTime,
           width = getTileWidth(),
-          distance = vecDist(mouseX, mouseY, mouseDownX, mouseDownY);
+          distance = vecDist(mouseLoc, mouseDownLoc);
 
     tilePathAnchorTime += (9 / 15) * duration - (2 / 3) * distance / width;
 
@@ -197,7 +197,7 @@ function updateTilePathAnchorTime() {
 function runOnTileMoveFinish(onComplete) {
     // If there is no current tile moving
     if (!isTileValid(tileMove.fromTile)) {
-        onComplete([-1, -1], [-1, -1]);
+        onComplete(VEC_NEG1, VEC_NEG1);
         return;
     }
 
@@ -219,7 +219,7 @@ function animateTileMove(fromTile, toTile, onComplete) {
     const owner = getTile(fromTile);
     if (owner === TILE_EMPTY) {
         if (onComplete !== null) {
-            onComplete([-1, -1], [-1, -1]);
+            onComplete(VEC_NEG1, VEC_NEG1);
         }
         return;
     }
@@ -240,8 +240,8 @@ function animateTileMove(fromTile, toTile, onComplete) {
 function clearTileMove() {
     tileMove.owner = TILE_EMPTY;
     tileMove.replacingOwner = TILE_EMPTY;
-    tileMove.fromTile = [-1, -1];
-    tileMove.toTile = [-1, -1];
+    tileMove.fromTile = VEC_NEG1;
+    tileMove.toTile = VEC_NEG1;
     tileMove.startTime = LONG_TIME_AGO;
     tileMove.duration = -1;
 }
@@ -283,18 +283,18 @@ function redrawTiles(forceRedraw) {
     ctx.clearRect(0, 0, tilesWidth, tilesHeight);
 
     const tileWidth = getTileWidth(),
-          path = getTilePath(),
+          path = getTilePath(ownPlayer.playerNo),
           diceValue = countDiceUp();
 
     // Get the tile to draw a path for
     let pathTile = getDrawPotentialMoveTile(),
         startIndex = vecListIndexOf(path, pathTile),
         endIndex = (startIndex >= 0 ? min(startIndex + diceValue, path.length - 1) : -1),
-        endTile = (endIndex >= 0 ? path[endIndex] : [-1, -1]);
+        endTile = (endIndex >= 0 ? path[endIndex] : VEC_NEG1);
 
     if(startIndex === endIndex) {
-        pathTile = [-1, -1];
-        endTile = [-1, -1];
+        pathTile = VEC_NEG1;
+        endTile = VEC_NEG1;
     }
 
     // Get the tile we are currently moving
@@ -303,7 +303,7 @@ function redrawTiles(forceRedraw) {
           moveTo = tileMove.toTile;
 
     // Tiles we will draw later (or just don't want to draw)
-    const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo, getTileStart(otherPlayer.playerNo)];
+    const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo, getStartTile(otherPlayer.playerNo)];
 
     // Draw all tiles not part of a drawn path
     for(let x = 0; x < TILES_WIDTH; ++x) {
@@ -311,7 +311,7 @@ function redrawTiles(forceRedraw) {
             if(tiles[x][y] === TILE_EMPTY)
                 continue;
 
-            const loc = [x, y];
+            const loc = vec(x, y);
             if (vecListContains(ignoreDrawTiles, loc))
                 continue;
 
@@ -331,9 +331,9 @@ function redrawTiles(forceRedraw) {
         // Find the location of the dragged tile
         let dragLoc = null;
         if (draggingTile) {
-            dragLoc = vecAdd(tileToCanvas(pathTile), [mouseX - mouseDownX, mouseY - mouseDownY]);
-            dragLoc[0] = clamp(dragLoc[0], tileWidth, tilesWidth - tileWidth);
-            dragLoc[1] = clamp(dragLoc[1], tileWidth, tilesHeight - tileWidth);
+            dragLoc = vecAdd(tileToCanvas(pathTile), vecSub(mouseLoc, mouseDownLoc));
+            dragLoc.x = clamp(dragLoc.x, tileWidth, tilesWidth - tileWidth);
+            dragLoc.y = clamp(dragLoc.y, tileWidth, tilesHeight - tileWidth);
         }
 
         // Convert the tile path to a canvas location curve
@@ -356,11 +356,14 @@ function redrawTiles(forceRedraw) {
         if(!draggingTile) {
             renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, (isTileSelected(pathTile) ? 255 : 0));
         } else {
-            const draggedOnBoard = isTileOnBoard(canvasToTile(mouseX, mouseY)),
-                draggedWidth = tileWidth * (draggedOnBoard ? HOVER_WIDTH_RATIO : 1),
-                draggedShadowWidth = tileWidth * (draggedOnBoard ? SHADOW_WIDTH_RATIO : 1);
+            if (dragLoc === null)
+                throw "This def shouldn't happen";
 
-            paintTile(ctx, dragLoc[0], dragLoc[1], draggedWidth, draggedShadowWidth, owner, 255);
+            const draggedOnBoard = isTileOnBoard(canvasToTile(mouseLoc)),
+                  draggedWidth = tileWidth * (draggedOnBoard ? HOVER_WIDTH_RATIO : 1),
+                  draggedShadowWidth = tileWidth * (draggedOnBoard ? SHADOW_WIDTH_RATIO : 1);
+
+            paintTile(ctx, dragLoc.x, dragLoc.y, draggedWidth, draggedShadowWidth, owner, 255);
         }
     }
 
@@ -384,17 +387,17 @@ function drawMovingTile(ctx, time, tileWidth) {
           endLoc = curve[curve.length - 1];
 
     if (tileMove.replacingOwner !== TILE_EMPTY) {
-        paintTile(ctx, endLoc[0], endLoc[1], tileWidth, tileWidth, tileMove.replacingOwner, 0);
+        paintTile(ctx, endLoc.x, endLoc.y, tileWidth, tileWidth, tileMove.replacingOwner, 0);
     }
 
     const tileMovingWidth = tileWidth * (1 + 0.2 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5)));
 
-    paintTile(ctx, startLoc[0], startLoc[1], tileMovingWidth, tileMovingWidth, tileMove.owner, 0);
+    paintTile(ctx, startLoc.x, startLoc.y, tileMovingWidth, tileMovingWidth, tileMove.owner, 0);
 }
 
 function getDrawPotentialMoveTile() {
     if (!isAwaitingMove())
-        return [-1, -1];
+        return VEC_NEG1;
 
     if (getTile(hoveredTile) === ownPlayer.playerNo)
         return hoveredTile;
@@ -402,7 +405,7 @@ function getDrawPotentialMoveTile() {
     if (isTileSelected(draggedTile))
         return selectedTile;
 
-    return [-1, -1];
+    return VEC_NEG1;
 }
 
 function computePathCurve(startIndex, endIndex, playerNo) {
@@ -449,16 +452,16 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
 
 
     const endLoc = curve[curve.length - 1];
-    ctx.moveTo(endLoc[0], endLoc[1]);
+    ctx.moveTo(endLoc.x, endLoc.y);
 
     if (dragLoc !== null && vecDist(dragLoc, curve[0]) > DRAG_DIRECT_LINE_TILE_WIDTHS * tileWidth) {
         // Just draw a direct line to the end point
-        ctx.lineTo(dragLoc[0], dragLoc[1]);
+        ctx.lineTo(dragLoc.x, dragLoc.y);
     } else {
         // Draw the path curve
         for (let index = curve.length - 2; index >= 0; --index) {
             const point = curve[index];
-            ctx.lineTo(point[0], point[1]);
+            ctx.lineTo(point.x, point.y);
         }
     }
 
@@ -472,11 +475,11 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
 
         const crossSize = tileWidth / 6;
 
-        ctx.moveTo(endLoc[0] - crossSize, endLoc[1] - crossSize);
-        ctx.lineTo(endLoc[0] + crossSize, endLoc[1] + crossSize);
+        ctx.moveTo(endLoc.x - crossSize, endLoc.y - crossSize);
+        ctx.lineTo(endLoc.x + crossSize, endLoc.y + crossSize);
 
-        ctx.moveTo(endLoc[0] - crossSize, endLoc[1] + crossSize);
-        ctx.lineTo(endLoc[0] + crossSize, endLoc[1] - crossSize);
+        ctx.moveTo(endLoc.x - crossSize, endLoc.y + crossSize);
+        ctx.lineTo(endLoc.x + crossSize, endLoc.y - crossSize);
 
         ctx.stroke();
     }
@@ -498,7 +501,7 @@ function renderTile(ctx, location, width, shadowWidth, owner, shadowRed, shadowG
 
     const loc = tileToCanvas(location);
 
-    paintTile(ctx, loc[0], loc[1], width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue);
+    paintTile(ctx, loc.x, loc.y, width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue);
 }
 
 // TODO : paintTile should take a location array, not left, top
@@ -633,7 +636,7 @@ function redrawPlayerScores(player, drawFromLeft) {
     const renderTarget = getPlayerRenderTarget(player),
           tilesCtx = renderTarget.tilesCtx,
           scoreCtx = renderTarget.scoreCtx,
-          startTile = getStartTile();
+          startTile = getStartTile(ownPlayer.playerNo);
 
     const highlightStartTile = (
         player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !dice.rolling

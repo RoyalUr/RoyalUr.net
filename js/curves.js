@@ -4,13 +4,13 @@
 
 function findQuadraticBezierPoint(prev, curr, next, t) {
     const a = (1 - t)*(1 - t),
-        b = 2*(1-t)*t,
-        c = t*t;
+          b = 2*(1-t)*t,
+          c = t*t;
 
-    return [
-        a * prev[0] + b * curr[0] + c * next[0],
-        a * prev[1] + b * curr[1] + c * next[1]
-    ];
+    return vec(
+        a * prev.x + b * curr.x + c * next.x,
+        a * prev.y + b * curr.y + c * next.y
+    );
 }
 
 /**
@@ -19,7 +19,7 @@ function findQuadraticBezierPoint(prev, curr, next, t) {
 function pushLineToCurve(curve, from, to, resolution) {
     const steps = Math.ceil(vecDist(from, to) / resolution);
     for (let step = 1; step < steps; ++step) {
-        curve.push(vecLin(step / steps, from, to));
+        curve.push(vecLin(from, to, step / steps));
     }
 }
 
@@ -101,7 +101,7 @@ function isPointAheadInPath(point, path, index, epsilon) {
     // Check if in-front on the prev -> curr line
     if (index > 0) {
         const line = vecSub(currLoc, path[index - 1]),
-            relPoint = vecSub(point, path[index - 1]);
+              relPoint = vecSub(point, path[index - 1]);
         if (vecProject(relPoint, line) < epsilon)
             return false;
     }
@@ -109,7 +109,7 @@ function isPointAheadInPath(point, path, index, epsilon) {
     // Check if in-front on the curr -> next line
     if (index < path.length - 1) {
         const line = vecSub(path[index + 1], currLoc),
-            relPoint = vecSub(point, currLoc);
+              relPoint = vecSub(point, currLoc);
         if (vecProject(relPoint, line) < epsilon)
             return false;
     }

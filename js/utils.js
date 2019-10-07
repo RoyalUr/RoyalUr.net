@@ -422,124 +422,112 @@ function pad(value, length, prefix) {
 // VECTORS
 //
 
-function vecAdd(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
+const VEC_NEG1 = new Vector2D(-1, -1);
 
-    return [x1 + x2, y1 + y2];
+function Vector2D(x, y) {
+    this.x = x;
+    this.y = y;
 }
 
-function vecSub(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return [x1 - x2, y1 - y2];
+/**
+ * Create a vector with the given {@param x} and {@param y} components.
+ */
+function vec(x, y) {
+    if (typeof x !== "number" || typeof y !== "number")
+        throw "x and y must be numbers: " + x + ", " + y;
+    if (isNaN(x) || isNaN(y))
+        throw "x and y cannot be NaN: " + x + ", " + y;
+    if (x === -1 && y === -1)
+        return VEC_NEG1;
+    return new Vector2D(x, y);
 }
 
-function vecMul(mul, x, y) {
-    if (y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
+/**
+ * Construct a list of vectors from a list of pairs of coordinates in the form [x1, y1, x2, y2, ..., xn, yn].
+ */
+function vecList() {
+    if (arguments.length % 2 !== 0)
+        throw "Arguments must be of even length";
 
-    return [mul * x, mul * y];
+    const vecs = [];
+    for (let index = 0; index < arguments.length; index += 2) {
+        const x = arguments[index],
+              y = arguments[index + 1],
+              v = vec(x, y);
+
+        vecs.push(v);
+    }
+    return vecs;
 }
 
-function vecLin(t, x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return [
-        (1 - t) * x1 + t * x2,
-        (1 - t) * y1 + t * y2
-    ];
+function vecAdd(v1, v2) {
+    return vec(v1.x + v2.x, v1.y + v2.y);
 }
 
-function vecLen(x, y) {
-    if (y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return Math.sqrt(x*x + y*y);
+function vecSub(v1, v2) {
+    return vec(v1.x - v2.x, v1.y - v2.y);
 }
 
-function vecProject(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return (x1 * x2 + y1 * y2) / vecLen(x2, y2);
+function vecMul(v, mul) {
+    return vec(mul * v.x, mul * v.y);
 }
 
-function vecMidpoint(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return [
-        (x1 + x2) / 2,
-        (y1 + y2) / 2
-    ];
+/**
+ * Linearly interpolate between {@param v1} and {@param v2} with {@param t}
+ * giving the distance moved from v1 to v2 as a value from 0 to 1 inclusive.
+ */
+function vecLin(v1, v2, t) {
+    return vec(
+        v1.x * (1 - t) + v2.x * t,
+        v1.y * (1 - t) + v2.y * t
+    );
 }
 
-function vecEquals(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    return x1 === x2 && y1 === y2;
+function vecLenSquared(v) {
+    return v.x * v.x + v.y * v.y;
 }
 
-function vecDist(x1, y1, x2, y2) {
-    if(x2 === undefined) {
-        x2 = y1[0];
-        y2 = y1[1];
-        y1 = x1[1];
-        x1 = x1[0];
-    }
-
-    const dx = x2 - x1,
-          dy = y2 - y1;
-
-    return Math.sqrt(dx*dx + dy*dy);
+function vecLen(v) {
+    return Math.sqrt(vecLenSquared(v));
 }
 
-function vecListIndexOf(locations, x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
+/**
+ * Get the dot product of {@param v1} and {@param v2}.
+ */
+function vecDot(v1, v2) {
+    return v1.x * v2.x + v1.y * v2;
+}
 
+/**
+ * Get the vector projection of {@param v1} onto {@param v2}.
+ */
+function vecProject(v1, v2) {
+    return vecDot(v1, v2) / vecLen(v2);
+}
+
+function vecMidpoint(v1, v2) {
+    return vec(
+        (v1.x + v2.x) / 2,
+        (v1.y + v2.y) / 2
+    );
+}
+
+function vecEquals(v1, v2) {
+    return v1.x === v2.x && v1.y === v2.y;
+}
+
+function vecDist(v1, v2) {
+    return vecLen(vecSub(v1, v2));
+}
+
+function vecListIndexOf(locations, v) {
     for(let index = 0; index < locations.length; ++index) {
-        if(vecEquals([x, y], locations[index]))
+        if(vecEquals(locations[index], v))
             return index;
     }
-
     return -1;
 }
 
-function vecListContains(locations, x, y) {
-    return vecListIndexOf(locations, x, y) !== -1;
+function vecListContains(locations, v) {
+    return vecListIndexOf(locations, v) !== -1;
 }

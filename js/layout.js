@@ -46,15 +46,13 @@ let width = NaN,
     centreLeft = NaN,
     centreTop = NaN;
 
-let mouseX = -1,
-    mouseY = -1,
-    hoveredTile = [-1, -1];
+let mouseLoc = VEC_NEG1,
+    hoveredTile = VEC_NEG1;
 
 let mouseDown = false,
     mouseDownTime = LONG_TIME_AGO,
-    mouseDownX = -1,
-    mouseDownY = -1,
-    draggedTile = [-1, -1];
+    mouseDownLoc = VEC_NEG1,
+    draggedTile = VEC_NEG1;
 
 function setupElements() {
     playButton.addEventListener("click", onPlayClick);
@@ -87,11 +85,10 @@ function setupElements() {
     watchButton.addEventListener("mouseover", function() { menuState.watchButton = BUTTON_STATE_HOVERED; });
     watchButton.addEventListener("mouseout", function() { menuState.watchButton = BUTTON_STATE_INACTIVE; });
 
-    function updateMouse(x, y, down) {
-        mouseX = x;
-        mouseY = y;
+    function updateMouse(loc, down) {
+        mouseLoc = loc;
 
-        const newHoveredTile = canvasToTile(x, y);
+        const newHoveredTile = canvasToTile(loc);
         if(!vecEquals(hoveredTile, newHoveredTile)) {
             game.onTileHover(newHoveredTile);
         }
@@ -103,15 +100,13 @@ function setupElements() {
         if(down) {
             mouseDown = true;
             mouseDownTime = getTime();
-            mouseDownX = x;
-            mouseDownY = y;
-            draggedTile = canvasToTile(x, y);
+            mouseDownLoc = loc;
+            draggedTile = hoveredTile;
         } else {
             mouseDown = false;
             mouseDownTime = LONG_TIME_AGO;
-            mouseDownX = -1;
-            mouseDownY = -1;
-            draggedTile = [-1, -1];
+            mouseDownLoc = VEC_NEG1;
+            draggedTile = VEC_NEG1;
         }
     }
 
@@ -123,14 +118,18 @@ function setupElements() {
         if (!game)
             return;
 
-        updateMouse(event.clientX - tilesLeft, event.clientY - tilesTop);
+        const loc = vec(
+            event.clientX - tilesLeft,
+            event.clientY - tilesTop
+        );
+        updateMouse(loc);
     };
 
     document.body.onmousedown = function(event) {
         if (!game)
             return;
 
-        updateMouse(mouseX, mouseY, true);
+        updateMouse(mouseLoc, true);
         game.onTileClick(hoveredTile);
 
         event.preventDefault();
@@ -141,7 +140,7 @@ function setupElements() {
             return;
 
         game.onTileRelease(hoveredTile);
-        updateMouse(mouseX, mouseY, false);
+        updateMouse(mouseLoc, false);
     };
 
     // addTwitterButton();
@@ -307,10 +306,11 @@ function getTileWidth() {
 
     for (let x = 0; x < TILES_WIDTH; ++x) {
         for (let y = 0; y < TILES_HEIGHT; ++y) {
-            if (!isTileOnBoard(x, y))
+            const loc = vec(x, y);
+            if (!isTileOnBoard(loc))
                 continue;
 
-            cumulativeTileWidth += regions[x + y * TILES_WIDTH][2];
+            cumulativeTileWidth += regions[x + y * TILES_WIDTH].width;
             tilesRecordedCount += 1;
         }
     }
@@ -341,7 +341,7 @@ function getBoardTileRegions() {
         return boardTileRegions;
 
     const boardImage = getRawImageResource("board"),
-        tileRegions = getImageAnnotation("board");
+          tileRegions = getImageAnnotation("board");
 
     if (!boardImage)
         throw "Missing board image";
@@ -351,23 +351,23 @@ function getBoardTileRegions() {
         throw "Invalid board tile annotations : invalid length, expected " + TILES_COUNT + ", received " + tileRegions.length;
 
     const boardImgWidth = boardImage.width,
-        boardImgHeight = boardImage.height;
+          boardImgHeight = boardImage.height;
 
     boardTileRegions = [];
 
     for (let index = 0; index < tileRegions.length; ++index) {
         const region = tileRegions[index],
-            x = region[0],
-            y = region[1],
-            width = region[2],
-            height = region[3];
+              x = region[0],
+              y = region[1],
+              width = region[2],
+              height = region[3];
 
-        boardTileRegions.push([
-            x / boardImgWidth,
-            y / boardImgHeight,
-            width / boardImgWidth,
-            height / boardImgHeight
-        ]);
+        boardTileRegions.push({
+            x: x / boardImgWidth,
+            y: y / boardImgHeight,
+            width: width / boardImgWidth,
+            height: height / boardImgHeight
+        });
     }
 
     return boardTileRegions;
@@ -384,28 +384,21 @@ function getBoardTilePositions() {
     const tileRegions = getBoardTileRegions();
 
     boardTilePositions = [];
-
     for (let index = 0; index < tileRegions.length; ++index) {
-        const region = tileRegions[index],
-            x = region[0],
-            y = region[1],
-            width = region[2],
-            height = region[3];
+        const region = tileRegions[index];
 
-        boardTilePositions.push([
-            x + width / 2,
-            y + height / 2
-        ]);
+        boardTilePositions.push(vec(
+            region.x + region.width / 2,
+            region.y + region.height / 2
+        ));
     }
 
     return boardTilePositions;
 }
 
-function tileToCanvas(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
+function tileToCanvas(tileLoc) {
+    let x = tileLoc.x,
+        y = tileLoc.y;
 
     // If we're flipping the board
     if(ownPlayer === darkPlayer) {
@@ -421,17 +414,15 @@ function tileToCanvas(x, y) {
           index = x + y * TILES_WIDTH;
 
     const position = tilePositions[index],
-        canvas_x = position[0] * boardWidth + tilesXOffset,
-        canvas_y = position[1] * boardHeight + tilesYOffset;
+          screen_x = position.x * boardWidth + tilesXOffset,
+          screen_y = position.y * boardHeight + tilesYOffset;
 
-    return [canvas_x, canvas_y];
+    return vec(screen_x, screen_y);
 }
 
-function canvasToTile(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
+function canvasToTile(screenLoc) {
+    let x = screenLoc.x,
+        y = screenLoc.y;
 
     // The tiles canvas is bigger than the board canvas
     x -= (tilesWidth - boardCanvasWidth) / 2;
@@ -443,7 +434,7 @@ function canvasToTile(x, y) {
         prop_y = y / boardHeight;
 
     if (prop_x < 0 || prop_x >= 1 || prop_y < 0 || prop_y >= 1)
-        return [-1, -1];
+        return VEC_NEG1;
 
     if (ownPlayer === darkPlayer) {
         prop_x = 1 - prop_x;
@@ -456,11 +447,9 @@ function canvasToTile(x, y) {
 
     for (let index = 0; index < tilePositions.length; ++index) {
         const pos = tilePositions[index],
-            pos_x = pos[0],
-            pos_y = pos[1],
-            dx = pos_x - prop_x,
-            dy = pos_y - prop_y,
-            dist_sq = dx*dx + dy*dy;
+              dx = pos.x - prop_x,
+              dy = pos.y - prop_y,
+              dist_sq = dx*dx + dy*dy;
 
         if (closest_index === -1 || dist_sq < closest_dist) {
             closest_index = index;
@@ -468,10 +457,10 @@ function canvasToTile(x, y) {
         }
     }
 
-    return [
-        closest_index % TILES_WIDTH,
-        Math.floor(closest_index / TILES_WIDTH)
-    ];
+    const tile_x = closest_index % TILES_WIDTH,
+          tile_y = Math.floor(closest_index / TILES_WIDTH);
+
+    return vec(tile_x, tile_y);
 }
 
 

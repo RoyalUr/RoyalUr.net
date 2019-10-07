@@ -5,6 +5,7 @@
     "js/utils.js",
     "js/stats.js",
     "js/resources.js",
+    "js/board.js",
     "js/model.js",
     "js/layout.js",
     "js/particles.js",
@@ -12,6 +13,7 @@
     "js/render.js",
     "js/packets.js",
     "js/network.js",
+    "js/simulation.js",
     "js/gameControl.js",
     "js/client.js"
   ],

@@ -25,45 +25,35 @@ function Game() {
     this.lastTileReleaseTime = LONG_TIME_AGO;
     this.lastTileReleaseTile = [-1, -1];
 
-    this.onTileHover = function(x, y) {
-        if(y === undefined) {
-            y = x[1];
-            x = x[0];
-        }
-
+    this.onTileHover = function(loc) {
         if(isAwaitingMove()
             && !isTileSelected()
-            && getTile(x, y) === ownPlayer.playerNo
-            && isValidMoveFrom([x, y])) {
+            && getTile(loc) === ownPlayer.playerNo
+            && isValidMoveFrom(loc)) {
             playSound("hover");
         }
     }.bind(this);
 
-    this.onTileClick = function(x, y) {
-        if(y === undefined) {
-            y = x[1];
-            x = x[0];
-        }
-
+    this.onTileClick = function(loc) {
         this.lastTileClickWasSelect = false;
 
         if(isTileSelected()) {
-            const to = getTileMoveToLocation(selectedTile);
+            const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
 
-            if(vecEquals([x, y], to)) {
+            if(vecEquals(loc, to)) {
                 this.performMove();
                 return;
             }
         }
 
-        if(isTileSelected(x, y))
+        if(isTileSelected(loc))
             return;
 
-        const tileOwner = getTile(x, y);
+        const tileOwner = getTile(loc);
 
         if(!isAwaitingMove()
             || tileOwner !== ownPlayer.playerNo
-            || !isValidMoveFrom([x, y])) {
+            || !isValidMoveFrom(loc)) {
 
             if(tileOwner !== TILE_EMPTY) {
                 playSound("error");
@@ -74,46 +64,42 @@ function Game() {
         }
 
         this.lastTileClickWasSelect = true;
-        selectTile(x, y);
+        selectTile(loc);
         playSound("pickup");
     }.bind(this);
 
-    this.onTileRelease = function(x, y) {
-        if(y === undefined) {
-            y = x[1];
-            x = x[0];
-        }
-
-        if(getTime() - this.lastTileReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals([x, y], this.lastTileReleaseTile)
-            && isAwaitingMove() && getTile(x, y) === ownPlayer.playerNo &&  isValidMoveFrom([x, y])) {
+    this.onTileRelease = function(loc) {
+        if(getTime() - this.lastTileReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals(loc, this.lastTileReleaseTile)
+            && isAwaitingMove() && getTile(loc) === ownPlayer.playerNo &&  isValidMoveFrom(loc)) {
             this.performMove();
             return;
         }
 
         this.lastTileReleaseTime = getTime();
-        this.lastTileReleaseTile = [x, y];
+        this.lastTileReleaseTile = loc;
 
         updateTilePathAnchorTime();
 
-        if(!this.lastTileClickWasSelect && isTileSelected(x, y)) {
+        if(!this.lastTileClickWasSelect && isTileSelected(loc)) {
             unselectTile();
             playSound("place");
             return;
         }
 
-        if(isTileSelected(draggedTile) && isValidMoveFrom(draggedTile) && vecEquals([x, y], getTileMoveToLocation(draggedTile))) {
+        if(isTileSelected(draggedTile)
+            && isValidMoveFrom(draggedTile)
+            && vecEquals(loc, getTileMoveToLocation(ownPlayer.playerNo, draggedTile, countDiceUp()))) {
             this.performMove(true);
         }
     }.bind(this);
 
     this.setupStartTiles = function() {
         const activePlayer = getActivePlayer();
-
         if(activePlayer.tiles.current === 0)
             return;
 
         const playerNo = activePlayer.playerNo,
-              location = getTileStart(playerNo);
+              location = getStartTile(playerNo);
 
         setTile(location, playerNo);
 
@@ -134,6 +120,7 @@ function OnlineGame() {
 
     this.init = function() {
         connect();
+        resetDice();
     }.bind(this);
 
     this.onPacketMessage = function(data) {
@@ -192,7 +179,7 @@ function OnlineGame() {
     }.bind(this);
 
     this.performMove = function(noAnimation) {
-        const to = getTileMoveToLocation(selectedTile);
+        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
 
         if (!noAnimation) {
             animateTileMove(selectedTile, to);
@@ -201,8 +188,8 @@ function OnlineGame() {
         setTile(to, getTile(selectedTile));
         setTile(selectedTile, TILE_EMPTY);
 
-        if(vecEquals(selectedTile, getTileStart())) {
-            takeTile(getActivePlayer());
+        if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
+            takeTile(ownPlayer);
         }
 
         sendPacket(writeMovePacket(selectedTile));
@@ -236,6 +223,7 @@ function ComputerGame() {
         updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
 
         clearTiles();
+        resetDice();
         this.setupRoll(true);
     }.bind(this);
 
@@ -249,7 +237,7 @@ function ComputerGame() {
     }.bind(this);
 
     this.performMove = function(noAnimation) {
-        const to = getTileMoveToLocation(selectedTile),
+        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp()),
               toTile = getTile(to);
 
         if (toTile !== TILE_EMPTY) {
@@ -268,8 +256,8 @@ function ComputerGame() {
         setTile(to, getTile(selectedTile));
         setTile(selectedTile, TILE_EMPTY);
 
-        if(vecEquals(selectedTile, getTileStart())) {
-            takeTile(getActivePlayer());
+        if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
+            takeTile(ownPlayer);
         }
 
         unselectTile();
@@ -300,7 +288,7 @@ function ComputerGame() {
 
     this.onFinishMove = function(fromTile, toTile) {
         // If they've just taken a piece off the board, give them some score
-        if (vecEquals(toTile, getTileEnd(this.turnPlayer.playerNo))) {
+        if (vecEquals(toTile, getEndTile(this.turnPlayer.playerNo))) {
             this.updateActivePlayer();
 
             addScore(this.turnPlayer);
@@ -347,11 +335,11 @@ function ComputerGame() {
     this.performComputerMove = function(availableMoves) {
         // TODO : Use an actual AI instead of just making a random move
         const from = randElement(availableMoves),
-              to = getTileMoveToLocation(from),
+              to = getTileMoveToLocation(otherPlayer.playerNo, from, countDiceUp()),
               toTile = getTile(to);
 
         // Moving a new piece onto the board
-        if (vecEquals(from, getTileStart(otherPlayer.playerNo))) {
+        if (vecEquals(from, getStartTile(otherPlayer.playerNo))) {
             takeTile(otherPlayer);
         }
 

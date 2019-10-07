@@ -36,25 +36,15 @@ const TILES_WIDTH = 3,
       TILES_HEIGHT = 8,
       TILES_COUNT = TILES_WIDTH * TILES_HEIGHT;
 
-function isTileValid(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return x >= 0 && y >= 0 && x < TILES_WIDTH && y < TILES_HEIGHT;
+function isTileValid(loc) {
+    return loc.x >= 0 && loc.y >= 0 && loc.x < TILES_WIDTH && loc.y < TILES_HEIGHT;
 }
 
-function isTileOnBoard(x, y) {
-    if(!isTileValid(x, y))
+function isTileOnBoard(loc) {
+    if(!isTileValid(loc))
         return false;
 
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return x === 1 || (y !== 4 && y !== 5);
+    return loc.x === 1 || (loc.y !== 4 && loc.y !== 5);
 }
 
 
@@ -67,90 +57,76 @@ const TILE_EMPTY = 0,
       TILE_DARK = 1,
       TILE_LIGHT = 2;
 
-const LIGHT_PATH = [
-    [0, 4],
-    [0, 3],
-    [0, 2],
-    [0, 1],
-    [0, 0],
-    [1, 0],
-    [1, 1],
-    [1, 2],
-    [1, 3],
-    [1, 4],
-    [1, 5],
-    [1, 6],
-    [1, 7],
-    [0, 7],
-    [0, 6],
-    [0, 5]
-];
+const LIGHT_PATH = vecList(
+    0, 4,
+    0, 3,
+    0, 2,
+    0, 1,
+    0, 0,
+    1, 0,
+    1, 1,
+    1, 2,
+    1, 3,
+    1, 4,
+    1, 5,
+    1, 6,
+    1, 7,
+    0, 7,
+    0, 6,
+    0, 5
+);
 
-const DARK_PATH = [
-    [2, 4],
-    [2, 3],
-    [2, 2],
-    [2, 1],
-    [2, 0],
-    [1, 0],
-    [1, 1],
-    [1, 2],
-    [1, 3],
-    [1, 4],
-    [1, 5],
-    [1, 6],
-    [1, 7],
-    [2, 7],
-    [2, 6],
-    [2, 5]
-];
+const DARK_PATH = vecList(
+    2, 4,
+    2, 3,
+    2, 2,
+    2, 1,
+    2, 0,
+    1, 0,
+    1, 1,
+    1, 2,
+    1, 3,
+    1, 4,
+    1, 5,
+    1, 6,
+    1, 7,
+    2, 7,
+    2, 6,
+    2, 5
+);
 
 const LIGHT_START = LIGHT_PATH[0],
       LIGHT_END = LIGHT_PATH[LIGHT_PATH.length - 1],
       DARK_START = DARK_PATH[0],
       DARK_END = DARK_PATH[DARK_PATH.length - 1];
 
-const LOCUS_LOCATIONS = [
-    [0, 0],
-    [2, 0],
-    [1, 3],
-    [0, 6],
-    [2, 6]
-];
+const LOCUS_LOCATIONS = vecList(
+    0, 0,
+    2, 0,
+    1, 3,
+    0, 6,
+    2, 6
+);
 
 const tiles = [];
 {
     for(let x = 0; x < TILES_WIDTH; ++x) {
-        const row = [];
+        const col = [];
         for(let y = 0; y < TILES_HEIGHT; ++y) {
-            row.push(0);
+            col.push(0);
         }
-        tiles.push(row);
+        tiles.push(col);
     }
 }
 
-let selectedTile = [-1, -1];
+let selectedTile = VEC_NEG1;
 
-function getTile(x, y) {
-    if(x.constructor === Array) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(x < 0 || y < 0 || x >= TILES_WIDTH || y >= TILES_HEIGHT)
-        return TILE_EMPTY;
-
-    return tiles[x][y];
+function getTile(loc) {
+    return (isTileValid(loc) ? tiles[loc.x][loc.y] : TILE_EMPTY);
 }
 
-function setTile(x, y, owner) {
-    if(x.constructor === Array) {
-        owner = y;
-        y = x[1];
-        x = x[0];
-    }
-
-    tiles[x][y] = owner;
+function setTile(loc, owner) {
+    tiles[loc.x][loc.y] = owner;
 }
 
 function loadTileState(tileArray) {
@@ -175,110 +151,30 @@ function clearTiles() {
     }
 }
 
-function selectTile(x, y) {
+function selectTile(loc) {
     if(!ownPlayer.active) {
         unselectTile();
         return;
     }
 
-    if(x.constructor === Array) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(x < 0 || x >= TILES_WIDTH || y < 0 || y >= TILES_HEIGHT || tiles[x][y] === TILE_EMPTY) {
+    if(loc.x < 0 || loc.x >= TILES_WIDTH || loc.y < 0 || loc.y >= TILES_HEIGHT || tiles[loc.x][loc.y] === TILE_EMPTY) {
         unselectTile();
         return;
     }
 
-    selectedTile = [x, y];
+    selectedTile = loc;
 }
 
 function unselectTile() {
-    selectedTile = [-1, -1];
+    selectedTile = VEC_NEG1;
 }
 
-function isTileSelected(x, y) {
-    if(x !== undefined && y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    if(selectedTile[0] === -1 && selectedTile[1] === -1)
-        return false;
-
-    if(x === undefined && y === undefined)
-        return true;
-
-    return vecEquals([x, y], selectedTile);
+function isTileSelected(loc) {
+    return !vecEquals(selectedTile, VEC_NEG1) && (loc === undefined || vecEquals(loc, selectedTile));
 }
 
-function isTileHovered(x, y) {
-    if (y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return vecEquals([x, y], hoveredTile);
-}
-
-function getTilePath(playerNo) {
-    playerNo = (playerNo !== undefined ? playerNo : getActivePlayer().playerNo);
-    if (playerNo === lightPlayer.playerNo)
-        return LIGHT_PATH;
-    if (playerNo === darkPlayer.playerNo)
-        return DARK_PATH;
-    throw "Unknown playerNo " + playerNo;
-}
-
-function getTileStart(playerNo) {
-    playerNo = (playerNo === undefined ? getActivePlayer().playerNo : playerNo);
-
-    if (playerNo === lightPlayer.playerNo)
-        return LIGHT_START;
-    if (playerNo === darkPlayer.playerNo)
-        return DARK_START;
-
-    throw "Unknown playerNo " + playerNo;
-}
-
-function getTileEnd(playerNo) {
-    playerNo = (playerNo === undefined ? getActivePlayer().playerNo : playerNo);
-
-    if (playerNo === lightPlayer.playerNo)
-        return LIGHT_END;
-    if (playerNo === darkPlayer.playerNo)
-        return DARK_END;
-
-    throw "Unknown playerNo " + playerNo;
-}
-
-function getTileMoveToLocation(x, y) {
-    const path = getTilePath(),
-          diceValue = countDiceUp(),
-          index = vecListIndexOf(path, x, y);
-
-    if(index === -1 || index + diceValue >= path.length)
-        return null;
-
-    return path[index + diceValue];
-}
-
-function isLocusTile(x, y) {
-    return vecListContains(LOCUS_LOCATIONS, x, y);
-}
-
-function isStartTile(x, y) {
-    if(y === undefined) {
-        y = x[1];
-        x = x[0];
-    }
-
-    return vecEquals([x, y], getStartTile());
-}
-
-function getStartTile() {
-    return (getActivePlayer() === lightPlayer ? LIGHT_START : DARK_START);
+function isTileHovered(loc) {
+    return !vecEquals(hoveredTile, VEC_NEG1) && (loc === undefined || vecEquals(loc, hoveredTile));
 }
 
 function isValidMoveFrom(playerNo, loc) {
@@ -287,19 +183,16 @@ function isValidMoveFrom(playerNo, loc) {
         playerNo = ownPlayer.playerNo;
     }
 
-    const x = loc[0],
-          y = loc[1];
-
-    if(countDiceUp() === 0)
+    const diceValue = countDiceUp();
+    if(diceValue === 0)
         return false;
 
-    const to = getTileMoveToLocation(x, y);
-
+    const to = getTileMoveToLocation(playerNo, loc, diceValue);
     if(to === null)
         return false;
 
     const toOwner = getTile(to),
-          fromOwner = getTile(x, y);
+          fromOwner = getTile(loc);
 
     if (fromOwner !== playerNo)
         return false;
@@ -316,10 +209,11 @@ function getAllValidMoveTiles(playerNo) {
 
     for(let x = 0; x < TILES_WIDTH; ++x) {
         for(let y = 0; y < TILES_HEIGHT; ++y) {
-            if (!isValidMoveFrom(playerNo, [x, y]))
+            const loc = vec(x, y);
+            if (!isValidMoveFrom(playerNo, loc))
                 continue;
 
-            moves.push([x, y]);
+            moves.push(loc);
         }
     }
 
@@ -333,8 +227,11 @@ function resetTiles() {
 
 
 //
-// SCORES
+// PLAYERS
 //
+
+const LIGHT_PLAYER_NO = 2,
+      DARK_PLAYER_NO = 1;
 
 const darkPlayer = initPlayer(1, "Dark"),
       lightPlayer = initPlayer(2, "Light");
@@ -400,15 +297,16 @@ function setOwnPlayer(player) {
 }
 
 function getPlayer(playerNo) {
-    if (playerNo === lightPlayer.playerNo)
-        return lightPlayer;
-    if (playerNo === darkPlayer.playerNo)
-        return darkPlayer;
-    throw "Unknown playerNo " + playerNo;
+    switch (playerNo) {
+        case LIGHT_PLAYER_NO: return lightPlayer;
+        case DARK_PLAYER_NO:  return darkPlayer;
+        default:
+            throw "Unknown playerNo " + playerNo;
+    }
 }
 
 function getActivePlayer() {
-    return (lightPlayer.active ? lightPlayer : darkPlayer);
+    return (lightPlayer.active ? lightPlayer : (darkPlayer.active ? darkPlayer : null));
 }
 
 function isAwaitingMove() {
