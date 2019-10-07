@@ -257,7 +257,8 @@ function updateTileMove(time) {
 
     const onComplete = tileMove.onComplete,
           fromTile = tileMove.fromTile,
-          toTile = tileMove.toTile;
+          toTile = tileMove.toTile,
+          replacingOwner = tileMove.replacingOwner;
 
     clearTileMove();
 
@@ -265,7 +266,7 @@ function updateTileMove(time) {
         onComplete(fromTile, toTile);
     }
 
-    if (tileMove.replacingOwner !== TILE_EMPTY) {
+    if (replacingOwner !== TILE_EMPTY) {
         playSound("kill");
     } else {
         playSound("place");
