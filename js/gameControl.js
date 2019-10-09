@@ -28,8 +28,8 @@ function Game() {
     this.onTileHover = function(loc) {
         if(isAwaitingMove()
             && !isTileSelected()
-            && getTile(loc) === ownPlayer.playerNo
-            && isValidMoveFrom(loc)) {
+            && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
+
             playSound("hover");
         }
     }.bind(this);
@@ -49,11 +49,11 @@ function Game() {
         if(isTileSelected(loc))
             return;
 
-        const tileOwner = getTile(loc);
+        const tileOwner = board.getTile(loc);
 
         if(!isAwaitingMove()
             || tileOwner !== ownPlayer.playerNo
-            || !isValidMoveFrom(loc)) {
+            || !board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
 
             if(tileOwner !== TILE_EMPTY) {
                 playSound("error");
@@ -69,8 +69,11 @@ function Game() {
     }.bind(this);
 
     this.onTileRelease = function(loc) {
-        if(getTime() - this.lastTileReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS && vecEquals(loc, this.lastTileReleaseTile)
-            && isAwaitingMove() && getTile(loc) === ownPlayer.playerNo &&  isValidMoveFrom(loc)) {
+        if(getTime() - this.lastTileReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS
+            && vecEquals(loc, this.lastTileReleaseTile)
+            && isAwaitingMove()
+            && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
+
             this.performMove();
             return;
         }
@@ -86,9 +89,10 @@ function Game() {
             return;
         }
 
+        const diceValue = countDiceUp();
         if(isTileSelected(draggedTile)
-            && isValidMoveFrom(draggedTile)
-            && vecEquals(loc, getTileMoveToLocation(ownPlayer.playerNo, draggedTile, countDiceUp()))) {
+            && board.isValidMoveFrom(ownPlayer.playerNo, draggedTile, diceValue)
+            && vecEquals(loc, getTileMoveToLocation(ownPlayer.playerNo, draggedTile, diceValue))) {
             this.performMove(true);
         }
     }.bind(this);
@@ -101,16 +105,16 @@ function Game() {
         const playerNo = activePlayer.playerNo,
               location = getStartTile(playerNo);
 
-        setTile(location, playerNo);
+        board.setTile(location, playerNo);
 
-        if(!isValidMoveFrom(playerNo, location)) {
-            setTile(location, TILE_EMPTY);
+        if(!board.isValidMoveFrom(playerNo, location, countDiceUp())) {
+            board.setTile(location, TILE_EMPTY);
         }
     }.bind(this);
 
     this.clearStartTiles = function() {
-        setTile(LIGHT_START, TILE_EMPTY);
-        setTile(DARK_START, TILE_EMPTY);
+        board.setTile(LIGHT_START, TILE_EMPTY);
+        board.setTile(DARK_START, TILE_EMPTY);
     }.bind(this);
 }
 
@@ -134,12 +138,12 @@ function OnlineGame() {
     }.bind(this);
 
     this.onPacketMove = function(move) {
-        const tile = getTile(move.from);
+        const tile = board.getTile(move.from);
 
         if(tile !== TILE_EMPTY) {
             animateTileMove(move.from, move.to);
-            setTile(move.to, tile);
-            setTile(move.from, TILE_EMPTY);
+            board.setTile(move.to, tile);
+            board.setTile(move.from, TILE_EMPTY);
         }
     }.bind(this);
 
@@ -149,7 +153,7 @@ function OnlineGame() {
 
         layoutDice();
         unselectTile();
-        loadTileState(state.board);
+        board.loadTileState(state.board);
 
         if (state.isGameWon) {
             runOnTileMoveFinish(function() {
@@ -185,8 +189,8 @@ function OnlineGame() {
             animateTileMove(selectedTile, to);
         }
 
-        setTile(to, getTile(selectedTile));
-        setTile(selectedTile, TILE_EMPTY);
+        board.setTile(to, board.getTile(selectedTile));
+        board.setTile(selectedTile, TILE_EMPTY);
 
         if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
             takeTile(ownPlayer);
@@ -222,7 +226,7 @@ function ComputerGame() {
         updatePlayerState(ownPlayer, 7, 0, this.isHumansTurn());
         updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
 
-        clearTiles();
+        board.clearTiles();
         resetDice();
         this.setupRoll(true);
     }.bind(this);
@@ -238,7 +242,7 @@ function ComputerGame() {
 
     this.performMove = function(noAnimation) {
         const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp()),
-              toTile = getTile(to);
+              toTile = board.getTile(to);
 
         if (toTile !== TILE_EMPTY) {
             addTile(getPlayer(toTile));
@@ -253,8 +257,8 @@ function ComputerGame() {
             }.bind(this));
         }
 
-        setTile(to, getTile(selectedTile));
-        setTile(selectedTile, TILE_EMPTY);
+        board.setTile(to, board.getTile(selectedTile));
+        board.setTile(selectedTile, TILE_EMPTY);
 
         if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
             takeTile(ownPlayer);
@@ -292,7 +296,7 @@ function ComputerGame() {
             this.updateActivePlayer();
 
             addScore(this.turnPlayer);
-            setTile(toTile, TILE_EMPTY);
+            board.setTile(toTile, TILE_EMPTY);
 
             if (this.turnPlayer.score.current === 7) {
                 switchToScreen(SCREEN_WIN);
@@ -310,7 +314,7 @@ function ComputerGame() {
     this.onFinishDice = function() {
         this.setupStartTiles();
 
-        const availableMoves = getAllValidMoveTiles(this.turnPlayer.playerNo);
+        const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
 
         if (availableMoves.length === 0) {
             setMessage(
@@ -336,7 +340,7 @@ function ComputerGame() {
         // TODO : Use an actual AI instead of just making a random move
         const from = randElement(availableMoves),
               to = getTileMoveToLocation(otherPlayer.playerNo, from, countDiceUp()),
-              toTile = getTile(to);
+              toTile = board.getTile(to);
 
         // Moving a new piece onto the board
         if (vecEquals(from, getStartTile(otherPlayer.playerNo))) {
@@ -349,8 +353,8 @@ function ComputerGame() {
         }
 
         animateTileMove(from, to, this.onFinishMove);
-        setTile(to, otherPlayer.playerNo);
-        setTile(from, TILE_EMPTY);
+        board.setTile(to, otherPlayer.playerNo);
+        board.setTile(from, TILE_EMPTY);
         otherPlayer.active = false;
 
         this.clearStartTiles();

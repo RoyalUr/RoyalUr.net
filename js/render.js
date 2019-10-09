@@ -196,7 +196,7 @@ function updateTilePathAnchorTime() {
 
 function runOnTileMoveFinish(onComplete) {
     // If there is no current tile moving
-    if (!isTileValid(tileMove.fromTile)) {
+    if (!isTileLocValid(tileMove.fromTile)) {
         onComplete(VEC_NEG1, VEC_NEG1);
         return;
     }
@@ -216,7 +216,7 @@ function runOnTileMoveFinish(onComplete) {
 function animateTileMove(fromTile, toTile, onComplete) {
     onComplete = (!onComplete ? null : onComplete);
 
-    const owner = getTile(fromTile);
+    const owner = board.getTile(fromTile);
     if (owner === TILE_EMPTY) {
         if (onComplete !== null) {
             onComplete(VEC_NEG1, VEC_NEG1);
@@ -225,7 +225,7 @@ function animateTileMove(fromTile, toTile, onComplete) {
     }
 
     tileMove.owner = owner;
-    tileMove.replacingOwner = getTile(toTile);
+    tileMove.replacingOwner = board.getTile(toTile);
     tileMove.fromTile = fromTile;
     tileMove.toTile = toTile;
     tileMove.startTime = getTime();
@@ -248,7 +248,7 @@ function clearTileMove() {
 
 function updateTileMove(time) {
     // If there is no current tile moving
-    if (!isTileValid(tileMove.fromTile))
+    if (!isTileLocValid(tileMove.fromTile))
         return;
 
     const age = (time - tileMove.startTime) / tileMove.duration;
@@ -307,25 +307,22 @@ function redrawTiles(forceRedraw) {
     const ignoreDrawTiles = [pathTile, endTile, moveFrom, moveTo, getStartTile(otherPlayer.playerNo)];
 
     // Draw all tiles not part of a drawn path
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            if(tiles[x][y] === TILE_EMPTY)
-                continue;
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        const loc = TILE_LOCS[index],
+              tile = board.getTile(loc);
 
-            const loc = vec(x, y);
-            if (vecListContains(ignoreDrawTiles, loc))
-                continue;
+        if (tile === TILE_EMPTY || vecListContains(ignoreDrawTiles, loc))
+            continue;
 
-            const tileDrawWidth = tileWidth * (isTileHovered(loc) ? HOVER_WIDTH_RATIO : 1),
-                  shadowColour = (isTileSelected(loc) ? 255 : 0);
+        const tileDrawWidth = tileWidth * (isTileHovered(loc) ? HOVER_WIDTH_RATIO : 1),
+              shadowColour = (isTileSelected(loc) ? 255 : 0);
 
-            renderTile(ctx, loc, tileDrawWidth, tileDrawWidth, tiles[x][y], shadowColour);
-        }
+        renderTile(ctx, loc, tileDrawWidth, tileDrawWidth, tile, shadowColour);
     }
 
     // Draw a potential move
-    if(isTileValid(pathTile)) {
-        const isValidMove = isValidMoveFrom(pathTile),
+    if(isTileLocValid(pathTile)) {
+        const isValidMove = board.isValidMoveFrom(ownPlayer.playerNo, pathTile, diceValue),
               draggingTile = isTileSelected(draggedTile),
               owner = ownPlayer.playerNo;
 
@@ -347,9 +344,9 @@ function redrawTiles(forceRedraw) {
               cyclicWidthMul = 1 + 0.03 * Math.cos(5 * time),
               tileCyclicWidth = tileHoverWidth * cyclicWidthMul;
 
-        if(getTile(endTile) !== TILE_EMPTY) {
+        if(board.getTile(endTile) !== TILE_EMPTY) {
             const tileWidth = (isValidMove ? tileCyclicWidth : tileHoverWidth);
-            renderTile(ctx, endTile, tileWidth, tileWidth, getTile(endTile), (endHovered ? 255 : 0));
+            renderTile(ctx, endTile, tileWidth, tileWidth, board.getTile(endTile), (endHovered ? 255 : 0));
         } else if(isValidMove) {
             renderTile(ctx, endTile, tileCyclicWidth, tileCyclicWidth, owner, (endHovered ? 255 : 0));
         }
@@ -360,7 +357,7 @@ function redrawTiles(forceRedraw) {
             if (dragLoc === null)
                 throw "This def shouldn't happen";
 
-            const draggedOnBoard = isTileOnBoard(canvasToTile(mouseLoc)),
+            const draggedOnBoard = isTileLocOnBoard(canvasToTile(mouseLoc)),
                   draggedWidth = tileWidth * (draggedOnBoard ? HOVER_WIDTH_RATIO : 1),
                   draggedShadowWidth = tileWidth * (draggedOnBoard ? SHADOW_WIDTH_RATIO : 1);
 
@@ -374,7 +371,7 @@ function redrawTiles(forceRedraw) {
 
 function drawMovingTile(ctx, time, tileWidth) {
     // There is no moving tile
-    if (!isTileValid(tileMove.fromTile))
+    if (!isTileLocValid(tileMove.fromTile))
         return;
 
     const path = getTilePath(tileMove.owner),
@@ -400,7 +397,7 @@ function getDrawPotentialMoveTile() {
     if (!isAwaitingMove())
         return VEC_NEG1;
 
-    if (getTile(hoveredTile) === ownPlayer.playerNo)
+    if (board.getTile(hoveredTile) === ownPlayer.playerNo)
         return hoveredTile;
 
     if (isTileSelected(draggedTile))
@@ -470,7 +467,7 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
     ctx.closePath();
 
     // Draw a cross if its not a valid move
-    if(!isValidMove && getTile(endTile) === TILE_EMPTY) {
+    if(!isValidMove && board.getTile(endTile) === TILE_EMPTY) {
         ctx.beginPath();
         ctx.setLineDash([]);
 
@@ -495,7 +492,7 @@ function getTileImage(owner, width) {
 }
 
 function renderTile(ctx, location, width, shadowWidth, owner, shadowRed, shadowGreen, shadowBlue) {
-    if(!isTileOnBoard(location)) {
+    if(!isTileLocOnBoard(location)) {
         width /= HOVER_WIDTH_RATIO;
         shadowWidth /= SHADOW_WIDTH_RATIO;
     }
@@ -637,11 +634,18 @@ function redrawPlayerScores(player, drawFromLeft) {
     const renderTarget = getPlayerRenderTarget(player),
           tilesCtx = renderTarget.tilesCtx,
           scoreCtx = renderTarget.scoreCtx,
-          startTile = getStartTile(ownPlayer.playerNo);
+          startTile = getStartTile(ownPlayer.playerNo),
+          diceValue = countDiceUp();
 
     const highlightStartTile = (
-        player === ownPlayer && ownPlayer.active && isValidMoveFrom(startTile) && !dice.rolling
-        && (isTileHovered(startTile) || (isTileSelected(startTile) && !isValidMoveFrom(hoveredTile)))
+        player === ownPlayer
+        && ownPlayer.active
+        && board.isValidMoveFrom(ownPlayer.playerNo, startTile, diceValue)
+        && !dice.rolling
+        && (
+            isTileHovered(startTile)
+            || (isTileSelected(startTile) && !board.isValidMoveFrom(ownPlayer.playerNo, hoveredTile, diceValue))
+        )
     );
 
     drawTiles(

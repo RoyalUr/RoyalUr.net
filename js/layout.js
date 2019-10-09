@@ -307,7 +307,7 @@ function getTileWidth() {
     for (let x = 0; x < TILES_WIDTH; ++x) {
         for (let y = 0; y < TILES_HEIGHT; ++y) {
             const loc = vec(x, y);
-            if (!isTileOnBoard(loc))
+            if (!isTileLocOnBoard(loc))
                 continue;
 
             cumulativeTileWidth += regions[x + y * TILES_WIDTH].width;

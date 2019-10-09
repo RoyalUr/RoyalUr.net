@@ -3,17 +3,8 @@
 //
 
 function captureCurrentGameState() {
-    const board = [];
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        const col = [];
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            col.push(getTile(x, y));
-        }
-        board.push(col);
-    }
-
     return {
-        board: board,
+        board: board.clone(),
         active_player: getActivePlayer().playerNo,
         light_tiles: lightPlayer.tiles.current,
         light_score: lightPlayer.score.current,
@@ -23,17 +14,27 @@ function captureCurrentGameState() {
 }
 
 function calculateStateUtility(state, playerNo) {
-    let utility = 15 * (state.light_score - state.dark_score);
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        const col = state.board[x];
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            const tile = col[y];
-            if (tile === playerNo) {
-                utility += 1;
-            } else if (tile !== TILE_EMPTY) {
-                utility -= 1;
-            }
+    let lightUtility = 15 * (state.light_score - state.dark_score);
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        const tile = state.board.getTile(TILE_LOCS[index]);
+        switch (tile) {
+            case TILE_LIGHT:
+                lightUtility += 1;
+                break;
+            case TILE_DARK:
+                lightUtility -= 1;
+                break;
+            default:
+                break;
         }
     }
-    return utility;
+
+    switch (playerNo) {
+        case LIGHT_PLAYER_NO:
+            return lightUtility;
+        case DARK_PLAYER_NO:
+            return -lightUtility;
+        default:
+            throw "Invalid player no " + playerNo;
+    }
 }

@@ -429,6 +429,10 @@ function Vector2D(x, y) {
     this.y = y;
 }
 
+Vector2D.prototype.toString = function() {
+    return "Vector2D(" + this.x + ", " + this.y + ")";
+};
+
 /**
  * Create a vector with the given {@param x} and {@param y} components.
  */
