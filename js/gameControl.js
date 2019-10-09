@@ -4,6 +4,8 @@
 
 const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
 
+let computerIntelligence = 5;
+
 function Game() {
     this.__class_name__ = "Game";
 
@@ -332,14 +334,28 @@ function ComputerGame() {
         }
 
         if (this.isComputersTurn()) {
-            setTimeout(() => this.performComputerMove(availableMoves), 500);
+            const start = getTime(),
+                  move = this.determineComputerMove(availableMoves),
+                  durationMS = (getTime() - start) * 1000;
+
+            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 500 - durationMS)));
         }
     }.bind(this);
 
-    this.performComputerMove = function(availableMoves) {
-        // TODO : Use an actual AI instead of just making a random move
-        const from = randElement(availableMoves),
-              to = getTileMoveToLocation(otherPlayer.playerNo, from, countDiceUp()),
+    this.determineComputerMove = function(availableMoves) {
+        const diceValue = countDiceUp();
+        let from = availableMoves[0];
+
+        if (availableMoves.length === 1)
+            return from;
+
+        // Get the AI involved
+        return captureCurrentGameState().findBestMove(otherPlayer.playerNo, diceValue, computerIntelligence);
+    }.bind(this);
+
+    this.performComputerMove = function(from) {
+        const diceValue = countDiceUp(),
+              to = getTileMoveToLocation(otherPlayer.playerNo, from, diceValue),
               toTile = board.getTile(to);
 
         // Moving a new piece onto the board

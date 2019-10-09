@@ -218,6 +218,9 @@ function Board(tiles) {
     }.bind(this);
 
     this.getAllValidMoves = function(playerNo, moveDistance) {
+        if (moveDistance <= 0)
+            return [];
+
         const moves = [];
         for (let index = 0; index < TILES_COUNT; ++index) {
             const loc = TILE_LOCS[index];
@@ -226,6 +229,7 @@ function Board(tiles) {
 
             moves.push(loc);
         }
+        shuffle(moves);
         return moves;
     }.bind(this);
 }

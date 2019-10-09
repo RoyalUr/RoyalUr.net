@@ -2,16 +2,23 @@
 // This file contains non-game-specific utility functions.
 //
 
-function def(value, defaultValue) {
-    return (value === undefined ? defaultValue : value);
-}
+function shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
 
-function callListeners(listeners) {
-    const args = Array.prototype.slice.call(arguments, 1);
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
 
-    for(let index = 0; index < listeners.length; ++index) {
-        listeners[index].apply(this, args);
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
     }
+
+    return array;
 }
 
 
