@@ -4,7 +4,8 @@
 
 const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
 
-let computerIntelligence = 5;
+let computerIntelligence = 5,
+    previousGameState = null;
 
 function Game() {
     this.__class_name__ = "Game";
@@ -338,7 +339,7 @@ function ComputerGame() {
                   move = this.determineComputerMove(availableMoves),
                   durationMS = (getTime() - start) * 1000;
 
-            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 500 - durationMS)));
+            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 600 - durationMS)));
         }
     }.bind(this);
 
@@ -350,7 +351,8 @@ function ComputerGame() {
             return from;
 
         // Get the AI involved
-        return captureCurrentGameState().findBestMove(otherPlayer.playerNo, diceValue, computerIntelligence);
+        previousGameState = captureCurrentGameState();
+        return previousGameState.findBestMove(diceValue, computerIntelligence);
     }.bind(this);
 
     this.performComputerMove = function(from) {

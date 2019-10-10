@@ -45,7 +45,7 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
             case DARK_PLAYER_NO:
                 return -lightUtility;
             default:
-                throw "Invalid player no " + playerNo;
+                throw "Invalid playerNo " + playerNo;
         }
     }.bind(this);
 
@@ -54,26 +54,28 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
         this.board.setTile(DARK_START, (this.darkTiles > 0 ? TILE_DARK : TILE_EMPTY));
     }.bind(this);
 
-    this.findBestMove = function(playerNo, moveDistance, depth) {
-        const start = getTime();
-
-        const bestMove = this.findMultiTurnBestMoveAndUtility(playerNo, moveDistance, depth);
-
-        const end = getTime();
-        console.log("Finding best move took " + (end - start) + "s");
-
-        return (bestMove !== null ? bestMove.from : null);
+    this.findBestMove = function(moveDistance, depth) {
+        const bestMove = this.findTieredBestMoveAndUtility(moveDistance, depth);
+        return bestMove.from;
     }.bind(this);
 
-    this.findMultiTurnBestMoveAndUtility = function(playerNo, moveDistance, depth) {
+    this.findTieredBestMoveAndUtility = function(moveDistance, depth) {
         const moveStates = this.findMoveStates(moveDistance);
 
         let bestFrom = null,
             bestUtility = 0;
 
         for (let index = 0; index < moveStates.length; ++index) {
-            const move = moveStates[index],
-                  utility = move.state.findMultiTurnWeightedUtility(playerNo, depth - 1);
+            const move = moveStates[index];
+
+            let utility = NaN;
+            if (depth <= 1) {
+                utility = move.state.calculateUtility(this.activePlayerNo);
+            } else {
+                utility = move.state.findTieredWeightedUtility(depth - 1);
+                // Correct for if the utility is for the other player
+                utility *= (this.activePlayerNo === move.state.activePlayerNo ? 1 : -1);
+            }
 
             if (bestFrom === null || utility > bestUtility) {
                 bestFrom = move.from;
@@ -81,72 +83,27 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
             }
         }
 
-        // If we could find no moves
-        if (bestFrom === null)
-            return null;
-
         return {
             from: bestFrom,
             utility: bestUtility
         };
     }.bind(this);
 
-    this.findMultiTurnWeightedUtility = function(playerNo, depth) {
-        if (depth === 1)
-            return this.findSingleTurnWeightedUtility(playerNo);
-
+    this.findTieredWeightedUtility = function(depth) {
         let weighted = 0;
         for (let moveDistance = 0; moveDistance <= 4; ++moveDistance) {
-            const bestMove = this.findMultiTurnBestMoveAndUtility(playerNo, moveDistance, depth),
-                utility = (bestMove !== null ? bestMove.utility : this.calculateUtility(playerNo));;
+            const bestMove = this.findTieredBestMoveAndUtility(moveDistance, depth);
 
-            weighted += MOVE_PROBABILITIES[moveDistance] * utility;
-        }
-        return weighted;
-    }.bind(this);
-
-    this.findSingleTurnBestMoveAndUtility = function(playerNo, moveDistance) {
-        const moveStates = this.findMoveStates(moveDistance);
-
-        let bestFrom = null,
-            bestUtility = 0;
-
-        for (let index = 0; index < moveStates.length; ++index) {
-            const move = moveStates[index],
-                  utility = move.state.calculateUtility(playerNo);
-
-            if (bestFrom === null || utility > bestUtility) {
-                bestFrom = move.from;
-                bestUtility = utility;
-            }
-        }
-
-        // If we could find no moves
-        if (bestFrom === null)
-            return null;
-
-        return {
-            from: bestFrom,
-            utility: bestUtility
-        };
-    }.bind(this);
-
-    this.findSingleTurnWeightedUtility = function(playerNo) {
-        let weighted = 0;
-        for (let moveDistance = 0; moveDistance <= 4; ++moveDistance) {
-            const bestMove = this.findSingleTurnBestMoveAndUtility(playerNo, moveDistance),
-                utility = (bestMove !== null ? bestMove.utility : this.calculateUtility(playerNo));
-
-            weighted += MOVE_PROBABILITIES[moveDistance] * utility;
+            weighted += MOVE_PROBABILITIES[moveDistance] * bestMove.utility;
         }
         return weighted;
     }.bind(this);
 
     this.findMoveStates = function(moveDistance) {
+        this.setupStartTiles();
+
         const moves = this.board.getAllValidMoves(this.activePlayerNo, moveDistance),
               states = [];
-
-        this.setupStartTiles();
 
         for (let index = 0; index < moves.length; ++index) {
             const from = moves[index],
@@ -178,7 +135,7 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
 
                 if (toTile === TILE_LIGHT) {
                     newLightTiles += 1;
-                } else {
+                } else if (toTile === TILE_DARK) {
                     newDarkTiles += 1;
                 }
 
@@ -199,6 +156,22 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
                 state: newState
             });
         }
+
+        // If there are no available moves
+        if (states.length === 0) {
+            const newActivePlayerNo = (this.activePlayerNo === LIGHT_PLAYER_NO ? DARK_PLAYER_NO : LIGHT_PLAYER_NO),
+                  newState = new GameState(
+                      this.board.clone(), newActivePlayerNo,
+                      this.lightTiles, this.lightScore,
+                      this.darkTiles, this.darkScore
+                  );
+
+            states.push({
+                from: null,
+                state: newState
+            });
+        }
+
         return states;
     }.bind(this);
 }
