@@ -314,7 +314,7 @@ function redrawTiles(forceRedraw) {
         if (tile === TILE_EMPTY || vecListContains(ignoreDrawTiles, loc))
             continue;
 
-        const tileDrawWidth = tileWidth * (isTileHovered(loc) ? HOVER_WIDTH_RATIO : 1),
+        const tileDrawWidth = tileWidth * (vecEquals(pathTile, loc) ? HOVER_WIDTH_RATIO : 1),
               shadowColour = (isTileSelected(loc) ? 255 : 0);
 
         renderTile(ctx, loc, tileDrawWidth, tileDrawWidth, tile, shadowColour);
@@ -397,10 +397,13 @@ function getDrawPotentialMoveTile() {
     if (!isAwaitingMove())
         return VEC_NEG1;
 
+    if (isTileSelected(draggedTile))
+        return draggedTile;
+
     if (board.getTile(hoveredTile) === ownPlayer.playerNo)
         return hoveredTile;
 
-    if (isTileSelected(draggedTile))
+    if (isTileSelected())
         return selectedTile;
 
     return VEC_NEG1;
@@ -637,15 +640,13 @@ function redrawPlayerScores(player, drawFromLeft) {
           startTile = getStartTile(ownPlayer.playerNo),
           diceValue = countDiceUp();
 
-    const highlightStartTile = (
+    const potentialMoveTile = getDrawPotentialMoveTile(),
+          highlightStartTile = (
         player === ownPlayer
         && ownPlayer.active
         && board.isValidMoveFrom(ownPlayer.playerNo, startTile, diceValue)
         && !dice.rolling
-        && (
-            isTileHovered(startTile)
-            || (isTileSelected(startTile) && !board.isValidMoveFrom(ownPlayer.playerNo, hoveredTile, diceValue))
-        )
+        && vecEquals(startTile, potentialMoveTile)
     );
 
     drawTiles(
