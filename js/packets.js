@@ -177,7 +177,7 @@ function PacketIn(data) {
     }.bind(this);
 
     this.nextLocation = function() {
-        return [this.nextDigit(), this.nextDigit()];
+        return vec(this.nextDigit(), this.nextDigit());
     }.bind(this);
 
     this.nextPlayer = function() {
@@ -284,12 +284,10 @@ function writeDiceRollPacket() {
 }
 
 function writeMovePacket(from) {
-    assert(from.length === 2, "from must be a length 2 array");
-
     const packet = new PacketOut("move");
 
-    packet.writeDigit(from[0]);
-    packet.writeDigit(from[1]);
+    packet.writeDigit(from.x);
+    packet.writeDigit(from.y);
 
     return packet;
 }
