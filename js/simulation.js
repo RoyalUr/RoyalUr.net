@@ -17,6 +17,9 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
     this.lightScore = lightScore;
     this.darkTiles = darkTiles;
     this.darkScore = darkScore;
+    this.lightWon = (lightScore >= 7);
+    this.darkWon = (darkScore >= 7);
+    this.won = (this.lightWon || this.darkWon);
 
     this.calculateUtility = function(playerNo) {
         let lightUtility = 15 * (this.lightScore - this.darkScore);
@@ -24,7 +27,8 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
             const loc = TILE_LOCS[index],
                   tile = this.board.getTile(loc);
 
-            if (!isTileLocOnBoard(loc))
+            // Ignore empty tiles, and start & end tiles
+            if (tile === TILE_EMPTY || !isTileLocOnBoard(loc))
                 continue;
 
             switch (tile) {
@@ -35,7 +39,7 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
                     lightUtility -= vecListIndexOf(DARK_PATH, loc);
                     break;
                 default:
-                    break;
+                    throw "Invalid tile " + tile;
             }
         }
 
@@ -60,6 +64,13 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
     }.bind(this);
 
     this.findTieredBestMoveAndUtility = function(moveDistance, depth) {
+        if (this.won) {
+            return {
+                from: null,
+                utility: this.calculateUtility(this.activePlayerNo)
+            };
+        }
+
         const moveStates = this.findMoveStates(moveDistance);
 
         let bestFrom = null,
@@ -90,6 +101,10 @@ function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, dar
     }.bind(this);
 
     this.findTieredWeightedUtility = function(depth) {
+        if (this.won) {
+            return this.calculateUtility(this.activePlayerNo);
+        }
+
         let weighted = 0;
         for (let moveDistance = 0; moveDistance <= 4; ++moveDistance) {
             const bestMove = this.findTieredBestMoveAndUtility(moveDistance, depth);
