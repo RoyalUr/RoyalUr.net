@@ -15,6 +15,7 @@
     "js/network.js",
     "js/simulation.js",
     "js/gameControl.js",
+    "js/screens.js",
     "js/client.js"
   ],
 
