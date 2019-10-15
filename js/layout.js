@@ -340,33 +340,22 @@ function getBoardTileRegions() {
     if (boardTileRegions)
         return boardTileRegions;
 
-    const boardImage = getRawImageResource("board"),
-          tileRegions = getImageAnnotation("board");
+    const tileRegions = getImageAnnotation("board");
 
-    if (!boardImage)
-        throw "Missing board image";
     if (!tileRegions)
         throw "Missing board tile annotations";
     if (tileRegions.length !== TILES_COUNT)
         throw "Invalid board tile annotations : invalid length, expected " + TILES_COUNT + ", received " + tileRegions.length;
 
-    const boardImgWidth = boardImage.width,
-          boardImgHeight = boardImage.height;
-
     boardTileRegions = [];
 
     for (let index = 0; index < tileRegions.length; ++index) {
-        const region = tileRegions[index],
-              x = region[0],
-              y = region[1],
-              width = region[2],
-              height = region[3];
-
+        const region = tileRegions[index];
         boardTileRegions.push({
-            x: x / boardImgWidth,
-            y: y / boardImgHeight,
-            width: width / boardImgWidth,
-            height: height / boardImgHeight
+            x: region[0],
+            y: region[1],
+            width: region[2],
+            height: region[3]
         });
     }
 

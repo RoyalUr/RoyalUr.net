@@ -7,6 +7,7 @@
 
 import sys
 import json
+from PIL import Image
 
 
 #
@@ -15,12 +16,21 @@ import json
 
 if len(sys.argv) != 4:
     print("Usage:")
-    print("  python -m annotation_reformatter <annotation file> <output file>")
+    print("  python3 -m annotation_reformatter <annotation file> <original image> <output file>")
     sys.exit(1)
 
 annotation_file = sys.argv[1]
-output_name = sys.argv[2]
+image_file = sys.argv[2]
 output_file = sys.argv[3]
+
+
+#
+# Load the image to find its width and height
+#
+
+image = Image.open(image_file)
+img_width = image.size[0]
+img_height = image.size[1]
 
 
 #
@@ -34,10 +44,10 @@ def parse_region(region):
         sys.exit(0)
 
     return [
-        shape["x"],
-        shape["y"],
-        shape["width"],
-        shape["height"]
+        shape["x"] / img_width,
+        shape["y"] / img_height,
+        shape["width"] / img_width,
+        shape["height"] / img_height
     ]
 
 
