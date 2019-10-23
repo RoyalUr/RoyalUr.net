@@ -115,7 +115,11 @@ def combineJS(target_folder, javascript_files, prefix=""):
     """
     Concatenate all javascript into a single source file.
     """
-    assert executePipedCommands(["cat"] + javascript_files, target_folder + "/index.js", prefix=prefix)
+    assert executePipedCommands(
+        ["cat"] + javascript_files,
+        target_folder + "/index.js",
+        prefix=prefix
+    )
 
 
 def combineMinifyJS(target_folder, javascript_files, prefix=""):
@@ -123,7 +127,9 @@ def combineMinifyJS(target_folder, javascript_files, prefix=""):
     Concatenate all javascript into a single source file, and minify it.
     """
     assert executePipedCommands(
-        ["uglifyjs"] + javascript_files + ["--compress", "--mangle"], target_folder + "/index.js",
+        ["npx", "babel", "--presets=@babel/env"] + javascript_files,
+        ["uglifyjs", "--compress", "--mangle"],
+        target_folder + "/index.js",
         prefix=prefix
     )
 
