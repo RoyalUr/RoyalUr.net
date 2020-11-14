@@ -91,19 +91,6 @@ def loadCompilationSpec(spec_file="compilation.json"):
         return javascript_files, resource_files, sprite_groups, annotation_files
 
 
-def requiresReleaseBuild(target_folder, resource_files, prefix=""):
-    """
-    Check whether all resource files exist in the compiled directory.
-    Does not check if any annotations or resource file contents have changed.
-    """
-    for file in [""] + resource_files:
-        if not os.path.exists(target_folder + "/" + file):
-            return True
-    if not os.path.exists(target_folder + "/res/annotations.json"):
-        return True
-    return False
-
-
 def clean(target_folder, prefix=""):
     """
     Completely empty the compilation folder.
@@ -195,6 +182,21 @@ def copyResourceFiles(target_folder, resource_files, prefix=""):
         assert executePipedCommands(["cp", fromPath, toPath], prefix=prefix)
 
 
+def requiresReleaseBuild(target_folder, resource_files, prefix=""):
+    """
+    Check whether all resource files exist in the compiled directory.
+    Does not check if any annotations or resource file contents have changed.
+    """
+    for fromPath, toRel in resource_files.items():
+        toRel = toRel if len(toRel) > 0 else fromPath
+        toPath = os.path.join(target_folder, toRel)
+        if not os.path.exists(toPath):
+            return True
+    if not os.path.exists(target_folder + "/res/annotations.json"):
+        return True
+    return False
+
+
 def combineAnnotations(target_folder, annotation_files, additional_annotations, prefix=""):
     """
     Combine all resource annotations into their own file.
@@ -208,28 +210,37 @@ def combineAnnotations(target_folder, annotation_files, additional_annotations, 
         json.dump(annotations, f, separators=(',', ':'))
 
 
-def createReleaseBuild(target_folder):
-    print("\nCompiling Release Build")
+def createReleaseBuild(target_folder, prefix=""):
+    sub_prefix = prefix + " .. "
+
+    print(prefix)
+    print(prefix + "Compiling Release Build")
     javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
 
-    print("\n1. Clean")
-    clean(target_folder, prefix=" .. ")
+    print(prefix)
+    print(prefix + "1. Clean")
+    clean(target_folder, prefix=sub_prefix)
 
-    print("\n2. Combine & Minify Javascript")
-    combineMinifyJS(target_folder, javascript_files, prefix=" .. ")
+    print(prefix)
+    print(prefix + "2. Combine & Minify Javascript")
+    combineMinifyJS(target_folder, javascript_files, prefix=sub_prefix)
 
-    print("\n3. Copy Resource Files")
-    copyResourceFiles(target_folder, resource_files, prefix=" .. ")
+    print(prefix)
+    print(prefix + "3. Copy Resource Files")
+    copyResourceFiles(target_folder, resource_files, prefix=sub_prefix)
 
-    print("\n4. Create Sprites")
-    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=" .. ")
+    print(prefix)
+    print(prefix + "4. Create Sprites")
+    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=sub_prefix)
 
-    print("\n5. Create Annotations File")
+    print(prefix)
+    print(prefix + "5. Create Annotations File")
     combineAnnotations(target_folder, annotation_files, {
         "sprites": sprite_annotations
-    }, prefix=" .. ")
+    }, prefix=sub_prefix)
 
-    print("\nDone!\n")
+    print(prefix)
+    print(prefix + "Done!\n")
 
 
 def createDevBuild(target_folder):
@@ -259,9 +270,8 @@ def createJSDevBuild(target_folder):
 
     print("\n1. Check whether to revert to a Release Build")
     if requiresReleaseBuild(target_folder, resource_files):
-        print >>sys.stderr, " .. ERROR : Release build is required\n"
-        createReleaseBuild(target_folder)
-        return
+        print("\nERROR : Release build is required\n", file=sys.stderr)
+        createReleaseBuild(target_folder, prefix="| ")
 
     print("\n2. Combine Javascript")
     combineJS(target_folder, javascript_files, prefix=" .. ")

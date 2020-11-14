@@ -188,10 +188,7 @@ function OnlineGame() {
     this.performMove = function(noAnimation) {
         const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
 
-        if (!noAnimation) {
-            animateTileMove(selectedTile, to);
-        }
-
+        animateTileMove(selectedTile, to);
         board.setTile(to, board.getTile(selectedTile));
         board.setTile(selectedTile, TILE_EMPTY);
 
@@ -200,8 +197,12 @@ function OnlineGame() {
         }
 
         sendPacket(writeMovePacket(selectedTile));
-
         unselectTile();
+        console.log(noAnimation);
+        if (noAnimation) {
+            finishTileMove();
+        }
+
         ownPlayer.active = false;
         this.clearStartTiles();
     }.bind(this);
@@ -251,15 +252,8 @@ function ComputerGame() {
             addTile(getPlayer(toTile));
         }
 
-        if (!noAnimation) {
-            animateTileMove(selectedTile, to, this.onFinishMove);
-        } else {
-            const from = selectedTile;
-            setTimeout(function() {
-                this.onFinishMove(from, to);
-            }.bind(this));
-        }
-
+        const from = selectedTile;
+        animateTileMove(selectedTile, to, this.onFinishMove);
         board.setTile(to, board.getTile(selectedTile));
         board.setTile(selectedTile, TILE_EMPTY);
 
@@ -268,6 +262,13 @@ function ComputerGame() {
         }
 
         unselectTile();
+        if (noAnimation) {
+            setTimeout(function() {
+                this.onFinishMove(from, to);
+            }.bind(this));
+            finishTileMove();
+        }
+
         ownPlayer.active = false;
         this.clearStartTiles();
     }.bind(this);
