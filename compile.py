@@ -7,6 +7,7 @@ import sys
 import json
 import subprocess
 from PIL import Image
+from pathlib import Path
 
 
 
@@ -116,7 +117,7 @@ def combineJS(target_folder, javascript_files, prefix=""):
     Concatenate all javascript into a single source file.
     """
     assert executePipedCommands(
-        ["cat"] + javascript_files,
+        ["npx", "babel", "--presets=@babel/env"] + javascript_files,
         target_folder + "/index.js",
         prefix=prefix
     )
@@ -181,7 +182,17 @@ def copyResourceFiles(target_folder, resource_files, prefix=""):
     """
     Copy all the resource files for the page into the target folder.
     """
-    assert executePipedCommands(["rsync", "-R"] + resource_files + [target_folder], prefix=prefix)
+    made_directories = set()
+    for fromPath, toRel in resource_files.items():
+        toRel = toRel if len(toRel) > 0 else fromPath
+        toPath = os.path.join(target_folder, toRel)
+        # Make sure the directory to copy the file to exists.
+        directory = str(Path(toPath).parent)
+        if directory not in made_directories:
+            assert executePipedCommands(["mkdir", "-p", directory], prefix=prefix)
+            made_directories.add(directory)
+        # Copy the file.
+        assert executePipedCommands(["cp", fromPath, toPath], prefix=prefix)
 
 
 def combineAnnotations(target_folder, annotation_files, additional_annotations, prefix=""):

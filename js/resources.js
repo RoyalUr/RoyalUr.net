@@ -156,34 +156,34 @@ const audioResources = [
     // Sounds when moving a tile
     {
         key: "place_1",
-        url: "res/audio/place_1.mp4"
+        url: "res/audio_place_1.mp4"
     }, {
         key: "place_2",
-        url: "res/audio/place_2.mp4"
+        url: "res/audio_place_2.mp4"
     }, {
         key: "place_3",
-        url: "res/audio/place_3.mp4"
+        url: "res/audio_place_3.mp4"
     }, {
         key: "place_4",
-        url: "res/audio/place_4.mp4"
+        url: "res/audio_place_4.mp4"
     },
 
     // Sounds when selecting a tile
     {
         key: "pickup_1",
-        url: "res/audio/pickup_1.mp4"
+        url: "res/audio_pickup_1.mp4"
     }, {
         key: "pickup_2",
-        url: "res/audio/pickup_2.mp4"
+        url: "res/audio_pickup_2.mp4"
     }, {
         key: "pickup_3",
-        url: "res/audio/pickup_3.mp4"
+        url: "res/audio_pickup_3.mp4"
     },
     
     // Sound when trying to pick up a tile that cannot be moved
     {
         key: "error",
-        url: "res/audio/error.mp4",
+        url: "res/audio_error.mp4",
         volume: 0.5,
         instances: 3
     },
@@ -191,14 +191,14 @@ const audioResources = [
     // Sound when taking out an enemy tile
     {
         key: "kill",
-        url: "res/audio/kill.mp4",
+        url: "res/audio_kill.mp4",
         volume: 0.5
     },
     
     // Sound when hovering over tiles
     {
         key: "hover",
-        url: "res/audio/hover.mp4",
+        url: "res/audio_hover.mp4",
         volume: 0.5,
         instances: 3
     },
@@ -206,19 +206,19 @@ const audioResources = [
     // Sounds when rolling dice
     {
         key: "dice_click",
-        url: "res/audio/dice_click.mp4",
+        url: "res/audio_dice_click.mp4",
         volume: 0.5,
         instances: 5
     },
     {
         key: "dice_hit",
-        url: "res/audio/dice_hit.mp4",
+        url: "res/audio_dice_hit.mp4",
         volume: 0.3,
         instances: 4
     },
     {
         key: "dice_select",
-        url: "res/audio/dice_select.mp4",
+        url: "res/audio_dice_select.mp4",
         volume: 0.3,
         instances: 4
     },
@@ -226,24 +226,24 @@ const audioResources = [
     // Sounds when a message pops up
     {
         key: "typewriter_key",
-        url: "res/audio/typewriter_key.mp4",
+        url: "res/audio_typewriter_key.mp4",
         instances: 4
     },
     {
         key: "typewriter_end",
-        url: "res/audio/typewriter_end.mp4",
+        url: "res/audio_typewriter_end.mp4",
     },
 
     // Firework sounds
     {
         key: "firework_explode",
-        url: "res/audio/firework_explode.mp4",
+        url: "res/audio_firework_explode.mp4",
         volume: 0.5,
         instances: 4
     },
     {
         key: "firework_rocket",
-        url: "res/audio/firework_rocket.mp4",
+        url: "res/audio_firework_rocket.mp4",
         volume: 0.05,
         instances: 4
     }
@@ -416,6 +416,9 @@ function loadAudio() {
             }
             markResourceLoaded(resourceName)
         };
+        element.onerror = function() {
+            console.log(arguments);
+        };
         element.src = resource.url;
     }
     
@@ -457,11 +460,11 @@ const sprites = {
 
 const imageResources = {
     "logo": "res/logo.png",
-    "board": "res/board_light.png",
-    "darkTile": "res/darkTile.png",
-    "lightTile": "res/lightTile.png",
-    "play_online": "res/buttons/play_online.png",
-    "play_computer": "res/buttons/play_computer.png",
+    "board": "res/board.png",
+    "tile_dark": "res/tile_dark.png",
+    "tile_light": "res/tile_light.png",
+    "play_online": "res/button_play_online.png",
+    "play_computer": "res/button_play_computer.png",
 };
 
 const loadedImageResources = {};
@@ -521,6 +524,10 @@ function loadSprites() {
 
             spriteResource.loaded = true;
             markResourceLoaded(resourceName);
+        };
+
+        spriteResource.image.onerror = function() {
+            console.log(arguments);
         };
 
         spriteResource.image.src = url;
@@ -616,6 +623,10 @@ function loadImages() {
 
             imageResource.loaded = true;
             markResourceLoaded(resourceName);
+        };
+
+        imageResource.image.onerror = function() {
+            console.log(arguments);
         };
 
         imageResource.image.src = imageResources[key];

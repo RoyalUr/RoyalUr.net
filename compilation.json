@@ -19,48 +19,43 @@
     "js/client.js"
   ],
 
-  "resources": [
-    ".htaccess",
-    "index.html",
-    "lost.html",
-    "style.css",
-    "favicon.png",
-
-    "res/font/DuranGo.ttf",
-    "res/font/Nunito.woff2",
-
-    "res/logo.png",
-    "res/wood-blue-1.png",
-    "res/board_light.png",
-    "res/darkTile.png",
-    "res/lightTile.png",
-
-    "res/buttons/play_online.png",
-    "res/buttons/play_computer.png",
-
-    "res/audio/place_1.mp4",
-    "res/audio/place_2.mp4",
-    "res/audio/place_3.mp4",
-    "res/audio/place_4.mp4",
-
-    "res/audio/pickup_1.mp4",
-    "res/audio/pickup_2.mp4",
-    "res/audio/pickup_3.mp4",
-
-    "res/audio/error.mp4",
-    "res/audio/kill.mp4",
-    "res/audio/hover.mp4",
-
-    "res/audio/dice_click.mp4",
-    "res/audio/dice_hit.mp4",
-    "res/audio/dice_select.mp4",
-
-    "res/audio/typewriter_key.mp4",
-    "res/audio/typewriter_end.mp4",
-
-    "res/audio/firework_explode.mp4",
-    "res/audio/firework_rocket.mp4"
-  ],
+  "resources": {
+    ".htaccess": "",
+    "index.html": "",
+    "lost.html": "",
+    "style.css": "",
+    "favicon.ico": "",
+    "favicon16.ico": "",
+    "favicon32.ico": "",
+    "favicon96.ico": "",
+    "robots.txt": "",
+    "res/font/DuranGo.ttf": "res/font_durango.ttf",
+    "res/font/Nunito.woff2": "res/font_nunito.woff2",
+    "res/logo.png": "",
+    "res/wood-blue-1.png": "res/background.png",
+    "res/board_light.png": "res/board.png",
+    "res/darkTile.png": "res/tile_dark.png",
+    "res/lightTile.png": "res/tile_light.png",
+    "res/buttons/play_online.png": "res/button_play_online.png",
+    "res/buttons/play_computer.png": "res/button_play_computer.png",
+    "res/audio/place_1.mp4": "res/audio_place_1.mp4",
+    "res/audio/place_2.mp4": "res/audio_place_2.mp4",
+    "res/audio/place_3.mp4": "res/audio_place_3.mp4",
+    "res/audio/place_4.mp4": "res/audio_place_4.mp4",
+    "res/audio/pickup_1.mp4": "res/audio_pickup_1.mp4",
+    "res/audio/pickup_2.mp4": "res/audio_pickup_2.mp4",
+    "res/audio/pickup_3.mp4": "res/audio_pickup_3.mp4",
+    "res/audio/error.mp4": "res/audio_error.mp4",
+    "res/audio/kill.mp4": "res/audio_kill.mp4",
+    "res/audio/hover.mp4": "res/audio_hover.mp4",
+    "res/audio/dice_click.mp4": "res/audio_dice_click.mp4",
+    "res/audio/dice_hit.mp4": "res/audio_dice_hit.mp4",
+    "res/audio/dice_select.mp4": "res/audio_dice_select.mp4",
+    "res/audio/typewriter_key.mp4": "res/audio_typewriter_key.mp4",
+    "res/audio/typewriter_end.mp4": "res/audio_typewriter_end.mp4",
+    "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
+    "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4"
+  },
 
   "sprites": {
     "res/buttons.png": [

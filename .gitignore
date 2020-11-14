@@ -3,6 +3,12 @@
 /.idea
 /res
 /compiled
-/favicon.png
+/favicon.ico
+/favicon16.ico
+/favicon32.ico
+/favicon96.ico
 /deploy.sh
-/__pycache__
+__pycache__
+/package.json
+/package-lock.json
+/node_modules

@@ -489,8 +489,8 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
 }
 
 function getTileImage(owner, width) {
-    if(owner === TILE_DARK) return getImageResource("darkTile", width);
-    if(owner === TILE_LIGHT)  return getImageResource("lightTile", width);
+    if(owner === TILE_DARK) return getImageResource("tile_dark", width);
+    if(owner === TILE_LIGHT)  return getImageResource("tile_light", width);
     return null;
 }
 
