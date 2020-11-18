@@ -21,7 +21,7 @@
 body, html {
     width: 100%;
     height: 100%;
-    background: url(res/background.png) repeat;
+    background: rgb(40, 50, 60) url(res/background.png) repeat;
     background-size: 300px;
 }
 
