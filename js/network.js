@@ -2,11 +2,13 @@
 // This file manages the connection to the game server.
 //
 
-const address = "ws://" + window.location.hostname + ":9113",
-      debugNetwork = (window.location.hostname === "localhost");
+const isLocalhost = (window.location.hostname === "localhost"),
+      address = (isLocalhost ? "ws://localhost:9113" : "ws://game.royalur.net:9113");
+let debug = isLocalhost;
 
-function debug(message) {
-    if(debugNetwork) console.log(message);
+
+function printDebug(message) {
+    if(debug) console.log(message);
 }
 
 
@@ -103,7 +105,7 @@ function connectSocket() {
 function receiveMessage(message) {
     const packet = readPacket(message);
 
-    debug("Recieved packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
+    printDebug("Recieved packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
 
     if (packet.type in packetHandlers) {
         packetHandlers[packet.type](packet);

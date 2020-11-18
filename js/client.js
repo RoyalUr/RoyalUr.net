@@ -36,7 +36,7 @@ function setup() {
 function finishSetup() {
     clientFinishSetupTime = getTime();
 
-    if (debugNetwork) {
+    if (debug) {
         reportStartupPerformance();
     }
 }
@@ -188,7 +188,6 @@ function getHashGameID() {
         resetHash();
         return null;
     }
-
     return gameID;
 }
 
