@@ -147,28 +147,19 @@ canvas {
  */
 
 .shadow {
-    filter: url(#drop-shadow-black);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=6, OffY=6, Color='#444')";
+    filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
 .shadow:hover {
-    filter: url(#drop-shadow-white);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
+    filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
-#play img {
-    filter: url(#drop-shadow-black);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=6, OffY=6, Color='#444')";
+#play img, #play span, #play canvas {
+    filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
-#play span {
-    filter: url(#drop-shadow-black);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
-}
-
-#play:hover span {
-    filter: url(#drop-shadow-white);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#444')";
+#play:hover span, #play:hover canvas {
+    filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
 #menu-outer {

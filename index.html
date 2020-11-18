@@ -93,33 +93,6 @@
             </svg><span id="exit-text">Exit Game</span>
         </div></div>
 
-        <!-- SHADOW FILTERS -->
-        <svg height='0' xmlns='http://www.w3.org/2000/svg' style="display: none">
-            <filter id='drop-shadow-black' x='-40%' y='-40%' width='180%' height='180%'>
-                <feGaussianBlur in='SourceAlpha' stdDeviation='12'></feGaussianBlur>
-                <feOffset dx='6' dy='6' result='offsetblur'></feOffset>
-                <feFlood flood-color='rgb(0,0,0)'></feFlood>
-                <feComposite in2='offsetblur' operator='in'></feComposite>
-                <feMerge>
-                    <feMergeNode></feMergeNode>
-                    <feMergeNode in='SourceGraphic'></feMergeNode>
-                </feMerge>
-            </filter>
-        </svg>
-
-        <svg height='0' xmlns='http://www.w3.org/2000/svg' style="display: none">
-            <filter id='drop-shadow-white' x='-40%' y='-40%' width='180%' height='180%'>
-                <feGaussianBlur in='SourceAlpha' stdDeviation='12'></feGaussianBlur>
-                <feOffset dx='6' dy='6' result='offsetblur'></feOffset>
-                <feFlood flood-color='rgba(255, 255, 255, 0.2)'></feFlood>
-                <feComposite in2='offsetblur' operator='in'></feComposite>
-                <feMerge>
-                    <feMergeNode></feMergeNode>
-                    <feMergeNode in='SourceGraphic'></feMergeNode>
-                </feMerge>
-            </filter>
-        </svg>
-
         <!-- SCRIPTS -->
         <script src="index.js"></script>
     </body>
