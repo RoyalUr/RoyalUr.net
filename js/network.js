@@ -3,7 +3,7 @@
 //
 
 const isLocalhost = (window.location.hostname === "localhost"),
-      address = (isLocalhost ? "ws://localhost:9113" : "ws://game.royalur.net:9113");
+      address = (isLocalhost ? "ws://localhost:9113" : "wss://game.royalur.net:9113");
 let debug = isLocalhost;
 
 
