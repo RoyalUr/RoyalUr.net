@@ -3,7 +3,7 @@
 //
 
 const isLocalhost = (window.location.hostname === "localhost"),
-      address = (isLocalhost ? "ws://localhost:9113" : "wss://game.royalur.net:9113");
+      address = (isLocalhost ? "ws://localhost:9113" : "wss://royalur.net:9113");
 let debug = isLocalhost;
 
 
@@ -20,6 +20,9 @@ function printDebug(message) {
 let socket = null,
     socketState = "closed",
     uniqueId = null;
+
+// Fix for bug in FireFox.
+window.onbeforeunload = function() { disconnect(); };
 
 function sendPacket(packet) {
     socket.send(packet.data);
@@ -54,6 +57,7 @@ function connectSocket() {
     socket = new ReconnectingWebSocket(address, null, {
         debug: false,
 
+        timeoutInterval: 15000,
         reconnectInterval: 1000,
         maxReconnectInterval: 5000,
         reconnectDecay: 1.5
