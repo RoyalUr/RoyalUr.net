@@ -210,6 +210,27 @@ def combineAnnotations(target_folder, annotation_files, additional_annotations, 
         json.dump(annotations, f, separators=(',', ':'))
 
 
+def zipDevelopmentResFolder(target_folder, prefix=""):
+    """
+    Creates a zip file with the full contents of the development resources folder.
+    """
+    output_file = os.path.join(target_folder, "res.zip")
+    assert executePipedCommands(["zip", "-q", "-r", output_file, "./res"], prefix=prefix)
+
+
+def downloadDevelopmentResFolder(prefix=""):
+    """
+    Downloads and unzips the development resources folder from https://royalur.net/res.zip.
+    """
+    assert not os.path.exists("./res"), "The ./res directory already exists"
+    assert not os.path.exists("./res.zip"), "The ./res.zip archive already exists"
+    assert executePipedCommands(["wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip"], prefix=prefix)
+    try:
+        assert executePipedCommands(["unzip", "-q", "./res.zip", "res/*"], prefix=prefix)
+    finally:
+        assert executePipedCommands(["rm", "-f", "./res.zip"], prefix=prefix)
+
+
 def createReleaseBuild(target_folder, prefix=""):
     sub_prefix = prefix + " .. "
 
@@ -238,6 +259,10 @@ def createReleaseBuild(target_folder, prefix=""):
     combineAnnotations(target_folder, annotation_files, {
         "sprites": sprite_annotations
     }, prefix=sub_prefix)
+
+    print(prefix)
+    print(prefix + "6. Zip Development Resources Folder")
+    zipDevelopmentResFolder(target_folder, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "Done!\n")
@@ -290,6 +315,11 @@ if len(sys.argv) != 2:
     print("Usage:")
     print("  python -m compile <" + DEV_MODE + ":" + JS_DEV_MODE + ":" + RELEASE_MODE + ">")
     sys.exit(1)
+
+# Download the resources folder if it doesn't exist.
+if not os.path.exists("./res"):
+    print("Could not find ./res directory, attempting to download it...")
+    downloadDevelopmentResFolder(prefix=" .. ")
 
 compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
 
