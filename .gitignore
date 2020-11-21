@@ -4,7 +4,6 @@
 /compiled
 /deploy.sh
 __pycache__
-/package.json
 /package-lock.json
 /node_modules
 /post_compile.sh
