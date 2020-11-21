@@ -1,12 +1,7 @@
 .DS_Store
-/.htaccess
 /.idea
 /res
 /compiled
-/favicon.ico
-/favicon16.ico
-/favicon32.ico
-/favicon96.ico
 /deploy.sh
 __pycache__
 /package.json
