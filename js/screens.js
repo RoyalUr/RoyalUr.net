@@ -112,7 +112,7 @@ registerScreenTransitionHandlers(
 
 // Screens where the exit button should be shown
 registerScreenTransitionHandlers(
-    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN], onEnterExitableScreen, onExitExitableScreen
+    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN, SCREEN_PLAY_SELECT], onEnterExitableScreen, onExitExitableScreen
 );
 
 
