@@ -278,7 +278,7 @@ canvas {
     position: absolute;
     display: inline-block;
 
-    top: 50%;
+    top: 45%;
     transform: translateY(-50%);
 
     cursor: pointer;
@@ -287,6 +287,17 @@ canvas {
 
 .play-select-option:hover {
     opacity: 1.0;
+}
+
+#play-select-description {
+    position: absolute;
+    display: inline-block;
+
+    cursor: default;
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .play-select-scaling {
@@ -318,6 +329,16 @@ canvas {
 .play-select-icon {
     padding-top: 5%;
     width: 75%;
+}
+
+#play-online .play-select-icon {
+    padding-top: 3%;
+    width: 70%;
+}
+
+#play-computer .play-select-icon {
+    padding-top: 1%;
+    width: 70%;
 }
 
 

@@ -20,7 +20,8 @@ const menuDiv = document.getElementById("menu"),
 const playSelectDiv = document.getElementById("play-select"),
       playLocalButton = document.getElementById("play-local"),
       playOnlineButton = document.getElementById("play-online"),
-      playComputerButton = document.getElementById("play-computer");
+      playComputerButton = document.getElementById("play-computer"),
+      playSelectDescriptionDiv = document.getElementById("play-select-description");
 
 const loadingDiv = document.getElementById("loading");
 
@@ -73,6 +74,14 @@ function setupElements() {
     playLocalButton.addEventListener("click", onPlayLocal);
     playOnlineButton.addEventListener("click", onPlayOnline);
     playComputerButton.addEventListener("click", onPlayComputer);
+
+    playLocalButton.addEventListener("mouseover", onHoverPlayLocal);
+    playOnlineButton.addEventListener("mouseover", onHoverPlayOnline);
+    playComputerButton.addEventListener("mouseover", onHoverPlayComputer);
+
+    playLocalButton.addEventListener("mouseout", onPlayUnhover);
+    playOnlineButton.addEventListener("mouseout", onPlayUnhover);
+    playComputerButton.addEventListener("mouseout", onPlayUnhover);
 
     diceCanvas.addEventListener("click", function() { game.onDiceClick(); });
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
@@ -238,6 +247,9 @@ function resizeMenu() {
     playOnlineButton.style.left = middleAnchor + "px";
     playComputerButton.style.width = playButtonWidth + "px";
     playComputerButton.style.left = (middleAnchor + buttonSeparation) + "px";
+
+    playSelectDescriptionDiv.style.width = width + "px";
+    playSelectDescriptionDiv.style.top = (0.5 * height + buttonSeparation / 2) + "px";
 }
 
 

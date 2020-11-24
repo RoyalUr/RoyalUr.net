@@ -77,6 +77,8 @@ const playTilesButtonMargin = 0.1,
       playTilesHeightInactive = 0.6,
       playTilesHeightActive = 0.75;
 
+const playSelectDescriptionFade = createFade(0.1, 0.2).invisible();
+
 function redrawButton(canvas, ctx, imageKey) {
     const image = getImageResource(imageKey, canvas.width);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -87,6 +89,7 @@ function redrawMenu(forceRedraw) {
     menuDiv.style.opacity = screenState.menuFade.get();
     exitButton.style.opacity = screenState.exitFade.get();
     playSelectDiv.style.opacity = screenState.playSelectFade.get();
+    playSelectDescriptionDiv.style.opacity = playSelectDescriptionFade.get();
     networkStatus.hidden = false;
 
     if (forceRedraw || isOnScreen(SCREEN_MENU) || isOnScreen(SCREEN_PLAY_SELECT)) {

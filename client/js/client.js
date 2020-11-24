@@ -87,6 +87,25 @@ function onPlayComputer(event) {
     switchToScreen(SCREEN_GAME);
 }
 
+function onHoverPlayLocal() {
+    playSelectDescriptionDiv.textContent = "Two players, one computer.";
+    playSelectDescriptionFade.fadeIn();
+}
+
+function onHoverPlayOnline() {
+    playSelectDescriptionDiv.textContent = "Play people across the globe.";
+    playSelectDescriptionFade.fadeIn();
+}
+
+function onHoverPlayComputer() {
+    playSelectDescriptionDiv.textContent = "Try your luck against the computer.";
+    playSelectDescriptionFade.fadeIn();
+}
+
+function onPlayUnhover() {
+    playSelectDescriptionFade.fadeOut();
+}
+
 function onExitClick(event) {
     event.stopPropagation();
     switchToScreen(SCREEN_MENU);
