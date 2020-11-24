@@ -455,7 +455,6 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
     }
     ctx.lineDashOffset = dashOffset;
 
-
     const endLoc = curve[curve.length - 1];
     ctx.moveTo(endLoc.x, endLoc.y);
 
@@ -533,6 +532,7 @@ const scoreTileRatio = 0.8;
 
 let renderedScoreText = {
     width: NaN,
+    lastRefresh: -1,
     tiles: null,
     score: null
 };
@@ -569,32 +569,27 @@ function drawName(player, isActive) {
     return drawScoreText(player.name, isActive, 1.0);
 }
 
-function checkForRenderedScoreTextResize() {
-    if (renderedScoreText.width === tilesWidth)
-        return;
+function refreshRenderedScoreText() {
+    // We refresh the score text periodically due to font-loading shenanigans.
+    if (renderedScoreText.tiles != null && renderedScoreText.score != null) {
+        const timeSinceRefresh = getTime() - renderedScoreText.lastRefresh;
+        if (renderedScoreText.width === tilesWidth && timeSinceRefresh < 3)
+            return;
+    }
 
-    renderedScoreText.tiles = null;
-    renderedScoreText.score = null;
+    renderedScoreText.lastRefresh = getTime();
     renderedScoreText.width = tilesWidth;
+    renderedScoreText.tiles = drawScoreText("Tiles", false, 0.5);
+    renderedScoreText.score = drawScoreText("Score", false, 0.5);
 }
 
 function getRenderedTilesText() {
-    checkForRenderedScoreTextResize();
-
-    if (renderedScoreText.tiles === null) {
-        renderedScoreText.tiles = drawScoreText("Tiles", false, 0.5);
-        renderedScoreText.width = tilesWidth;
-    }
+    refreshRenderedScoreText();
     return renderedScoreText.tiles;
 }
 
 function getRenderedScoreText() {
-    checkForRenderedScoreTextResize();
-
-    if (renderedScoreText.score === null) {
-        renderedScoreText.score = drawScoreText("Score", false, 0.5);
-        renderedScoreText.width = tilesWidth;
-    }
+    refreshRenderedScoreText();
     return renderedScoreText.score;
 }
 

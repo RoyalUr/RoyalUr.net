@@ -708,9 +708,9 @@ function renderResource(width, height, renderFunction) {
 
     canvas.width = width;
     canvas.height = height;
-
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     renderFunction(ctx, canvas);
-
     return canvas;
 }
 
