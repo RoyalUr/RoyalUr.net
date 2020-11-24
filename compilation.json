@@ -20,11 +20,11 @@
   ],
 
   "resources": {
-    ".htaccess": "",
-    "index.html": "",
-    "lost.html": "",
-    "style.css": "",
-    "robots.txt": "",
+    "site/.htaccess": ".htaccess",
+    "site/index.html": "index.html",
+    "site/lost.html": "lost.html",
+    "site/style.css": "style.css",
+    "site/robots.txt": "robots.txt",
     "res/favicon.ico": "favicon.ico",
     "res/favicon16.ico": "favicon16.ico",
     "res/favicon32.ico": "favicon32.ico",
