@@ -1,4 +1,5 @@
-# 🎲 The Royal Game of Ur Client
+![The Royal Game of Ur Logo](https://github.com/Sothatsit/RoyalUrClient/blob/master/logo.png?raw=true)
+
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
 
 The server code of The Royal Game of Ur can be found in the
