@@ -3,9 +3,14 @@
 </a></p><hr/>
 
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
-
 The server code of The Royal Game of Ur can be found in the
 [RoyalUrServer repository](https://github.com/Sothatsit/RoyalUrServer).
+
+The Royal Game of Ur is based upon an ancient Sumerian board game in the British Museum.
+The original board game can be dated to 2600 BC, and was discovered in a royal tomb in
+the city-state of Ur in ancient Mesopotamia.  Learn more about the game on
+[Wikipedia](https://en.wikipedia.org/wiki/Royal_Game_of_Ur), or watch a fun match
+between Tom Scott and Irving Finkel on [YouTube](https://youtu.be/WZskjLq040I)!
 
 
 # 🖥️ Compilation
