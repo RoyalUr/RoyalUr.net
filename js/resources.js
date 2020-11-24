@@ -3,8 +3,7 @@
 //
 
 const resourceStats = {};
-let onMenuScreenLoadedFn = null,
-    onAllResourcesLoadedFn = null;
+let onAllResourcesLoadedFn = null;
 
 function loadResources(onComplete) {
     onAllResourcesLoadedFn = function() {
