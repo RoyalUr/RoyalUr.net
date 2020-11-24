@@ -1,6 +1,9 @@
 # 🎲 The Royal Game of Ur Client
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
 
+The server code of The Royal Game of Ur can be found in the
+[RoyalUrServer repository](https://github.com/Sothatsit/RoyalUrServer).
+
 
 # 🖥️ Compilation
 This project uses Babel to transpile all Javascript to a single ES5 compatible file,
