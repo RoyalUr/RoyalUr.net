@@ -70,6 +70,12 @@ function onPlayClick(event) {
     switchToScreen(SCREEN_PLAY_SELECT);
 }
 
+function onPlayLocal(event) {
+    event.stopPropagation();
+    game = new LocalGame();
+    switchToScreen(SCREEN_GAME);
+}
+
 function onPlayOnline(event) {
     event.stopPropagation();
     connectToGame();

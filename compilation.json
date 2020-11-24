@@ -36,6 +36,7 @@
     "res/board_light.png": "res/board.png",
     "res/darkTile.png": "res/tile_dark.png",
     "res/lightTile.png": "res/tile_light.png",
+    "res/buttons/play_local.png": "res/button_play_local.png",
     "res/buttons/play_online.png": "res/button_play_online.png",
     "res/buttons/play_computer.png": "res/button_play_computer.png",
     "res/audio/place_1.mp4": "res/audio_place_1.mp4",

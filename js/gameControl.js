@@ -379,3 +379,175 @@ function ComputerGame() {
         this.clearStartTiles();
     }.bind(this);
 }
+
+function LocalGame() {
+    Game.apply(this);
+    this.__class_name__ = "LocalGame";
+
+    setOwnPlayer(randBool() ? "light" : "dark");
+    lightPlayer.name = "Light";
+    darkPlayer.name = "Dark";
+
+    this.turnPlayer = lightPlayer;
+
+    this.isComputersTurn = function() {
+        return this.turnPlayer === otherPlayer;
+    }.bind(this);
+
+    this.isHumansTurn = function() {
+        return this.turnPlayer === ownPlayer;
+    }.bind(this);
+
+    this.init = function() {
+        updatePlayerState(ownPlayer, 7, 0, this.isHumansTurn());
+        updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
+
+        board.clearTiles();
+        resetDice();
+        this.setupRoll(true);
+    }.bind(this);
+
+    this.onDiceClick = function() {
+        if(!dice.active || dice.rolling || !ownPlayer.active)
+            return;
+
+        startRollingDice();
+        dice.callback = this.onFinishDice;
+        setDiceValues(generateRandomDiceValues());
+    }.bind(this);
+
+    this.performMove = function(noAnimation) {
+        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp()),
+            toTile = board.getTile(to);
+
+        if (toTile !== TILE_EMPTY) {
+            addTile(getPlayer(toTile));
+        }
+
+        const from = selectedTile;
+        animateTileMove(selectedTile, to, this.onFinishMove);
+        board.setTile(to, board.getTile(selectedTile));
+        board.setTile(selectedTile, TILE_EMPTY);
+
+        if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
+            takeTile(ownPlayer);
+        }
+
+        unselectTile();
+        if (noAnimation) {
+            setTimeout(function() {
+                this.onFinishMove(from, to);
+            }.bind(this));
+            finishTileMove();
+        }
+
+        ownPlayer.active = false;
+        this.clearStartTiles();
+    }.bind(this);
+
+    this.updateActivePlayer = function() {
+        ownPlayer.active = this.isHumansTurn();
+        otherPlayer.active = this.isComputersTurn();
+    }.bind(this);
+
+    this.setupRoll = function(delayComputerRoll) {
+        this.updateActivePlayer();
+        layoutDice();
+        unselectTile();
+
+        if (this.isHumansTurn()) {
+            setWaitingForDiceRoll();
+        } else {
+            setTimeout(function() {
+                startRollingDice();
+                dice.callback = this.onFinishDice;
+                setDiceValues(generateRandomDiceValues());
+            }.bind(this), (delayComputerRoll ? 1500 : 0));
+        }
+    }.bind(this);
+
+    this.onFinishMove = function(fromTile, toTile) {
+        // If they've just taken a piece off the board, give them some score
+        if (vecEquals(toTile, getEndTile(this.turnPlayer.playerNo))) {
+            this.updateActivePlayer();
+
+            addScore(this.turnPlayer);
+            board.setTile(toTile, TILE_EMPTY);
+
+            if (this.turnPlayer.score.current === 7) {
+                switchToScreen(SCREEN_WIN);
+                return;
+            }
+        }
+
+        if (!isLocusTile(toTile)) {
+            this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+        }
+
+        this.setupRoll();
+    }.bind(this);
+
+    this.onFinishDice = function() {
+        this.setupStartTiles();
+
+        const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
+
+        if (availableMoves.length === 0) {
+            setMessage(
+                "No moves",
+                DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION
+            );
+            setTimeout(function() {
+                playSound("error");
+            }, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+            setTimeout(function() {
+                this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+                this.setupRoll();
+            }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
+            return;
+        }
+
+        if (this.isComputersTurn()) {
+            const start = getTime(),
+                move = this.determineComputerMove(availableMoves),
+                durationMS = (getTime() - start) * 1000;
+
+            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 600 - durationMS)));
+        }
+    }.bind(this);
+
+    this.determineComputerMove = function(availableMoves) {
+        const diceValue = countDiceUp();
+        let from = availableMoves[0];
+
+        if (availableMoves.length === 1)
+            return from;
+
+        // Get the AI involved
+        previousGameState = captureCurrentGameState();
+        return previousGameState.findBestMove(diceValue, computerIntelligence);
+    }.bind(this);
+
+    this.performComputerMove = function(from) {
+        const diceValue = countDiceUp(),
+            to = getTileMoveToLocation(otherPlayer.playerNo, from, diceValue),
+            toTile = board.getTile(to);
+
+        // Moving a new piece onto the board
+        if (vecEquals(from, getStartTile(otherPlayer.playerNo))) {
+            takeTile(otherPlayer);
+        }
+
+        // Taking out a piece
+        if (toTile !== TILE_EMPTY) {
+            addTile(getPlayer(toTile));
+        }
+
+        animateTileMove(from, to, this.onFinishMove);
+        board.setTile(to, otherPlayer.playerNo);
+        board.setTile(from, TILE_EMPTY);
+        otherPlayer.active = false;
+
+        this.clearStartTiles();
+    }.bind(this);
+}

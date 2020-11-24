@@ -18,6 +18,7 @@ const menuDiv = document.getElementById("menu"),
       exitButton = document.getElementById("exit");
 
 const playSelectDiv = document.getElementById("play-select"),
+      playLocalButton = document.getElementById("play-local"),
       playOnlineButton = document.getElementById("play-online"),
       playComputerButton = document.getElementById("play-computer");
 
@@ -69,6 +70,7 @@ function setupElements() {
 
     playSelectDiv.addEventListener("click", onExitClick);
 
+    playLocalButton.addEventListener("click", onPlayLocal);
     playOnlineButton.addEventListener("click", onPlayOnline);
     playComputerButton.addEventListener("click", onPlayComputer);
 
@@ -224,16 +226,18 @@ function resizeMenu() {
     learnButton.style.marginBottom = 0.05 * buttonWidth + "px";
 
     // Set the size and spacing of the play selection buttons
-    const playButtonWidth = min(buttonWidth, width / 2),
-          playButtonSpacing = min(playButtonWidth / 2, (width - playButtonWidth * 2) / 3),
-          onlineLeft = (width - playButtonSpacing) / 2 - playButtonWidth,
-          computerLeft = (width + playButtonSpacing) / 2;
+    const numButtons = 3,
+          playButtonWidth = min(buttonWidth, width / numButtons),
+          playButtonSpacing = min(playButtonWidth / 2, (width - playButtonWidth * numButtons) / (numButtons + 1)),
+          buttonSeparation = playButtonSpacing / numButtons + playButtonWidth,
+          middleAnchor = width / 2 - 0.5 * playButtonWidth;
 
+    playLocalButton.style.width = playButtonWidth + "px";
+    playLocalButton.style.left = (middleAnchor - buttonSeparation) + "px";
     playOnlineButton.style.width = playButtonWidth + "px";
-    playOnlineButton.style.left = onlineLeft + "px";
-
+    playOnlineButton.style.left = middleAnchor + "px";
     playComputerButton.style.width = playButtonWidth + "px";
-    playComputerButton.style.left = computerLeft + "px";
+    playComputerButton.style.left = (middleAnchor + buttonSeparation) + "px";
 }
 
 

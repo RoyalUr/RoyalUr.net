@@ -1,5 +1,5 @@
 <p align="center"><a href="https://royalur.net">
-  <img src="https://github.com/Sothatsit/RoyalUrClient/blob/master/logo.png?raw=true" width="600">
+  <img src="https://github.com/Sothatsit/RoyalUrClient/blob/master/banner.png?raw=true">
 </a></p><hr/>
 
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
