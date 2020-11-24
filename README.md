@@ -1,4 +1,5 @@
-![The Royal Game of Ur Logo](https://github.com/Sothatsit/RoyalUrClient/blob/master/logo.png?raw=true)
+[![The Royal Game of Ur Logo](https://github.com/Sothatsit/RoyalUrClient/blob/master/logo.png?raw=true)](https://royalur.net)
+------------------
 
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
 
