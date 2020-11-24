@@ -7,6 +7,11 @@ const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
 let computerIntelligence = 5,
     previousGameState = null;
 
+
+//
+// The parent Game class that each different play option derives from.
+//
+
 function Game() {
     this.__class_name__ = "Game";
 
@@ -19,10 +24,8 @@ function Game() {
     this.onPacketMessage = unimplemented("onPacketMessage");
     this.onPacketMove = unimplemented("onPacketMove");
     this.onPacketState = unimplemented("onPacketState");
-
     this.onDiceClick = unimplemented("onDiceClick");
     this.performMove = unimplemented("performMove");
-
 
     this.lastTileClickWasSelect = false;
     this.lastTileReleaseTime = LONG_TIME_AGO;
@@ -121,6 +124,12 @@ function Game() {
     }.bind(this);
 }
 
+
+
+//
+// Represents games that are played online.
+//
+
 function OnlineGame() {
     Game.apply(this);
     this.__class_name__ = "OnlineGame";
@@ -207,6 +216,12 @@ function OnlineGame() {
         this.clearStartTiles();
     }.bind(this);
 }
+
+
+
+//
+// Represents games that are played against the computer.
+//
 
 function ComputerGame() {
     Game.apply(this);
@@ -319,7 +334,6 @@ function ComputerGame() {
         this.setupStartTiles();
 
         const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
-
         if (availableMoves.length === 0) {
             setMessage(
                 "No moves",
@@ -340,7 +354,7 @@ function ComputerGame() {
                   move = this.determineComputerMove(availableMoves),
                   durationMS = (getTime() - start) * 1000;
 
-            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 600 - durationMS)));
+            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 700 - durationMS)));
         }
     }.bind(this);
 
@@ -380,14 +394,19 @@ function ComputerGame() {
     }.bind(this);
 }
 
+
+
+//
+// Represents games that are played locally between players.
+//
+
 function LocalGame() {
     Game.apply(this);
     this.__class_name__ = "LocalGame";
 
-    setOwnPlayer(randBool() ? "light" : "dark");
+    setOwnPlayer("light");
     lightPlayer.name = "Light";
     darkPlayer.name = "Dark";
-
     this.turnPlayer = lightPlayer;
 
     this.isComputersTurn = function() {

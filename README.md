@@ -27,22 +27,14 @@ To install the NPM dependencies used in the compilation, run: \
 
 
 # 📂 Project Structure
-**Main Files** \
-`/index.html` is the main HTML page that is displayed upon visiting the site. \
-`/style.css` contains all of the styling for the site. \
-`/js/` contains all of the JavaScript of the client. \
+`/site/` contains the HTML and CSS files, as well as other site config files. \
+`/js/` contains the JavaScript of the client. \
 `/js/lib/` contains the JavaScript libraries used by the client. \
+`package.json` contains the NPM dependencies for compiling the site. \
 `/compilation.json` contains the specification for how to compile the project. \
-`/compile.sh` is a convenience script for running compile.py. \
+`/compile.sh` is a convenience script for running compile.py and optionally post_compile.sh. \
 `/compile.py` is the Python script that actually performs the compilation. \
 `/compiled/` is the directory where the site is compiled to.
-
-**Other Files** \
-`package.json` contains the NPM dependencies for compiling the site. \
-`/lost.html` is the page that is displayed when resources cannot be found. \
-`/annotation_reformatter.py` reformats annotations that specify where to place tiles on the board. \
-`/.htaccess` is used to configure the Apache webserver used to serve the site. \
-`/robots.txt` specifies options for web crawlers.
 
 
 # 💾 Resource Files
