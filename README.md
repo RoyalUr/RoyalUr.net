@@ -15,7 +15,7 @@ between Tom Scott and Irving Finkel on [YouTube](https://youtu.be/WZskjLq040I)!
 
 # 🖥️ Compilation
 This project uses Babel to transpile all Javascript to a single ES5 compatible file,
-as well as a Python script to generate all of the resource files needed for the site.
+as well as a Python script to generate the resource files needed for the site.
 
 The following commands will compile the site to _./compiled_: \
 `./compile.sh release` -- Full clean compilation, with minified JS. \
@@ -27,9 +27,9 @@ To install the NPM dependencies used in the compilation, run: \
 
 
 # 📂 Project Structure
-`/site/` contains the HTML and CSS files, as well as other site config files. \
-`/js/` contains the JavaScript of the client. \
-`/js/lib/` contains the JavaScript libraries used by the client. \
+`/client/` contains the source files for the site, as well as site config files. \
+`/client/js/` contains the JavaScript of the client. \
+`/client/js/lib/` contains the JavaScript libraries used by the client. \
 `package.json` contains the NPM dependencies for compiling the site. \
 `/compilation.json` contains the specification for how to compile the project. \
 `/compile.sh` is a convenience script for running compile.py and optionally post_compile.sh. \
