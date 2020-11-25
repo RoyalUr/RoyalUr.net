@@ -297,7 +297,6 @@ function ComputerGame() {
         this.updateActivePlayer();
         layoutDice();
         unselectTile();
-
         if (this.isHumansTurn()) {
             setWaitingForDiceRoll();
         } else {
@@ -404,26 +403,29 @@ function LocalGame() {
     Game.apply(this);
     this.__class_name__ = "LocalGame";
 
-    setOwnPlayer("light");
-    lightPlayer.name = "Light";
-    darkPlayer.name = "Dark";
+    // Setup the game.
+    setOwnPlayer(randBool() ? "light" : "dark");
     this.turnPlayer = lightPlayer;
 
-    this.isComputersTurn = function() {
-        return this.turnPlayer === otherPlayer;
+    // Reset the names of the players.
+    lightPlayer.name = "Light";
+    darkPlayer.name = "Dark";
+
+    this.isLeftTurn = function() {
+        return this.turnPlayer === leftPlayer;
     }.bind(this);
 
-    this.isHumansTurn = function() {
-        return this.turnPlayer === ownPlayer;
+    this.isRightTurn = function() {
+        return this.turnPlayer === rightPlayer;
     }.bind(this);
 
     this.init = function() {
-        updatePlayerState(ownPlayer, 7, 0, this.isHumansTurn());
-        updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
+        updatePlayerState(leftPlayer, 7, 0, this.isLeftTurn());
+        updatePlayerState(rightPlayer, 7, 0, this.isRightTurn());
 
         board.clearTiles();
         resetDice();
-        this.setupRoll(true);
+        this.setupRoll();
     }.bind(this);
 
     this.onDiceClick = function() {
@@ -437,7 +439,7 @@ function LocalGame() {
 
     this.performMove = function(noAnimation) {
         const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp()),
-            toTile = board.getTile(to);
+              toTile = board.getTile(to);
 
         if (toTile !== TILE_EMPTY) {
             addTile(getPlayer(toTile));
@@ -465,24 +467,17 @@ function LocalGame() {
     }.bind(this);
 
     this.updateActivePlayer = function() {
-        ownPlayer.active = this.isHumansTurn();
-        otherPlayer.active = this.isComputersTurn();
+        leftPlayer.active = this.isLeftTurn();
+        rightPlayer.active = this.isRightTurn();
+        ownPlayer = (leftPlayer.active ? leftPlayer : rightPlayer);
+        otherPlayer = (leftPlayer.active ? rightPlayer : leftPlayer);
     }.bind(this);
 
-    this.setupRoll = function(delayComputerRoll) {
+    this.setupRoll = function() {
         this.updateActivePlayer();
         layoutDice();
         unselectTile();
-
-        if (this.isHumansTurn()) {
-            setWaitingForDiceRoll();
-        } else {
-            setTimeout(function() {
-                startRollingDice();
-                dice.callback = this.onFinishDice;
-                setDiceValues(generateRandomDiceValues());
-            }.bind(this), (delayComputerRoll ? 1500 : 0));
-        }
+        setWaitingForDiceRoll();
     }.bind(this);
 
     this.onFinishMove = function(fromTile, toTile) {
@@ -500,7 +495,7 @@ function LocalGame() {
         }
 
         if (!isLocusTile(toTile)) {
-            this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+            this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
         }
 
         this.setupRoll();
@@ -520,53 +515,9 @@ function LocalGame() {
                 playSound("error");
             }, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
             setTimeout(function() {
-                this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+                this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
                 this.setupRoll();
             }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
-            return;
         }
-
-        if (this.isComputersTurn()) {
-            const start = getTime(),
-                move = this.determineComputerMove(availableMoves),
-                durationMS = (getTime() - start) * 1000;
-
-            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 600 - durationMS)));
-        }
-    }.bind(this);
-
-    this.determineComputerMove = function(availableMoves) {
-        const diceValue = countDiceUp();
-        let from = availableMoves[0];
-
-        if (availableMoves.length === 1)
-            return from;
-
-        // Get the AI involved
-        previousGameState = captureCurrentGameState();
-        return previousGameState.findBestMove(diceValue, computerIntelligence);
-    }.bind(this);
-
-    this.performComputerMove = function(from) {
-        const diceValue = countDiceUp(),
-            to = getTileMoveToLocation(otherPlayer.playerNo, from, diceValue),
-            toTile = board.getTile(to);
-
-        // Moving a new piece onto the board
-        if (vecEquals(from, getStartTile(otherPlayer.playerNo))) {
-            takeTile(otherPlayer);
-        }
-
-        // Taking out a piece
-        if (toTile !== TILE_EMPTY) {
-            addTile(getPlayer(toTile));
-        }
-
-        animateTileMove(from, to, this.onFinishMove);
-        board.setTile(to, otherPlayer.playerNo);
-        board.setTile(from, TILE_EMPTY);
-        otherPlayer.active = false;
-
-        this.clearStartTiles();
     }.bind(this);
 }

@@ -78,6 +78,9 @@ const LIGHT_PLAYER_NO = TILE_LIGHT,
 const darkPlayer = initPlayer(1, "Dark"),
       lightPlayer = initPlayer(2, "Light");
 
+let leftPlayer = darkPlayer,
+    rightPlayer = lightPlayer;
+
 let ownPlayer = darkPlayer,
     otherPlayer = lightPlayer;
 
@@ -136,6 +139,9 @@ function setOwnPlayer(player) {
         ownPlayer = darkPlayer;
         otherPlayer = lightPlayer;
     }
+    // With the exception of local games, ownPlayer is left and otherPlayer is right.
+    leftPlayer = ownPlayer;
+    rightPlayer = otherPlayer;
 }
 
 function getPlayer(playerNo) {

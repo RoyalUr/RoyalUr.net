@@ -672,8 +672,8 @@ function redrawScores(forceRedraw) {
     if (!forceRedraw && !isOnScreen(SCREEN_GAME))
         return;
 
-    redrawPlayerScores(ownPlayer, false);
-    redrawPlayerScores(otherPlayer, true);
+    redrawPlayerScores(leftPlayer, false);
+    redrawPlayerScores(rightPlayer, true);
 }
 
 

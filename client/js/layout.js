@@ -406,7 +406,7 @@ function tileToCanvas(tileLoc) {
         y = tileLoc.y;
 
     // If we're flipping the board
-    if(ownPlayer === darkPlayer) {
+    if(leftPlayer === darkPlayer) {
         x = TILES_WIDTH - x - 1;
     }
 
@@ -441,7 +441,7 @@ function canvasToTile(screenLoc) {
     if (prop_x < 0 || prop_x >= 1 || prop_y < 0 || prop_y >= 1)
         return VEC_NEG1;
 
-    if (ownPlayer === darkPlayer) {
+    if (leftPlayer === darkPlayer) {
         prop_x = 1 - prop_x;
     }
 
@@ -503,7 +503,7 @@ function initPlayerRenderTarget(side) {
 }
 
 function getPlayerRenderTarget(player) {
-    return (player === ownPlayer ? leftPlayerRenderTarget : rightPlayerRenderTarget);
+    return (player === leftPlayer ? leftPlayerRenderTarget : rightPlayerRenderTarget);
 }
 
 function resizeScores() {
@@ -573,7 +573,7 @@ function resizeDice() {
 }
 
 function layoutDice() {
-    if(ownPlayer.active) {
+    if(leftPlayer.active) {
         diceLeft = boardCanvasLeft - diceWidth;
     } else {
         diceLeft = boardCanvasLeft + boardCanvasWidth;
