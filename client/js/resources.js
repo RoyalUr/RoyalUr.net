@@ -432,18 +432,17 @@ function loadAudio() {
 //
 
 const sprites = {
-    "res/buttons.png": {
-        "res/buttons/exit.png": "exit",
-        "res/buttons/exit_active.png": "exit_active",
-
+    "res/play_button.png": {
         "res/buttons/play.png": "play",
-        "res/buttons/play_active.png": "play_active",
-
+        "res/buttons/play_active.png": "play_active"
+    },
+    "res/learn_button.png": {
         "res/buttons/learn.png": "learn",
-        "res/buttons/learn_active.png": "learn_active",
-
+        "res/buttons/learn_active.png": "learn_active"
+    },
+    "res/watch_button.png": {
         "res/buttons/watch.png": "watch",
-        "res/buttons/watch_active.png": "watch_active",
+        "res/buttons/watch_active.png": "watch_active"
     },
 
     "res/dice.png": {

@@ -59,10 +59,13 @@
   },
 
   "sprites": {
-    "res/buttons.png": [
-      "res/buttons/exit.png", "res/buttons/exit_active.png",
-      "res/buttons/play.png", "res/buttons/play_active.png",
-      "res/buttons/learn.png", "res/buttons/learn_active.png",
+    "res/play_button.png": [
+      "res/buttons/play.png", "res/buttons/play_active.png"
+    ],
+    "res/learn_button.png": [
+      "res/buttons/learn.png", "res/buttons/learn_active.png"
+    ],
+    "res/watch_button.png": [
       "res/buttons/watch.png", "res/buttons/watch_active.png"
     ],
     "res/dice.png": [
