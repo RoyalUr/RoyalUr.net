@@ -88,9 +88,11 @@ function redrawButton(canvas, ctx, imageKey) {
 function redrawMenu(forceRedraw) {
     menuDiv.style.opacity = screenState.menuFade.get();
     exitButton.style.opacity = screenState.exitFade.get();
-    playSelectDiv.style.opacity = screenState.playSelectFade.get();
-    playSelectDescriptionDiv.style.opacity = playSelectDescriptionFade.get();
     networkStatus.hidden = false;
+
+    const descriptionFade = playSelectDescriptionFade.get();
+    playSelectDiv.style.opacity = screenState.playSelectFade.get();
+    playSelectDescriptionDiv.style.opacity = (screenState.playSelectFade.isFadeIn ? descriptionFade : 0);
 
     if (forceRedraw || isOnScreen(SCREEN_MENU) || isOnScreen(SCREEN_PLAY_SELECT)) {
         const playButtonActive = (menuState.playButton !== BUTTON_STATE_INACTIVE),
