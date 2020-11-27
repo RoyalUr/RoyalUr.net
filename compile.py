@@ -6,23 +6,22 @@ import os
 import sys
 import json
 import subprocess
-from PIL import Image
+from PIL import Image as PILImage
 from pathlib import Path
-
 
 
 #
 # Utility Functions
 #
 
-def executeCommand(*command, **kwargs):
+def execute_command(*command, **kwargs):
     """
     Shorthand to execute a single command.
     """
-    return executePipedCommands(command, **kwargs)
+    return execute_piped_commands(command, **kwargs)
 
 
-def executePipedCommands(*commands, **kwargs):
+def execute_piped_commands(*commands, **kwargs):
     """
     Executes the given commands where the output of each is piped to the next.
     The last command can be a string filename, in which case the final output will be written to the file.
@@ -55,154 +54,316 @@ def executePipedCommands(*commands, **kwargs):
         stdout, stderr = last_process.communicate()
         stdout = ("" if stdout is None else stdout.decode('utf-8'))
         stderr = ("" if stderr is None else stderr.decode('utf-8'))
-        retCode = last_process.returncode
+        ret_code = last_process.returncode
 
         if stdout != "":
             print(prefix + "STDOUT:", stdout)
         if stderr != "":
             print(prefix + "STDERR", stderr, file=sys.stderr)
 
-        if retCode < 0:
-            print(prefix + "Execution of", command[0], "was terminated by signal:", -retCode, file=sys.stderr)
-        elif retCode != 0:
-            print(prefix + "Command", command[0], "resulted in the non-zero return code:", retCode, file=sys.stderr)
+        if ret_code < 0:
+            print(prefix + "Execution of", commands[-1], "was terminated by signal:", -ret_code, file=sys.stderr)
+        elif ret_code != 0:
+            print(prefix + "Command", commands[-1], "resulted in the non-zero return code:", ret_code, file=sys.stderr)
 
-        return retCode == 0
+        return ret_code == 0
     except OSError as error:
-        print(prefix + "Execution of", command[0], "failed:", error, file=sys.stderr)
+        print(prefix + "Execution of", commands[-1], "failed:", error, file=sys.stderr)
         return False
 
+
+#
+# Compilation Specification
+#
+
+class CompilationSpec:
+    def __init__(self, spec_json):
+        self.js_files = spec_json["javascript"]
+        self.res_files = spec_json["resources"]
+        self.annotation_files = spec_json["annotations"]
+
+        self.image_size_classes = {}
+        for spec, name in spec_json["image_size_classes"].items():
+            self.image_size_classes[spec] = ImageSizeClass(spec, name)
+
+        self.image_size_groups = {}
+        for name, size_specs in spec_json["image_size_groups"].items():
+            self.image_size_groups[name] = ImageSizeGroup(name, size_specs)
+
+        self.images = {}
+        for from_rel, spec in spec_json["images"].items():
+            image = Image(from_rel, spec)
+            self.images[from_rel] = image
+            if image.size_group is not None:
+                if image.size_group not in self.image_size_groups:
+                    raise Exception("Unknown size group {} for image {}".format(image.size_group, from_rel))
+                image.sizes = self.image_size_groups[image.size_group]
+
+        self.sprites = {}
+        for to_rel, input_images in spec_json["sprites"].items():
+            images = []
+            for image_from_rel in input_images:
+                if image_from_rel not in self.images:
+                    raise Exception("Unknown image {} for sprite {}".format(image_from_rel, to_rel))
+                images.append(self.images[image_from_rel])
+            self.sprites[to_rel] = Sprite(to_rel, images)
+
+    @staticmethod
+    def read(file):
+        with open(file, 'r') as f:
+            spec_json = json.load(f)
+        return CompilationSpec(spec_json)
+
+
+class ImageSizeClass:
+    def __init__(self, spec, name):
+        self.spec = spec
+        self.name = name
+        spec_wh = spec.split("_", 2)
+        self.width = -1 if spec_wh[0] == "u" else int(spec_wh[0])
+        self.height = -1 if spec_wh[1] == "u" else int(spec_wh[1])
+
+
+class ImageSizeGroup:
+    def __init__(self, name, spec):
+        self.name = name
+        self.sizes = {}
+        for size_class, size_spec in spec.items():
+            self.sizes[size_class] = ImageSize(size_spec)
+        # Each size group should contain the original copy size.
+        if "u_u" not in self.sizes:
+            self.sizes["u_u"] = ImageSize("auto x auto")
+
+    def items(self):
+        return self.sizes.items()
+
+
+class ImageSize:
+    def __init__(self, spec):
+        self.spec = spec
+        spec_wh = spec.split("x", 2)
+        w = spec_wh[0].strip()
+        h = spec_wh[1].strip()
+        self.width = -1 if w == "auto" else int(w)
+        self.height = -1 if h == "auto" else int(h)
+
+    def calc_width(self, original_width, original_height):
+        if self.width > 0:
+            return self.width
+        if self.height <= 0:
+            return original_width
+        return int(original_width * self.height / original_height)
+
+    def calc_height(self, original_width, original_height):
+        if self.height > 0:
+            return self.height
+        if self.width <= 0:
+            return original_height
+        return int(original_height * self.width / original_width)
+
+
+class Image:
+    def __init__(self, from_rel, spec):
+        self.from_rel = from_rel
+        self.to_rel = spec["dest"] if "dest" in spec else None
+        self.size_group = spec["size_group"] if "size_group" in spec else None
+        self.sizes = None
+        # If no size group is given, it must be directly specified.
+        if "sizes" in spec:
+            if self.size_group is not None:
+                raise Exception("Cannot specify both a size_group and sizes")
+            self.sizes = ImageSizeGroup("Direct:" + from_rel, spec["sizes"])
+        elif self.size_group is None:
+            raise Exception("Must specify either a size_group or sizes")
+
+        # May be populated later.
+        self.original_image = None
+        self.scaled_copies = None
+
+    def get_original(self):
+        if self.original_image is None:
+            self.original_image = PILImage.open(self.from_rel)
+        return self.original_image
+
+    def get_scaled_copies(self):
+        if self.scaled_copies is not None:
+            return self.scaled_copies
+        original = self.get_original()
+
+        self.scaled_copies = {}
+        for size_class, size in self.sizes.items():
+            width = size.calc_width(*original.size)
+            height = size.calc_height(*original.size)
+            self.scaled_copies[size_class] = original.resize((width, height), PILImage.LANCZOS)
+        return self.scaled_copies
+
+
+class Sprite:
+    def __init__(self, to_rel, images):
+        self.to_rel = to_rel
+        self.images = images
+        self.scaled_copies = None
+
+    def get_scaled_copies(self):
+        if self.scaled_copies is not None:
+            return self.scaled_copies
+        scales = {}
+        # First figure out all of the available scales.
+        for image in self.images:
+            scaled_copies = image.get_scaled_copies()
+            for size_class, scaled_copy in image.get_scaled_copies().items():
+                scales[size_class] = {}
+        # Then add all of the scaled copies.
+        for image in self.images:
+            scaled_copies = image.get_scaled_copies()
+            for size_class in scales.keys():
+                if size_class not in scaled_copies:
+                    raise Exception("Image {} is missing size class {} for generating sprite {}".format(
+                        image.from_rel, size_class, self.to_rel
+                    ))
+                scales[size_class][image.from_rel] = scaled_copies[size_class]
+        # Generate each sprite image for each size class.
+        self.scaled_copies = {}
+        for size_class, images in scales.items():
+            self.scaled_copies[size_class] = SpriteInstance.create(images)
+        return self.scaled_copies
+
+
+class SpriteInstance:
+    def __init__(self, image, annotations):
+        self.image = image
+        self.annotations = annotations
+
+    @staticmethod
+    def create(images):
+        annotations = {}
+        total_width = 0
+        max_height = 0
+        # Create the image annotations, and find the dimensions of the sprite.
+        for image_from_rel, image in images.items():
+            width, height = image.size
+            annotations[image_from_rel] = {
+                "width": width,
+                "height": height,
+                "x_offset": total_width,
+                "y_offset": 0
+            }
+            total_width += width
+            max_height = max(max_height, height)
+        # Generate the sprite image.
+        sprite_image = PILImage.new('RGBA', (total_width, max_height))
+        x_offset = 0
+        for image in images.values():
+            sprite_image.paste(image, (x_offset, 0))
+            x_offset += image.size[0]
+        return SpriteInstance(sprite_image, annotations)
 
 
 #
 # Perform Compilation
 #
 
-def loadCompilationSpec(spec_file="compilation.json"):
-    """
-    Load the specification for this compilation.
-    """
-    with open(spec_file, 'r') as f:
-        compilation_specs = json.load(f)
-        javascript_files = compilation_specs["javascript"]
-        resource_files = compilation_specs["resources"]
-        sprite_groups = compilation_specs["sprites"]
-        annotation_files = compilation_specs["annotations"]
-        return javascript_files, resource_files, sprite_groups, annotation_files
-
-
-def clean(target_folder, prefix=""):
+def clean(target_folder, comp_spec, *, prefix=""):
     """
     Completely empty the compilation folder.
     """
-    assert executeCommand("rm", "-rf", target_folder, prefix=prefix)
-    assert executeCommand("mkdir", target_folder, prefix=prefix)
+    assert execute_command("rm", "-rf", target_folder, prefix=prefix)
+    assert execute_command("mkdir", target_folder, prefix=prefix)
 
 
-def combineJS(target_folder, javascript_files, prefix=""):
+def combine_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file.
     """
-    assert executePipedCommands(
-        ["npx", "babel", "--presets=@babel/env"] + javascript_files,
+    assert execute_piped_commands(
+        ["npx", "babel", "--presets=@babel/env"] + comp_spec.js_files,
         target_folder + "/index.js",
         prefix=prefix
     )
 
 
-def combineMinifyJS(target_folder, javascript_files, prefix=""):
+def combine_minify_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file, and minify it.
     """
-    assert executePipedCommands(
-        ["npx", "babel", "--presets=@babel/env"] + javascript_files,
+    assert execute_piped_commands(
+        ["npx", "babel", "--presets=@babel/env"] + comp_spec.js_files,
         ["uglifyjs", "--compress", "--mangle"],
         target_folder + "/index.js",
         prefix=prefix
     )
 
 
-def createSprites(target_folder, sprite_groups, prefix=""):
+def create_sprites(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate groups of images into a single image.
     """
     sprite_annotations = {}
 
-    for target_file, group in sprite_groups.items():
-        annotations = {}
-        images = []
+    for sprite_to_rel, sprite in comp_spec.sprites.items():
+        for size_class, sprite_instance in sprite.get_scaled_copies().items():
+            # Insert the size class into the path.
+            to_rel_path, to_rel_ext = os.path.splitext(sprite_to_rel)
+            to_rel = "{}.{}{}".format(to_rel_path, size_class, to_rel_ext)
 
-        total_width = 0
-        max_height = 0
-
-        for file in group:
-            image = Image.open(file)
-            images.append(image)
-
-            annotations[file] = {
-                "width": image.size[0],
-                "height": image.size[1],
-                "x_offset": total_width,
-                "y_offset": 0
-            }
-
-            total_width += image.size[0]
-            max_height = max(image.size[1], max_height)
-
-        sprite = Image.new('RGBA', (total_width, max_height))
-
-        x_offset = 0
-        for image in images:
-            sprite.paste(image, (x_offset, 0))
-            x_offset += image.size[0]
-
-        output_file = os.path.join(target_folder, target_file)
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        sprite.save(output_file)
-
-        sprite_annotations[target_file] = annotations
+            # Save the image and store its annotations.
+            sprite_annotations[to_rel] = sprite_instance.annotations
+            output_file = os.path.join(target_folder, to_rel)
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            sprite_instance.image.save(output_file)
+            print("{}Created {}".format(prefix, to_rel))
 
     return sprite_annotations
 
 
-def copyResourceFiles(target_folder, resource_files, prefix=""):
+def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     """
     Copy all the resource files for the page into the target folder.
     """
-    made_directories = set()
-    for fromPath, toRel in resource_files.items():
-        toRel = toRel if len(toRel) > 0 else fromPath
-        toPath = os.path.join(target_folder, toRel)
-        # Make sure the directory to copy the file to exists.
-        directory = str(Path(toPath).parent)
-        if directory not in made_directories:
-            assert executePipedCommands(["mkdir", "-p", directory], prefix=prefix)
-            made_directories.add(directory)
-        # Copy the file.
-        assert executePipedCommands(["cp", fromPath, toPath], prefix=prefix)
+    # Copy static files.
+    for from_path, to_rel in comp_spec.res_files.items():
+        to_path = os.path.join(target_folder, to_rel)
+        os.makedirs(os.path.dirname(to_path), exist_ok=True)
+        assert execute_piped_commands(["cp", from_path, to_path], prefix=prefix)
+
+    # Copy images.
+    for from_rel, image in comp_spec.images.items():
+        if image.to_rel is None:
+            continue
+
+        for size_class, scaled_image in image.get_scaled_copies().items():
+            # Insert the size class into the path.
+            to_rel_path, to_rel_ext = os.path.splitext(image.to_rel)
+            to_rel = "{}.{}{}".format(to_rel_path, size_class, to_rel_ext)
+
+            # Save the image.
+            output_file = os.path.join(target_folder, to_rel)
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            scaled_image.save(output_file)
+            print("{}Created {}".format(prefix, to_rel))
 
 
-def requiresReleaseBuild(target_folder, resource_files, prefix=""):
+def requires_release_build(target_folder, comp_spec, *, prefix=""):
     """
     Check whether all resource files exist in the compiled directory.
     Does not check if any annotations or resource file contents have changed.
     """
-    for fromPath, toRel in resource_files.items():
-        toRel = toRel if len(toRel) > 0 else fromPath
-        toPath = os.path.join(target_folder, toRel)
-        if not os.path.exists(toPath):
+    for fromPath, to_rel in comp_spec.res_files.items():
+        to_rel = to_rel if len(to_rel) > 0 else fromPath
+        to_path = os.path.join(target_folder, to_rel)
+        if not os.path.exists(to_path):
             return True
     if not os.path.exists(target_folder + "/res/annotations.json"):
         return True
     return False
 
 
-def combineAnnotations(target_folder, annotation_files, additional_annotations, prefix=""):
+def combine_annotations(target_folder, comp_spec, additional_annotations, *, prefix=""):
     """
     Combine all resource annotations into their own file.
     """
     annotations = {**additional_annotations}
-    for key, file in annotation_files.items():
+    for key, file in comp_spec.annotation_files.items():
         with open(file, "r") as f:
             annotations[key] = json.load(f)
 
@@ -210,96 +371,100 @@ def combineAnnotations(target_folder, annotation_files, additional_annotations, 
         json.dump(annotations, f, separators=(',', ':'))
 
 
-def zipDevelopmentResFolder(target_folder, prefix=""):
+def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
     """
     Creates a zip file with the full contents of the development resources folder.
     """
     output_file = os.path.join(target_folder, "res.zip")
-    assert executePipedCommands(["zip", "-q", "-r", output_file, "./res"], prefix=prefix)
+    assert execute_piped_commands(["zip", "-q", "-r", output_file, "./res"], prefix=prefix)
 
 
-def downloadDevelopmentResFolder(prefix=""):
+def download_development_res_folder(*, prefix=""):
     """
     Downloads and unzips the development resources folder from https://royalur.net/res.zip.
     """
     assert not os.path.exists("./res"), "The ./res directory already exists"
     assert not os.path.exists("./res.zip"), "The ./res.zip archive already exists"
-    assert executePipedCommands(["wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip"], prefix=prefix)
+    assert execute_piped_commands(["wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip"], prefix=prefix)
     try:
-        assert executePipedCommands(["unzip", "-q", "./res.zip", "res/*"], prefix=prefix)
+        assert execute_piped_commands(["unzip", "-q", "./res.zip", "res/*"], prefix=prefix)
     finally:
-        assert executePipedCommands(["rm", "-f", "./res.zip"], prefix=prefix)
+        assert execute_piped_commands(["rm", "-f", "./res.zip"], prefix=prefix)
 
 
-def createReleaseBuild(target_folder, prefix=""):
+#
+# Create the different types of builds.
+#
+
+def create_release_build(target_folder, prefix=""):
     sub_prefix = prefix + " .. "
 
     print(prefix)
     print(prefix + "Compiling Release Build")
-    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
+    comp_spec = CompilationSpec.read("compilation.json")
 
     print(prefix)
     print(prefix + "1. Clean")
-    clean(target_folder, prefix=sub_prefix)
+    clean(target_folder, comp_spec, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "2. Combine & Minify Javascript")
-    combineMinifyJS(target_folder, javascript_files, prefix=sub_prefix)
+    combine_minify_js(target_folder, comp_spec, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "3. Copy Resource Files")
-    copyResourceFiles(target_folder, resource_files, prefix=sub_prefix)
+    copy_resource_files(target_folder, comp_spec, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "4. Create Sprites")
-    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=sub_prefix)
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "5. Create Annotations File")
-    combineAnnotations(target_folder, annotation_files, {
+    combine_annotations(target_folder, comp_spec, {
         "sprites": sprite_annotations
     }, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "6. Zip Development Resources Folder")
-    zipDevelopmentResFolder(target_folder, prefix=sub_prefix)
+    zip_development_res_folder(target_folder, comp_spec, prefix=sub_prefix)
 
     print(prefix)
     print(prefix + "Done!\n")
 
 
-def createDevBuild(target_folder):
+def create_dev_build(target_folder):
     print("\nCompiling Development Build")
-    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
+    comp_spec = CompilationSpec.read("compilation.json")
 
     print("\n1. Combine Javascript")
-    combineJS(target_folder, javascript_files, prefix=" .. ")
+    combine_js(target_folder, comp_spec, prefix=" .. ")
 
     print("\n2. Copy Resource Files")
-    copyResourceFiles(target_folder, resource_files, prefix=" .. ")
+    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
     print("\n3. Create Sprites")
-    sprite_annotations = createSprites(target_folder, sprite_groups, prefix=" .. ")
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
 
     print("\n4. Create Annotations File")
-    combineAnnotations(target_folder, annotation_files, {
+    combine_annotations(target_folder, comp_spec, {
         "sprites": sprite_annotations
     }, prefix=" .. ")
 
     print("\nDone!\n")
 
 
-def createJSDevBuild(target_folder):
+def create_jsdev_build(target_folder):
     print("\nCompiling Javascript Development Build")
-    javascript_files, resource_files, sprite_groups, annotation_files = loadCompilationSpec()
+    comp_spec = CompilationSpec.read("compilation.json")
 
     print("\n1. Check whether to revert to a Release Build")
-    if requiresReleaseBuild(target_folder, resource_files):
+    if requires_release_build(target_folder, comp_spec):
         print("\nERROR : Release build is required\n", file=sys.stderr)
-        createReleaseBuild(target_folder, prefix="| ")
+        create_release_build(target_folder, prefix="| ")
 
     print("\n2. Combine Javascript")
-    combineJS(target_folder, javascript_files, prefix=" .. ")
+    combine_js(target_folder, comp_spec, prefix=" .. ")
 
     print("\nDone!\n")
 
@@ -319,16 +484,16 @@ if len(sys.argv) != 2:
 # Download the resources folder if it doesn't exist.
 if not os.path.exists("./res"):
     print("Could not find ./res directory, attempting to download it...")
-    downloadDevelopmentResFolder(prefix=" .. ")
+    download_development_res_folder(prefix=" .. ")
 
 compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
 
 if compilation_mode == RELEASE_MODE:
-    createReleaseBuild("compiled")
+    create_release_build("compiled")
 elif compilation_mode == JS_DEV_MODE:
-    createJSDevBuild("compiled")
+    create_jsdev_build("compiled")
 elif compilation_mode == DEV_MODE:
-    createDevBuild("compiled")
+    create_dev_build("compiled")
 else:
     if compilation_mode != "":
         print("Invalid compilation mode", compilation_mode)

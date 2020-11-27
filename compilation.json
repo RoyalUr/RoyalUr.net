@@ -31,14 +31,6 @@
     "res/favicon96.ico": "favicon96.ico",
     "res/font/DuranGo.ttf": "res/font_durango.ttf",
     "res/font/Nunito.woff2": "res/font_nunito.woff2",
-    "res/logo.png": "",
-    "res/wood-blue-1.png": "res/background.png",
-    "res/board_light.png": "res/board.png",
-    "res/darkTile.png": "res/tile_dark.png",
-    "res/lightTile.png": "res/tile_light.png",
-    "res/buttons/play_local.png": "res/button_play_local.png",
-    "res/buttons/play_online.png": "res/button_play_online.png",
-    "res/buttons/play_computer.png": "res/button_play_computer.png",
     "res/audio/place_1.mp4": "res/audio_place_1.mp4",
     "res/audio/place_2.mp4": "res/audio_place_2.mp4",
     "res/audio/place_3.mp4": "res/audio_place_3.mp4",
@@ -58,15 +50,122 @@
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4"
   },
 
+  "image_size_classes": {
+    "u_u": "Full-Res",
+    "u_2160": "4k",
+    "u_1440": "1440p",
+    "u_1080": "1080p",
+    "u_720": "720p"
+  },
+
+  "image_size_groups": {
+    "menu-button": {
+      "u_2160": "auto x 384",
+      "u_1440": "auto x 256",
+      "u_1080": "auto x 192",
+      "u_720": "auto x 128"
+    },
+    "play-select-button": {
+      "u_2160": "auto x 576",
+      "u_1440": "auto x 384",
+      "u_1080": "auto x 288",
+      "u_720": "auto x 192"
+    },
+    "dice": {
+      "u_2160": "auto x 192",
+      "u_1440": "auto x 128",
+      "u_1080": "auto x 96",
+      "u_720": "auto x 64"
+    },
+    "tile": {
+      "u_2160": "auto x 288",
+      "u_1440": "auto x 192",
+      "u_1080": "auto x 144",
+      "u_720": "auto x 96"
+    }
+  },
+
+  "images": {
+    "res/logo.png": {
+      "dest": "res/logo.png",
+      "sizes": {
+        "u_2160": "auto x 768",
+        "u_1440": "auto x 512",
+        "u_1080": "auto x 384",
+        "u_720": "auto x 256"
+      }
+    },
+    "res/wood-blue-1.png": {
+      "dest": "res/background.png",
+      "sizes": {
+        "u_u": "300 x 300",
+        "u_2160": "300 x 300",
+        "u_1440": "300 x 300",
+        "u_1080": "300 x 300",
+        "u_720": "300 x 300"
+      }
+    },
+    "res/board_light.png": {
+      "dest": "res/board.png",
+      "sizes": {
+        "u_2160": "auto x 2304",
+        "u_1440": "auto x 1536",
+        "u_1080": "auto x 1152",
+        "u_720": "auto x 768"
+      }
+    },
+
+    "res/darkTile.png": {
+      "dest": "res/tile_dark.png",
+      "size_group": "tile"
+    },
+    "res/lightTile.png": {
+      "dest": "res/tile_light.png",
+      "size_group": "tile"
+    },
+
+    "res/buttons/play_local.png": {
+      "dest": "res/button_play_local.png",
+      "size_group": "play-select-button"
+    },
+    "res/buttons/play_online.png": {
+      "dest": "res/button_play_online.png",
+      "size_group": "play-select-button"
+    },
+    "res/buttons/play_computer.png": {
+      "dest": "res/button_play_computer.png",
+      "size_group": "play-select-button"
+    },
+
+    "res/buttons/play.png":         {"size_group": "menu-button"},
+    "res/buttons/play_active.png":  {"size_group": "menu-button"},
+    "res/buttons/learn.png":        {"size_group": "menu-button"},
+    "res/buttons/learn_active.png": {"size_group": "menu-button"},
+    "res/buttons/watch.png":        {"size_group": "menu-button"},
+    "res/buttons/watch_active.png": {"size_group": "menu-button"},
+
+    "res/dice/up1.png": {"size_group":  "dice"},
+    "res/dice/up2.png": {"size_group":  "dice"},
+    "res/dice/up3.png": {"size_group":  "dice"},
+    "res/dice/down1.png": {"size_group":  "dice"},
+    "res/dice/down2.png": {"size_group":  "dice"},
+    "res/dice/down3.png": {"size_group":  "dice"},
+    "res/dice/darkShadow.png": {"size_group":  "dice"},
+    "res/dice/lightShadow.png": {"size_group":  "dice"}
+  },
+
   "sprites": {
     "res/play_button.png": [
-      "res/buttons/play.png", "res/buttons/play_active.png"
+      "res/buttons/play.png",
+      "res/buttons/play_active.png"
     ],
     "res/learn_button.png": [
-      "res/buttons/learn.png", "res/buttons/learn_active.png"
+      "res/buttons/learn.png",
+      "res/buttons/learn_active.png"
     ],
     "res/watch_button.png": [
-      "res/buttons/watch.png", "res/buttons/watch_active.png"
+      "res/buttons/watch.png",
+      "res/buttons/watch_active.png"
     ],
     "res/dice.png": [
       "res/dice/up1.png",
