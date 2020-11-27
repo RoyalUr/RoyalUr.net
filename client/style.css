@@ -21,8 +21,6 @@
 body, html {
     width: 100%;
     height: 100%;
-    background: rgb(40, 50, 60) url(res/background.png) repeat;
-    background-size: 300px;
 }
 
 html {
@@ -35,6 +33,43 @@ body {
 
 canvas {
     position: absolute;
+}
+
+@media all and (max-height: 720px) and (min-width:1px)
+{
+    body {
+        background: rgb(40, 50, 60) url(res/background.u_720.png) repeat;
+        background-size: 260px;
+    }
+}
+@media all and (max-height: 1080px) and (min-height : 721px) and (min-width:1px)
+{
+    body {
+        background: rgb(40, 50, 60) url(res/background.u_1080.png) repeat;
+        background-size: 300px;
+    }
+}
+@media all and (max-height: 1440px) and (min-height : 1081px) and (min-width:1px)
+{
+    body {
+        background: rgb(40, 50, 60) url(res/background.u_1440.png) repeat;
+        background-size: 340px;
+    }
+}
+@media all and (max-height: 2160px) and (min-height : 1441px) and (min-width:1px)
+{
+    body {
+        background: rgb(40, 50, 60) url(res/background.u_2160.png) repeat;
+        background-size: 380px;
+    }
+}
+
+@media all and (min-height : 2161px) and (min-width:1px)
+{
+    body {
+        background: rgb(40, 50, 60) url(res/background.u_u.png) repeat;
+        background-size: 420px;
+    }
 }
 
 
