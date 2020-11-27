@@ -1,23 +1,27 @@
 {
-  "javascript": [
-    "client/js/lib/reconnecting-websocket.js",
-    "client/js/lib/fitty.js",
-    "client/js/utils.js",
-    "client/js/stats.js",
-    "client/js/resources.js",
-    "client/js/board.js",
-    "client/js/model.js",
-    "client/js/layout.js",
-    "client/js/particles.js",
-    "client/js/curves.js",
-    "client/js/render.js",
-    "client/js/packets.js",
-    "client/js/network.js",
-    "client/js/simulation.js",
-    "client/js/gameControl.js",
-    "client/js/screens.js",
-    "client/js/client.js"
-  ],
+  "javascript": {
+    "index.js": [
+      "client/js/lib/reconnecting-websocket.js",
+      "client/js/lib/fitty.js",
+      "client/js/stats.js",
+      "client/js/board.js",
+      "client/js/model.js",
+      "client/js/layout.js",
+      "client/js/particles.js",
+      "client/js/curves.js",
+      "client/js/render.js",
+      "client/js/packets.js",
+      "client/js/network.js",
+      "client/js/simulation.js",
+      "client/js/gameControl.js",
+      "client/js/screens.js",
+      "client/js/client.js"
+    ],
+    "resources.js": [
+      "client/js/utils.js",
+      "client/js/resources.js"
+    ]
+  },
 
   "resources": {
     "client/.htaccess": ".htaccess",

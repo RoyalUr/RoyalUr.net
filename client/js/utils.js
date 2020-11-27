@@ -2,6 +2,8 @@
 // This file contains non-game-specific utility functions.
 //
 
+const LONG_TIME_AGO = -1000;
+
 function shuffle(array) {
     let currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -66,9 +68,6 @@ function assert(predicate, message) {
 //
 // GRAPHIC UTILITIES
 //
-
-
-const LONG_TIME_AGO = -1000;
 
 function rgb(r, g, b) {
     if(g === undefined) {

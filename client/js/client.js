@@ -8,7 +8,7 @@ const clientStartTime = getTime();
 let resourcesLoadedTime = LONG_TIME_AGO,
     clientFinishSetupTime = LONG_TIME_AGO;
 
-loadResources(setup);
+setLoadResourcesCompleteFn(setup);
 
 function setup() {
     resourcesLoadedTime = getTime();

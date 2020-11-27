@@ -274,23 +274,25 @@ def combine_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file.
     """
-    assert execute_piped_commands(
-        ["npx", "babel", "--presets=@babel/env"] + comp_spec.js_files,
-        target_folder + "/index.js",
-        prefix=prefix
-    )
+    for to_rel, file_list in comp_spec.js_files.items():
+        assert execute_piped_commands(
+            ["npx", "babel", "--presets=@babel/env"] + file_list,
+            os.path.join(target_folder, to_rel),
+            prefix=prefix
+        )
 
 
 def combine_minify_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file, and minify it.
     """
-    assert execute_piped_commands(
-        ["npx", "babel", "--presets=@babel/env"] + comp_spec.js_files,
-        ["uglifyjs", "--compress", "--mangle"],
-        target_folder + "/index.js",
-        prefix=prefix
-    )
+    for to_rel, file_list in comp_spec.js_files.items():
+        assert execute_piped_commands(
+            ["npx", "babel", "--presets=@babel/env"] + file_list,
+            ["uglifyjs", "--compress", "--mangle"],
+            os.path.join(target_folder, to_rel),
+            prefix=prefix
+        )
 
 
 def create_sprites(target_folder, comp_spec, *, prefix=""):

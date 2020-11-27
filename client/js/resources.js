@@ -154,7 +154,35 @@ const audioPacks = {
 //
 
 const resourceStats = {};
-let onAllResourcesLoadedFn = null;
+let onResourcesRetrievedFn = null,
+    onLoadResourcesCompleteFn = null,
+    resourcesLoaded = false;
+
+function loadResources() {
+    const resolution = determineResolution();
+    console.log("Detected a resolution of " + resolution_names[resolution]);
+
+    onResourcesRetrievedFn = function() {
+        markResourceLoading("sprite_splitting");
+        splitSpritesIntoImages(resolution);
+        markResourceLoaded("sprite_splitting", true);
+        resourcesLoaded = true;
+        if (onLoadResourcesCompleteFn != null) {
+            onLoadResourcesCompleteFn();
+        }
+    };
+
+    loadImages(resolution);
+    loadAudio();
+}
+
+function setLoadResourcesCompleteFn(onComplete) {
+    if (resourcesLoaded) {
+        onComplete();
+    } else {
+        onLoadResourcesCompleteFn = onComplete;
+    }
+}
 
 function determineResolution() {
     const width = document.documentElement.clientWidth,
@@ -172,22 +200,6 @@ function determineResolution() {
             continue;
         return resolution;
     }
-}
-
-function loadResources(onComplete) {
-    const resolution = determineResolution();
-    console.log("Detected a resolution of " + resolution_names[resolution]);
-
-    onAllResourcesLoadedFn = function() {
-        markResourceLoading("sprite_splitting");
-        splitSpritesIntoImages(resolution);
-        markResourceLoaded("sprite_splitting", true);
-
-        onComplete();
-    };
-
-    loadImages(resolution);
-    loadAudio();
 }
 
 function getResourceStats(name) {
@@ -250,11 +262,11 @@ function markResourceLoaded(name, skipCompleteCheck) {
 
         // If all resources have been loaded
         if (!skipCompleteCheck && getResourcesLoading().length === 0) {
-            if (onAllResourcesLoadedFn === null)
-                throw "Completed loading resources, but there is no onAllResourcesLoadedFn";
+            if (onResourcesRetrievedFn === null)
+                throw "Completed loading resources, but there is no onResourcesRetrievedFn";
 
-            const onCompleteFn = onAllResourcesLoadedFn;
-            onAllResourcesLoadedFn = null;
+            const onCompleteFn = onResourcesRetrievedFn;
+            onResourcesRetrievedFn = null;
 
             onCompleteFn();
         }
@@ -757,3 +769,10 @@ function calcImageWidth(image, height) {
 function calcImageHeight(image, width) {
     return Math.ceil(image.height / image.width * width);
 }
+
+
+//
+// Start the loading!
+//
+
+loadResources();
