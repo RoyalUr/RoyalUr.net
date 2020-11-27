@@ -169,6 +169,7 @@ function loadResources() {
         resourcesLoaded = true;
         if (onLoadResourcesCompleteFn != null) {
             onLoadResourcesCompleteFn();
+            onLoadResourcesCompleteFn = null;
         }
     };
 
@@ -185,8 +186,8 @@ function setLoadResourcesCompleteFn(onComplete) {
 }
 
 function determineResolution() {
-    const width = document.documentElement.clientWidth,
-          height = document.documentElement.clientHeight;
+    const width = document.documentElement.clientWidth * window.devicePixelRatio,
+          height = document.documentElement.clientHeight * window.devicePixelRatio;
 
     for (let index = 0; index < resolutions.length; ++index) {
         const resolution = resolutions[index],
@@ -705,14 +706,20 @@ function getRawImageResource(key) {
 }
 
 function getImageResource(key, width) {
+    if (width < 1)
+        throw "Width cannot be less than 1: " + width
+
     const imageResource = getRawImageResource(key);
     if(!imageResource)
-        return null;
+        throw "Missing image resource " + key;
 
     const scaledowns = Math.floor(Math.log(imageResource.width / width) / Math.log(2)) - 1;
 
-    if(!width || scaledowns <= 0)
+    if(!width || scaledowns <= 0) {
+        if (!imageResource.image)
+            throw "Missing image for resource " + key;
         return imageResource.image;
+    }
 
     if(scaledowns >= imageResource.scaled.length) {
         let scaledownsDone = imageResource.scaled.length - 1,
@@ -730,6 +737,8 @@ function getImageResource(key, width) {
         }
     }
 
+    if (!imageResource.scaled[scaledowns])
+        throw "Missing image scaled down " + scaledowns + " for resource " + key;
     return imageResource.scaled[scaledowns];
 }
 

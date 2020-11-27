@@ -810,7 +810,7 @@ function redrawDice(forceRedraw) {
                 playSound("dice_click");
             }
         }
-        
+
         paintDice(diceCtx, diceImage, diceWidth, (index + 0.5) * space, 1.5 * space, diceHighlighted);
     }
 

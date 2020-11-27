@@ -130,8 +130,8 @@ function setupElements() {
             return;
 
         const loc = vec(
-            event.clientX - tilesLeft,
-            event.clientY - tilesTop
+            fromScreenPixels(event.clientX) - tilesLeft,
+            fromScreenPixels(event.clientY) - tilesTop
         );
         updateMouse(loc);
     };
@@ -174,14 +174,25 @@ function addTwitterButton() {
     button.appendChild(script);
 }
 
+function toScreenPixels(size) {
+    return size / window.devicePixelRatio;
+}
+
+function fromScreenPixels(size) {
+    return size * window.devicePixelRatio;
+}
+
+function screenPixels(size) {
+    return toScreenPixels(size) + "px";
+}
+
 function resize() {
-    viewport = document.body.getBoundingClientRect();
-    centreLeft = Math.round((viewport.left + viewport.right) / 2);
-    centreTop = Math.round((viewport.top + viewport.bottom) / 2);
-    width = viewport.right - viewport.left;
-    height = viewport.bottom - viewport.top;
+    width = Math.round(document.documentElement.clientWidth * window.devicePixelRatio);
+    height = Math.round(document.documentElement.clientHeight * window.devicePixelRatio);
+    centreLeft = Math.round(width / 2);
+    centreTop = Math.round(height / 2);
     useWidth = width;
-    useHeight = min(useWidth / maxWidthOnHeightRatio, height);
+    useHeight = min(Math.round(useWidth / maxWidthOnHeightRatio), height);
 
     resizeMenu();
     resizeBoard();
@@ -206,13 +217,13 @@ function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWi
     const image = getImageResource(imageKey, buttonWidth),
           height = calcImageHeight(image, buttonWidth);
 
-    buttonElem.style.width = menuWidth + "px";
-    buttonElem.style.height = height + "px";
+    buttonElem.style.width = screenPixels(menuWidth);
+    buttonElem.style.height = screenPixels(height);
 
     canvasElem.width = buttonWidth;
     canvasElem.height = height;
-    canvasElem.style.width = buttonWidth + "px";
-    canvasElem.style.height = height + "px";
+    canvasElem.style.width = screenPixels(buttonWidth);
+    canvasElem.style.height = screenPixels(height);
 }
 
 function resizeMenu() {
@@ -223,16 +234,16 @@ function resizeMenu() {
 
     const buttonWidth = menuWidth * buttonMenuWidthPercentage;
 
-    menuDiv.style.width = menuWidth + "px";
+    menuDiv.style.width = screenPixels(menuWidth);
 
     layoutButton(playButton, playButtonCanvas, playButtonCtx, "play", menuWidth, buttonWidth);
     layoutButton(learnButton, learnButtonCanvas, learnButtonCtx, "learn", menuWidth, buttonWidth);
     layoutButton(watchButton, watchButtonCanvas, watchButtonCtx, "watch", menuWidth, buttonWidth);
 
     // Set the spacing between the buttons and title
-    playButton.style.marginTop = 0.05 * buttonWidth + "px";
-    playButton.style.marginBottom = 0.1 * buttonWidth + "px";
-    learnButton.style.marginBottom = 0.05 * buttonWidth + "px";
+    playButton.style.marginTop = screenPixels(0.05 * buttonWidth);
+    playButton.style.marginBottom = screenPixels(0.1 * buttonWidth);
+    learnButton.style.marginBottom = screenPixels(0.05 * buttonWidth);
 
     // Set the size and spacing of the play selection buttons
     const numButtons = 3,
@@ -241,15 +252,15 @@ function resizeMenu() {
           buttonSeparation = playButtonSpacing / numButtons + playButtonWidth,
           middleAnchor = width / 2 - 0.5 * playButtonWidth;
 
-    playLocalButton.style.width = playButtonWidth + "px";
-    playLocalButton.style.left = (middleAnchor - buttonSeparation) + "px";
-    playOnlineButton.style.width = playButtonWidth + "px";
-    playOnlineButton.style.left = middleAnchor + "px";
-    playComputerButton.style.width = playButtonWidth + "px";
-    playComputerButton.style.left = (middleAnchor + buttonSeparation) + "px";
+    playLocalButton.style.width = screenPixels(playButtonWidth);
+    playLocalButton.style.left = screenPixels(middleAnchor - buttonSeparation);
+    playOnlineButton.style.width = screenPixels(playButtonWidth);
+    playOnlineButton.style.left = screenPixels(middleAnchor);
+    playComputerButton.style.width = screenPixels(playButtonWidth);
+    playComputerButton.style.left = screenPixels(middleAnchor + buttonSeparation);
 
-    playSelectDescriptionDiv.style.width = width + "px";
-    playSelectDescriptionDiv.style.top = (0.5 * height + buttonSeparation / 2) + "px";
+    playSelectDescriptionDiv.style.width = screenPixels(width);
+    playSelectDescriptionDiv.style.top = screenPixels(0.5 * height + buttonSeparation / 2);
 }
 
 
@@ -289,8 +300,10 @@ function resizeBoard() {
 
     boardCanvas.width = boardCanvasWidth;
     boardCanvas.height = boardCanvasHeight;
-    boardCanvas.style.left = boardCanvasLeft + "px";
-    boardCanvas.style.top = boardCanvasTop + "px";
+    boardCanvas.style.width = screenPixels(boardCanvasWidth);
+    boardCanvas.style.height = screenPixels(boardCanvasHeight);
+    boardCanvas.style.left = screenPixels(boardCanvasLeft);
+    boardCanvas.style.top = screenPixels(boardCanvasTop);
 
     tilesHeight = boardCanvasHeight;
     tilesWidth = boardCanvasWidth * 1.5;
@@ -300,8 +313,10 @@ function resizeBoard() {
 
     tilesCanvas.width = tilesWidth;
     tilesCanvas.height = tilesHeight;
-    tilesCanvas.style.left = tilesLeft + "px";
-    tilesCanvas.style.top = tilesTop + "px";
+    tilesCanvas.style.width = screenPixels(tilesWidth);
+    tilesCanvas.style.height = screenPixels(tilesHeight);
+    tilesCanvas.style.left = screenPixels(tilesLeft);
+    tilesCanvas.style.top = screenPixels(tilesTop);
 
     boardX = boardPadding;
     boardY = boardPadding;
@@ -529,23 +544,31 @@ function resizeScores() {
 
     leftTiles.width = tilesCountWidth;
     leftTiles.height = tilesCountHeight;
-    leftTiles.style.top = tilesCountTop + "px";
-    leftTiles.style.left = p1Left + "px";
+    leftTiles.style.width = screenPixels(tilesCountWidth);
+    leftTiles.style.height = screenPixels(tilesCountHeight);
+    leftTiles.style.top = screenPixels(tilesCountTop);
+    leftTiles.style.left = screenPixels(p1Left);
 
     rightTiles.width = tilesCountWidth;
     rightTiles.height = tilesCountHeight;
-    rightTiles.style.top = tilesCountTop + "px";
-    rightTiles.style.left = p2Left + "px";
+    rightTiles.style.width = screenPixels(tilesCountWidth);
+    rightTiles.style.height = screenPixels(tilesCountHeight);
+    rightTiles.style.top = screenPixels(tilesCountTop);
+    rightTiles.style.left = screenPixels(p2Left);
 
     leftScore.width = scoreWidth;
     leftScore.height = scoreHeight;
-    leftScore.style.top = scoreTop + "px";
-    leftScore.style.left = p1Left + "px";
+    leftScore.style.width = screenPixels(scoreWidth);
+    leftScore.style.height = screenPixels(scoreHeight);
+    leftScore.style.top = screenPixels(scoreTop);
+    leftScore.style.left = screenPixels(p1Left);
 
     rightScore.width = scoreWidth;
     rightScore.height = scoreHeight;
-    rightScore.style.top = scoreTop + "px";
-    rightScore.style.left = p2Left + "px";
+    rightScore.style.width = screenPixels(scoreWidth);
+    rightScore.style.height = screenPixels(scoreHeight);
+    rightScore.style.top = screenPixels(scoreTop);
+    rightScore.style.left = screenPixels(p2Left);
 }
 
 
@@ -569,6 +592,8 @@ function resizeDice() {
     diceHeight = 3 * space;
     diceCanvas.width = diceWidth;
     diceCanvas.height = diceHeight;
+    diceCanvas.style.width = screenPixels(diceWidth);
+    diceCanvas.style.height = screenPixels(diceHeight);
 
     layoutDice();
 }
@@ -582,8 +607,8 @@ function layoutDice() {
 
     diceTop = centreTop - diceHeight / 2;
 
-    diceCanvas.style.top = diceTop + "px";
-    diceCanvas.style.left = diceLeft + "px";
+    diceCanvas.style.top = screenPixels(diceTop);
+    diceCanvas.style.left = screenPixels(diceLeft);
 }
 
 
