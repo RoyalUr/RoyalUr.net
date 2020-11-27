@@ -2,20 +2,191 @@
 // This file manages the loading of resources such as audio and images that the client needs.
 //
 
+const resolutions = ["u_720", "u_1080", "u_1440", "u_2160", "u_u"];
+const resolution_names = {
+    "u_u": "Full-Res",
+    "u_2160": "4k",
+    "u_1440": "1440p",
+    "u_1080": "1080p",
+    "u_720": "720p"
+};
+
+const imageResources = {
+    "logo": "res/logo.png",
+    "board": "res/board.png",
+    "tile_dark": "res/tile_dark.png",
+    "tile_light": "res/tile_light.png",
+    "play_online": "res/button_play_online.png",
+    "play_computer": "res/button_play_computer.png",
+};
+
+const sprites = {
+    "res/play_button.png": {
+        "res/buttons/play.png": "play",
+        "res/buttons/play_active.png": "play_active"
+    },
+    "res/learn_button.png": {
+        "res/buttons/learn.png": "learn",
+        "res/buttons/learn_active.png": "learn_active"
+    },
+    "res/watch_button.png": {
+        "res/buttons/watch.png": "watch",
+        "res/buttons/watch_active.png": "watch_active"
+    },
+
+    "res/dice.png": {
+        "res/dice/up1.png": "diceUp1",
+        "res/dice/up2.png": "diceUp2",
+        "res/dice/up3.png": "diceUp3",
+        "res/dice/down1.png": "diceDown1",
+        "res/dice/down2.png": "diceDown2",
+        "res/dice/down3.png": "diceDown3",
+        "res/dice/darkShadow.png": "diceDarkShadow",
+        "res/dice/lightShadow.png": "diceLightShadow"
+    }
+};
+
+const audioResources = [
+    // Sounds when moving a tile
+    {
+        key: "place_1",
+        url: "res/audio_place_1.mp4"
+    }, {
+        key: "place_2",
+        url: "res/audio_place_2.mp4"
+    }, {
+        key: "place_3",
+        url: "res/audio_place_3.mp4"
+    }, {
+        key: "place_4",
+        url: "res/audio_place_4.mp4"
+    },
+
+    // Sounds when selecting a tile
+    {
+        key: "pickup_1",
+        url: "res/audio_pickup_1.mp4"
+    }, {
+        key: "pickup_2",
+        url: "res/audio_pickup_2.mp4"
+    }, {
+        key: "pickup_3",
+        url: "res/audio_pickup_3.mp4"
+    },
+
+    // Sound when trying to pick up a tile that cannot be moved
+    {
+        key: "error",
+        url: "res/audio_error.mp4",
+        volume: 0.5,
+        instances: 3
+    },
+
+    // Sound when taking out an enemy tile
+    {
+        key: "kill",
+        url: "res/audio_kill.mp4",
+        volume: 0.5
+    },
+
+    // Sound when hovering over tiles
+    {
+        key: "hover",
+        url: "res/audio_hover.mp4",
+        volume: 0.5,
+        instances: 3
+    },
+
+    // Sounds when rolling dice
+    {
+        key: "dice_click",
+        url: "res/audio_dice_click.mp4",
+        volume: 0.5,
+        instances: 5
+    },
+    {
+        key: "dice_hit",
+        url: "res/audio_dice_hit.mp4",
+        volume: 0.3,
+        instances: 4
+    },
+    {
+        key: "dice_select",
+        url: "res/audio_dice_select.mp4",
+        volume: 0.3,
+        instances: 4
+    },
+
+    // Sounds when a message pops up
+    {
+        key: "typewriter_key",
+        url: "res/audio_typewriter_key.mp4",
+        instances: 4
+    },
+    {
+        key: "typewriter_end",
+        url: "res/audio_typewriter_end.mp4",
+    },
+
+    // Firework sounds
+    {
+        key: "firework_explode",
+        url: "res/audio_firework_explode.mp4",
+        volume: 0.5,
+        instances: 4
+    },
+    {
+        key: "firework_rocket",
+        url: "res/audio_firework_rocket.mp4",
+        volume: 0.05,
+        instances: 4
+    }
+];
+
+const audioPacks = {
+    "place": ["place_1", "place_2", "place_3", "place_4"],
+    "pickup": ["pickup_1", "pickup_2", "pickup_3"]
+};
+
+
+//
+// Management of the loading.
+//
+
 const resourceStats = {};
 let onAllResourcesLoadedFn = null;
 
+function determineResolution() {
+    const width = document.documentElement.clientWidth,
+          height = document.documentElement.clientHeight;
+
+    for (let index = 0; index < resolutions.length; ++index) {
+        const resolution = resolutions[index],
+              wh_specs = resolution.split("_"),
+              res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
+              res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
+
+        if (res_width > 0 && width > res_width)
+            continue;
+        if (res_height > 0 && height > res_height)
+            continue;
+        return resolution;
+    }
+}
+
 function loadResources(onComplete) {
+    const resolution = determineResolution();
+    console.log("Detected a resolution of " + resolution_names[resolution]);
+
     onAllResourcesLoadedFn = function() {
         markResourceLoading("sprite_splitting");
-        splitSpritesIntoImages();
+        splitSpritesIntoImages(resolution);
         markResourceLoaded("sprite_splitting", true);
 
         onComplete();
     };
 
-    loadImages();
-    loadSprites();
+    loadImages(resolution);
     loadAudio();
 }
 
@@ -125,7 +296,7 @@ function reportResourceLoadingStatistics() {
 
 
 //
-// LOADING BAR
+// Loading bar.
 //
 
 const loadingBarElement = document.getElementById("loading-bar");
@@ -147,112 +318,8 @@ function redrawLoadingBar() {
 
 
 //
-// AUDIO
+// Audio loading.
 //
-
-const audioResources = [
-    // Sounds
-    
-    // Sounds when moving a tile
-    {
-        key: "place_1",
-        url: "res/audio_place_1.mp4"
-    }, {
-        key: "place_2",
-        url: "res/audio_place_2.mp4"
-    }, {
-        key: "place_3",
-        url: "res/audio_place_3.mp4"
-    }, {
-        key: "place_4",
-        url: "res/audio_place_4.mp4"
-    },
-
-    // Sounds when selecting a tile
-    {
-        key: "pickup_1",
-        url: "res/audio_pickup_1.mp4"
-    }, {
-        key: "pickup_2",
-        url: "res/audio_pickup_2.mp4"
-    }, {
-        key: "pickup_3",
-        url: "res/audio_pickup_3.mp4"
-    },
-    
-    // Sound when trying to pick up a tile that cannot be moved
-    {
-        key: "error",
-        url: "res/audio_error.mp4",
-        volume: 0.5,
-        instances: 3
-    },
-    
-    // Sound when taking out an enemy tile
-    {
-        key: "kill",
-        url: "res/audio_kill.mp4",
-        volume: 0.5
-    },
-    
-    // Sound when hovering over tiles
-    {
-        key: "hover",
-        url: "res/audio_hover.mp4",
-        volume: 0.5,
-        instances: 3
-    },
-    
-    // Sounds when rolling dice
-    {
-        key: "dice_click",
-        url: "res/audio_dice_click.mp4",
-        volume: 0.5,
-        instances: 5
-    },
-    {
-        key: "dice_hit",
-        url: "res/audio_dice_hit.mp4",
-        volume: 0.3,
-        instances: 4
-    },
-    {
-        key: "dice_select",
-        url: "res/audio_dice_select.mp4",
-        volume: 0.3,
-        instances: 4
-    },
-
-    // Sounds when a message pops up
-    {
-        key: "typewriter_key",
-        url: "res/audio_typewriter_key.mp4",
-        instances: 4
-    },
-    {
-        key: "typewriter_end",
-        url: "res/audio_typewriter_end.mp4",
-    },
-
-    // Firework sounds
-    {
-        key: "firework_explode",
-        url: "res/audio_firework_explode.mp4",
-        volume: 0.5,
-        instances: 4
-    },
-    {
-        key: "firework_rocket",
-        url: "res/audio_firework_rocket.mp4",
-        volume: 0.05,
-        instances: 4
-    }
-];
-
-const audioPacks = {
-    "place": ["place_1", "place_2", "place_3", "place_4"],
-    "pickup": ["pickup_1", "pickup_2", "pickup_3"]
-};
 
 const audioPreferences = {
     songsMuted: false,
@@ -428,43 +495,8 @@ function loadAudio() {
 
 
 //
-// IMAGES
+// Image loading.
 //
-
-const sprites = {
-    "res/play_button.png": {
-        "res/buttons/play.png": "play",
-        "res/buttons/play_active.png": "play_active"
-    },
-    "res/learn_button.png": {
-        "res/buttons/learn.png": "learn",
-        "res/buttons/learn_active.png": "learn_active"
-    },
-    "res/watch_button.png": {
-        "res/buttons/watch.png": "watch",
-        "res/buttons/watch_active.png": "watch_active"
-    },
-
-    "res/dice.png": {
-        "res/dice/up1.png": "diceUp1",
-        "res/dice/up2.png": "diceUp2",
-        "res/dice/up3.png": "diceUp3",
-        "res/dice/down1.png": "diceDown1",
-        "res/dice/down2.png": "diceDown2",
-        "res/dice/down3.png": "diceDown3",
-        "res/dice/darkShadow.png": "diceDarkShadow",
-        "res/dice/lightShadow.png": "diceLightShadow"
-    }
-};
-
-const imageResources = {
-    "logo": "res/logo.png",
-    "board": "res/board.png",
-    "tile_dark": "res/tile_dark.png",
-    "tile_light": "res/tile_light.png",
-    "play_online": "res/button_play_online.png",
-    "play_computer": "res/button_play_computer.png",
-};
 
 const loadedImageResources = {};
 const loadedSpriteResources = {};
@@ -492,7 +524,59 @@ function loadImageAnnotations() {
     client.send();
 }
 
-function loadSprites() {
+function getImageURLWithResolution(url, resolution) {
+    const extDotIndex = url.lastIndexOf(".");
+    return url.substring(0, extDotIndex) + "." + resolution + url.substring(extDotIndex)
+}
+
+function loadImages(resolution) {
+    loadImageAnnotations();
+    loadSprites(resolution);
+
+    for(let key in imageResources) {
+        if(!imageResources.hasOwnProperty(key))
+            continue;
+
+        const resourceName = "image(" + key + ")";
+        markResourceLoading(resourceName);
+
+        const imageResource = {
+            key: key,
+            image: new Image(),
+            loaded: false,
+            width: NaN,
+            height: NaN,
+            scaled: []
+        };
+        imageResource.scaled.push(imageResource.image);
+
+        imageResource.image.onload = function() {
+            imageResource.width = this.width;
+            imageResource.height = this.height;
+
+            if(!imageResource.width || !imageResource.height) {
+                error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", "
+                    + "invalid width or height (" + imageResource.width + " x " + imageResource.height + ")");
+
+                markResourceLoaded(resourceName);
+                loadedImageResources[imageResource.key] = undefined;
+                return;
+            }
+
+            imageResource.loaded = true;
+            markResourceLoaded(resourceName);
+        };
+
+        imageResource.image.onerror = function() {
+            console.log(arguments);
+        };
+
+        imageResource.image.src = getImageURLWithResolution(imageResources[key], resolution);
+        loadedImageResources[key] = imageResource;
+    }
+}
+
+function loadSprites(resolution) {
     for(let url in sprites) {
         if(!sprites.hasOwnProperty(url))
             continue;
@@ -529,12 +613,12 @@ function loadSprites() {
             console.log(arguments);
         };
 
-        spriteResource.image.src = url;
+        spriteResource.image.src = getImageURLWithResolution(url, resolution);
         loadedSpriteResources[url] = spriteResource;
     }
 }
 
-function splitSpritesIntoImages() {
+function splitSpritesIntoImages(resolution) {
     const spriteAnnotations = getImageAnnotation("sprites");
 
     if (!spriteAnnotations) {
@@ -545,7 +629,7 @@ function splitSpritesIntoImages() {
     for(let url in sprites) {
         const resource = loadedSpriteResources[url],
               mappings = sprites[url],
-              annotations = spriteAnnotations[url];
+              annotations = spriteAnnotations[getImageURLWithResolution(url, resolution)];
 
         if (!resource || !resource.loaded) {
             error("[FATAL] Sprite " + url + " is not loaded, and therefore cannot be split");
@@ -583,53 +667,6 @@ function splitSpritesIntoImages() {
                 scaled: [image]
             };
         }
-    }
-}
-
-function loadImages() {
-    loadImageAnnotations();
-    loadSprites();
-
-    for(let key in imageResources) {
-        if(!imageResources.hasOwnProperty(key))
-            continue;
-
-        const resourceName = "image(" + key + ")";
-        markResourceLoading(resourceName);
-
-        const imageResource = {
-            key: key,
-            image: new Image(),
-            loaded: false,
-            width: NaN,
-            height: NaN,
-            scaled: []
-        };
-        imageResource.scaled.push(imageResource.image);
-
-        imageResource.image.onload = function() {
-            imageResource.width = this.width;
-            imageResource.height = this.height;
-
-            if(!imageResource.width || !imageResource.height) {
-                error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", "
-                      + "invalid width or height (" + imageResource.width + " x " + imageResource.height + ")");
-
-                markResourceLoaded(resourceName);
-                loadedImageResources[imageResource.key] = undefined;
-                return;
-            }
-
-            imageResource.loaded = true;
-            markResourceLoaded(resourceName);
-        };
-
-        imageResource.image.onerror = function() {
-            console.log(arguments);
-        };
-
-        imageResource.image.src = imageResources[key];
-        loadedImageResources[key] = imageResource;
     }
 }
 

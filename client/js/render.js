@@ -546,23 +546,22 @@ function drawScoreText(text, isActive, scale) {
     return renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
         // Render the text on another canvas, and then onto this one so that the alpha stacks correctly
         const renderedText = renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
-            const tileWidth = getTileWidth(),
-                offset = 0.01 * tileWidth;
+            const tileWidth = getTileWidth();
 
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = Math.round(tileWidth * 0.85 * scale) + "px DuranGo";
+            ctx.font = Math.round(tileWidth * 1.6 * scale) + "px DuranGo";
 
             if (isActive) {
                 ctx.save();
                 ctx.shadowBlur = 5;
                 ctx.shadowColor = rgba(255, 255, 255, 0.7);
-                ctx.fillText(text, scoreWidth / 2, 0.5 * tileWidth);
+                ctx.fillText(text, scoreWidth / 2, scoreHeight * scale / 2);
                 ctx.restore();
             }
 
             ctx.fillStyle = rgb(255);
-            ctx.fillText(text, scoreWidth / 2, 0.5 * tileWidth);
+            ctx.fillText(text, scoreWidth / 2, scoreHeight * scale / 2);
         });
 
         ctx.globalAlpha = (isActive ? 1.0 : 0.8);
@@ -571,21 +570,21 @@ function drawScoreText(text, isActive, scale) {
 }
 
 function drawName(player, isActive) {
-    return drawScoreText(player.name, isActive, 1.0);
+    return drawScoreText(player.name, isActive, 0.6);
 }
 
 function refreshRenderedScoreText() {
     // We refresh the score text periodically due to font-loading shenanigans.
     if (renderedScoreText.tiles != null && renderedScoreText.score != null) {
         const timeSinceRefresh = getTime() - renderedScoreText.lastRefresh;
-        if (renderedScoreText.width === tilesWidth && timeSinceRefresh < 3)
+        if (renderedScoreText.width === tilesWidth && timeSinceRefresh < 1)
             return;
     }
 
     renderedScoreText.lastRefresh = getTime();
     renderedScoreText.width = tilesWidth;
-    renderedScoreText.tiles = drawScoreText("Tiles", false, 0.5);
-    renderedScoreText.score = drawScoreText("Score", false, 0.5);
+    renderedScoreText.tiles = drawScoreText("Tiles", false, 0.28);
+    renderedScoreText.score = drawScoreText("Score", false, 0.28);
 }
 
 function getRenderedTilesText() {
@@ -601,9 +600,12 @@ function getRenderedScoreText() {
 function getRenderedPlayerName(player) {
     const renderTarget = getPlayerRenderTarget(player);
 
+    const timeSinceRefresh = getTime() - renderTarget.lastRefresh;
     if(renderTarget.renderedIdleName === null || renderTarget.renderedActiveName === null
-        || scoreWidth !== renderTarget.renderedIdleName.width || player.name !== renderTarget.renderedNameString) {
+        || scoreWidth !== renderTarget.renderedIdleName.width || player.name !== renderTarget.renderedNameString
+        || timeSinceRefresh > 1) {
 
+        renderTarget.lastRefresh = getTime();
         renderTarget.renderedIdleName = drawName(player, false);
         renderTarget.renderedActiveName = drawName(player, true);
         renderTarget.renderedNameString = player.name;
@@ -658,13 +660,13 @@ function redrawPlayerScores(player, drawFromLeft) {
         player.tiles.current, highlightStartTile,
     );
     drawTiles(
-        scoreCtx, player.playerNo, tileWidth * 1.25,
+        scoreCtx, player.playerNo, tileWidth * 1.75,
         player.score.current, false
     );
 
     tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
-    tilesCtx.drawImage(getRenderedTilesText(), 0, tileWidth);
-    scoreCtx.drawImage(getRenderedScoreText(), 0, 0);
+    tilesCtx.drawImage(getRenderedTilesText(), 0, 1.25 * tileWidth);
+    scoreCtx.drawImage(getRenderedScoreText(), 0, 0.7 * tileWidth);
 }
 
 function redrawScores(forceRedraw) {

@@ -98,7 +98,6 @@
     "res/wood-blue-1.png": {
       "dest": "res/background.png",
       "sizes": {
-        "u_u": "300 x 300",
         "u_2160": "300 x 300",
         "u_1440": "300 x 300",
         "u_1080": "300 x 300",

@@ -7,7 +7,6 @@ import sys
 import json
 import subprocess
 from PIL import Image as PILImage
-from pathlib import Path
 
 
 #
@@ -326,10 +325,16 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
         assert execute_piped_commands(["cp", from_path, to_path], prefix=prefix)
 
-    # Copy images.
+    # Copy and scale images.
     for from_rel, image in comp_spec.images.items():
         if image.to_rel is None:
             continue
+
+        # Copy the original image.
+        output_file = os.path.join(target_folder, image.to_rel)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        image.get_original().save(output_file)
+        print("{}Copied {}".format(prefix, image.to_rel))
 
         for size_class, scaled_image in image.get_scaled_copies().items():
             # Insert the size class into the path.
@@ -337,9 +342,7 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
             to_rel = "{}.{}{}".format(to_rel_path, size_class, to_rel_ext)
 
             # Save the image.
-            output_file = os.path.join(target_folder, to_rel)
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)
-            scaled_image.save(output_file)
+            scaled_image.save(os.path.join(target_folder, to_rel))
             print("{}Created {}".format(prefix, to_rel))
 
 

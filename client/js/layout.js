@@ -496,6 +496,7 @@ function initPlayerRenderTarget(side) {
         scoreCanvas: scoreCanvas,
         scoreCtx: scoreCtx,
 
+        lastRefresh: getTime(),
         renderedNameString: null,
         renderedIdleName: null,
         renderedActiveName: null
@@ -510,10 +511,10 @@ function resizeScores() {
     const tileWidth = getTileWidth();
 
     scoreWidth = 7 * tileWidth;
-    scoreHeight = tileWidth * 1.75;
+    scoreHeight = tileWidth * 2.25;
 
     const tilesCountWidth = scoreWidth,
-          tilesCountHeight = scoreHeight + tileWidth;
+          tilesCountHeight = scoreHeight + 0.5 * tileWidth;
 
     const verticalPadding = Math.round(0.05 * boardCanvasHeight),
           tilesCountTop = boardCanvasTop + verticalPadding,
