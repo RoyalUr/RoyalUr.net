@@ -19,6 +19,7 @@ function setup() {
     updateAudioVolumes();
     playSong();
 
+    document.addEventListener("keyup", handleKeyPress);
     window.onhashchange = onHashChange;
     if (getHashGameID() !== null) {
         connectToGame(true);
@@ -62,7 +63,7 @@ function reportStartupPerformance() {
 
 
 //
-// MENU
+// Menu interaction.
 //
 
 function onPlayClick(event) {
@@ -118,7 +119,7 @@ function connectToGame() {
 
 
 //
-// NETWORK : CONNECTING
+// Establishing a network connection.
 //
 
 function onNetworkConnecting() {
@@ -155,7 +156,7 @@ function onNetworkDisconnect() {
 
 
 //
-// NETWORK : GAME
+// Interactions with a networked game.
 //
 
 function onPacketInvalidGame() {
@@ -188,7 +189,7 @@ function onPacketState(state) {
 
 
 //
-// GAME HASH
+// Game hash handling.
 //
 
 function getHashRaw() {
@@ -221,5 +222,29 @@ function onHashChange() {
         connectToGame();
     } else {
         switchToScreen(SCREEN_MENU);
+    }
+}
+
+
+//
+// Game interactions.
+//
+
+function handleKeyPress(event) {
+    if (event.defaultPrevented)
+        return;
+
+    const key = event.key || event.keyCode;
+    if (key === "Enter" || key === 13 || key === " " || key === "Space" || key === 32) {
+        if (game) {
+            event.stopPropagation();
+            game.onDiceClick();
+        } else if (isOnScreen(SCREEN_MENU)) {
+            onPlayClick(event);
+        }
+    } else if (key === "Escape" || key === "Esc" || key === 27) {
+        if (screenState.exitFade.isFadeIn) {
+            onExitClick(event);
+        }
     }
 }
