@@ -160,8 +160,7 @@ let onResourcesRetrievedFn = null,
     resourcesLoaded = false;
 
 function loadResources() {
-    const resolution = determineResolution();
-    console.log("Detected a resolution of " + resolution_names[resolution]);
+    const resolution = detectResolution();
 
     onResourcesRetrievedFn = function() {
         markResourceLoading("sprite_splitting");
@@ -186,7 +185,7 @@ function setLoadResourcesCompleteFn(onComplete) {
     }
 }
 
-function determineResolution() {
+function detectResolution() {
     const width = document.documentElement.clientWidth * window.devicePixelRatio,
           height = document.documentElement.clientHeight * window.devicePixelRatio;
 
