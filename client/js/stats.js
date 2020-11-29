@@ -12,8 +12,7 @@ const STAT_OVERALL = "overall",
       STAT_NETWORK_STATUS = "network_status",
       STAT_MESSAGE = "message",
       STAT_WIN_SCREEN = "win_screen",
-      STAT_OVERLAY = "overlay",
-      STAT_CANVAS_IMAGES = "canvas_images";
+      STAT_OVERLAY = "overlay";
 
 const renderStatCounters = {
     start: getTime(),

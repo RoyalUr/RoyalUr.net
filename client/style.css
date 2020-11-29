@@ -35,10 +35,6 @@ canvas {
     position: absolute;
 }
 
-canvas.canvas_image {
-    position: relative;
-}
-
 body {
     background: rgb(40, 50, 60) url(res/background.u_u.png) repeat;
 }
@@ -184,7 +180,7 @@ body {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
-#play:hover canvas.canvas_image {
+#play:hover img {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
@@ -257,7 +253,7 @@ body {
     vertical-align: middle;
 }
 
-#play .canvas_image {
+#play img {
     display: inline-block;
     vertical-align: middle;
 

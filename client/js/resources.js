@@ -3,13 +3,21 @@
 //
 
 const resolutions = ["u_720", "u_1080", "u_1440", "u_2160", "u_u"];
-const resolution_names = {
-    "u_u": "Full-Res",
-    "u_2160": "4k",
-    "u_1440": "1440p",
-    "u_1080": "1080p",
-    "u_720": "720p"
-};
+const resolution = (function() {
+    const width = document.documentElement.clientWidth * window.devicePixelRatio,
+          height = document.documentElement.clientHeight * window.devicePixelRatio;
+    for (let index = 0; index < resolutions.length; ++index) {
+        const resolution = resolutions[index],
+              wh_specs = resolution.split("_"),
+              res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
+              res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
+        if (res_width > 0 && width > res_width)
+            continue;
+        if (res_height > 0 && height > res_height)
+            continue;
+        return resolution;
+    }
+})();
 
 const imageResources = {
     "logo": "res/logo.png",
@@ -160,11 +168,9 @@ let onResourcesRetrievedFn = null,
     resourcesLoaded = false;
 
 function loadResources() {
-    const resolution = detectResolution();
-
     onResourcesRetrievedFn = function() {
         markResourceLoading("sprite_splitting");
-        splitSpritesIntoImages(resolution);
+        splitSpritesIntoImages();
         markResourceLoaded("sprite_splitting", true);
         resourcesLoaded = true;
         if (onLoadResourcesCompleteFn != null) {
@@ -173,7 +179,7 @@ function loadResources() {
         }
     };
 
-    loadImages(resolution);
+    loadImages();
     loadAudio();
 }
 
@@ -182,24 +188,6 @@ function setLoadResourcesCompleteFn(onComplete) {
         onComplete();
     } else {
         onLoadResourcesCompleteFn = onComplete;
-    }
-}
-
-function detectResolution() {
-    const width = document.documentElement.clientWidth * window.devicePixelRatio,
-          height = document.documentElement.clientHeight * window.devicePixelRatio;
-
-    for (let index = 0; index < resolutions.length; ++index) {
-        const resolution = resolutions[index],
-              wh_specs = resolution.split("_"),
-              res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
-              res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
-
-        if (res_width > 0 && width > res_width)
-            continue;
-        if (res_height > 0 && height > res_height)
-            continue;
-        return resolution;
     }
 }
 
@@ -537,14 +525,18 @@ function loadImageAnnotations() {
     client.send();
 }
 
-function getImageURLWithResolution(url, resolution) {
+function getImageURL(imageKey) {
+    return addResolutionToURL(imageResources[imageKey]);
+}
+
+function addResolutionToURL(url) {
     const extDotIndex = url.lastIndexOf(".");
     return url.substring(0, extDotIndex) + "." + resolution + url.substring(extDotIndex)
 }
 
-function loadImages(resolution) {
+function loadImages() {
     loadImageAnnotations();
-    loadSprites(resolution);
+    loadSprites();
 
     for(let key in imageResources) {
         if(!imageResources.hasOwnProperty(key))
@@ -584,12 +576,12 @@ function loadImages(resolution) {
             console.log(arguments);
         };
 
-        imageResource.image.src = getImageURLWithResolution(imageResources[key], resolution);
+        imageResource.image.src = addResolutionToURL(imageResources[key]);
         loadedImageResources[key] = imageResource;
     }
 }
 
-function loadSprites(resolution) {
+function loadSprites() {
     for(let url in sprites) {
         if(!sprites.hasOwnProperty(url))
             continue;
@@ -626,12 +618,12 @@ function loadSprites(resolution) {
             console.log(arguments);
         };
 
-        spriteResource.image.src = getImageURLWithResolution(url, resolution);
+        spriteResource.image.src = addResolutionToURL(url, resolution);
         loadedSpriteResources[url] = spriteResource;
     }
 }
 
-function splitSpritesIntoImages(resolution) {
+function splitSpritesIntoImages() {
     const spriteAnnotations = getImageAnnotation("sprites");
 
     if (!spriteAnnotations) {
@@ -642,7 +634,7 @@ function splitSpritesIntoImages(resolution) {
     for(let url in sprites) {
         const resource = loadedSpriteResources[url],
               mappings = sprites[url],
-              annotations = spriteAnnotations[getImageURLWithResolution(url, resolution)];
+              annotations = spriteAnnotations[addResolutionToURL(url, resolution)];
 
         if (!resource || !resource.loaded) {
             error("[FATAL] Sprite " + url + " is not loaded, and therefore cannot be split");

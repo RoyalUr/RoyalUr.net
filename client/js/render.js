@@ -42,7 +42,6 @@ function redraw(forceRedraw) {
         callRedraw(STAT_MESSAGE, redrawMessage);
         callRedraw(STAT_WIN_SCREEN, redrawWinScreen);
         callRedraw(STAT_OVERLAY, redrawOverlay);
-        callRedraw(STAT_CANVAS_IMAGES, redrawCanvasImages);
 
         updateElementVisibilities([
             menuDiv, playSelectDiv, boardCanvas, tilesCanvas, exitButton,
@@ -991,35 +990,4 @@ function spawnWinFireworks() {
 
         createFirework(x1, y1, x2, y2, WIN_FIREWORK_SPEED * height, colour.r, colour.g, colour.b);
     }
-}
-
-
-//
-// Rendering of the canvas images.
-//
-
-function redrawCanvasImages(forceRedraw) {
-    if (!forceRedraw)
-        return;
-
-    for (let imageKey in canvasImageElements) {
-        if (!canvasImageElements.hasOwnProperty(imageKey))
-            continue;
-
-        const elements = canvasImageElements[imageKey];
-        for (let index = 0; index < elements.length; ++index) {
-            redrawCanvasImage(imageKey, elements[index]);
-        }
-    }
-}
-
-function redrawCanvasImage(imageKey, element) {
-    if (!element.width)
-        return;
-
-    const image = getImageResource(imageKey, element.width),
-          ctx = element.getContext("2d");
-
-    ctx.clearRect(0, 0, element.width, element.height);
-    ctx.drawImage(image, 0, 0, element.width, element.height);
 }
