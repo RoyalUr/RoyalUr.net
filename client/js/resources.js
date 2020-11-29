@@ -467,27 +467,24 @@ function loadAudio() {
     for(let index = 0; index < audioResources.length; ++index) {
         const resource = audioResources[index],
               resourceName = "audio(" + resource.key + ")";
-
-        markResourceLoading(resourceName);
         
         const instances = (resource.instances !== undefined ? resource.instances : 1),
-              element = document.createElement("audio");
+              element = new Audio();
 
         // The list we are going to fill with the loaded audio elements
         resource.elements = [];
 
         element.preload = "auto";
-        element.onloadeddata = () => {
-            resource.elements.push(element);
-            for (let index = 1; index < instances; ++index) {
-                resource.elements.push(element.cloneNode());
-            }
-            markResourceLoaded(resourceName)
-        };
-        element.onerror = function() {
-            console.log(arguments);
-        };
+        element.addEventListener("error", () => {
+            console.log("There was an error loading audio resource " + resourceName + ": " + element.error);
+        });
         element.src = resource.url;
+        element.load();
+
+        resource.elements.push(element);
+        for (let index = 1; index < instances; ++index) {
+            resource.elements.push(element.cloneNode());
+        }
     }
     
     updateAudioVolumes();
