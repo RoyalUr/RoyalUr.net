@@ -16,6 +16,7 @@ const imageResources = {
     "board": "res/board.png",
     "tile_dark": "res/tile_dark.png",
     "tile_light": "res/tile_light.png",
+    "play_local": "res/button_play_local.png",
     "play_online": "res/button_play_online.png",
     "play_computer": "res/button_play_computer.png",
 };

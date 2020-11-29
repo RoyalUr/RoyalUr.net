@@ -8,7 +8,7 @@ const menuDiv = document.getElementById("menu"),
       playButton = document.getElementById("play"),
       playButtonCanvas = document.getElementById("play-canvas"),
       playButtonCtx = playButtonCanvas.getContext("2d"),
-      playButtonTiles = playButton.getElementsByTagName("img"),
+      playButtonTiles = playButton.getElementsByClassName("canvas_image"),
       learnButton = document.getElementById("learn"),
       learnButtonCanvas = document.getElementById("learn-canvas"),
       learnButtonCtx = learnButtonCanvas.getContext("2d"),
@@ -38,6 +38,15 @@ const messageContainerElement = document.getElementById("message-container"),
 
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
+
+const canvasImagesByClass = {
+    "logo_canvas_image": "logo",
+    "play_local_canvas_image": "play_local",
+    "play_online_canvas_image": "play_online",
+    "play_computer_canvas_image": "play_computer",
+    "tile_dark_canvas_image": "tile_dark",
+};
+const canvasImageElements = {};
 
 
 let width = NaN,
@@ -96,6 +105,22 @@ function setupElements() {
     watchButton.addEventListener("mouseover", function() { menuState.watchButton = BUTTON_STATE_HOVERED; });
     watchButton.addEventListener("mouseout", function() { menuState.watchButton = BUTTON_STATE_INACTIVE; });
 
+    for (let className in canvasImagesByClass) {
+        if (!canvasImagesByClass.hasOwnProperty(className))
+            continue;
+
+        const imageKey = canvasImagesByClass[className],
+              elements = document.getElementsByClassName(className);
+        canvasImageElements[imageKey] = elements;
+
+        for (let index = 0; index < elements.length; ++index) {
+            const element = elements[index],
+                  onResizeFn = () => {resizeCanvasImage(imageKey, element);redrawCanvasImages(true);};
+
+            new ResizeObserver(onResizeFn).observe(element);
+        }
+    }
+
     function updateMouse(loc, down) {
         mouseLoc = loc;
 
@@ -153,25 +178,6 @@ function setupElements() {
         game.onTileRelease(hoveredTile);
         updateMouse(mouseLoc, false);
     };
-
-    // addTwitterButton();
-}
-
-function addTwitterButton() {
-    const button = document.getElementById("twitter-button"),
-          link = document.createElement("a"),
-          script = document.createElement("script");
-
-    link.setAttribute("href", "https://twitter.com/soth_dev?ref_src=twsrc%5Etfw");
-    link.setAttribute("class", "twitter-follow-button");
-    link.setAttribute("data-show-count", "false");
-
-    button.appendChild(link);
-
-    script.setAttribute("charset", "utf-8");
-    script.setAttribute("src", "https://platform.twitter.com/widgets.js");
-
-    button.appendChild(script);
 }
 
 function toScreenPixels(size) {
@@ -199,6 +205,7 @@ function resize() {
     resizeScores();
     resizeDice();
     resizeOverlay();
+    resizeCanvasImages();
 
     redraw(true);
 }
@@ -206,7 +213,7 @@ function resize() {
 
 
 //
-// MENU
+// Layout of the menu screen.
 //
 
 const menuWidthOnHeightRatio = 760 / 840,
@@ -266,7 +273,7 @@ function resizeMenu() {
 
 
 //
-// BOARD
+// Layout of the board and tiles.
 //
 
 const boardPadding = 30,
@@ -486,7 +493,7 @@ function canvasToTile(screenLoc) {
 
 
 //
-// SCORES
+// Layout of the player tiles and scores.
 //
 
 const leftPlayerRenderTarget = initPlayerRenderTarget("left"),
@@ -574,7 +581,7 @@ function resizeScores() {
 
 
 //
-// DICE
+// Layout of the dice.
 //
 
 const diceCanvas = document.getElementById("dice"),
@@ -614,7 +621,7 @@ function layoutDice() {
 
 
 //
-// OVERLAY
+// Layout of the fireworks overlay.
 //
 
 let overlayWidth = NaN,
@@ -626,4 +633,38 @@ function resizeOverlay() {
 
     overlayCanvas.width = overlayWidth;
     overlayCanvas.height = overlayHeight;
+}
+
+
+//
+// Layout of the canvas images.
+//
+
+function resizeCanvasImages() {
+    for (let imageKey in canvasImageElements) {
+        if (!canvasImageElements.hasOwnProperty(imageKey))
+            continue;
+
+        const elements = canvasImageElements[imageKey];
+        for (let index = 0; index < elements.length; ++index) {
+            resizeCanvasImage(imageKey, elements[index]);
+        }
+    }
+}
+
+function resizeCanvasImage(imageKey, element) {
+    const image = getImageResource(imageKey);
+    let elemWidth = element.clientWidth,
+        elemHeight = element.clientHeight;
+
+    if (element.classList.contains("maintain-aspect-ratio-by-width")) {
+        elemHeight = image.height / image.width * elemWidth;
+        element.style.height = elemHeight + "px";
+    } else if (element.classList.contains("maintain-aspect-ratio-by-height")) {
+        elemWidth = image.width / image.height * elemHeight;
+        element.style.width = elemWidth + "px";
+    }
+
+    element.width = Math.ceil(fromScreenPixels(elemWidth));
+    element.height = Math.ceil(fromScreenPixels(elemHeight));
 }

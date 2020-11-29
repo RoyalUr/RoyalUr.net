@@ -35,41 +35,28 @@ canvas {
     position: absolute;
 }
 
-@media all and (max-height: 720px) and (min-width:1px)
-{
-    body {
-        background: rgb(40, 50, 60) url(res/background.u_720.png) repeat;
-        background-size: 260px;
-    }
-}
-@media all and (max-height: 1080px) and (min-height : 721px) and (min-width:1px)
-{
-    body {
-        background: rgb(40, 50, 60) url(res/background.u_1080.png) repeat;
-        background-size: 300px;
-    }
-}
-@media all and (max-height: 1440px) and (min-height : 1081px) and (min-width:1px)
-{
-    body {
-        background: rgb(40, 50, 60) url(res/background.u_1440.png) repeat;
-        background-size: 340px;
-    }
-}
-@media all and (max-height: 2160px) and (min-height : 1441px) and (min-width:1px)
-{
-    body {
-        background: rgb(40, 50, 60) url(res/background.u_2160.png) repeat;
-        background-size: 380px;
-    }
+canvas.canvas_image {
+    position: relative;
 }
 
-@media all and (min-height : 2161px) and (min-width:1px)
-{
-    body {
-        background: rgb(40, 50, 60) url(res/background.u_u.png) repeat;
-        background-size: 420px;
-    }
+body {
+    background: rgb(40, 50, 60) url(res/background.u_u.png) repeat;
+}
+
+@media all and (max-height: 720px) and (min-width:1px) {
+    body { background-size: 260px; }
+}
+@media all and (max-height: 1080px) and (min-height : 721px) and (min-width:1px) {
+    body { background-size: 300px; }
+}
+@media all and (max-height: 1440px) and (min-height : 1081px) and (min-width:1px) {
+    body { background-size: 340px; }
+}
+@media all and (max-height: 2160px) and (min-height : 1441px) and (min-width:1px) {
+    body { background-size: 380px; }
+}
+@media all and (min-height : 2161px) and (min-width:1px) {
+    body { background-size: 420px; }
 }
 
 
@@ -189,12 +176,16 @@ canvas {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
-#play img, #play span, #play canvas {
+#play span, #play canvas {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
-#play:hover span, #play:hover canvas {
+#play:hover canvas {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
+}
+
+#play:hover canvas.canvas_image {
+    filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
 #menu-outer {
@@ -266,7 +257,7 @@ canvas {
     vertical-align: middle;
 }
 
-#play img {
+#play .canvas_image {
     display: inline-block;
     vertical-align: middle;
 
@@ -349,7 +340,8 @@ canvas {
 .play-select-option:hover .play-select-scaling {
     width: 100%;
     height: 100%;
-    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .play-select-text {

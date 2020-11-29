@@ -24,12 +24,12 @@
         <!-- MENU -->
         <div id="menu-outer">
             <div id="menu">
-                <img id="title" src="../res/logo.png" alt="Logo"/>
+                <canvas id="title" class="logo_canvas_image canvas_image maintain-aspect-ratio-by-width"></canvas>
 
                 <div id="play" class="menu-button">
-                    <img src="res/tile_dark.png"  alt="play"/>
+                    <canvas class="tile_dark_canvas_image canvas_image"></canvas>
                     <canvas id="play-canvas"></canvas>
-                    <img src="res/tile_dark.png"  alt="play"/>
+                    <canvas class="tile_dark_canvas_image canvas_image"></canvas>
                 </div>
 
                 <a id="learn" class="menu-button shadow" href="https://youtu.be/WZskjLq040I?t=222" target="_blank">
@@ -45,17 +45,17 @@
         <div id="play-select">
             <div id="play-local" class="play-select-option"><div class="play-select-scaling">
                 <div class="play-select-text">Local</div>
-                <img src="res/button_play_local.png" class="play-select-icon" alt="play locally" />
+                <canvas class="play-select-icon play_local_canvas_image canvas_image maintain-aspect-ratio-by-width"></canvas>
             </div></div>
 
             <div id="play-online" class="play-select-option"><div class="play-select-scaling">
                 <div class="play-select-text">Online</div>
-                <img src="res/button_play_online.png" class="play-select-icon" alt="play online" />
+                <canvas class="play-select-icon play_online_canvas_image canvas_image maintain-aspect-ratio-by-width"></canvas>
             </div></div>
 
             <div id="play-computer" class="play-select-option"><div class="play-select-scaling">
                 <div class="play-select-text">Computer</div>
-                <img src="res/button_play_computer.png" class="play-select-icon" alt="play computer" />
+                <canvas class="play-select-icon play_computer_canvas_image canvas_image maintain-aspect-ratio-by-width"></canvas>
             </div></div>
 
             <div id="play-select-description">
