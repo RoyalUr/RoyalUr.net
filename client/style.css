@@ -78,6 +78,19 @@ body {
     transform: translate(-50%, -50%) scale(1);
 }
 
+#loading span {
+    position: fixed;
+    top: 50%;
+    width: 100%;
+    -webkit-transform: translate(0, -180px) scale(1);
+    transform: translate(0, -180px) scale(1);
+
+    color: white;
+    font: 36px Serif;
+    text-align: center;
+    vertical-align: baseline;
+}
+
 .stroke-still {
     stroke: #232323;
 }
