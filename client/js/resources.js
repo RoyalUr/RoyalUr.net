@@ -159,6 +159,137 @@ const audioPacks = {
 
 
 //
+// Resource Types.
+//
+
+function Resource(name, url) {
+    this.__class_name__ = "Resource";
+    this.name = name;
+    this.url = url;
+
+    this.loading = false;
+    this.loaded = false;
+    this.errored = false;
+    this.error = null;
+}
+Resource.prototype.load = function() {
+    this.loading = true;
+    this.loaded = false;
+    this.errored = false;
+    this.error = null;
+    this._load();
+};
+Resource.prototype._load = function() { throw "load is not implemented within " + this.__class_name__; };
+Resource.prototype.onLoad = function() {
+    this.loading = false;
+    this.loaded = true;
+    this.errored = false;
+    this.error = null;
+};
+Resource.prototype.onError = function(error) {
+    this.loading = false;
+    this.loaded = false;
+    this.errored = true;
+    this.error = error;
+};
+
+
+/**
+ * Annotations about other resources.
+ */
+function AnnotationsResource(name, url) {
+    Resource.call(this, name, url);
+    this.__class_name__ = "AnnotationsResource";
+}
+AnnotationsResource.prototype = Object.create(Resource.prototype);
+Object.defineProperty(AnnotationsResource.prototype, "constructor", {
+    value: AnnotationsResource, enumerable: false, writable: true
+});
+
+AnnotationsResource.prototype._load = function() {
+const client = new XMLHttpRequest();
+    client.onreadystatechange = function() {
+        if (this.readyState !== 4)
+            return;
+
+        if (this.status !== 200) {
+            this.onError("Error " + this.status + " loading image annotations: " + this.responseText);
+            return;
+        }
+
+        this.data = JSON.parse(this.responseText);
+        this.onLoad();
+    }.bind(client);
+    client.open('GET', this.url);
+    client.send();
+};
+
+
+/**
+ * Sounds to be played.
+ */
+function AudioResource(name, url, instances=1, volume=1) {
+    Resource.call(this, name, url);
+    this.__class_name__ = "AudioResource";
+    this.volume = volume;
+    this.instances = instances;
+}
+AudioResource.prototype = Object.create(Resource.prototype);
+Object.defineProperty(AudioResource.prototype, "constructor", {
+    value: AudioResource, enumerable: false, writable: true
+})
+
+AudioResource.prototype._load = function () {
+    const resource = audioResources[index],
+          resourceName = "audio(" + resource.key + ")";
+
+    const instances = (resource.instances !== undefined ? resource.instances : 1),
+          element = new Audio();
+
+    // The list we are going to fill with the loaded audio elements
+    resource.elements = [];
+
+    element.preload = "auto";
+    element.addEventListener("error", () => {
+        console.log("There was an error loading audio resource " + resourceName + ": " + element.error);
+    });
+    element.src = resource.url;
+    element.load();
+
+    resource.elements.push(element);
+    for (let index = 1; index < instances; ++index) {
+        resource.elements.push(element.cloneNode());
+    }
+};
+
+
+/**
+ * An image to be displayed.
+ */
+function ImageResource(name, url) {
+    Resource.call(this, name, url);
+    this.__class_name__ = "ImageResource";
+}
+ImageResource.prototype = Object.create(Resource.prototype);
+Object.defineProperty(ImageResource.prototype, "constructor", {
+    value: ImageResource, enumerable: false, writable: true
+})
+
+
+/**
+ * An image that gets split up into multiple smaller images.
+ */
+function SpriteResource(name, url) {
+    ImageResource.call(this, name, url);
+    this.__class_name__ = "SpriteResource";
+}
+SpriteResource.prototype = Object.create(ImageResource.prototype);
+Object.defineProperty(SpriteResource.prototype, "constructor", {
+    value: SpriteResource, enumerable: false, writable: true
+})
+
+
+//
 // Management of the loading.
 //
 
@@ -731,20 +862,6 @@ function getImageResource(key, width) {
     return imageResource.scaled[scaledowns];
 }
 
-function getImageResourceFromHeight(key, height) {
-    const imageResource = loadedImageResources[key];
-
-    if(!imageResource) {
-        error("Cannot find image with key \"" + key + "\"");
-        return null;
-    }
-
-    const scale = height / imageResource.height,
-          width = scale * imageResource.width;
-
-    return getImageResource(key, width);
-}
-
 function renderResource(width, height, renderFunction) {
     if (width < 1 || height < 1)
         throw "Width and height must both be at least 1, was given " + width + "x" + height;
@@ -758,10 +875,6 @@ function renderResource(width, height, renderFunction) {
     ctx.imageSmoothingQuality = "high";
     renderFunction(ctx, canvas);
     return canvas;
-}
-
-function calcImageWidth(image, height) {
-    return Math.ceil(image.width / image.height * height);
 }
 
 function calcImageHeight(image, width) {

@@ -23,6 +23,12 @@ function shuffle(array) {
     return array;
 }
 
+function unimplemented(name) {
+    return function() {
+        error(name + " is not implemented within " + this.__class_name__);
+    };
+}
+
 
 
 //

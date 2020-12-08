@@ -265,12 +265,11 @@ function updateTileMove(time) {
 
 function finishTileMove() {
     const onComplete = tileMove.onComplete,
-        fromTile = tileMove.fromTile,
-        toTile = tileMove.toTile,
-        replacingOwner = tileMove.replacingOwner;
+          fromTile = tileMove.fromTile,
+          toTile = tileMove.toTile,
+          replacingOwner = tileMove.replacingOwner;
 
     clearTileMove();
-
     if (onComplete !== null) {
         onComplete(fromTile, toTile);
     }
