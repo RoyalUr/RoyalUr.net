@@ -280,8 +280,11 @@ function tryTakeSingleAction(event, keyIsSpace) {
             return;
 
         // See if there is a single tile that can be moved, or if space is pressed any available moves.
-        const currentPlayer = getActivePlayer(),
-              availableMoves = board.getAllValidMoves(currentPlayer.playerNo, countDiceUp());
+        const currentPlayer = getActivePlayer();
+        if (!currentPlayer)
+            return;
+
+        const availableMoves = board.getAllValidMoves(currentPlayer.playerNo, countDiceUp());
         if (availableMoves.length === 0)
             return;
 
