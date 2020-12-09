@@ -32,6 +32,8 @@ function setup() {
         redrawLoop();
         finishSetup();
     });
+
+    window.onbeforeunload = onBeforeUnload;
 }
 
 function finishSetup() {
@@ -58,6 +60,25 @@ function reportStartupPerformance() {
     report += "(" + (Math.round(setupDuration * 1000 * 10) / 10) + "ms)\n ";
 
     console.log(report);
+}
+
+function getExitConfirmation() {
+    if (!isOnScreen(SCREEN_GAME))
+        return null;
+    if (!game || !game.exitLosesGame)
+        return "Are you sure you wish to exit?";
+    return "Your game will be lost if you exit. Are you sure you wish to exit?";
+}
+
+function onBeforeUnload(event) {
+    event = event || window.event;
+    const message = getExitConfirmation();
+    if (!message)
+        return;
+
+    event.preventDefault();
+    event.returnValue = message;
+    return message;
 }
 
 
@@ -109,6 +130,10 @@ function onPlayUnhover() {
 
 function onExitClick(event) {
     event.stopPropagation();
+    const message = getExitConfirmation();
+    if (message && !window.confirm(message))
+        return;
+
     switchToScreen(SCREEN_MENU);
 }
 

@@ -12,12 +12,15 @@ let computerIntelligence = 5,
 // The parent Game class that each different play option derives from.
 //
 
-function Game() {
+function Game(exitLosesGame) {
     this.__class_name__ = "Game";
+    this.exitLosesGame = exitLosesGame;
 
     this.lastTileClickWasSelect = false;
     this.lastTileReleaseTime = LONG_TIME_AGO;
     this.lastTileReleaseTile = [-1, -1];
+
+    layoutDice();
 }
 
 Game.prototype.onPacketMessage = unimplemented("onPacketMessage");
@@ -140,7 +143,7 @@ Game.prototype.performMove = function(from, noAnimation) {
 //
 
 function OnlineGame() {
-    Game.apply(this);
+    Game.call(this, false);
     this.__class_name__ = "OnlineGame";
 }
 
@@ -229,7 +232,7 @@ OnlineGame.prototype.onFinishMove = function() { /* Do nothing. */ };
 //
 
 function BrowserGame() {
-    Game.apply(this);
+    Game.call(this, true);
     this.__class_name__ = "BrowserGame";
 }
 BrowserGame.prototype = Object.create(Game.prototype);
@@ -254,7 +257,7 @@ BrowserGame.prototype.onDiceClick = function() {
 //
 
 function ComputerGame() {
-    BrowserGame.apply(this);
+    BrowserGame.call(this);
     this.__class_name__ = "ComputerGame";
 
     setOwnPlayer(randBool() ? "light" : "dark");
@@ -390,7 +393,7 @@ ComputerGame.prototype.performComputerMove = function(from) {
 //
 
 function LocalGame() {
-    BrowserGame.apply(this);
+    BrowserGame.call(this);
     this.__class_name__ = "LocalGame";
 
     // Setup the game.
