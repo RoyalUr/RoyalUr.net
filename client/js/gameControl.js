@@ -24,7 +24,6 @@ Game.prototype.onPacketMessage = unimplemented("onPacketMessage");
 Game.prototype.onPacketMove = unimplemented("onPacketMove");
 Game.prototype.onPacketState = unimplemented("onPacketState");
 Game.prototype.onDiceClick = unimplemented("onDiceClick");
-Game.prototype.performMove = unimplemented("performMove");
 
 Game.prototype.onTileHover = function(loc) {
     if(isAwaitingMove() && !isTileSelected() && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
@@ -37,7 +36,7 @@ Game.prototype.onTileClick = function(loc) {
     if(isTileSelected()) {
         const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
         if(vecEquals(loc, to)) {
-            this.performMove();
+            this.performMove(selectedTile);
             return;
         }
     }
@@ -65,7 +64,7 @@ Game.prototype.onTileRelease = function(loc) {
         && isAwaitingMove()
         && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
 
-        this.performMove();
+        this.performMove(selectedTile);
         return;
     }
 
@@ -83,7 +82,7 @@ Game.prototype.onTileRelease = function(loc) {
     if(isTileSelected(draggedTile)
         && board.isValidMoveFrom(ownPlayer.playerNo, draggedTile, diceValue)
         && vecEquals(loc, getTileMoveToLocation(ownPlayer.playerNo, draggedTile, diceValue))) {
-        this.performMove(true);
+        this.performMove(selectedTile, true);
     }
 };
 Game.prototype.setupStartTiles = function() {
@@ -103,6 +102,35 @@ Game.prototype.setupStartTiles = function() {
 Game.prototype.clearStartTiles = function() {
     board.setTile(LIGHT_START, TILE_EMPTY);
     board.setTile(DARK_START, TILE_EMPTY);
+};
+Game.prototype.onFinishMove = unimplemented("onFinishMove");
+Game.prototype.performMove = function(from, noAnimation) {
+    const diceValue = countDiceUp(),
+          fromTile = board.getTile(from),
+          player = getPlayer(fromTile),
+          to = getTileMoveToLocation(fromTile, from, diceValue),
+          toTile = board.getTile(to);
+
+    // Moving a new piece onto the board.
+    if (vecEquals(from, getStartTile(fromTile))) {
+        takeTile(player);
+    }
+
+    // Taking out a piece.
+    if (toTile !== TILE_EMPTY) {
+        addTile(getPlayer(toTile));
+    }
+
+    animateTileMove(from, to, this.onFinishMove.bind(this));
+    board.setTile(to, fromTile);
+    board.setTile(from, TILE_EMPTY);
+
+    unselectTile();
+    player.active = false;
+    this.clearStartTiles();
+    if (noAnimation) {
+        finishTileMove();
+    }
 };
 
 
@@ -163,7 +191,7 @@ OnlineGame.prototype.onPacketState = function(state) {
             startRollingDice();
         }
 
-        dice.callback = this.setupStartTiles.bind(this);
+        dice.callback = this.onFinishDice.bind(this);
         setDiceValues(state.roll);
     } else {
         setWaitingForDiceRoll();
@@ -171,32 +199,28 @@ OnlineGame.prototype.onPacketState = function(state) {
 };
 OnlineGame.prototype.onDiceClick = function() {
     if(!dice.active || dice.rolling || !ownPlayer.active)
-        return;
+        return false;
 
     startRollingDice();
     sendPacket(writeDiceRollPacket());
+    return true;
 };
-OnlineGame.prototype.performMove = function(noAnimation) {
-    const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
+OnlineGame.prototype.onFinishDice = function () {
+    this.setupStartTiles();
 
-    animateTileMove(selectedTile, to);
-    board.setTile(to, board.getTile(selectedTile));
-    board.setTile(selectedTile, TILE_EMPTY);
-
-    if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
-        takeTile(ownPlayer);
+    // If the player has only one available move, select it for them.
+    if (ownPlayer.active) {
+        const availableMoves = board.getAllValidMoves(ownPlayer.playerNo, countDiceUp());
+        if (availableMoves.length === 1) {
+            selectTile(availableMoves[0]);
+        }
     }
-
-    sendPacket(writeMovePacket(selectedTile));
-    unselectTile();
-    console.log(noAnimation);
-    if (noAnimation) {
-        finishTileMove();
-    }
-
-    ownPlayer.active = false;
-    this.clearStartTiles();
 };
+OnlineGame.prototype.performMove = function(from, noAnimation) {
+    Game.prototype.performMove.call(this, from, noAnimation);
+    sendPacket(writeMovePacket(from));
+};
+OnlineGame.prototype.onFinishMove = function() { /* Do nothing. */ };
 
 
 
@@ -212,31 +236,15 @@ BrowserGame.prototype = Object.create(Game.prototype);
 Object.defineProperty(BrowserGame.prototype, "constructor", {
     value: BrowserGame, enumerable: false, writable: true
 });
+BrowserGame.prototype.onFinishDice = unimplemented("onFinishDice");
+BrowserGame.prototype.onDiceClick = function() {
+    if(!dice.active || dice.rolling || !ownPlayer.active)
+        return false;
 
-BrowserGame.prototype.onFinishMove = unimplemented("onFinishMove");
-BrowserGame.prototype.performMove = function(noAnimation) {
-    const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp()),
-          toTile = board.getTile(to);
-
-    if (toTile !== TILE_EMPTY) {
-        addTile(getPlayer(toTile));
-    }
-
-    animateTileMove(selectedTile, to, this.onFinishMove.bind(this));
-    board.setTile(to, board.getTile(selectedTile));
-    board.setTile(selectedTile, TILE_EMPTY);
-
-    if(vecEquals(selectedTile, getStartTile(ownPlayer.playerNo))) {
-        takeTile(ownPlayer);
-    }
-
-    unselectTile();
-    ownPlayer.active = false;
-    this.clearStartTiles();
-
-    if (noAnimation) {
-        finishTileMove();
-    }
+    startRollingDice();
+    dice.callback = this.onFinishDice.bind(this);
+    setDiceValues(generateRandomDiceValues());
+    return true;
 };
 
 
@@ -273,14 +281,6 @@ ComputerGame.prototype.init = function() {
     board.clearTiles();
     resetDice();
     this.setupRoll(true);
-};
-ComputerGame.prototype.onDiceClick = function() {
-    if(!dice.active || dice.rolling || !ownPlayer.active)
-        return;
-
-    startRollingDice();
-    dice.callback = this.onFinishDice.bind(this);
-    setDiceValues(generateRandomDiceValues());
 };
 ComputerGame.prototype.updateActivePlayer = function() {
     ownPlayer.active = this.isHumansTurn();
@@ -337,6 +337,8 @@ ComputerGame.prototype.onFinishDice = function() {
             this.setupRoll();
         }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
         return;
+    } else if (availableMoves.length === 1 && this.isHumansTurn()) {
+        selectTile(availableMoves[0]);
     }
 
     if (this.isComputersTurn()) {
@@ -418,14 +420,6 @@ LocalGame.prototype.init = function() {
     resetDice();
     this.setupRoll();
 };
-LocalGame.prototype.onDiceClick = function() {
-    if(!dice.active || dice.rolling || !ownPlayer.active)
-        return;
-
-    startRollingDice();
-    dice.callback = this.onFinishDice.bind(this);
-    setDiceValues(generateRandomDiceValues());
-};
 LocalGame.prototype.updateActivePlayer = function() {
     leftPlayer.active = this.isLeftTurn();
     rightPlayer.active = this.isRightTurn();
@@ -476,5 +470,7 @@ LocalGame.prototype.onFinishDice = function() {
             this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
             this.setupRoll();
         }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
+    } else if (availableMoves.length === 1) {
+        selectTile(availableMoves[0]);
     }
 };

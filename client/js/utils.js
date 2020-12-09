@@ -440,7 +440,6 @@ function Vector2D(x, y) {
     this.x = x;
     this.y = y;
 }
-
 Vector2D.prototype.toString = function() {
     return "Vector2D(" + this.x + ", " + this.y + ")";
 };

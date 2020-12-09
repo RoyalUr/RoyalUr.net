@@ -234,17 +234,55 @@ function handleKeyPress(event) {
     if (event.defaultPrevented)
         return;
 
-    const key = event.key || event.keyCode;
-    if (key === "Enter" || key === 13 || key === " " || key === "Space" || key === 32) {
-        if (game) {
-            event.stopPropagation();
-            game.onDiceClick();
-        } else if (isOnScreen(SCREEN_MENU)) {
-            onPlayClick(event);
-        }
+    const key = event.key || event.keyCode,
+          keyIsEnter = (key === "Enter" || key === 13),
+          keyIsSpace = (key === " " || key === "Space" || key === 32);
+
+    if (keyIsEnter || keyIsSpace) {
+        tryTakeSingleAction(event, keyIsSpace);
     } else if (key === "Escape" || key === "Esc" || key === 27) {
         if (screenState.exitFade.isFadeIn) {
             onExitClick(event);
         }
+    }
+}
+
+function tryTakeSingleAction(event, keyIsSpace) {
+    if (game) {
+        event.stopPropagation();
+        // Try roll the dice.
+        if (game.onDiceClick())
+            return;
+
+        // See if there is a single tile that can be moved, or if space is pressed any available moves.
+        const currentPlayer = getActivePlayer(),
+              availableMoves = board.getAllValidMoves(currentPlayer.playerNo, countDiceUp());
+        if (availableMoves.length === 0)
+            return;
+
+        // Sort the available moves so that they are in a predictable order.
+        const playerPath = getTilePath(currentPlayer.playerNo);
+        availableMoves.sort(function(from1, from2) {
+            return vecListIndexOf(playerPath, from1) - vecListIndexOf(playerPath, from2);
+        });
+
+        // If space is pressed we cycle through available tiles to move.
+        if (keyIsSpace && availableMoves.length > 1) {
+            const selectedIndex = vecListIndexOf(availableMoves, selectedTile),
+                  selectIndex = (selectedIndex + 1) % availableMoves.length;
+            selectTile(availableMoves[selectIndex]);
+            return;
+        }
+
+        // If there is one available move, or enter is pressed, try move the selected tile.
+        if (!isTileSelected()) {
+            if (availableMoves.length === 1) {
+                selectTile(availableMoves[0]);
+            }
+            return;
+        }
+        game.performMove(selectedTile);
+    } else if (isOnScreen(SCREEN_MENU)) {
+        onPlayClick(event);
     }
 }
