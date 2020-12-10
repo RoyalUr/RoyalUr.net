@@ -304,14 +304,14 @@ def create_sprites(target_folder, comp_spec, *, prefix=""):
     for sprite_to_rel, sprite in comp_spec.sprites.items():
         for size_class, sprite_instance in sprite.get_scaled_copies().items():
             # Insert the size class into the path.
-            to_rel_path, to_rel_ext = os.path.splitext(sprite_to_rel)
-            to_rel = "{}.{}{}".format(to_rel_path, size_class, to_rel_ext)
+            to_rel = "{}.{}".format(sprite_to_rel, size_class)
 
             # Save the image and store its annotations.
             sprite_annotations[to_rel] = sprite_instance.annotations
             output_file = os.path.join(target_folder, to_rel)
             os.makedirs(os.path.dirname(output_file), exist_ok=True)
-            sprite_instance.image.save(output_file)
+            sprite_instance.image.save(output_file + ".png")
+            sprite_instance.image.save(output_file + ".webp")
             print("{}Created {}".format(prefix, to_rel))
 
     return sprite_annotations
@@ -335,16 +335,17 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
         # Copy the original image.
         output_file = os.path.join(target_folder, image.to_rel)
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        image.get_original().save(output_file)
+        image.get_original().save(output_file + ".png")
+        image.get_original().save(output_file + ".webp")
         print("{}Copied {}".format(prefix, image.to_rel))
 
         for size_class, scaled_image in image.get_scaled_copies().items():
             # Insert the size class into the path.
-            to_rel_path, to_rel_ext = os.path.splitext(image.to_rel)
-            to_rel = "{}.{}{}".format(to_rel_path, size_class, to_rel_ext)
+            to_rel = "{}.{}".format(image.to_rel, size_class)
 
             # Save the image.
-            scaled_image.save(os.path.join(target_folder, to_rel))
+            scaled_image.save(os.path.join(target_folder, to_rel) + ".png")
+            scaled_image.save(os.path.join(target_folder, to_rel) + ".webp")
             print("{}Created {}".format(prefix, to_rel))
 
     # Create the favicon images.

@@ -87,7 +87,7 @@
 
   "images": {
     "res/logo.png": {
-      "dest": "res/logo.png",
+      "dest": "res/logo",
       "sizes": {
         "u_2160": "auto x 768",
         "u_1440": "auto x 512",
@@ -96,7 +96,7 @@
       }
     },
     "res/wood-blue-1.png": {
-      "dest": "res/background.png",
+      "dest": "res/background",
       "sizes": {
         "u_u": "420 x 420",
         "u_2160": "380 x 380",
@@ -106,7 +106,7 @@
       }
     },
     "res/board_light.png": {
-      "dest": "res/board.png",
+      "dest": "res/board",
       "sizes": {
         "u_2160": "auto x 2304",
         "u_1440": "auto x 1536",
@@ -116,24 +116,24 @@
     },
 
     "res/darkTile.png": {
-      "dest": "res/tile_dark.png",
+      "dest": "res/tile_dark",
       "size_group": "tile"
     },
     "res/lightTile.png": {
-      "dest": "res/tile_light.png",
+      "dest": "res/tile_light",
       "size_group": "tile"
     },
 
     "res/buttons/play_local.png": {
-      "dest": "res/button_play_local.png",
+      "dest": "res/button_play_local",
       "size_group": "play-select-button"
     },
     "res/buttons/play_online.png": {
-      "dest": "res/button_play_online.png",
+      "dest": "res/button_play_online",
       "size_group": "play-select-button"
     },
     "res/buttons/play_computer.png": {
-      "dest": "res/button_play_computer.png",
+      "dest": "res/button_play_computer",
       "size_group": "play-select-button"
     },
 
@@ -155,19 +155,19 @@
   },
 
   "sprites": {
-    "res/play_button.png": [
+    "res/play_button": [
       "res/buttons/play.png",
       "res/buttons/play_active.png"
     ],
-    "res/learn_button.png": [
+    "res/learn_button": [
       "res/buttons/learn.png",
       "res/buttons/learn_active.png"
     ],
-    "res/watch_button.png": [
+    "res/watch_button": [
       "res/buttons/watch.png",
       "res/buttons/watch_active.png"
     ],
-    "res/dice.png": [
+    "res/dice": [
       "res/dice/up1.png",
       "res/dice/up2.png",
       "res/dice/up3.png",

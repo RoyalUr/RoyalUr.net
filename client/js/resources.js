@@ -18,32 +18,42 @@ const resolution = (function() {
         return resolution;
     }
 })();
+const imageExtension = (function() {
+    // Check if Google WebP is supported.
+    const webpCanvas = document.createElement('canvas');
+    if (!!(webpCanvas.getContext && webpCanvas.getContext('2d'))) {
+        const webpData = webpCanvas.toDataURL('image/webp');
+        if (webpData.indexOf('data:image/webp') === 0)
+            return "webp";
+    }
+    return "png";
+})();
 
 const imageResources = {
-    "logo": "res/logo.png",
-    "board": "res/board.png",
-    "tile_dark": "res/tile_dark.png",
-    "tile_light": "res/tile_light.png",
-    "play_local": "res/button_play_local.png",
-    "play_online": "res/button_play_online.png",
-    "play_computer": "res/button_play_computer.png",
+    "logo": "res/logo",
+    "board": "res/board",
+    "tile_dark": "res/tile_dark",
+    "tile_light": "res/tile_light",
+    "play_local": "res/button_play_local",
+    "play_online": "res/button_play_online",
+    "play_computer": "res/button_play_computer",
 };
 
 const sprites = {
-    "res/play_button.png": {
+    "res/play_button": {
         "res/buttons/play.png": "play",
         "res/buttons/play_active.png": "play_active"
     },
-    "res/learn_button.png": {
+    "res/learn_button": {
         "res/buttons/learn.png": "learn",
         "res/buttons/learn_active.png": "learn_active"
     },
-    "res/watch_button.png": {
+    "res/watch_button": {
         "res/buttons/watch.png": "watch",
         "res/buttons/watch_active.png": "watch_active"
     },
 
-    "res/dice.png": {
+    "res/dice": {
         "res/dice/up1.png": "diceUp1",
         "res/dice/up2.png": "diceUp2",
         "res/dice/up3.png": "diceUp3",
@@ -654,12 +664,14 @@ function loadImageAnnotations() {
 }
 
 function getImageURL(imageKey) {
-    return addResolutionToURL(imageResources[imageKey]);
+    return completeURL(imageResources[imageKey]);
 }
 
-function addResolutionToURL(url) {
-    const extDotIndex = url.lastIndexOf(".");
-    return url.substring(0, extDotIndex) + "." + resolution + url.substring(extDotIndex)
+function completeURL(url, extension) {
+    if (extension === undefined) {
+        extension = imageExtension;
+    }
+    return url + "." + resolution + (extension.length === 0 ? "" : "." + extension);
 }
 
 function loadImages() {
@@ -704,7 +716,7 @@ function loadImages() {
             console.log(arguments);
         };
 
-        imageResource.image.src = addResolutionToURL(imageResources[key]);
+        imageResource.image.src = completeURL(imageResources[key]);
         loadedImageResources[key] = imageResource;
     }
 }
@@ -746,7 +758,7 @@ function loadSprites() {
             console.log(arguments);
         };
 
-        spriteResource.image.src = addResolutionToURL(url, resolution);
+        spriteResource.image.src = completeURL(url);
         loadedSpriteResources[url] = spriteResource;
     }
 }
@@ -762,7 +774,7 @@ function splitSpritesIntoImages() {
     for(let url in sprites) {
         const resource = loadedSpriteResources[url],
               mappings = sprites[url],
-              annotations = spriteAnnotations[addResolutionToURL(url, resolution)];
+              annotations = spriteAnnotations[completeURL(url, "")];
 
         if (!resource || !resource.loaded) {
             error("[FATAL] Sprite " + url + " is not loaded, and therefore cannot be split");
