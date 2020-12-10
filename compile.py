@@ -51,7 +51,7 @@ def execute_piped_commands(*commands, prefix=""):
         pipe_out = subprocess.PIPE
         if index == len(commands) - 1 and output_file is not None:
             pipe_out = open(output_file, 'w')
-            command_print += "\n" + prefix + " > " + output_file
+            command_print += " > " + output_file
 
         print(prefix + command_print)
         if last_process is None:
