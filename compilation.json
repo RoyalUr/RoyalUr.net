@@ -1,4 +1,9 @@
 {
+  "css": {
+    "source": "client/style.css",
+    "dest": "style.css"
+  },
+
   "javascript": {
     "index.js": [
       "client/js/lib/reconnecting-websocket.js",
@@ -27,7 +32,6 @@
     "client/.htaccess": ".htaccess",
     "client/index.html": "index.html",
     "client/lost.html": "lost.html",
-    "client/style.css": "style.css",
     "client/robots.txt": "robots.txt",
     "res/font/DuranGo.ttf": "res/font_durango.ttf",
     "res/font/Nunito.woff2": "res/font_nunito.woff2",

@@ -3,6 +3,7 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
-    "uglify-js": "^3.11.5"
+    "uglify-js": "^3.11.5",
+    "uglifycss": "^0.0.29"
   }
 }

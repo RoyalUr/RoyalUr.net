@@ -37,22 +37,7 @@ canvas {
 
 body {
     background: rgb(40, 50, 60) url(res/background.png) repeat;
-}
-
-@media all and (max-height: 720px) and (min-width:1px) {
-    body { background-size: 260px; }
-}
-@media all and (max-height: 1080px) and (min-height : 721px) and (min-width:1px) {
-    body { background-size: 300px; }
-}
-@media all and (max-height: 1440px) and (min-height : 1081px) and (min-width:1px) {
-    body { background-size: 340px; }
-}
-@media all and (max-height: 2160px) and (min-height : 1441px) and (min-width:1px) {
-    body { background-size: 380px; }
-}
-@media all and (min-height : 2161px) and (min-width:1px) {
-    body { background-size: 420px; }
+    background-size: 40vh;
 }
 
 

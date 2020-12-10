@@ -28,20 +28,16 @@ def append_size_class(path, size_class):
 
 
 def execute_command(*command, **kwargs):
-    """
-    Shorthand to execute a single command.
-    """
     return execute_piped_commands(command, **kwargs)
 
 
-def execute_piped_commands(*commands, **kwargs):
+def execute_piped_commands(*commands, prefix=""):
     """
     Executes the given commands where the output of each is piped to the next.
     The last command can be a string filename, in which case the final output will be written to the file.
     Returns whether execution was successful.
     """
-    prefix = kwargs.pop("prefix", "")
-
+    # See if the command output should be piped to a file.
     output_file = None
     if isinstance(commands[-1], str):
         output_file = commands[-1]
@@ -55,7 +51,7 @@ def execute_piped_commands(*commands, **kwargs):
         pipe_out = subprocess.PIPE
         if index == len(commands) - 1 and output_file is not None:
             pipe_out = open(output_file, 'w')
-            command_print += " > " + output_file
+            command_print += "\n" + prefix + " > " + output_file
 
         print(prefix + command_print)
         if last_process is None:
@@ -68,17 +64,14 @@ def execute_piped_commands(*commands, **kwargs):
         stdout = ("" if stdout is None else stdout.decode('utf-8'))
         stderr = ("" if stderr is None else stderr.decode('utf-8'))
         ret_code = last_process.returncode
-
         if stdout != "":
             print(prefix + "STDOUT:", stdout)
         if stderr != "":
-            print(prefix + "STDERR", stderr, file=sys.stderr)
-
+            print(prefix + "STDERR:", stderr, file=sys.stderr)
         if ret_code < 0:
             print(prefix + "Execution of", commands[-1], "was terminated by signal:", -ret_code, file=sys.stderr)
         elif ret_code != 0:
             print(prefix + "Command", commands[-1], "resulted in the non-zero return code:", ret_code, file=sys.stderr)
-
         return ret_code == 0
     except OSError as error:
         print(prefix + "Execution of", commands[-1], "failed:", error, file=sys.stderr)
@@ -91,6 +84,10 @@ def execute_piped_commands(*commands, **kwargs):
 
 class CompilationSpec:
     def __init__(self, spec_json):
+        css_spec = spec_json["css"]
+        self.css_source = css_spec["source"]
+        self.css_dest = css_spec["dest"]
+
         self.js_files = spec_json["javascript"]
         self.res_files = spec_json["resources"]
         self.annotation_files = spec_json["annotations"]
@@ -349,6 +346,17 @@ def combine_minify_js(target_folder, comp_spec, *, prefix=""):
         )
 
 
+def minify_css(target_folder, comp_spec, *, prefix=""):
+    """
+    Minify the CSS of the website.
+    """
+    assert execute_piped_commands(
+        ["uglifycss", comp_spec.css_source],
+        os.path.join(target_folder, comp_spec.css_dest),
+        prefix=prefix
+    )
+
+
 def create_sprites(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate groups of images into a single image.
@@ -390,21 +398,6 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     favicon_16.save(os.path.join(target_folder, "favicon16.ico"), sizes=[(16, 16)])
 
 
-def requires_release_build(target_folder, comp_spec, *, prefix=""):
-    """
-    Check whether all resource files exist in the compiled directory.
-    Does not check if any annotations or resource file contents have changed.
-    """
-    for fromPath, to_rel in comp_spec.res_files.items():
-        to_rel = to_rel if len(to_rel) > 0 else fromPath
-        to_path = os.path.join(target_folder, to_rel)
-        if not os.path.exists(to_path):
-            return True
-    if not os.path.exists(target_folder + "/res/annotations.json"):
-        return True
-    return False
-
-
 def combine_annotations(target_folder, comp_spec, additional_annotations, *, prefix=""):
     """
     Combine all resource annotations into their own file.
@@ -423,7 +416,7 @@ def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
     Creates a zip file with the full contents of the development resources folder.
     """
     output_file = os.path.join(target_folder, "res.zip")
-    assert execute_piped_commands(["zip", "-q", "-r", output_file, "./res"], prefix=prefix)
+    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
 
 
 def download_development_res_folder(*, prefix=""):
@@ -432,52 +425,45 @@ def download_development_res_folder(*, prefix=""):
     """
     assert not os.path.exists("./res"), "The ./res directory already exists"
     assert not os.path.exists("./res.zip"), "The ./res.zip archive already exists"
-    assert execute_piped_commands(["wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip"], prefix=prefix)
+    assert execute_command("wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip", prefix=prefix)
     try:
-        assert execute_piped_commands(["unzip", "-q", "./res.zip", "res/*"], prefix=prefix)
+        assert execute_command("unzip", "-q", "./res.zip", "res/*", prefix=prefix)
     finally:
-        assert execute_piped_commands(["rm", "-f", "./res.zip"], prefix=prefix)
+        assert execute_command("rm", "-f", "./res.zip", prefix=prefix)
 
 
 #
 # Create the different types of builds.
 #
 
-def create_release_build(target_folder, prefix=""):
-    sub_prefix = prefix + " .. "
-
-    print(prefix)
-    print(prefix + "Compiling Release Build")
+def create_release_build(target_folder):
+    print("\nCompiling Release Build")
     comp_spec = CompilationSpec.read("compilation.json")
 
-    print(prefix)
-    print(prefix + "1. Clean")
-    clean(target_folder, comp_spec, prefix=sub_prefix)
+    print("\n1. Clean")
+    clean(target_folder, comp_spec, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "2. Combine & Minify Javascript")
-    combine_minify_js(target_folder, comp_spec, prefix=sub_prefix)
+    print("\n2. Combine & Minify Javascript")
+    combine_minify_js(target_folder, comp_spec, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "3. Copy Resource Files")
-    copy_resource_files(target_folder, comp_spec, prefix=sub_prefix)
+    print("\n3. Minify CSS")
+    minify_css(target_folder, comp_spec, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "4. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=sub_prefix)
+    print("\n4. Copy Resource Files")
+    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "5. Create Annotations File")
+    print("\n5. Create Sprites")
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, {
         "sprites": sprite_annotations
-    }, prefix=sub_prefix)
+    }, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "6. Zip Development Resources Folder")
-    zip_development_res_folder(target_folder, comp_spec, prefix=sub_prefix)
+    print("\n7. Zip Development Resources Folder")
+    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
 
-    print(prefix)
-    print(prefix + "Done!\n")
+    print("\nDone!\n")
 
 
 def create_dev_build(target_folder):
@@ -487,13 +473,16 @@ def create_dev_build(target_folder):
     print("\n1. Combine Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n2. Copy Resource Files")
+    print("\n2. Minify CSS")
+    minify_css(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n3. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n3. Create Sprites")
+    print("\n4. Create Sprites")
     sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n4. Create Annotations File")
+    print("\n5. Create Annotations File")
     combine_annotations(target_folder, comp_spec, {
         "sprites": sprite_annotations
     }, prefix=" .. ")
