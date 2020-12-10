@@ -6,12 +6,26 @@ import os
 import sys
 import json
 import subprocess
+import shutil
 from PIL import Image as PILImage
 
 
 #
 # Utility Functions
 #
+
+def getmtime(filename):
+    try:
+        return os.path.getmtime(filename)
+    except FileNotFoundError:
+        return -1
+
+
+def append_size_class(path, size_class):
+    if size_class == "u_u":
+        return path
+    return "{}.{}".format(path, size_class)
+
 
 def execute_command(*command, **kwargs):
     """
@@ -133,6 +147,15 @@ class ImageSizeGroup:
         if "u_u" not in self.sizes:
             self.sizes["u_u"] = ImageSize("auto x auto")
 
+    def __getitem__(self, key):
+        return self.sizes[key]
+
+    def keys(self):
+        return self.sizes.keys()
+
+    def values(self):
+        return self.sizes.values()
+
     def items(self):
         return self.sizes.items()
 
@@ -177,71 +200,98 @@ class Image:
 
         # May be populated later.
         self.original_image = None
-        self.scaled_copies = None
 
     def get_original(self):
         if self.original_image is None:
             self.original_image = PILImage.open(self.from_rel)
         return self.original_image
 
-    def get_scaled_copies(self):
-        if self.scaled_copies is not None:
-            return self.scaled_copies
+    def get_scaled(self, size):
         original = self.get_original()
+        width = size.calc_width(*original.size)
+        height = size.calc_height(*original.size)
+        return original.resize((width, height), PILImage.LANCZOS)
 
-        self.scaled_copies = {}
+    def save_image_copies(self, target_folder, *, prefix=""):
+        original = self.get_original()
+        mtime = getmtime(self.from_rel)
+
+        # Make sure the directory to copy the image to exists.
+        output_file = os.path.join(target_folder, self.to_rel)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+        # Create the scaled copies.
         for size_class, size in self.sizes.items():
-            width = size.calc_width(*original.size)
-            height = size.calc_height(*original.size)
-            self.scaled_copies[size_class] = original.resize((width, height), PILImage.LANCZOS)
-        return self.scaled_copies
+            # Check if the scaled copy already exists.
+            scaled_file = append_size_class(output_file, size_class)
+            scaled_file_png = scaled_file + ".png"
+            scaled_file_webp = scaled_file + ".webp"
+            if mtime <= getmtime(scaled_file_png) and mtime <= getmtime(scaled_file_webp):
+                continue
+
+            # Save the scaled copies.
+            scaled_image = self.get_scaled(size)
+            scaled_image.save(scaled_file_png)
+            print("{}created {}".format(prefix, scaled_file_png))
+            scaled_image.save(scaled_file_webp)
+            print("{}created {}".format(prefix, scaled_file_webp))
 
 
 class Sprite:
     def __init__(self, to_rel, images):
         self.to_rel = to_rel
         self.images = images
-        self.scaled_copies = None
+        size_classes = self.get_size_classes()
+        for image in images:
+            if image.sizes.keys() != size_classes:
+                raise Exception("Images have inconsistent sets of size classes")
 
-    def get_scaled_copies(self):
-        if self.scaled_copies is not None:
-            return self.scaled_copies
-        scales = {}
-        # First figure out all of the available scales.
-        for image in self.images:
-            scaled_copies = image.get_scaled_copies()
-            for size_class, scaled_copy in image.get_scaled_copies().items():
-                scales[size_class] = {}
-        # Then add all of the scaled copies.
-        for image in self.images:
-            scaled_copies = image.get_scaled_copies()
-            for size_class in scales.keys():
-                if size_class not in scaled_copies:
-                    raise Exception("Image {} is missing size class {} for generating sprite {}".format(
-                        image.from_rel, size_class, self.to_rel
-                    ))
-                scales[size_class][image.from_rel] = scaled_copies[size_class]
-        # Generate each sprite image for each size class.
-        self.scaled_copies = {}
-        for size_class, images in scales.items():
-            self.scaled_copies[size_class] = SpriteInstance.create(images)
-        return self.scaled_copies
+    def get_mod_time(self):
+        return min(getmtime(image.from_rel) for image in self.images)
 
+    def get_size_classes(self):
+        return set().union(*(image.sizes.keys() for image in self.images))
 
-class SpriteInstance:
-    def __init__(self, image, annotations):
-        self.image = image
-        self.annotations = annotations
+    def save_sprite_copies(self, target_folder, *, prefix=""):
+        mtime = self.get_mod_time()
 
-    @staticmethod
-    def create(images):
+        # Make sure the directory to create the sprites in exists.
+        output_file = os.path.join(target_folder, self.to_rel)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+        # Create the scaled sprites.
+        sprite_annotations = {}
+        for size_class in self.get_size_classes():
+            # Generate the sprite's annotations.
+            to_rel = append_size_class(self.to_rel, size_class)
+            annotations, total_width, max_height = self.generate_sprite_annotations(size_class)
+            sprite_annotations[to_rel] = annotations
+
+            # Determine whether we need to generate the sprite image itself.
+            scaled_file = append_size_class(output_file, size_class)
+            scaled_file_png = scaled_file + ".png"
+            scaled_file_webp = scaled_file + ".webp"
+            if mtime <= getmtime(scaled_file_png) and mtime <= getmtime(scaled_file_webp):
+                continue
+
+            # Generate the sprite image.
+            sprite_image = self.generate_sprite_image(size_class, total_width, max_height)
+            sprite_image.save(scaled_file_png)
+            print("{}created {}".format(prefix, scaled_file_png))
+            sprite_image.save(scaled_file_webp)
+            print("{}created {}".format(prefix, scaled_file_webp))
+
+        return sprite_annotations
+
+    def generate_sprite_annotations(self, size_class):
         annotations = {}
         total_width = 0
         max_height = 0
-        # Create the image annotations, and find the dimensions of the sprite.
-        for image_from_rel, image in images.items():
-            width, height = image.size
-            annotations[image_from_rel] = {
+        for image in self.images:
+            size = image.sizes[size_class]
+            width = size.calc_width(*image.get_original().size)
+            height = size.calc_height(*image.get_original().size)
+            annotations[image.from_rel] = {
                 "width": width,
                 "height": height,
                 "x_offset": total_width,
@@ -249,13 +299,17 @@ class SpriteInstance:
             }
             total_width += width
             max_height = max(max_height, height)
-        # Generate the sprite image.
+
+        return annotations, total_width, max_height
+
+    def generate_sprite_image(self, size_class, total_width, max_height):
         sprite_image = PILImage.new('RGBA', (total_width, max_height))
         x_offset = 0
-        for image in images.values():
-            sprite_image.paste(image, (x_offset, 0))
-            x_offset += image.size[0]
-        return SpriteInstance(sprite_image, annotations)
+        for image in self.images:
+            scaled_image = image.get_scaled(image.sizes[size_class])
+            sprite_image.paste(scaled_image, (x_offset, 0))
+            x_offset += scaled_image.size[0]
+        return sprite_image
 
 
 #
@@ -300,20 +354,8 @@ def create_sprites(target_folder, comp_spec, *, prefix=""):
     Concatenate groups of images into a single image.
     """
     sprite_annotations = {}
-
-    for sprite_to_rel, sprite in comp_spec.sprites.items():
-        for size_class, sprite_instance in sprite.get_scaled_copies().items():
-            # Insert the size class into the path.
-            to_rel = "{}.{}".format(sprite_to_rel, size_class)
-
-            # Save the image and store its annotations.
-            sprite_annotations[to_rel] = sprite_instance.annotations
-            output_file = os.path.join(target_folder, to_rel)
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)
-            sprite_instance.image.save(output_file + ".png")
-            sprite_instance.image.save(output_file + ".webp")
-            print("{}Created {}".format(prefix, to_rel))
-
+    for sprite in comp_spec.sprites.values():
+        sprite_annotations.update(sprite.save_sprite_copies(target_folder, prefix=prefix))
     return sprite_annotations
 
 
@@ -324,29 +366,17 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     # Copy static files.
     for from_path, to_rel in comp_spec.res_files.items():
         to_path = os.path.join(target_folder, to_rel)
+        if getmtime(from_path) <= getmtime(to_path):
+            continue
+
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
-        assert execute_piped_commands(["cp", from_path, to_path], prefix=prefix)
+        shutil.copyfile(from_path, to_path)
+        print("{}copied {}".format(prefix, to_rel))
 
     # Copy and scale images.
     for from_rel, image in comp_spec.images.items():
-        if image.to_rel is None:
-            continue
-
-        # Copy the original image.
-        output_file = os.path.join(target_folder, image.to_rel)
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        image.get_original().save(output_file + ".png")
-        image.get_original().save(output_file + ".webp")
-        print("{}Copied {}".format(prefix, image.to_rel))
-
-        for size_class, scaled_image in image.get_scaled_copies().items():
-            # Insert the size class into the path.
-            to_rel = "{}.{}".format(image.to_rel, size_class)
-
-            # Save the image.
-            scaled_image.save(os.path.join(target_folder, to_rel) + ".png")
-            scaled_image.save(os.path.join(target_folder, to_rel) + ".webp")
-            print("{}Created {}".format(prefix, to_rel))
+        if image.to_rel is not None:
+            image.save_image_copies(target_folder, prefix=prefix)
 
     # Create the favicon images.
     favicon_image = PILImage.open("res/favicon.png")

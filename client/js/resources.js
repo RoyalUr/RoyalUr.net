@@ -668,10 +668,8 @@ function getImageURL(imageKey) {
 }
 
 function completeURL(url, extension) {
-    if (extension === undefined) {
-        extension = imageExtension;
-    }
-    return url + "." + resolution + (extension.length === 0 ? "" : "." + extension);
+    extension = (extension !== undefined ? extension : imageExtension);
+    return url + (resolution !== "u_u" ? "." + resolution : "") + (extension.length > 0 ? "." + extension : "");
 }
 
 function loadImages() {
