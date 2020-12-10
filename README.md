@@ -19,8 +19,7 @@ as well as a Python script to generate the resource files needed for the site.
 
 The following commands will compile the site to _./compiled_: \
 `./compile.sh release` -- Full clean compilation, with minified JS. \
-`./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder. \
-`./compile.sh jsdev` -- No minification, no cleaning, no resource generation.
+`./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder.
 
 To install the NPM dependencies used in the compilation, run: \
 `npm install`

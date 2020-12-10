@@ -501,50 +501,25 @@ def create_dev_build(target_folder):
     print("\nDone!\n")
 
 
-def create_jsdev_build(target_folder):
-    print("\nCompiling Javascript Development Build")
-    comp_spec = CompilationSpec.read("compilation.json")
-
-    print("\n1. Check whether to revert to a Release Build")
-    if requires_release_build(target_folder, comp_spec):
-        print("\nERROR : Release build is required\n", file=sys.stderr)
-        create_release_build(target_folder, prefix="| ")
-
-    print("\n2. Combine Javascript")
-    combine_js(target_folder, comp_spec, prefix=" .. ")
-
-    print("\nDone!\n")
-
-
 #
 # Run the Compilation
 #
-DEV_MODE = "dev"
-JS_DEV_MODE = "jsdev"
-RELEASE_MODE = "release"
+if __name__ == "__main__":
+    # Download the resources folder if it doesn't exist.
+    if not os.path.exists("./res"):
+        print("Could not find ./res directory, attempting to download it...")
+        download_development_res_folder(prefix=" .. ")
 
-if len(sys.argv) != 2:
-    print("Usage:")
-    print("  python -m compile <" + DEV_MODE + ":" + JS_DEV_MODE + ":" + RELEASE_MODE + ">")
-    sys.exit(1)
+    # Detect the compilation mode, and start it.
+    mode = (sys.argv[1] if len(sys.argv) == 2 else "")
+    if mode == "release":
+        create_release_build("compiled")
+    elif mode == "dev":
+        create_dev_build("compiled")
+    else:
+        if mode != "":
+            print("Invalid compilation mode", mode)
 
-# Download the resources folder if it doesn't exist.
-if not os.path.exists("./res"):
-    print("Could not find ./res directory, attempting to download it...")
-    download_development_res_folder(prefix=" .. ")
-
-compilation_mode = (sys.argv[1] if len(sys.argv) == 2 else "")
-
-if compilation_mode == RELEASE_MODE:
-    create_release_build("compiled")
-elif compilation_mode == JS_DEV_MODE:
-    create_jsdev_build("compiled")
-elif compilation_mode == DEV_MODE:
-    create_dev_build("compiled")
-else:
-    if compilation_mode != "":
-        print("Invalid compilation mode", compilation_mode)
-
-    print("Usage:")
-    print("  python -m compile <" + DEV_MODE + ":" + RELEASE_MODE + ">")
-    sys.exit(1)
+        print("Usage:")
+        print("  python -m compile <dev:release>")
+        sys.exit(1)
