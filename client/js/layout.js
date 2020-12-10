@@ -253,15 +253,13 @@ function resizeMenu() {
           buttonSeparation = playButtonSpacing / numButtons + playButtonWidth,
           middleAnchor = width / 2 - 0.5 * playButtonWidth;
 
-    function layoutButton(elem, left) {
-        elem.width = screenPixels(playButtonWidth);
+    function layoutPlayButton(elem, left) {
         elem.style.width = screenPixels(playButtonWidth);
         elem.style.left = screenPixels(left);
     }
-
-    layoutButton(playLocalButton, middleAnchor - buttonSeparation);
-    layoutButton(playOnlineButton, middleAnchor);
-    layoutButton(playComputerButton, middleAnchor + buttonSeparation);
+    layoutPlayButton(playLocalButton, middleAnchor - buttonSeparation);
+    layoutPlayButton(playOnlineButton, middleAnchor);
+    layoutPlayButton(playComputerButton, middleAnchor + buttonSeparation);
 
     playSelectDescriptionDiv.style.width = screenPixels(width);
     playSelectDescriptionDiv.style.top = screenPixels(0.5 * height + buttonSeparation / 2);
