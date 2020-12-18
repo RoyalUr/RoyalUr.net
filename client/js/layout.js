@@ -23,7 +23,8 @@ const playSelectDiv = document.getElementById("play-select"),
       playComputerButton = document.getElementById("play-computer"),
       playSelectDescriptionDiv = document.getElementById("play-select-description");
 
-const loadingDiv = document.getElementById("loading");
+const loadingDiv = document.getElementById("loading"),
+      loadingTextSpan = document.getElementById("loading-text");
 
 const boardCanvas = document.getElementById("board"),
       boardCtx = boardCanvas.getContext("2d");

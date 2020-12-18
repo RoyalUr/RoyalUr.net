@@ -78,6 +78,10 @@ function isOnScreen(screens) {
     return false;
 }
 
+function setupLoadingScreen(screen) {
+    loadingTextSpan.textContent = (screen === SCREEN_MENU ? "The Royal Ur is Loading..." : "Fetching Game Assets...");
+}
+
 function switchToScreen(screen, hasty) {
     // Check if we have to wait for resources to load before switching.
     const requiredLoadingStage = screenRequiredLoadingStages[screen];
@@ -85,6 +89,7 @@ function switchToScreen(screen, hasty) {
         screenState.loadingTargetScreen = screen;
         screenState.loadingTargetStage = requiredLoadingStage;
         loadingBar.stage = requiredLoadingStage;
+        setupLoadingScreen(screen);
         setScreen(SCREEN_LOADING, hasty)
         return;
     }
