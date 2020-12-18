@@ -316,7 +316,5 @@ function tryTakeSingleAction(event, keyIsSpace) {
             return;
         }
         game.performMove(selectedTile);
-    } else if (isOnScreen(SCREEN_MENU)) {
-        onPlayClick(event);
     }
 }
