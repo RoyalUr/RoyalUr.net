@@ -5,26 +5,32 @@
 console.log("\nCurious how the client works? Check out the source: https://github.com/Sothatsit/RoyalUrClient\n ");
 
 const clientStartTime = getTime();
-let resourcesLoadedTime = LONG_TIME_AGO,
+let menuResourcesLoadedTime = LONG_TIME_AGO,
     clientFinishSetupTime = LONG_TIME_AGO;
 
-setLoadResourcesCompleteFn(setup);
+setLoadingCallback(onStageLoaded);
+function onStageLoaded(stage) {
+    if (stage === 0) {
+        setup();
+    } else if (stage === 1) {
+        setupGameElements();
+    }
+    resize();
+    maybeSwitchOffLoadingScreen(stage);
+}
 
 function setup() {
-    resourcesLoadedTime = getTime();
+    menuResourcesLoadedTime = getTime();
 
-    setupElements();
+    setupMenuElements();
     setInterval(updateRenderStatistics, 1000);
-
-    updateAudioVolumes();
-    playSong();
 
     document.addEventListener("keyup", handleKeyPress);
     window.onhashchange = onHashChange;
     if (getHashGameID() !== null) {
         connectToGame(true);
     } else {
-        switchToScreen(SCREEN_MENU);
+        setScreen(SCREEN_MENU);
     }
 
     window.requestAnimationFrame(function() {
@@ -32,7 +38,6 @@ function setup() {
         redrawLoop();
         finishSetup();
     });
-
     window.onbeforeunload = onBeforeUnload;
 }
 
@@ -46,8 +51,8 @@ function finishSetup() {
 
 function reportStartupPerformance() {
     const startupDuration = clientFinishSetupTime - clientStartTime,
-          resourceLoadDuration = resourcesLoadedTime - clientStartTime,
-          setupDuration = clientFinishSetupTime - resourcesLoadedTime,
+          resourceLoadDuration = menuResourcesLoadedTime - clientStartTime,
+          setupDuration = clientFinishSetupTime - menuResourcesLoadedTime,
           resourceLoadPercentage = resourceLoadDuration / startupDuration,
           setupPercentage = setupDuration / startupDuration;
 

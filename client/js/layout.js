@@ -64,16 +64,13 @@ let mouseDown = false,
     mouseDownLoc = VEC_NEG1,
     draggedTile = VEC_NEG1;
 
-function setupElements() {
+function setupMenuElements() {
     playButton.addEventListener("click", onPlayClick);
     exitButton.addEventListener("click", onExitClick);
 
-    // Adjust the font sizes of the play select options to fit their bounding boxes
+    // Adjust the font sizes of the play select options to fit their bounding boxes.
     fitty(".play-select-text", {
-        // Ensure all play select options have the same font size
-        couplingGroup: "play-select-text",
-
-        // We don't want the text to take up the whole available space
+        couplingGroup: "play-select-text", // Ensure all play select options have the same font size.
         padding: 0.05
     });
 
@@ -90,10 +87,6 @@ function setupElements() {
     playLocalButton.addEventListener("mouseout", onPlayUnhover);
     playOnlineButton.addEventListener("mouseout", onPlayUnhover);
     playComputerButton.addEventListener("mouseout", onPlayUnhover);
-
-    diceCanvas.addEventListener("click", function() { game.onDiceClick(); });
-    diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
-    diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
 
     playButton.addEventListener("mouseover", function() { menuState.playButton = BUTTON_STATE_HOVERED; });
     playButton.addEventListener("mouseout", function() { menuState.playButton = BUTTON_STATE_INACTIVE; });
@@ -115,16 +108,22 @@ function setupElements() {
             elements[index].src = imageURL;
         }
     }
+    window.onresize = () => {window.requestAnimationFrame(resize);};
+}
+
+function setupGameElements() {
+    diceCanvas.addEventListener("click", function() { if (game) {game.onDiceClick();} });
+    diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
+    diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
 
     function updateMouse(loc, down) {
         mouseLoc = loc;
 
         const newHoveredTile = canvasToTile(loc);
-        if(!vecEquals(hoveredTile, newHoveredTile)) {
+        if(game && !vecEquals(hoveredTile, newHoveredTile)) {
             game.onTileHover(newHoveredTile);
         }
         hoveredTile = newHoveredTile;
-
         if(down === undefined)
             return;
 
@@ -141,14 +140,8 @@ function setupElements() {
         }
     }
 
-    window.onresize = function(event) {
-        window.requestAnimationFrame(resize);
-    };
-
     document.onmousemove = function(event) {
-        if (!game)
-            return;
-
+        if (!game) return;
         const loc = vec(
             fromScreenPixels(event.clientX) - tilesLeft,
             fromScreenPixels(event.clientY) - tilesTop
@@ -157,19 +150,14 @@ function setupElements() {
     };
 
     document.body.onmousedown = function(event) {
-        if (!game)
-            return;
-
+        if (!game) return;
         updateMouse(mouseLoc, true);
         game.onTileClick(hoveredTile);
-
         event.preventDefault();
     };
 
     document.onmouseup = function(event) {
-        if (!game)
-            return;
-
+        if (!game) return;
         game.onTileRelease(hoveredTile);
         updateMouse(mouseLoc, false);
     };
@@ -196,11 +184,13 @@ function resize() {
     useHeight = min(Math.round(useWidth / maxWidthOnHeightRatio), height);
 
     resizeMenu();
-    resizeBoard();
-    resizeScores();
-    resizeDice();
     resizeOverlay();
 
+    if (loading.stage > 1) {
+        resizeBoard();
+        resizeScores();
+        resizeDice();
+    }
     redraw(true);
 }
 
@@ -357,7 +347,7 @@ function getBoardWidthToHeightRatio() {
     if (boardWidthToHeightRatio)
         return boardWidthToHeightRatio;
 
-    const boardImage = getRawImageResource("board");
+    const boardImage = getImageResource("board");
     if (!boardImage)
         throw "Missing board image";
 
@@ -373,8 +363,7 @@ function getBoardTileRegions() {
     if (boardTileRegions)
         return boardTileRegions;
 
-    const tileRegions = getImageAnnotation("board");
-
+    const tileRegions = annotationsResource.get("board");
     if (!tileRegions)
         throw "Missing board tile annotations";
     if (tileRegions.length !== TILES_COUNT)

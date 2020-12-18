@@ -28,144 +28,140 @@ const imageExtension = (function() {
     }
     return "png";
 })();
+function completeURL(url, extension) {
+    extension = (extension !== undefined ? extension : imageExtension);
+    return url + (resolution !== "u_u" ? "." + resolution : "") + (extension.length > 0 ? "." + extension : "");
+}
 
-const imageResources = {
-    "logo": "res/logo",
-    "board": "res/board",
-    "tile_dark": "res/tile_dark",
-    "tile_light": "res/tile_light",
-    "play_local": "res/button_play_local",
-    "play_online": "res/button_play_online",
-    "play_computer": "res/button_play_computer",
+
+//
+// Loading bar.
+//
+
+const loadingBar = {
+    element: document.getElementById("loading-bar"),
+    stage: 0
 };
 
-const sprites = {
-    "res/play_button": {
-        "res/buttons/play.png": "play",
-        "res/buttons/play_active.png": "play_active"
-    },
-    "res/learn_button": {
-        "res/buttons/learn.png": "learn",
-        "res/buttons/learn_active.png": "learn_active"
-    },
-    "res/watch_button": {
-        "res/buttons/watch.png": "watch",
-        "res/buttons/watch_active.png": "watch_active"
-    },
+function getPercentageLoaded() {
+    if (loadingBar.stage < 0 || loadingBar.stage >= stagedResources.length)
+        return 0;
 
-    "res/dice": {
-        "res/dice/up1.png": "diceUp1",
-        "res/dice/up2.png": "diceUp2",
-        "res/dice/up3.png": "diceUp3",
-        "res/dice/down1.png": "diceDown1",
-        "res/dice/down2.png": "diceDown2",
-        "res/dice/down3.png": "diceDown3",
-        "res/dice/darkShadow.png": "diceDarkShadow",
-        "res/dice/lightShadow.png": "diceLightShadow"
+    const resources = stagedResources[loadingBar.stage];
+    let loaded = 0;
+    for (let index = 0; index < resources.length; ++index) {
+        if (resources[index].loaded) {
+            loaded += 1;
+        }
     }
+    return (resources.length === 0 ? 0 : loaded / resources.length);
+}
+
+function redrawLoadingBar() {
+    loadingBar.element.style.width = (getPercentageLoaded() * 100) + "%";
+}
+
+
+//
+// Management of the loading.
+//
+
+const loading = {
+    callback: function() {},
+    stage: 0
 };
 
-const audioResources = [
-    // Sounds when moving a tile
-    {
-        key: "place_1",
-        url: "res/audio_place_1.mp4"
-    }, {
-        key: "place_2",
-        url: "res/audio_place_2.mp4"
-    }, {
-        key: "place_3",
-        url: "res/audio_place_3.mp4"
-    }, {
-        key: "place_4",
-        url: "res/audio_place_4.mp4"
-    },
+function loadResources() {
+    annotationsResource.load();
+    startLoadingStage();
+}
 
-    // Sounds when selecting a tile
-    {
-        key: "pickup_1",
-        url: "res/audio_pickup_1.mp4"
-    }, {
-        key: "pickup_2",
-        url: "res/audio_pickup_2.mp4"
-    }, {
-        key: "pickup_3",
-        url: "res/audio_pickup_3.mp4"
-    },
-
-    // Sound when trying to pick up a tile that cannot be moved
-    {
-        key: "error",
-        url: "res/audio_error.mp4",
-        volume: 0.5,
-        instances: 3
-    },
-
-    // Sound when taking out an enemy tile
-    {
-        key: "kill",
-        url: "res/audio_kill.mp4",
-        volume: 0.5
-    },
-
-    // Sound when hovering over tiles
-    {
-        key: "hover",
-        url: "res/audio_hover.mp4",
-        volume: 0.5,
-        instances: 3
-    },
-
-    // Sounds when rolling dice
-    {
-        key: "dice_click",
-        url: "res/audio_dice_click.mp4",
-        volume: 0.5,
-        instances: 5
-    },
-    {
-        key: "dice_hit",
-        url: "res/audio_dice_hit.mp4",
-        volume: 0.3,
-        instances: 4
-    },
-    {
-        key: "dice_select",
-        url: "res/audio_dice_select.mp4",
-        volume: 0.3,
-        instances: 4
-    },
-
-    // Sounds when a message pops up
-    {
-        key: "typewriter_key",
-        url: "res/audio_typewriter_key.mp4",
-        instances: 4
-    },
-    {
-        key: "typewriter_end",
-        url: "res/audio_typewriter_end.mp4",
-    },
-
-    // Firework sounds
-    {
-        key: "firework_explode",
-        url: "res/audio_firework_explode.mp4",
-        volume: 0.5,
-        instances: 4
-    },
-    {
-        key: "firework_rocket",
-        url: "res/audio_firework_rocket.mp4",
-        volume: 0.05,
-        instances: 4
+function setLoadingCallback(callback) {
+    loading.callback = callback;
+    for (let missed = 0; missed < loading.stage; ++missed) {
+        callback(missed);
     }
-];
+}
 
-const audioPacks = {
-    "place": ["place_1", "place_2", "place_3", "place_4"],
-    "pickup": ["pickup_1", "pickup_2", "pickup_3"]
-};
+function startLoadingStage() {
+    if (loading.stage >= stagedResources.length)
+        return;
+
+    const resources = stagedResources[loading.stage];
+    for (let index = 0; index < resources.length; ++index) {
+        resources[index].load();
+    }
+    // In case there are no resources left to load at this stage.
+    onResourceLoaded(null);
+}
+
+function onResourceLoaded(resource) {
+    redrawLoadingBar();
+
+    if (loading.stage >= stagedResources.length)
+        return;
+    const resources = stagedResources[loading.stage];
+
+    // Check that there are no resources that are not yet loaded.
+    for (let index = 0; index < resources.length; ++index) {
+        if (!resources[index].loaded)
+            return;
+    }
+
+    // All resources at the current stage have loaded.
+    const previousStage = loading.stage;
+    loading.stage += 1;
+    loading.callback(previousStage);
+    startLoadingStage();
+}
+
+function getResourcesLoading() {
+    const loading = [];
+    for (let index = 0; index < allResources.length; ++index) {
+        const resource = allResources[index];
+        if (resource.loading) {
+            loading.push(resource);
+        }
+    }
+    return loading;
+}
+
+function getResourcesLoaded() {
+    const loaded = [];
+    for (let index = 0; index < allResources.length; ++index) {
+        const resource = allResources[index];
+        if (resource.loaded) {
+            loaded.push(resource);
+        }
+    }
+    return loaded;
+}
+
+function reportResourceLoadingStatistics() {
+    const loading = getResourcesLoading(),
+          loaded = getResourcesLoaded();
+
+    if (loading.length === 0 && loaded.length === 0) {
+        console.log("No resources loaded or loading");
+        return;
+    }
+    loaded.sort((a, b) => a.loadStart - b.loadStart);
+
+    let report = "Resource Loading Statistics:\n";
+    for (let index = 0; index < loading.length; ++index) {
+        report += "  Loading : " + loading[index].name + "\n";
+    }
+    for (let index = 0; index < loaded.length; ++index) {
+        const entry = loaded[index];
+        if (!entry.hasMeaningfulLoadStats())
+            continue;
+
+        const start = Math.round(entry.loadStart * 10000) / 10 + "ms",
+              duration = Math.round(entry.loadDuration * 10000) / 10 + "ms";
+        report += "  " + start + " for " + duration + " : " + entry.name + "\n";
+    }
+    console.log(report);
+}
 
 
 //
@@ -176,459 +172,298 @@ function Resource(name, url) {
     this.__class_name__ = "Resource";
     this.name = name;
     this.url = url;
-
+    this.loadStart = -1;
+    this.loadEnd = -1;
+    this.loadDuration = -1;
     this.loading = false;
     this.loaded = false;
     this.errored = false;
     this.error = null;
+    this.onLoadCallbacks = [];
 }
+Resource.prototype.updateState = function(state) {
+    this.loading = getOrDefault(state, "loading", false);
+    this.loaded = getOrDefault(state, "loaded", false);
+    this.errored = getOrDefault(state, "errored", false);
+    this.error = getOrDefault(state, "error", null);
+};
 Resource.prototype.load = function() {
-    this.loading = true;
-    this.loaded = false;
-    this.errored = false;
-    this.error = null;
+    if (this.loading)
+        return;
+    this.updateState({loading: true});
+    this.loadStart = getTime();
     this._load();
 };
-Resource.prototype._load = function() { throw "load is not implemented within " + this.__class_name__; };
+Resource.prototype._load = unimplemented("_load");
 Resource.prototype.onLoad = function() {
-    this.loading = false;
-    this.loaded = true;
-    this.errored = false;
-    this.error = null;
+    this.updateState({loaded: true});
+    this.loadEnd = getTime();
+    this.loadDuration = this.loadEnd - this.loadStart;
+    for (let index = 0; index < this.onLoadCallbacks.length; ++index) {
+        this.onLoadCallbacks[index]();
+    }
+    this.onLoadCallbacks = [];
+    onResourceLoaded(this);
+};
+Resource.prototype.runOnLoad = function(callback) {
+    if (!this.loaded) {
+        this.onLoadCallbacks.push(callback);
+    } else {
+        callback();
+    }
 };
 Resource.prototype.onError = function(error) {
-    this.loading = false;
-    this.loaded = false;
-    this.errored = true;
-    this.error = error;
+    this.updateState({errored: true, error: (error ? error : null)});
 };
+Resource.prototype.hasMeaningfulLoadStats = () => true;
 
 
-/**
- * Annotations about other resources.
- */
+/** Annotations about other resources. **/
 function AnnotationsResource(name, url) {
     Resource.call(this, name, url);
     this.__class_name__ = "AnnotationsResource";
+    this.data = null;
 }
-AnnotationsResource.prototype = Object.create(Resource.prototype);
-Object.defineProperty(AnnotationsResource.prototype, "constructor", {
-    value: AnnotationsResource, enumerable: false, writable: true
-});
-
+setSuperClass(AnnotationsResource, Resource);
 AnnotationsResource.prototype._load = function() {
-const client = new XMLHttpRequest();
+    const client = new XMLHttpRequest();
     client.onreadystatechange = function() {
-        if (this.readyState !== 4)
+        if (client.readyState !== 4)
             return;
-
-        if (this.status !== 200) {
-            this.onError("Error " + this.status + " loading image annotations: " + this.responseText);
+        if (client.status !== 200) {
+            this.onError("Error " + client.status + " loading image annotations: " + client.responseText);
             return;
         }
-
-        this.data = JSON.parse(this.responseText);
+        this.data = JSON.parse(client.responseText);
         this.onLoad();
-    }.bind(client);
+    }.bind(this);
     client.open('GET', this.url);
     client.send();
 };
-
-
-/**
- * Sounds to be played.
- */
-function AudioResource(name, url, instances=1, volume=1) {
-    Resource.call(this, name, url);
-    this.__class_name__ = "AudioResource";
-    this.volume = volume;
-    this.instances = instances;
+AnnotationsResource.prototype.get = function(key) {
+    return this.data !== undefined ? this.data[key] : undefined;
 }
-AudioResource.prototype = Object.create(Resource.prototype);
-Object.defineProperty(AudioResource.prototype, "constructor", {
-    value: AudioResource, enumerable: false, writable: true
-})
-
-AudioResource.prototype._load = function () {
-    const resource = audioResources[index],
-          resourceName = "audio(" + resource.key + ")";
-
-    const instances = (resource.instances !== undefined ? resource.instances : 1),
-          element = new Audio();
-
-    // The list we are going to fill with the loaded audio elements
-    resource.elements = [];
-
-    element.preload = "auto";
-    element.addEventListener("error", () => {
-        console.log("There was an error loading audio resource " + resourceName + ": " + element.error);
-    });
-    element.src = resource.url;
-    element.load();
-
-    resource.elements.push(element);
-    for (let index = 1; index < instances; ++index) {
-        resource.elements.push(element.cloneNode());
-    }
-};
 
 
-/**
- * An image to be displayed.
- */
+/** Images to be displayed. **/
 function ImageResource(name, url) {
     Resource.call(this, name, url);
     this.__class_name__ = "ImageResource";
+    this.image = null;
+    this.scaledImages = [];
 }
-ImageResource.prototype = Object.create(Resource.prototype);
-Object.defineProperty(ImageResource.prototype, "constructor", {
-    value: ImageResource, enumerable: false, writable: true
-})
-
-
-/**
- * An image that gets split up into multiple smaller images.
- */
-function SpriteResource(name, url) {
-    ImageResource.call(this, name, url);
-    this.__class_name__ = "SpriteResource";
-}
-SpriteResource.prototype = Object.create(ImageResource.prototype);
-Object.defineProperty(SpriteResource.prototype, "constructor", {
-    value: SpriteResource, enumerable: false, writable: true
-})
-
-
-//
-// Management of the loading.
-//
-
-const resourceStats = {};
-let onResourcesRetrievedFn = null,
-    onLoadResourcesCompleteFn = null,
-    resourcesLoaded = false;
-
-function loadResources() {
-    onResourcesRetrievedFn = function() {
-        markResourceLoading("sprite_splitting");
-        splitSpritesIntoImages();
-        markResourceLoaded("sprite_splitting", true);
-        resourcesLoaded = true;
-        if (onLoadResourcesCompleteFn != null) {
-            onLoadResourcesCompleteFn();
-            onLoadResourcesCompleteFn = null;
-        }
-    };
-
-    loadImages();
-    loadAudio();
-}
-
-function setLoadResourcesCompleteFn(onComplete) {
-    if (resourcesLoaded) {
-        onComplete();
-    } else {
-        onLoadResourcesCompleteFn = onComplete;
-    }
-}
-
-function getResourceStats(name) {
-    if (!resourceStats.hasOwnProperty(name)) {
-        resourceStats[name] = {
-            name: name,
-            loaded: false,
-            startLoadTime: LONG_TIME_AGO,
-            endLoadTime: LONG_TIME_AGO,
-            loadDuration: NaN
-        };
-    }
-
-    return resourceStats[name];
-}
-
-function getResourcesLoading() {
-    const loading = [];
-    for (let key in resourceStats) {
-        if (!resourceStats.hasOwnProperty(key))
-            continue;
-
-        const stats = resourceStats[key];
-        if (stats.loaded)
-            continue;
-
-        loading.push(stats);
-    }
-    return loading;
-}
-
-function getResourcesLoaded() {
-    const loaded = [];
-    for (let key in resourceStats) {
-        if (!resourceStats.hasOwnProperty(key))
-            continue;
-
-        const stats = resourceStats[key];
-        if (!stats.loaded)
-            continue;
-
-        loaded.push(stats);
-    }
-    return loaded;
-}
-
-function markResourceLoading(name) {
-    getResourceStats(name).startLoadTime = getTime();
-}
-
-function markResourceLoaded(name, skipCompleteCheck) {
-    // We only want to countdown in an animation frame for consistency
-    window.requestAnimationFrame(() => {
-        const stats = getResourceStats(name);
-
-        stats.loaded = true;
-        stats.endLoadTime = getTime();
-        stats.loadDuration = stats.endLoadTime - stats.startLoadTime;
-        redrawLoadingBar();
-
-        // If all resources have been loaded
-        if (!skipCompleteCheck && getResourcesLoading().length === 0) {
-            if (onResourcesRetrievedFn === null)
-                throw "Completed loading resources, but there is no onResourcesRetrievedFn";
-
-            const onCompleteFn = onResourcesRetrievedFn;
-            onResourcesRetrievedFn = null;
-
-            onCompleteFn();
-        }
-    });
-}
-
-function reportResourceLoadingStatistics() {
-    const loading = getResourcesLoading(),
-          loaded = getResourcesLoaded();
-
-    if (loading.length === 0 && loaded.length === 0) {
-        console.log("No resource loading statistics recorded");
-        return;
-    }
-
-    loaded.sort((a, b) => {
-        const x = a.loadDuration,
-              y = b.loadDuration;
-        return (x < y) ? 1 : ((x > y) ? -1 : 0);
-    });
-
-    let report = "Resource Loading Statistics:\n";
-    for (let index = 0; index < loading.length; ++index) {
-        const entry = loading[index];
-
-        report += "  Loading : " + entry.name;
-        report += "\n";
-    }
-
-    for (let index = 0; index < loaded.length; ++index) {
-        const entry = loaded[index];
-
-        report += "  " + Math.round(entry.loadDuration * 10000) / 10 + "ms : " + entry.name;
-        report += "\n";
-    }
-
-    console.log(report);
-}
-
-
-//
-// Loading bar.
-//
-
-const loadingBarElement = document.getElementById("loading-bar");
-
-function getPercentageLoaded() {
-    const loaded = getResourcesLoaded(),
-          loading = getResourcesLoading();
-
-    if (loading.length === 0 && loaded.length === 0)
-        return 0;
-
-    return loaded.length / (loading.length + loaded.length);
-}
-
-function redrawLoadingBar() {
-    loadingBarElement.style.width = (getPercentageLoaded() * 100) + "%";
-}
-
-
-
-//
-// Audio loading.
-//
-
-const audioPreferences = {
-    songsMuted: false,
-    songsVolume: 0.5,
-
-    soundMuted: false,
-    soundVolume: 0.5
+setSuperClass(ImageResource, Resource);
+ImageResource.prototype._onImageLoad = function() {
+    this.onLoad();
 };
-
-function setSongsMuted(songsMuted) {
-    audioPreferences.songsMuted = songsMuted;
-    updateAudioVolumes();
-}
-
-function setSongsVolume(songsVolume) {
-    audioPreferences.songsVolume = songsVolume;
-    updateAudioVolumes();
-}
-
-function setSoundMuted(soundMuted) {
-    audioPreferences.soundMuted = soundMuted;
-    updateAudioVolumes();
-}
-
-function setSoundVolume(soundVolume) {
-    audioPreferences.soundVolume = soundVolume;
-    updateAudioVolumes();
-}
-
-function updateAudioVolumes() {
-    const songVolume = (!audioPreferences.songsMuted ? audioPreferences.songsVolume : 0),
-          soundVolume = (!audioPreferences.soundMuted ? audioPreferences.soundVolume : 0);
-
-    for(let index = 0; index < audioResources.length; ++index) {
-        const resource = audioResources[index];
-
-        if(!resource.elements)
-            continue;
-
-        let volume = (resource.song ? songVolume : soundVolume);
-        
-        if(resource.volume) {
-            volume *= resource.volume;
-        }
-        
-        for(let elementIndex = 0; elementIndex < resource.elements.length; ++elementIndex) {
-            resource.elements[elementIndex].volume = volume;
-        }
-    }
-}
-
-function isAudioPlaying(element) {
-    return element.currentTime > 0
-            && !element.paused
-            && !element.ended
-            && element.readyState > 2;
-}
-
-function playSound(key, onComplete, overrideTabActive) {
-    // We usually don't want to play any sounds if the tab is not active
-    if (document.hidden && !overrideTabActive)
-        return;
-
-    // Allow random choice of sound from packs
-    if(audioPacks[key]) {
-        key = randElement(audioPacks[key]);
-    }
-
-    for(let index = 0; index < audioResources.length; ++index) {
-        const resource = audioResources[index];
-
-        if(resource.key !== key)
-            continue;
-        
-        let element = undefined;
-        
-        for(let elementIndex = 0; elementIndex < resource.elements.length; ++elementIndex) {
-            const potentialElement = resource.elements[elementIndex];
-            
-            if(!isAudioPlaying(potentialElement)) {
-                element = potentialElement;
-                break;
-            }
-        }
-
-        if(element === undefined) {
-            console.error("Ran out of audio instances to play the sound \"" + key + "\"");
+ImageResource.prototype._load = function() {
+    this.image = new Image();
+    this.image.onload = function() {
+        if (!this.image.width || !this.image.height) {
+            this.onError(
+                "Failed to load image " + this.name + ", "
+                + "invalid width or height (" + this.image.width + " x " + this.image.height + ")"
+            );
             return;
         }
-        
-        element.onended = onComplete;
+        this._onImageLoad();
+    }.bind(this);
+    this.image.onerror = function() {
+        this.onError("Image Error: " + this.image.error);
+    }.bind(this);
+    this.image.src = completeURL(this.url);
+};
+ImageResource.prototype.getScaledImage = function(width) {
+    if (width <= 0)
+        throw "Width must be positive: " + width;
+
+    // Determine how many times to halve the size of the image.
+    const maxScaleDowns = 5;
+    let nextWidth = Math.round(this.image.width / 2),
+        scaleDowns = 0;
+    while (nextWidth > width && scaleDowns < maxScaleDowns) {
+        nextWidth = Math.round(nextWidth / 2);
+        scaleDowns += 1;
+    }
+
+    // Generate the scaled images.
+    while (this.scaledImages.length < scaleDowns) {
+        const scaledCount = this.scaledImages.length,
+              last = (scaledCount === 0 ? this.image : this.scaledImages[scaledCount - 1]),
+              nextWidth = Math.round(last.width / 2),
+              nextHeight = Math.round(last.height / 2);
+
+        this.scaledImages.push(renderResource(nextWidth, nextHeight, function(ctx) {
+            ctx.drawImage(last, 0, 0, nextWidth, nextHeight);
+        }));
+    }
+
+    // Return the required scaled image.
+    return (scaleDowns <= 0 ? this.image : this.scaledImages[scaleDowns - 1]);
+};
+
+
+/** An ImageResource that should never be loaded. **/
+function GeneratedImageResource(name, url, image) {
+    ImageResource.call(this, name, url);
+    this.image = image;
+    this.load();
+    this.onLoad();
+}
+setSuperClass(GeneratedImageResource, ImageResource);
+GeneratedImageResource.prototype._load = () => {};
+GeneratedImageResource.prototype.hasMeaningfulLoadStats = () => false;
+
+
+/** An image that gets split up into multiple smaller images. **/
+function SpriteResource(url, childrenIds) {
+    ImageResource.call(this, url, url);
+    this.__class_name__ = "SpriteResource";
+    this.childrenIds = childrenIds;
+}
+setSuperClass(SpriteResource, ImageResource);
+SpriteResource.prototype._onImageLoad = function() {
+    annotationsResource.runOnLoad(function() {
+        const annotations = annotationsResource.get("sprites")[completeURL(this.url, "")];
+        if (!annotations) {
+            this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url);
+            return;
+        }
+
+        for (let childURL in this.childrenIds) {
+            if (!this.childrenIds.hasOwnProperty(childURL))
+                continue;
+
+            const childAnnotations = annotations[childURL];
+            if (!childAnnotations) {
+                this.onError("[FATAL] Could not find annotations for image " + childURL + " in sprite " + this.url);
+                return;
+            }
+
+            const childImage = renderResource(childAnnotations["width"], childAnnotations["height"], function(ctx) {
+                ctx.drawImage(this.image, -childAnnotations["x_offset"], -childAnnotations["y_offset"]);
+            }.bind(this));
+
+            const childImageResource = new GeneratedImageResource(this.childrenIds[childURL], childURL, childImage);
+            imageResourcesFromSprites.push(childImageResource);
+            updateAllResourcesArray();
+        }
+        this.onLoad();
+    }.bind(this));
+};
+
+
+/** Sounds to be played. **/
+function AudioResource(name, url, options) {
+    Resource.call(this, name, url);
+    this.__class_name__ = "AudioResource";
+    this.volume = getOrDefault(options, "volume", 1);
+    this.instances = getOrDefault(options, "instances", 1);
+}
+setSuperClass(AudioResource, Resource);
+AudioResource.prototype._load = function() {
+    this.element = new Audio();
+    this.element.preload = "auto";
+    this.element.addEventListener("error", function() {
+        this.onError("Audio Error: " + this.element.error);
+    }.bind(this));
+    this.element.src = this.url;
+    this.element.load();
+    this.elements = [this.element];
+    for (let index = 1; index < this.instances; ++index) {
+        this.elements.push(this.element.cloneNode());
+    }
+    this.onLoad(); // Browsers sometimes only load audio when it is played.
+    this.updateElementSettings();
+};
+AudioResource.prototype.updateElementSettings = function() {
+    if (!this.loaded)
+        return;
+
+    const volume = (audioSettings.muted ? 0 : this.volume * audioSettings.volume);
+    for (let index = 0; index < this.elements.length; ++index) {
+        this.elements[index].volume = volume;
+    }
+};
+AudioResource.prototype.play = function(onCompleteCallback) {
+    onCompleteCallback = (onCompleteCallback !== undefined ? onCompleteCallback : ()=>{});
+    if (!this.loaded) {
+        onCompleteCallback();
+        return false;
+    }
+    for (let index = 0; index < this.elements.length; ++index) {
+        const element = this.elements[index];
+        if (isAudioElementPlaying(element))
+            continue;
+
+        element.onended = onCompleteCallback;
         const playPromise = element.play();
-        
-        // It can sometimes be stopped from playing randomly
+
+        // The audio can sometimes be stopped from playing randomly.
         if (playPromise !== undefined) {
-            playPromise.catch((error1) => {
+            playPromise.catch(() => {
                 element.play().catch((error2) => {
-                    console.error("Unable to play sound " + key + " : " + error2);
-                    if (onComplete) {
-                        onComplete();
-                    }
+                    console.error("Unable to play sound " + this.name + " : " + error2);
+                    onCompleteCallback();
                 });
             });
         }
-        return element;
+        return true;
     }
+    onCompleteCallback();
+    return false;
+};
+AudioResource.prototype.hasMeaningfulLoadStats = () => false;
 
+
+//
+// Audio management.
+//
+
+const audioSettings = {
+    muted: false,
+    volume: 0.5
+};
+
+function setAudioMuted(soundMuted) {
+    audioSettings.muted = soundMuted;
+    updateAudioElements();
+}
+
+function setAudioVolume(soundVolume) {
+    audioSettings.volume = soundVolume;
+    updateAudioElements();
+}
+
+function updateAudioElements() {
+    for (let index = 0; index < allResources.length; ++index) {
+        const resource = allResources[index];
+        if (resource instanceof AudioResource) {
+            resource.updateElementSettings();
+        }
+    }
+}
+
+function isAudioElementPlaying(element) {
+    return element.currentTime > 0 && !element.paused && !element.ended && element.readyState > 2;
+}
+
+function playSound(key, onCompleteCallback, overrideTabActive) {
+    // We usually don't want to play any sounds if the tab is not active.
+    if (document.hidden && !overrideTabActive)
+        return false;
+
+    // Allow random choice of sound from packs of audio clips.
+    if(audioPacks[key]) {
+        key = randElement(audioPacks[key]);
+    }
+    for (let index = 0; index < allResources.length; ++index) {
+        const resource = allResources[index];
+        if (resource instanceof AudioResource && resource.name === key)
+            return resource.play(onCompleteCallback);
+    }
     error("Unable to find the sound \"" + key + "\"");
-}
-
-const songQueue = [];
-
-let lastSong = undefined;
-
-function playSong() {
-    if(songQueue.length === 0) {
-        for(let index = 0; index < audioResources.length; ++index) {
-            const resource = audioResources[index];
-
-            if(!resource.song || lastSong === resource)
-                continue;
-
-            songQueue.push(resource);
-        }
-
-        if(songQueue.length === 0) {
-            setTimeout(playSong, 15);
-            return;
-        }
-    }
-
-    const playIndex = randInt(songQueue.length),
-          resource = songQueue[playIndex];
-
-    songQueue.splice(playIndex, 1);
-
-    resource.element.onended = playSong;
-    resource.element.play();
-
-    lastSong = resource;
-}
-
-function loadAudio() {
-    for(let index = 0; index < audioResources.length; ++index) {
-        const resource = audioResources[index],
-              resourceName = "audio(" + resource.key + ")";
-        
-        const instances = (resource.instances !== undefined ? resource.instances : 1),
-              element = new Audio();
-
-        // The list we are going to fill with the loaded audio elements
-        resource.elements = [];
-
-        element.preload = "auto";
-        element.addEventListener("error", () => {
-            console.log("There was an error loading audio resource " + resourceName + ": " + element.error);
-        });
-        element.src = resource.url;
-        element.load();
-
-        resource.elements.push(element);
-        for (let index = 1; index < instances; ++index) {
-            resource.elements.push(element.cloneNode());
-        }
-    }
-    
-    updateAudioVolumes();
+    return false;
 }
 
 
@@ -637,244 +472,31 @@ function loadAudio() {
 // Image loading.
 //
 
-const loadedImageResources = {};
-const loadedSpriteResources = {};
-let loadedImageAnnotations = {};
-
-function loadImageAnnotations() {
-    const resourceName = "imageAnnotations";
-    markResourceLoading(resourceName);
-
-    const client = new XMLHttpRequest();
-    client.onreadystatechange = function() {
-        if (this.readyState !== 4)
-            return;
-
-        if (this.status !== 200) {
-            error("Error " + this.status + " loading image annotations: " + this.responseText);
-            markResourceLoaded(resourceName);
-            return;
-        }
-
-        loadedImageAnnotations = JSON.parse(this.responseText);
-        markResourceLoaded(resourceName);
-    }.bind(client);
-    client.open('GET', '/res/annotations.json');
-    client.send();
-}
-
-function getImageURL(imageKey) {
-    return completeURL(imageResources[imageKey]);
-}
-
-function completeURL(url, extension) {
-    extension = (extension !== undefined ? extension : imageExtension);
-    return url + (resolution !== "u_u" ? "." + resolution : "") + (extension.length > 0 ? "." + extension : "");
-}
-
-function loadImages() {
-    loadImageAnnotations();
-    loadSprites();
-
-    for(let key in imageResources) {
-        if(!imageResources.hasOwnProperty(key))
-            continue;
-
-        const resourceName = "image(" + key + ")";
-        markResourceLoading(resourceName);
-
-        const imageResource = {
-            key: key,
-            image: new Image(),
-            loaded: false,
-            width: NaN,
-            height: NaN,
-            scaled: []
-        };
-        imageResource.scaled.push(imageResource.image);
-
-        imageResource.image.onload = function() {
-            imageResource.width = this.width;
-            imageResource.height = this.height;
-
-            if(!imageResource.width || !imageResource.height) {
-                error("[FATAL] Failed to load image resource \"" + imageResource.key + "\", "
-                    + "invalid width or height (" + imageResource.width + " x " + imageResource.height + ")");
-
-                markResourceLoaded(resourceName);
-                loadedImageResources[imageResource.key] = undefined;
-                return;
-            }
-
-            imageResource.loaded = true;
-            markResourceLoaded(resourceName);
-        };
-
-        imageResource.image.onerror = function() {
-            console.log(arguments);
-        };
-
-        imageResource.image.src = completeURL(imageResources[key]);
-        loadedImageResources[key] = imageResource;
+function findImageResource(key) {
+    for (let index = 0; index < allResources.length; ++index) {
+        const resource = allResources[index];
+        if (resource instanceof ImageResource && resource.name === key)
+            return resource;
     }
+    return null;
 }
 
-function loadSprites() {
-    for(let url in sprites) {
-        if(!sprites.hasOwnProperty(url))
-            continue;
-
-        const resourceName = "sprite(" + url + ")";
-        markResourceLoading(resourceName);
-
-        const spriteResource = {
-            url: url,
-            image: new Image(),
-            width: NaN,
-            height: NaN,
-            loaded: false
-        };
-
-        spriteResource.image.onload = function() {
-            spriteResource.width = this.width;
-            spriteResource.height = this.height;
-
-            if(!spriteResource.width || !spriteResource.height) {
-                error("[FATAL] Failed to load image resource \"" + spriteResource.url + "\", "
-                    + "invalid width or height (" + spriteResource.width + " x " + spriteResource.height + ")");
-
-                markResourceLoaded(resourceName);
-                loadedSpriteResources[spriteResource.url] = undefined;
-                return;
-            }
-
-            spriteResource.loaded = true;
-            markResourceLoaded(resourceName);
-        };
-
-        spriteResource.image.onerror = function() {
-            console.log(arguments);
-        };
-
-        spriteResource.image.src = completeURL(url);
-        loadedSpriteResources[url] = spriteResource;
-    }
-}
-
-function splitSpritesIntoImages() {
-    const spriteAnnotations = getImageAnnotation("sprites");
-
-    if (!spriteAnnotations) {
-        error("[FATAL] Sprite annotations are not loaded, and therefore sprites cannot be split");
-        return;
-    }
-
-    for(let url in sprites) {
-        const resource = loadedSpriteResources[url],
-              mappings = sprites[url],
-              annotations = spriteAnnotations[completeURL(url, "")];
-
-        if (!resource || !resource.loaded) {
-            error("[FATAL] Sprite " + url + " is not loaded, and therefore cannot be split");
-            return;
-        }
-
-        if (!annotations) {
-            error("[FATAL] Could not find sprite annotations for sprite " + url);
-            return;
-        }
-
-        for(let mappedURL in mappings) {
-            if (!mappings.hasOwnProperty(mappedURL))
-                continue;
-
-            const imageAnnotation = annotations[mappedURL],
-                  identifier = mappings[mappedURL];
-
-            if (!imageAnnotation) {
-                error("[FATAL] Could not find annotations for image " + mappedURL + " within sprite " + url);
-                return;
-            }
-
-            const image = renderResource(imageAnnotation["width"], imageAnnotation["height"], function(ctx) {
-                ctx.drawImage(resource.image, -imageAnnotation["x_offset"], -imageAnnotation["y_offset"]);
-            });
-
-            loadedImageResources[identifier] = {
-                key: identifier,
-                image: image,
-                loaded: true,
-                sprite: true,
-                width: image.width,
-                height: image.height,
-                scaled: [image]
-            };
-        }
-    }
-}
-
-function getImageAnnotation(key) {
-    const imageAnnotation = loadedImageAnnotations[key];
-
-    if(!imageAnnotation) {
-        error("Cannot find image annotation with key \"" + key + "\"");
-        return null;
-    }
-
-    return imageAnnotation;
-}
-
-function getRawImageResource(key) {
-    const imageResource = loadedImageResources[key];
-
-    if(!imageResource) {
-        error("Cannot find image with key \"" + key + "\"");
-        return null;
-    }
-
-    return imageResource;
+function getImageURL(key) {
+    return completeURL(findImageResource(key).url);
 }
 
 function getImageResource(key, width) {
-    if (width < 1)
-        throw "Width cannot be less than 1: " + width
-
-    const imageResource = getRawImageResource(key);
+    const imageResource = findImageResource(key);
     if(!imageResource)
         throw "Missing image resource " + key;
-
-    const scaledowns = Math.floor(Math.log(imageResource.width / width) / Math.log(2)) - 1;
-
-    if(!width || scaledowns <= 0) {
-        if (!imageResource.image)
-            throw "Missing image for resource " + key;
-        return imageResource.image;
-    }
-
-    if(scaledowns >= imageResource.scaled.length) {
-        let scaledownsDone = imageResource.scaled.length - 1,
-            current = imageResource.scaled[scaledownsDone];
-
-        while(scaledownsDone < scaledowns) {
-            scaledownsDone += 1;
-
-            const next = renderResource(current.width / 2, current.height / 2, function(ctx, canvas) {
-                ctx.drawImage(current, 0, 0, canvas.width, canvas.height);
-            });
-
-            imageResource.scaled.push(next);
-            current = next;
-        }
-    }
-
-    if (!imageResource.scaled[scaledowns])
-        throw "Missing image scaled down " + scaledowns + " for resource " + key;
-    return imageResource.scaled[scaledowns];
+    return imageResource.getScaledImage(width);
 }
 
 function renderResource(width, height, renderFunction) {
+    if (isNaN(width) || isNaN(height))
+        throw "Width and height cannot be NaN, was given " + width + " x " + height;
     if (width < 1 || height < 1)
-        throw "Width and height must both be at least 1, was given " + width + "x" + height;
+        throw "Width and height must both be at least 1, was given " + width + " x " + height;
 
     const canvas = document.createElement("canvas"),
           ctx = canvas.getContext("2d");
@@ -890,6 +512,80 @@ function renderResource(width, height, renderFunction) {
 function calcImageHeight(image, width) {
     return Math.ceil(image.height / image.width * width);
 }
+
+
+//
+// The resources to be loaded.
+//
+
+const annotationsResource = new AnnotationsResource("annotations", "/res/annotations.json");
+const stagedResources = [
+    [ // Menu
+        new ImageResource("logo", "res/logo"),
+        new ImageResource("tile_dark", "res/tile_dark"),
+        new ImageResource("play_local", "res/button_play_local"),
+        new ImageResource("play_online", "res/button_play_online"),
+        new ImageResource("play_computer", "res/button_play_computer"),
+        new SpriteResource("res/play_button", {
+            "res/buttons/play.png": "play",
+            "res/buttons/play_active.png": "play_active"
+        }),
+        new SpriteResource("res/learn_button", {
+            "res/buttons/learn.png": "learn",
+            "res/buttons/learn_active.png": "learn_active"
+        }),
+        new SpriteResource("res/watch_button", {
+            "res/buttons/watch.png": "watch",
+            "res/buttons/watch_active.png": "watch_active"
+        }),
+    ],
+    [ // Game
+        new ImageResource("board", "res/board"),
+        new ImageResource("tile_light", "res/tile_light"),
+        new SpriteResource("res/dice", {
+            "res/dice/up1.png": "diceUp1",
+            "res/dice/up2.png": "diceUp2",
+            "res/dice/up3.png": "diceUp3",
+            "res/dice/down1.png": "diceDown1",
+            "res/dice/down2.png": "diceDown2",
+            "res/dice/down3.png": "diceDown3",
+            "res/dice/darkShadow.png": "diceDarkShadow",
+            "res/dice/lightShadow.png": "diceLightShadow"
+        }),
+        new AudioResource("place_1", "res/audio_place_1.mp4"),
+        new AudioResource("place_2", "res/audio_place_2.mp4"),
+        new AudioResource("place_3", "res/audio_place_3.mp4"),
+        new AudioResource("place_4", "res/audio_place_4.mp4"),
+        new AudioResource("pickup_1", "res/audio_pickup_1.mp4"),
+        new AudioResource("pickup_2", "res/audio_pickup_2.mp4"),
+        new AudioResource("pickup_3", "res/audio_pickup_3.mp4"),
+        new AudioResource("error", "res/audio_error.mp4", {instances: 3, volume: 0.5}),
+        new AudioResource("kill", "res/audio_kill.mp4", {volume: 0.5}),
+        new AudioResource("hover", "res/audio_hover.mp4", {instances: 3, volume: 0.5}),
+        new AudioResource("dice_click", "res/audio_dice_click.mp4", {instances: 5, volume: 0.5}),
+        new AudioResource("dice_hit", "res/audio_dice_hit.mp4", {instances: 4, volume: 0.3}),
+        new AudioResource("dice_select", "res/audio_dice_select.mp4", {instances: 4, volume: 0.5}),
+        new AudioResource("firework_rocket", "res/audio_firework_rocket.mp4", {instances: 4, volume: 0.05}),
+    ],
+];
+const imageResourcesFromSprites = [];
+const allResources = [];
+
+/** Should be called as the underlying arrays holding the resources are changed. **/
+function updateAllResourcesArray() {
+    allResources.splice(0, allResources.length);
+    allResources.push(annotationsResource);
+    allResources.push.apply(allResources, imageResourcesFromSprites);
+    for (let index = 0; index < stagedResources.length; ++index) {
+        allResources.push.apply(allResources, stagedResources[index]);
+    }
+}
+updateAllResourcesArray();
+
+const audioPacks = {
+    "place": ["place_1", "place_2", "place_3", "place_4"],
+    "pickup": ["pickup_1", "pickup_2", "pickup_3"]
+};
 
 
 //

@@ -29,6 +29,20 @@ function unimplemented(name) {
     };
 }
 
+function getOrDefault(dict, key, defaultValue) {
+    if (!dict)
+        return defaultValue;
+    const value = dict[key];
+    return (value ? value : defaultValue);
+}
+
+function setSuperClass(subclass, superclass) {
+    subclass.prototype = Object.create(superclass.prototype);
+    Object.defineProperty(subclass.prototype, "constructor", {
+        value: subclass, enumerable: false, writable: true
+    });
+}
+
 
 
 //

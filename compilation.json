@@ -48,8 +48,6 @@
     "res/audio/dice_click.mp4": "res/audio_dice_click.mp4",
     "res/audio/dice_hit.mp4": "res/audio_dice_hit.mp4",
     "res/audio/dice_select.mp4": "res/audio_dice_select.mp4",
-    "res/audio/typewriter_key.mp4": "res/audio_typewriter_key.mp4",
-    "res/audio/typewriter_end.mp4": "res/audio_typewriter_end.mp4",
     "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4"
   },

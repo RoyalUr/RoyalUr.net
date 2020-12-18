@@ -146,11 +146,7 @@ function OnlineGame() {
     Game.call(this, false);
     this.__class_name__ = "OnlineGame";
 }
-
-OnlineGame.prototype = Object.create(Game.prototype);
-Object.defineProperty(OnlineGame.prototype, "constructor", {
-    value: OnlineGame, enumerable: false, writable: true
-});
+setSuperClass(OnlineGame, Game);
 
 OnlineGame.prototype.init = function() {
     connect();
@@ -235,10 +231,8 @@ function BrowserGame() {
     Game.call(this, true);
     this.__class_name__ = "BrowserGame";
 }
-BrowserGame.prototype = Object.create(Game.prototype);
-Object.defineProperty(BrowserGame.prototype, "constructor", {
-    value: BrowserGame, enumerable: false, writable: true
-});
+setSuperClass(BrowserGame, Game);
+
 BrowserGame.prototype.onFinishDice = unimplemented("onFinishDice");
 BrowserGame.prototype.onDiceClick = function() {
     if(!dice.active || dice.rolling || !ownPlayer.active)
@@ -266,10 +260,7 @@ function ComputerGame() {
 
     this.turnPlayer = lightPlayer;
 }
-ComputerGame.prototype = Object.create(BrowserGame.prototype);
-Object.defineProperty(ComputerGame.prototype, "constructor", {
-    value: ComputerGame, enumerable: false, writable: true
-});
+setSuperClass(ComputerGame, BrowserGame);
 
 ComputerGame.prototype.isComputersTurn = function() {
     return this.turnPlayer === otherPlayer;
@@ -404,10 +395,7 @@ function LocalGame() {
     lightPlayer.name = "Light";
     darkPlayer.name = "Dark";
 }
-LocalGame.prototype = Object.create(BrowserGame.prototype);
-Object.defineProperty(LocalGame.prototype, "constructor", {
-    value: LocalGame, enumerable: false, writable: true
-});
+setSuperClass(LocalGame, BrowserGame);
 
 LocalGame.prototype.isLeftTurn = function() {
     return this.turnPlayer === leftPlayer;

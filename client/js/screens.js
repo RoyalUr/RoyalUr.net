@@ -9,8 +9,18 @@ const SCREEN_LOADING = "loading",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
+const screenRequiredLoadingStages = {};
+screenRequiredLoadingStages[SCREEN_LOADING] = -1;
+screenRequiredLoadingStages[SCREEN_MENU] = 0;
+screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
+screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
+screenRequiredLoadingStages[SCREEN_GAME] = 1;
+screenRequiredLoadingStages[SCREEN_WIN] = 1;
+
 const screenState = {
     screen: SCREEN_LOADING,
+    loadingTargetScreen: null,
+    loadingTargetStage: 0,
 
     enterHandlers: [],
     exitHandlers: [],
@@ -23,11 +33,7 @@ const screenState = {
 };
 
 function registerScreenHandler(screens, handler, handlersList) {
-    // Screens should be an array
-    if (typeof screens === 'string' || screens instanceof String) {
-        screens = [screens];
-    }
-
+    screens = (typeof screens === 'string' || screens instanceof String ? [screens] : screens);
     handlersList.push({
         screens: screens,
         handlerFn: handler
@@ -51,37 +57,57 @@ function fireScreenHandlers(fromScreen, toScreen, hasty) {
     function fireMatchingScreenHandlers(inScreen, outScreen, handlersList) {
         for (let index = 0; index < handlersList.length; ++index) {
             const handler = handlersList[index];
-
-            if (!handler.screens.includes(inScreen))
-                continue;
-            if (handler.screens.includes(outScreen))
+            if (!handler.screens.includes(inScreen) || handler.screens.includes(outScreen))
                 continue;
 
             handler.handlerFn(hasty);
         }
     }
-
     fireMatchingScreenHandlers(toScreen, fromScreen, screenState.enterHandlers);
     fireMatchingScreenHandlers(fromScreen, toScreen, screenState.exitHandlers);
 }
 
-function isOnScreen(screen) {
-    return screenState.screen === screen;
+function isOnScreen(screens) {
+    if (typeof screens === "string" || screens instanceof String)
+        return screenState.screen === screens;
+
+    for (let index = 0; index < screens.length; ++index) {
+        if (isOnScreen(screens[index]))
+            return true;
+    }
+    return false;
 }
 
 function switchToScreen(screen, hasty) {
-    hasty = (!hasty ? false : hasty);
+    // Check if we have to wait for resources to load before switching.
+    const requiredLoadingStage = screenRequiredLoadingStages[screen];
+    if (loading.stage <= requiredLoadingStage) {
+        screenState.loadingTargetScreen = screen;
+        screenState.loadingTargetStage = requiredLoadingStage;
+        loadingBar.stage = requiredLoadingStage;
+        setScreen(SCREEN_LOADING, hasty)
+        return;
+    }
+    setScreen(screen, hasty);
+}
 
+function setScreen(screen, hasty) {
     const fromScreen = screenState.screen;
-
-    // Already on the given screen
     if (fromScreen === screen)
         return;
 
     screenState.screen = screen;
-    fireScreenHandlers(fromScreen, screen, hasty);
+    fireScreenHandlers(fromScreen, screen, !!hasty);
 }
 
+function maybeSwitchOffLoadingScreen(stage) {
+    if (screenState.loadingTargetScreen === null || stage < screenState.loadingTargetStage)
+        return;
+
+    setScreen(screenState.loadingTargetScreen, false);
+    screenState.loadingTargetScreen = null;
+    screenState.loadingTargetStage = 0;
+}
 
 
 //
@@ -118,19 +144,16 @@ registerScreenTransitionHandlers(
 
 function onEnterLoadingScreen(hasty) {
     loadingFade.fadeIn(hasty ? 0 : undefined);
+    redrawLoadingBar();
 }
 
 function onExitLoadingScreen(hasty) {
     loadingFade.fadeOut(hasty ? 0 : undefined);
 }
 
-function onEnterMenuScreen(hasty) {
+function onEnterMenuScreen(hasty) {}
 
-}
-
-function onExitMenuScreen(hasty) {
-
-}
+function onExitMenuScreen(hasty) {}
 
 function onEnterPlaySelectScreen(hasty) {
     fitty.fitAll();
@@ -170,8 +193,8 @@ function onExitConnectingScreen(hasty) {
 
 function onEnterGameScreen(hasty) {
     setMessageAndFade("Found your Game", screenState.connectionFade);
-
     game.init();
+    redrawBoard(true);
 }
 
 function onExitGameScreen(hasty) {
@@ -189,9 +212,7 @@ function onExitWinScreen(hasty) {
     setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
 }
 
-function onEnterServerScreen(hasty) {
-
-}
+function onEnterServerScreen(hasty) {}
 
 function onExitServerScreen(hasty) {
     disconnect();

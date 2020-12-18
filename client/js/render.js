@@ -152,7 +152,7 @@ function redrawMenu(forceRedraw) {
 
 function redrawBoard(forceRedraw) {
     // We only want to redraw the board when we have to
-    if (!forceRedraw)
+    if (!isOnScreen([SCREEN_GAME, SCREEN_WIN]) || !forceRedraw)
         return;
 
     const ctx = boardCtx;
@@ -282,8 +282,8 @@ function finishTileMove() {
 }
 
 function redrawTiles(forceRedraw) {
-    // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
+    // Avoid redrawing if we don't have to.
+    if (!isOnScreen(SCREEN_GAME))
         return;
 
     const ctx = tilesCtx,
@@ -669,8 +669,8 @@ function redrawPlayerScores(player, drawFromLeft) {
 }
 
 function redrawScores(forceRedraw) {
-    // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
+    // Avoid redrawing if we don't have to.
+    if (!isOnScreen(SCREEN_GAME))
         return;
 
     redrawPlayerScores(leftPlayer, false);
@@ -709,8 +709,8 @@ let diceHovered = false,
     lastDiceSelected = 0;
 
 function redrawDice(forceRedraw) {
-    // Avoid redrawing if we don't have to
-    if (!forceRedraw && !isOnScreen(SCREEN_GAME))
+    // Avoid redrawing if we don't have to.
+    if (!isOnScreen(SCREEN_GAME))
         return;
 
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
