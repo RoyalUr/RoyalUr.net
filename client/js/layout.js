@@ -5,14 +5,14 @@
 const maxWidthOnHeightRatio = 1.5;
 
 const menuDiv = document.getElementById("menu"),
-      playButton = document.getElementById("play"),
+      playButton = document.getElementById("play-button"),
       playButtonCanvas = document.getElementById("play-canvas"),
       playButtonCtx = playButtonCanvas.getContext("2d"),
       playButtonTiles = playButton.getElementsByTagName("img"),
-      learnButton = document.getElementById("learn"),
+      learnButton = document.getElementById("learn-button"),
       learnButtonCanvas = document.getElementById("learn-canvas"),
       learnButtonCtx = learnButtonCanvas.getContext("2d"),
-      watchButton = document.getElementById("watch"),
+      watchButton = document.getElementById("watch-button"),
       watchButtonCanvas = document.getElementById("watch-canvas"),
       watchButtonCtx = watchButtonCanvas.getContext("2d"),
       exitButton = document.getElementById("exit");
