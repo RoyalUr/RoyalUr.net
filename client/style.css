@@ -170,15 +170,15 @@ body {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
-#play span, #play canvas {
+#play-button img, #play-canvas {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
-#play:hover canvas {
+#play-button:hover canvas {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
 
-#play img {
+#play-button img {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 
@@ -233,7 +233,7 @@ body {
     position: relative;
 }
 
-#play {
+#play-button {
     padding: 0;
 
     display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
@@ -245,25 +245,25 @@ body {
     align-items: center;
 }
 
-#play canvas {
+#play-button canvas {
     /*position: relative;*/
     display: inline-block;
     vertical-align: middle;
 }
 
-#play img {
+#play-button img {
     display: inline-block;
     vertical-align: middle;
 
     transition: width 0.2s ease-in-out, height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
 }
 
-#learn, #learn canvas {
+#learn-button, #learn-button canvas {
     display: block;
     vertical-align: middle;
 }
 
-#watch, #watch canvas {
+#watch-button, #watch-button canvas {
     display: block;
     vertical-align: middle;
 }
@@ -482,7 +482,7 @@ body {
     position: absolute;
     left: 0;
     bottom: 0;
-    z-index: 10;
+    z-index: 100;
     vertical-align: baseline;
 }
 
@@ -491,7 +491,7 @@ body {
     padding-bottom: 6px;
 
     font-family: DuranGo, sans-serif;
-    font-size: 20px;
+    font-size: 3vh;
     text-shadow: black 0 0 10px;
 }
 
@@ -500,19 +500,6 @@ body {
     text-decoration: none;
     color: white;
     cursor: pointer;
-}
-
-.twitter-follow-button {
-    display: none;
-    margin-left: 3px;
-    margin-bottom: 6px;
-    vertical-align: text-bottom;
-
-    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.5);
-}
-
-.twitter-follow-button-rendered {
-    display: inline-block;
 }
 
 
@@ -587,4 +574,65 @@ body {
 .exit-content:hover svg line {
     stroke-width: 25;
     transition: stroke-width 0.2s ease-in-out;
+}
+
+
+/*
+ * LEARN SCREEN
+ */
+
+#learn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: none;
+}
+
+#learn-title {
+    width: 40%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5vh;
+}
+
+#learn-content {
+    max-width: 1000px;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2vh;
+    padding-left: 5vh;
+    padding-right: 5vh;
+    background: rgba(0,0,0,0.5);
+    box-shadow: 0 0 40px 2px rgba(0,0,0,0.3);
+}
+
+#learn-content, #learn-content * {
+    font-family: Nunito, sans-serif;
+    font-size: 3.5vh;
+    text-decoration: none;
+    color: white;
+}
+
+#learn-content b {
+    text-decoration: underline;
+    margin-right: 0.75vh;
+}
+
+#learn-content .how-to-play {
+    display: inline-block;
+    margin-bottom: 0.8vh;
+}
+
+#learn-content .sub-text, #learn-content .inline-sub-text {
+    font-size: 2.8vh;
+    margin-top: 0.15vh;
+}
+
+#learn-content .inline-sub-text {
+    display: inline;
 }

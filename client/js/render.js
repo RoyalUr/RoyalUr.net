@@ -35,6 +35,7 @@ function redraw(forceRedraw) {
         callRedraw(STAT_BOARD, redrawBoard);
         callRedraw(STAT_LOADING, redrawLoading);
         callRedraw(STAT_MENU, redrawMenu);
+        callRedraw(STAT_LEARN, redrawLearn);
         callRedraw(STAT_TILES, redrawTiles);
         callRedraw(STAT_DICE, redrawDice);
         callRedraw(STAT_SCORES, redrawScores);
@@ -44,7 +45,8 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playSelectDiv, boardCanvas, tilesCanvas, exitButton,
+            menuDiv, playSelectDiv, learnDiv,
+            boardCanvas, tilesCanvas, exitButton,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -65,6 +67,9 @@ function redrawLoading(forceRedraw) {
     const opacity = loadingFade.get();
     loadingDiv.style.opacity = opacity;
     loadingDiv.style.display = (opacity === 0 ? "none" : "")
+    if (loadingFade.isFadeIn) {
+        loadingTextSpan.textContent = getStageLoadingMessage(loading.stage);
+    }
 }
 
 
@@ -147,19 +152,30 @@ function redrawMenu(forceRedraw) {
 
 
 //
+// Rendering of the learn screen.
+//
+
+function redrawLearn(forceRedraw) {
+    learnDiv.style.opacity = screenState.learnFade.get();
+    if (!isOnScreen(SCREEN_LEARN) && !forceRedraw)
+        return;
+
+    // Do more fancy redrawing stuff here.
+}
+
+
+
+//
 // Rendering of the board itself.
 //
 
 function redrawBoard(forceRedraw) {
-    // We only want to redraw the board when we have to
     if (!isOnScreen([SCREEN_GAME, SCREEN_WIN]) || !forceRedraw)
         return;
 
     const ctx = boardCtx;
-
     ctx.shadowColor = 'black';
     ctx.shadowBlur = 30;
-
     ctx.clearRect(0, 0, boardCanvasWidth, boardCanvasHeight);
     ctx.drawImage(getImageResource("board", boardCanvasWidth), boardX, boardY, boardWidth, boardHeight);
 }

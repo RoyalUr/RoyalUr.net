@@ -30,7 +30,7 @@ function setup() {
     if (getHashGameID() !== null) {
         connectToGame(true);
     } else {
-        setScreen(SCREEN_MENU);
+        switchToScreen(SCREEN_MENU);
     }
 
     window.requestAnimationFrame(function() {
@@ -95,6 +95,11 @@ function onBeforeUnload(event) {
 function onPlayClick(event) {
     event.stopPropagation();
     switchToScreen(SCREEN_PLAY_SELECT);
+}
+
+function onLearnClick(event) {
+    event.stopPropagation();
+    switchToScreen(SCREEN_LEARN);
 }
 
 function onPlayLocal(event) {

@@ -490,6 +490,27 @@ def create_dev_build(target_folder):
     print("\nDone!\n")
 
 
+def create_nojs_build(target_folder):
+    print("\nCompiling Development NoJS Build")
+    comp_spec = CompilationSpec.read("compilation.json")
+
+    print("\n1. Minify CSS")
+    minify_css(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n2. Copy Resource Files")
+    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n3. Create Sprites")
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n4. Create Annotations File")
+    combine_annotations(target_folder, comp_spec, {
+        "sprites": sprite_annotations
+    }, prefix=" .. ")
+
+    print("\nDone!\n")
+
+
 #
 # Run the Compilation
 #
@@ -505,6 +526,8 @@ if __name__ == "__main__":
         create_release_build("compiled")
     elif mode == "dev":
         create_dev_build("compiled")
+    elif mode == "nojs":
+        create_nojs_build("compiled")
     else:
         if mode != "":
             print("Invalid compilation mode", mode)

@@ -36,10 +36,9 @@
                     <canvas id="play-canvas"></canvas>
                     <img class="tile_dark_image dynamic_image" src="" alt="" />
                 </div>
-
-                <a id="learn-button" class="menu-button shadow" href="https://youtu.be/WZskjLq040I?t=222" target="_blank" rel="noopener">
+                <div id="learn-button" class="menu-button shadow">
                     <canvas id="learn-canvas"></canvas>
-                </a>
+                </div>
                 <a id="watch-button" class="menu-button shadow" href="https://youtu.be/WZskjLq040I" target="_blank" rel="noopener">
                     <canvas id="watch-canvas"></canvas>
                 </a>
@@ -103,6 +102,34 @@
                 <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
             </svg><span id="exit-text">Exit to Menu</span>
         </div></div>
+
+        <!-- LEARN SCREEN -->
+        <div id="learn">
+            <div id="learn-content">
+                <img id="learn-title" class="logo_image dynamic_image" src="" alt="" />
+                <b>Goal:</b> Get all of your pieces around and off the board!
+                <br/><br/>
+
+                <b class="how-to-play">How to Play:</b><br/>
+                <b>1.</b> Roll the Dice.<br/>
+                <p class="sub-text">The value shown is how far you can move one of your pieces!</p>
+                <br/>
+
+                <b>2.</b> Move a Piece.<br/>
+                <p class="sub-text">
+                    Pieces can be moved by dragging, double clicking,
+                    or by clicking them and then their destination.
+                </p>
+                <br/>
+
+                <b>Lotus Flower Tiles:</b><br/>
+                <p style="display: inline">Extra Moves:</p>
+                <p class="inline-sub-text">Moving your tiles onto lotus tiles gives you another move!</p><br/>
+
+                <p style="display: inline">Safe:</p>
+                <p class="inline-sub-text">Pieces on lotus tiles cannot be taken!</p><br/>
+            </div>
+        </div>
 
         <!-- LAZY LOADED JAVASCRIPT -->
         <script async src="index.js"></script>

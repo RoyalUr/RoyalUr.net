@@ -44,17 +44,23 @@ const loadingBar = {
 };
 
 function getPercentageLoaded() {
-    if (loadingBar.stage < 0 || loadingBar.stage >= stagedResources.length)
+    const stage = min(loadingBar.stage, loading.stage);
+    if (stage < 0 || stage >= stagedResources.length)
         return 0;
 
-    const resources = stagedResources[loadingBar.stage];
-    let loaded = 0;
+    const resources = stagedResources[stage];
+    let loaded = 0, total = 0;
     for (let index = 0; index < resources.length; ++index) {
-        if (resources[index].loaded) {
+        const resource = resources[index];
+        if (!resource.hasMeaningfulLoadStats())
+            continue;
+
+        total += 1;
+        if (resource.loaded) {
             loaded += 1;
         }
     }
-    return (resources.length === 0 ? 0 : loaded / resources.length);
+    return (total === 0 ? 0 : loaded / total);
 }
 
 function redrawLoadingBar() {
@@ -81,6 +87,14 @@ function setLoadingCallback(callback) {
     for (let missed = 0; missed < loading.stage; ++missed) {
         callback(missed);
     }
+}
+
+function getStageLoadingMessage(stage) {
+    if (stage === 1)
+        return "Fetching Game Assets...";
+    if (stage >= 2)
+        return "Fetching Teaching Materials...";
+    return "The Royal Ur is Loading...";
 }
 
 function startLoadingStage() {
@@ -278,9 +292,9 @@ ImageResource.prototype.getScaledImage = function(width) {
         throw "Width must be positive: " + width;
 
     // Determine how many times to halve the size of the image.
-    const maxScaleDowns = 5;
+    const maxScaleDowns = 4;
     let nextWidth = Math.round(this.image.width / 2),
-        scaleDowns = 0;
+        scaleDowns = -1;
     while (nextWidth > width && scaleDowns < maxScaleDowns) {
         nextWidth = Math.round(nextWidth / 2);
         scaleDowns += 1;
@@ -567,6 +581,8 @@ const stagedResources = [
         new AudioResource("dice_select", "res/audio_dice_select.mp4", {instances: 4, volume: 0.5}),
         new AudioResource("firework_rocket", "res/audio_firework_rocket.mp4", {instances: 4, volume: 0.05}),
     ],
+    [ // Learn Screen
+    ]
 ];
 const imageResourcesFromSprites = [];
 const allResources = [];

@@ -5,6 +5,7 @@
 const SCREEN_LOADING = "loading",
       SCREEN_MENU = "menu",
       SCREEN_PLAY_SELECT = "play_select",
+      SCREEN_LEARN = "learn",
       SCREEN_CONNECTING = "connecting",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
@@ -13,6 +14,7 @@ const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
 screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
+screenRequiredLoadingStages[SCREEN_LEARN] = 2;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
 screenRequiredLoadingStages[SCREEN_WIN] = 1;
@@ -27,6 +29,7 @@ const screenState = {
 
     menuFade: createFade(0.5),
     playSelectFade: createFade(0.5),
+    learnFade: createFade(0.5),
     boardFade: createFade(0.5),
     exitFade: createFade(0.25),
     connectionFade: createFade(2, 0.5)
@@ -78,10 +81,6 @@ function isOnScreen(screens) {
     return false;
 }
 
-function setupLoadingScreen(screen) {
-    loadingTextSpan.textContent = (screen === SCREEN_MENU ? "The Royal Ur is Loading..." : "Fetching Game Assets...");
-}
-
 function switchToScreen(screen, hasty) {
     // Check if we have to wait for resources to load before switching.
     const requiredLoadingStage = screenRequiredLoadingStages[screen];
@@ -89,7 +88,6 @@ function switchToScreen(screen, hasty) {
         screenState.loadingTargetScreen = screen;
         screenState.loadingTargetStage = requiredLoadingStage;
         loadingBar.stage = requiredLoadingStage;
-        setupLoadingScreen(screen);
         setScreen(SCREEN_LOADING, hasty)
         return;
     }
@@ -122,6 +120,7 @@ function maybeSwitchOffLoadingScreen(stage) {
 registerScreenTransitionHandlers(SCREEN_LOADING,     onEnterLoadingScreen,    onExitLoadingScreen);
 registerScreenTransitionHandlers(SCREEN_MENU,        onEnterMenuScreen,       onExitMenuScreen);
 registerScreenTransitionHandlers(SCREEN_PLAY_SELECT, onEnterPlaySelectScreen, onExitPlaySelectScreen);
+registerScreenTransitionHandlers(SCREEN_LEARN,       onEnterLearnScreen,      onExitLearnScreen);
 registerScreenTransitionHandlers(SCREEN_CONNECTING,  onEnterConnectingScreen, onExitConnectingScreen);
 registerScreenTransitionHandlers(SCREEN_GAME,        onEnterGameScreen,       onExitGameScreen);
 registerScreenTransitionHandlers(SCREEN_WIN,         onEnterWinScreen,        onExitWinScreen);
@@ -143,7 +142,8 @@ registerScreenTransitionHandlers(
 
 // Screens where the exit button should be shown
 registerScreenTransitionHandlers(
-    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN, SCREEN_PLAY_SELECT], onEnterExitableScreen, onExitExitableScreen
+    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN, SCREEN_PLAY_SELECT, SCREEN_LEARN],
+    onEnterExitableScreen, onExitExitableScreen
 );
 
 
@@ -167,6 +167,18 @@ function onEnterPlaySelectScreen(hasty) {
 
 function onExitPlaySelectScreen(hasty) {
     screenState.playSelectFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterLearnScreen(hasty) {
+    setTimeout(() => {
+        if (isOnScreen(SCREEN_LEARN)) {
+            screenState.learnFade.fadeIn(hasty ? 0 : undefined);
+        }
+    }, (hasty ? 0 : 500));
+}
+
+function onExitLearnScreen(hasty) {
+    screenState.learnFade.fadeOut(hasty ? 0 : undefined);
 }
 
 function onEnterMenuScreens(hasty) {

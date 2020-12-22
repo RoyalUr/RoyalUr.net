@@ -23,6 +23,8 @@ const playSelectDiv = document.getElementById("play-select"),
       playComputerButton = document.getElementById("play-computer"),
       playSelectDescriptionDiv = document.getElementById("play-select-description");
 
+const learnDiv = document.getElementById("learn");
+
 const loadingDiv = document.getElementById("loading"),
       loadingTextSpan = document.getElementById("loading-text");
 
@@ -67,6 +69,7 @@ let mouseDown = false,
 
 function setupMenuElements() {
     playButton.addEventListener("click", onPlayClick);
+    learnButton.addEventListener("click", onLearnClick);
     exitButton.addEventListener("click", onExitClick);
 
     // Adjust the font sizes of the play select options to fit their bounding boxes.
@@ -173,7 +176,7 @@ function fromScreenPixels(size) {
 }
 
 function screenPixels(size) {
-    return toScreenPixels(size) + "px";
+    return Math.round(toScreenPixels(size)) + "px";
 }
 
 function resize() {
