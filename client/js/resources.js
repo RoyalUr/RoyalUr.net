@@ -403,7 +403,7 @@ AudioResource.prototype.play = function(onCompleteCallback) {
     onCompleteCallback = (onCompleteCallback !== undefined ? onCompleteCallback : ()=>{});
     if (!this.loaded) {
         onCompleteCallback();
-        return false;
+        return null;
     }
     for (let index = 0; index < this.elements.length; ++index) {
         const element = this.elements[index];
@@ -422,10 +422,10 @@ AudioResource.prototype.play = function(onCompleteCallback) {
                 });
             });
         }
-        return true;
+        return element;
     }
     onCompleteCallback();
-    return false;
+    return null;
 };
 AudioResource.prototype.hasMeaningfulLoadStats = () => false;
 
@@ -465,7 +465,7 @@ function isAudioElementPlaying(element) {
 function playSound(key, onCompleteCallback, overrideTabActive) {
     // We usually don't want to play any sounds if the tab is not active.
     if (document.hidden && !overrideTabActive)
-        return false;
+        return null;
 
     // Allow random choice of sound from packs of audio clips.
     if(audioPacks[key]) {
@@ -477,7 +477,7 @@ function playSound(key, onCompleteCallback, overrideTabActive) {
             return resource.play(onCompleteCallback);
     }
     error("Unable to find the sound \"" + key + "\"");
-    return false;
+    return null;
 }
 
 
@@ -580,6 +580,7 @@ const stagedResources = [
         new AudioResource("dice_hit", "res/audio_dice_hit.mp4", {instances: 4, volume: 0.3}),
         new AudioResource("dice_select", "res/audio_dice_select.mp4", {instances: 4, volume: 0.5}),
         new AudioResource("firework_rocket", "res/audio_firework_rocket.mp4", {instances: 4, volume: 0.05}),
+        new AudioResource("firework_explode", "res/audio_firework_explode.mp4", {instances: 4, volume: 0.5}),
     ],
     [ // Learn Screen
     ]

@@ -157,7 +157,7 @@ function simulateFireworks() {
 
         if (age > 1) {
             playSound("firework_explode");
-            if (firework.rocket_sound && isAudioPlaying(firework.rocket_sound)) {
+            if (firework.rocket_sound && isAudioElementPlaying(firework.rocket_sound)) {
                 firework.rocket_sound.pause();
                 firework.rocket_sound.currentTime = 0;
             }
