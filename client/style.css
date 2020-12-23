@@ -468,12 +468,25 @@ body {
     margin-top: 0.8vh;
     margin-right: 1.2vh;
     z-index: 100;
+
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+#controls:hover {
+    opacity: 1;
+}
+#controls .control {
+    display: inline-block;
+    float: right;
 }
 
 #controls svg {
-    display: inline-block;
-    float: right;
     height: 5.5vh;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+}
+#controls svg:hover {
+    opacity: 1;
 }
 
 svg.control-icon { cursor: pointer; }
