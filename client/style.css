@@ -4,7 +4,6 @@
     font-weight: 400;
     src: local('Nunito Regular'), local('Nunito-Regular'), url(res/font_nunito.woff2) format('woff2');
 }
-
 @font-face {
     font-family: 'DuranGo';
     font-style: normal;
@@ -22,24 +21,14 @@ body, html {
     width: 100%;
     height: 100%;
 }
+html { overflow: hidden; }
+body { overflow: auto; }
 
-html {
-    overflow: hidden;
-}
-
-body {
-    overflow: auto;
-}
-
-canvas {
-    position: absolute;
-}
-
+canvas { position: absolute; }
 body {
     background: rgb(32, 41, 48) url(res/background.png) repeat;
     background-size: 40vh;
 }
-
 
 
 /*
@@ -189,9 +178,7 @@ body {
 }
 
 #menu {
-    /* The Javascript will decide when to display the menu */
     opacity: 0;
-
     z-index: 5;
     margin: auto;
 }
@@ -235,18 +222,15 @@ body {
 
 #play-button {
     padding: 0;
-
     display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
     display: -ms-flexbox;  /* TWEENER - IE 10 */
     display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
     display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
-
     justify-content: center;
     align-items: center;
 }
 
 #play-button canvas {
-    /*position: relative;*/
     display: inline-block;
     vertical-align: middle;
 }
@@ -254,7 +238,6 @@ body {
 #play-button img {
     display: inline-block;
     vertical-align: middle;
-
     transition: width 0.2s ease-in-out, height 0.2s ease-in-out, margin-left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
 }
 
@@ -267,7 +250,6 @@ body {
     display: block;
     vertical-align: middle;
 }
-
 
 
 /*
@@ -365,42 +347,13 @@ body {
 
 
 /*
- *  BOARD
+ *  GAME ELEMENTS
  */
 
-#board {
-    z-index: 1;
-}
-
-
-
-/*
- * TILES
- */
-
-#tiles {
-    z-index: 3;
-}
-
-
-
-/*
- * SCORES
- */
-
-.score {
-    z-index: 1;
-}
-
-
-
-/*
- * DICE
- */
-
-#dice {
-    z-index: 4;
-}
+#board { z-index: 1; }
+#tiles { z-index: 3; }
+.score { z-index: 1; }
+#dice { z-index: 4; }
 
 
 
@@ -489,9 +442,8 @@ body {
 #created-by {
     padding: 10px;
     padding-bottom: 6px;
-
     font-family: DuranGo, sans-serif;
-    font-size: 3vh;
+    font-size: 2.5vh;
     text-shadow: black 0 0 10px;
 }
 
@@ -505,76 +457,41 @@ body {
 
 
 /*
- *  EXIT BUTTON
+ * CONTROLS
  */
 
-#exit {
+#controls {
     display: none;
     position: absolute;
     top: 0;
     right: 0;
-    margin: 10px;
-    z-index: 20;
-
-    direction: rtl;
-    overflow: hidden;
-
-    width: 50px;
-    height: 50px;
-
-    transition: width 0.2s ease-in-out;
+    margin: 0.8vh;
+    z-index: 100;
 }
 
-#exit:hover {
-    cursor: pointer;
-    width: 300px;
-
-    transition: width 0.2s ease-in-out;
-}
-
-.exit-content {
-    width: 300px;
-    height: 50px;
-    line-height: 50px;
-}
-
-.exit-content svg, .exit-content span {
+#controls svg {
     display: inline-block;
-    vertical-align: middle;
+    float: right;
+    height: 6vh;
+    margin-left: 0.8vh;
 }
 
-.exit-content svg {
-    width: 50px;
-    height: 50px;
-    vertical-align: top;
-}
-
-.exit-content span {
-    padding-top: 2px;
-    margin-left: 4px;
-    margin-right: 4px;
-    font-size: 28px;
-    font-weight: 700;
-    color: white;
-    user-select: none;
-}
-
-.exit-content:active span {
-    color: rgb(200, 200, 255);
-}
-
-.exit-content svg line {
+svg.control-icon { cursor: pointer; }
+svg.control-icon line, svg.control-icon path {
     stroke: white;
     stroke-linecap: round;
-
-    stroke-width: 21;
     transition: stroke-width 0.2s ease-in-out;
 }
-
-.exit-content:hover svg line {
-    stroke-width: 25;
-    transition: stroke-width 0.2s ease-in-out;
-}
+svg.settings-icon * { fill: white; }
+svg.settings-icon path { stroke-width: 0; }
+svg.settings-icon:hover path { stroke-width: 0.75; }
+svg.question-mark-icon * { fill: none; }
+svg.question-mark-icon line { stroke-width: 21; }
+svg.question-mark-icon path { stroke-width: 19; }
+svg.question-mark-icon:hover line { stroke-width: 24; }
+svg.question-mark-icon:hover path { stroke-width: 23; }
+svg.exit-icon line { stroke-width: 21; }
+svg.exit-icon:hover line { stroke-width: 25; }
 
 
 /*

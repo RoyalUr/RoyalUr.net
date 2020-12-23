@@ -14,6 +14,7 @@ let computerIntelligence = 5,
 
 function Game(exitLosesGame) {
     this.__class_name__ = "Game";
+    this.initialised = false;
     this.exitLosesGame = exitLosesGame;
 
     this.lastTileClickWasSelect = false;
@@ -27,7 +28,15 @@ Game.prototype.onPacketMessage = unimplemented("onPacketMessage");
 Game.prototype.onPacketMove = unimplemented("onPacketMove");
 Game.prototype.onPacketState = unimplemented("onPacketState");
 Game.prototype.onDiceClick = unimplemented("onDiceClick");
+Game.prototype._init = unimplemented("_init");
 
+Game.prototype.init = function() {
+    if (this.initialised)
+        return;
+
+    this._init();
+    this.initialised = true;
+};
 Game.prototype.onTileHover = function(loc) {
     if(isAwaitingMove() && !isTileSelected() && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
         playSound("hover");
@@ -148,7 +157,7 @@ function OnlineGame() {
 }
 setSuperClass(OnlineGame, Game);
 
-OnlineGame.prototype.init = function() {
+OnlineGame.prototype._init = function() {
     connect();
     resetDice();
 };
@@ -268,7 +277,7 @@ ComputerGame.prototype.isComputersTurn = function() {
 ComputerGame.prototype.isHumansTurn = function() {
     return this.turnPlayer === ownPlayer;
 };
-ComputerGame.prototype.init = function() {
+ComputerGame.prototype._init = function() {
     updatePlayerState(ownPlayer, 7, 0, this.isHumansTurn());
     updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
 
@@ -403,7 +412,7 @@ LocalGame.prototype.isLeftTurn = function() {
 LocalGame.prototype.isRightTurn = function() {
     return this.turnPlayer === rightPlayer;
 };
-LocalGame.prototype.init = function() {
+LocalGame.prototype._init = function() {
     updatePlayerState(leftPlayer, 7, 0, this.isLeftTurn());
     updatePlayerState(rightPlayer, 7, 0, this.isRightTurn());
 

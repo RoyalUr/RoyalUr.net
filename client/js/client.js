@@ -67,6 +67,14 @@ function reportStartupPerformance() {
     console.log(report);
 }
 
+function getReloadConfirmation() {
+    if (!isOnScreen(SCREEN_GAME) && screenState.exitTargetScreen !== SCREEN_GAME)
+        return null;
+    if (!game || !game.exitLosesGame)
+        return "Are you sure you wish to exit?";
+    return "Your game will be lost if you exit. Are you sure you wish to exit?";
+}
+
 function getExitConfirmation() {
     if (!isOnScreen(SCREEN_GAME))
         return null;
@@ -77,7 +85,7 @@ function getExitConfirmation() {
 
 function onBeforeUnload(event) {
     event = event || window.event;
-    const message = getExitConfirmation();
+    const message = getReloadConfirmation();
     if (!message)
         return;
 
@@ -138,13 +146,23 @@ function onPlayUnhover() {
     playSelectDescriptionFade.fadeOut();
 }
 
+function onSettingsControlClick(event) {
+    event.stopPropagation();
+    console.log("settings control clicked");
+}
+
+function onLearnControlClick(event) {
+    event.stopPropagation();
+    switchToScreen(SCREEN_LEARN);
+}
+
 function onExitClick(event) {
     event.stopPropagation();
     const message = getExitConfirmation();
     if (message && !window.confirm(message))
         return;
 
-    switchToScreen(SCREEN_MENU);
+    switchToScreen(screenState.exitTargetScreen);
 }
 
 function connectToGame() {
@@ -276,7 +294,7 @@ function handleKeyPress(event) {
     if (keyIsEnter || keyIsSpace) {
         tryTakeSingleAction(event, keyIsSpace);
     } else if (key === "Escape" || key === "Esc" || key === 27) {
-        if (screenState.exitFade.isFadeIn) {
+        if (screenState.exitControlFade.isFadeIn) {
             onExitClick(event);
         }
     }

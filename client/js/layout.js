@@ -14,8 +14,12 @@ const menuDiv = document.getElementById("menu"),
       learnButtonCtx = learnButtonCanvas.getContext("2d"),
       watchButton = document.getElementById("watch-button"),
       watchButtonCanvas = document.getElementById("watch-canvas"),
-      watchButtonCtx = watchButtonCanvas.getContext("2d"),
-      exitButton = document.getElementById("exit");
+      watchButtonCtx = watchButtonCanvas.getContext("2d");
+
+const controlsDiv = document.getElementById("controls"),
+      settingsControlButton = document.getElementById("settings-control"),
+      learnControlButton = document.getElementById("learn-control"),
+      exitControlButton = document.getElementById("exit-control");
 
 const playSelectDiv = document.getElementById("play-select"),
       playLocalButton = document.getElementById("play-local"),
@@ -70,7 +74,10 @@ let mouseDown = false,
 function setupMenuElements() {
     playButton.addEventListener("click", onPlayClick);
     learnButton.addEventListener("click", onLearnClick);
-    exitButton.addEventListener("click", onExitClick);
+
+    settingsControlButton.addEventListener("click", onSettingsControlClick);
+    learnControlButton.addEventListener("click", onLearnControlClick);
+    exitControlButton.addEventListener("click", onExitClick);
 
     // Adjust the font sizes of the play select options to fit their bounding boxes.
     fitty(".play-select-text", {

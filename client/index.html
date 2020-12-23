@@ -15,11 +15,12 @@
         <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
             <div id="loading-bar"></div>
             <span id="loading-text">The Royal Ur is Loading...</span>
+            <!-- This SVG holds a box that is animated through CSS. -->
             <svg width="200" height="200" viewBox="0 0 100 100">
-                <polyline class="line-cornered stroke-still" points="0,0 100,0 100,100" stroke-width="10" fill="none"></polyline>
-                <polyline class="line-cornered stroke-still" points="0,0 0,100 100,100" stroke-width="10" fill="none"></polyline>
-                <polyline class="line-cornered stroke-animation" points="0,0 100,0 100,100" stroke-width="10" fill="none"></polyline>
-                <polyline class="line-cornered stroke-animation" points="0,0 0,100 100,100" stroke-width="10" fill="none"></polyline>
+                <polyline class="line-cornered stroke-still" points="0,0 100,0 100,100" stroke-width="10" fill="none" />
+                <polyline class="line-cornered stroke-still" points="0,0 0,100 100,100" stroke-width="10" fill="none" />
+                <polyline class="line-cornered stroke-animation" points="0,0 100,0 100,100" stroke-width="10" fill="none" />
+                <polyline class="line-cornered stroke-animation" points="0,0 0,100 100,100" stroke-width="10" fill="none" />
             </svg>
         </div>
 
@@ -39,7 +40,8 @@
                 <div id="learn-button" class="menu-button shadow">
                     <canvas id="learn-canvas"></canvas>
                 </div>
-                <a id="watch-button" class="menu-button shadow" href="https://youtu.be/WZskjLq040I" target="_blank" rel="noopener">
+                <a id="watch-button" class="menu-button shadow"
+                   href="https://youtu.be/WZskjLq040I" target="_blank" rel="noopener">
                     <canvas id="watch-canvas"></canvas>
                 </a>
             </div>
@@ -96,12 +98,48 @@
             </a></div>
         </div>
 
-        <!-- EXIT BUTTON -->
-        <div id="exit"><div class="exit-content">
-            <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='-70 -70 240 240'>
-                <line x1='0' y1='0' x2='100' y2='100'></line><line x1='100' y1='0' x2='0' y2='100'></line>
-            </svg><span id="exit-text">Exit to Menu</span>
-        </div></div>
+        <!-- CONTROLS -->
+        <div id="controls">
+            <svg id="exit-control" class="exit-icon control-icon" xmlns='http://www.w3.org/2000/svg'
+                 preserveAspectRatio="none" viewBox="-30 -30 160 160">
+                <line x1='0' y1='0' x2='100' y2='100'/>
+                <line x1='100' y1='0' x2='0' y2='100'/>
+            </svg>
+            <svg id="learn-control" class="question-mark-icon control-icon" xmlns="http://www.w3.org/2000/svg"
+                 preserveAspectRatio="none" viewBox="-36 -36 150 150">
+                <path d="M 5 15 a 32 32 0 1 1 52 25 a 28 28 0 0 0 -17 26"/>
+                <line x1='40.5' y1='95' x2='40.5' y2='95'/>
+            </svg>
+            <svg id="settings-control" class="settings-icon control-icon" xmlns="http://www.w3.org/2000/svg"
+                 preserveAspectRatio="none" viewBox="-2 -2 29 29">
+                <path d="M 24.38, 10.175                                   l -2.231 -0.268
+                         c -0.228 -0.851 -0.562 -1.655 -0.992 -2.401       l 1.387 -1.763
+                         c 0.212 -0.271, 0.188 -0.69 -0.057 -0.934         l -2.299 -2.3
+                         c -0.242 -0.243 -0.662 -0.269 -0.934 -0.057       l -1.766, 1.389
+                         c -0.743 -0.43 -1.547 -0.764 -2.396 -0.99         L 14.825, 0.62
+                         C 14.784, 0.279, 14.469, 0, 14.125, 0             h -3.252
+                         c -0.344, 0 -0.659, 0.279 -0.699, 0.62            L 9.906, 2.851
+                         c -0.85, 0.227 -1.655, 0.562 -2.398, 0.991        L 5.743, 2.455
+                         c -0.27 -0.212 -0.69 -0.187 -0.933, 0.056         L 2.51, 4.812
+                         C 2.268, 5.054, 2.243, 5.474, 2.456, 5.746        L 3.842, 7.51
+                         c -0.43, 0.744 -0.764, 1.549 -0.991, 2.4          l -2.23, 0.267
+                         C 0.28, 10.217, 0, 10.532, 0, 10.877              v 3.252
+                         c 0, 0.344, 0.279, 0.657, 0.621, 0.699            l 2.231, 0.268
+                         c 0.228, 0.848, 0.561, 1.652, 0.991, 2.396        l -1.386, 1.766
+                         c -0.211, 0.271 -0.187, 0.69, 0.057, 0.934        l 2.296, 2.301
+                         c 0.243, 0.242, 0.663, 0.269, 0.933, 0.057        l 1.766 -1.39
+                         c 0.744, 0.43, 1.548, 0.765, 2.398, 0.991         l 0.268, 2.23
+                         c 0.041, 0.342, 0.355, 0.62, 0.699, 0.62          h 3.252
+                         c 0.345, 0, 0.659 -0.278, 0.699 -0.62             l 0.268 -2.23
+                         c 0.851 -0.228, 1.655 -0.562, 2.398 -0.991        l 1.766, 1.387
+                         c 0.271, 0.212, 0.69, 0.187, 0.933 -0.056         l 2.299 -2.301
+                         c 0.244 -0.242, 0.269 -0.662, 0.056 -0.935        l -1.388 -1.764
+                         c 0.431 -0.744, 0.764 -1.548, 0.992 -2.397        l 2.23 -0.268
+                         C 24.721, 14.785, 25, 14.473, 25, 14.127          v -3.252
+                         C 25.001, 10.529, 24.723, 10.216, 24.38, 10.175   z
+                         M 19.25, 12.75   a 6.75,6.75 0 0,1 -13.5,0   a 6.75,6.75 0 0,1 13.5,0" />
+            </svg>
+        </div>
 
         <!-- LEARN SCREEN -->
         <div id="learn">

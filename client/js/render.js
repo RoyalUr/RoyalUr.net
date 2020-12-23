@@ -45,8 +45,8 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playSelectDiv, learnDiv,
-            boardCanvas, tilesCanvas, exitButton,
+            menuDiv, playSelectDiv, learnDiv, boardCanvas, tilesCanvas,
+            settingsControlButton, learnControlButton, exitControlButton,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -92,8 +92,16 @@ function redrawButton(canvas, ctx, imageKey) {
 
 function redrawMenu(forceRedraw) {
     menuDiv.style.opacity = screenState.menuFade.get();
-    exitButton.style.opacity = screenState.exitFade.get();
     networkStatus.hidden = false;
+
+    let totalControlFades = 0;
+    for (let index = 0; index < allControlFades.length; ++index) {
+        totalControlFades += allControlFades[index].get();
+    }
+    controlsDiv.style.display = (totalControlFades > 0 ? "block" : "none");
+    settingsControlButton.style.opacity = screenState.settingsControlFade.get();
+    learnControlButton.style.opacity = screenState.learnControlFade.get();
+    exitControlButton.style.opacity = screenState.exitControlFade.get();
 
     const descriptionFade = playSelectDescriptionFade.get();
     playSelectDiv.style.opacity = screenState.playSelectFade.get();

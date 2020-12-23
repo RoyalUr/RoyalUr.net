@@ -10,6 +10,27 @@ const SCREEN_LOADING = "loading",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
+const screenState = {
+    screen: SCREEN_LOADING,
+    loadingTargetScreen: null,
+    loadingTargetStage: 0,
+
+    exitTargetScreen: SCREEN_MENU,
+
+    enterHandlers: [],
+    exitHandlers: [],
+
+    menuFade: createFade(0.5),
+    playSelectFade: createFade(0.5),
+    learnFade: createFade(0.5),
+    boardFade: createFade(0.5),
+    settingsControlFade: createFade(0.25),
+    learnControlFade: createFade(0.25),
+    exitControlFade: createFade(0.25),
+    connectionFade: createFade(2, 0.5)
+};
+const allControlFades = [screenState.settingsControlFade, screenState.learnControlFade, screenState.exitControlFade];
+
 const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
@@ -19,21 +40,14 @@ screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
 screenRequiredLoadingStages[SCREEN_WIN] = 1;
 
-const screenState = {
-    screen: SCREEN_LOADING,
-    loadingTargetScreen: null,
-    loadingTargetStage: 0,
-
-    enterHandlers: [],
-    exitHandlers: [],
-
-    menuFade: createFade(0.5),
-    playSelectFade: createFade(0.5),
-    learnFade: createFade(0.5),
-    boardFade: createFade(0.5),
-    exitFade: createFade(0.25),
-    connectionFade: createFade(2, 0.5)
-};
+const screenActiveControlFades = {};
+screenActiveControlFades[SCREEN_LOADING] = [];
+screenActiveControlFades[SCREEN_MENU] = [];
+screenActiveControlFades[SCREEN_PLAY_SELECT] = [screenState.exitControlFade];
+screenActiveControlFades[SCREEN_LEARN] = [screenState.exitControlFade];
+screenActiveControlFades[SCREEN_CONNECTING] = [screenState.exitControlFade];
+screenActiveControlFades[SCREEN_GAME] = [screenState.learnControlFade, screenState.exitControlFade];
+screenActiveControlFades[SCREEN_WIN] = [screenState.learnControlFade, screenState.exitControlFade];
 
 function registerScreenHandler(screens, handler, handlersList) {
     screens = (typeof screens === 'string' || screens instanceof String ? [screens] : screens);
@@ -81,7 +95,28 @@ function isOnScreen(screens) {
     return false;
 }
 
+function setVisibleControlButtons(controlFades, hasty) {
+    const fadeDuration = (hasty ? 0 : undefined);
+    for (let index = 0; index < allControlFades.length; ++index) {
+        allControlFades[index].fadeOut(fadeDuration);
+    }
+    for (let index = 0; index < controlFades.length; ++index) {
+        controlFades[index].fadeIn(fadeDuration);
+    }
+}
+
 function switchToScreen(screen, hasty) {
+    const fromScreen = screenState.screen;
+    if (fromScreen === screen)
+        return;
+
+    // When the learn screen is exited, it should return to its previous screen.
+    if (screen === SCREEN_LEARN) {
+        screenState.exitTargetScreen = fromScreen;
+    } else {
+        screenState.exitTargetScreen = SCREEN_MENU;
+    }
+
     // Check if we have to wait for resources to load before switching.
     const requiredLoadingStage = screenRequiredLoadingStages[screen];
     if (loading.stage <= requiredLoadingStage) {
@@ -99,6 +134,7 @@ function setScreen(screen, hasty) {
     if (fromScreen === screen)
         return;
 
+    setVisibleControlButtons(screenActiveControlFades[screen]);
     screenState.screen = screen;
     fireScreenHandlers(fromScreen, screen, !!hasty);
 }
@@ -130,22 +166,15 @@ registerScreenTransitionHandlers(
     [SCREEN_MENU, SCREEN_PLAY_SELECT], onEnterMenuScreens, onExitMenuScreens
 );
 
-// Screens where the game should connect to the server
+// Screens where the game should not disconnect from the server
 registerScreenTransitionHandlers(
-    [SCREEN_CONNECTING, SCREEN_GAME], onEnterServerScreen, onExitServerScreen
+    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_LEARN], onEnterServerScreen, onExitServerScreen
 );
 
 // Screens where the game board should be shown
 registerScreenTransitionHandlers(
     [SCREEN_GAME, SCREEN_WIN], onEnterBoardScreen, onExitBoardScreen
 );
-
-// Screens where the exit button should be shown
-registerScreenTransitionHandlers(
-    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_WIN, SCREEN_PLAY_SELECT, SCREEN_LEARN],
-    onEnterExitableScreen, onExitExitableScreen
-);
-
 
 function onEnterLoadingScreen(hasty) {
     loadingFade.fadeIn(hasty ? 0 : undefined);
@@ -213,10 +242,7 @@ function onEnterGameScreen(hasty) {
     game.init();
     redrawBoard(true);
 }
-
-function onExitGameScreen(hasty) {
-    game = null;
-}
+function onExitGameScreen(hasty) {}
 
 function onEnterWinScreen(hasty) {
     setMessage(
@@ -230,7 +256,6 @@ function onExitWinScreen(hasty) {
 }
 
 function onEnterServerScreen(hasty) {}
-
 function onExitServerScreen(hasty) {
     disconnect();
 }
@@ -245,12 +270,4 @@ function onEnterBoardScreen(hasty) {
 
 function onExitBoardScreen(hasty) {
     screenState.boardFade.fadeOut(hasty ? 0 : undefined);
-}
-
-function onEnterExitableScreen(hasty) {
-    screenState.exitFade.fadeIn(hasty ? 0 : undefined);
-}
-
-function onExitExitableScreen(hasty) {
-    screenState.exitFade.fadeOut(hasty ? 0 : undefined);
 }
