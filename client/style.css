@@ -465,15 +465,15 @@ body {
     position: absolute;
     top: 0;
     right: 0;
-    margin: 0.8vh;
+    margin-top: 0.8vh;
+    margin-right: 1.2vh;
     z-index: 100;
 }
 
 #controls svg {
     display: inline-block;
     float: right;
-    height: 6vh;
-    margin-left: 0.8vh;
+    height: 5.5vh;
 }
 
 svg.control-icon { cursor: pointer; }
@@ -490,8 +490,8 @@ svg.question-mark-icon line { stroke-width: 21; }
 svg.question-mark-icon path { stroke-width: 19; }
 svg.question-mark-icon:hover line { stroke-width: 24; }
 svg.question-mark-icon:hover path { stroke-width: 23; }
-svg.exit-icon line { stroke-width: 21; }
-svg.exit-icon:hover line { stroke-width: 25; }
+svg.exit-icon line { stroke-width: 20; }
+svg.exit-icon:hover line { stroke-width: 24; }
 
 
 /*
