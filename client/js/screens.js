@@ -27,14 +27,15 @@ const screenState = {
     boardFade: createFade(0.5),
     connectionFade: createFade(2, 0.5),
 
+    discordControlFade: createFade(controlFadeDuration),
     githubControlFade: createFade(controlFadeDuration),
     settingsControlFade: createFade(controlFadeDuration),
     learnControlFade: createFade(controlFadeDuration),
     exitControlFade: createFade(controlFadeDuration),
 };
 const allControlFades = [
-    screenState.githubControlFade, screenState.settingsControlFade,
-    screenState.learnControlFade, screenState.exitControlFade
+    screenState.discordControlFade, screenState.githubControlFade,
+    screenState.settingsControlFade, screenState.learnControlFade, screenState.exitControlFade
 ];
 
 const screenRequiredLoadingStages = {};
@@ -47,13 +48,20 @@ screenRequiredLoadingStages[SCREEN_GAME] = 1;
 screenRequiredLoadingStages[SCREEN_WIN] = 1;
 
 const screenActiveControlFades = {};
-screenActiveControlFades[SCREEN_LOADING] = [];
-screenActiveControlFades[SCREEN_MENU] = [screenState.githubControlFade];
-screenActiveControlFades[SCREEN_PLAY_SELECT] = [screenState.exitControlFade];
-screenActiveControlFades[SCREEN_LEARN] = [screenState.exitControlFade];
-screenActiveControlFades[SCREEN_CONNECTING] = [screenState.exitControlFade];
-screenActiveControlFades[SCREEN_GAME] = [screenState.learnControlFade, screenState.exitControlFade];
-screenActiveControlFades[SCREEN_WIN] = [screenState.learnControlFade, screenState.exitControlFade];
+(() => {
+    const DISCORD = screenState.discordControlFade,
+          GITHUB = screenState.githubControlFade,
+          LEARN = screenState.learnControlFade,
+          EXIT = screenState.exitControlFade;
+
+    screenActiveControlFades[SCREEN_LOADING] = [];
+    screenActiveControlFades[SCREEN_MENU] = [DISCORD, GITHUB];
+    screenActiveControlFades[SCREEN_PLAY_SELECT] = [EXIT];
+    screenActiveControlFades[SCREEN_LEARN] = [DISCORD, EXIT];
+    screenActiveControlFades[SCREEN_CONNECTING] = [EXIT];
+    screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
+    screenActiveControlFades[SCREEN_WIN] = [DISCORD, LEARN, EXIT];
+})();
 
 function registerScreenHandler(screens, handler, handlersList) {
     screens = (typeof screens === 'string' || screens instanceof String ? [screens] : screens);
@@ -101,14 +109,35 @@ function isOnScreen(screens) {
     return false;
 }
 
+function getVisibleControlFades() {
+    const fades = [];
+    for (let index = 0; index < allControlFades.length; ++index) {
+        const fade = allControlFades[index];
+        if (fade.isFadeIn) {
+            fades.push(fade);
+        }
+    }
+    return fades;
+}
+
 function setVisibleControlButtons(controlFades, hasty) {
-    const fadeDuration = (hasty ? 0 : undefined);
+    const previousFades = getVisibleControlFades(),
+          fadeDuration = (hasty ? 0 : undefined);
+    // Fade out all controls that are not visible any more.
     for (let index = 0; index < allControlFades.length; ++index) {
         const fade = allControlFades[index];
         if (!controlFades.includes(fade)) {
             fade.fadeOut(fadeDuration);
         }
     }
+    // Fade out the controls that are going to change position.
+    for (let index = 0; index < controlFades.length; ++index) {
+        const fade = controlFades[index];
+        if (controlFades.length - index !== previousFades.length - previousFades.indexOf(fade)) {
+            fade.fadeOut(fadeDuration);
+        }
+    }
+    // Fade in all the controls after the controls have faded out.
     setTimeout(() => {
         for (let index = 0; index < controlFades.length; ++index) {
             controlFades[index].fadeIn(fadeDuration);

@@ -46,7 +46,9 @@ function redraw(forceRedraw) {
 
         updateElementVisibilities([
             menuDiv, playSelectDiv, learnDiv, boardCanvas, tilesCanvas,
-            settingsControlButton, learnControlButton, exitControlButton,
+            discordControlButton, githubControlButton,
+            settingsControlButton, learnControlButton,
+            exitControlButton,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -99,6 +101,7 @@ function redrawMenu(forceRedraw) {
         totalControlFades += allControlFades[index].get();
     }
     controlsDiv.style.display = (totalControlFades > 0 ? "block" : "none");
+    discordControlButton.style.opacity = screenState.discordControlFade.get();
     githubControlButton.style.opacity = screenState.githubControlFade.get();
     settingsControlButton.style.opacity = screenState.settingsControlFade.get();
     learnControlButton.style.opacity = screenState.learnControlFade.get();

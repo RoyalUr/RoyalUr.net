@@ -507,7 +507,11 @@ svg.exit-icon line { stroke-width: 20; }
 svg.exit-icon:hover line { stroke-width: 24; }
 svg.github-icon * { fill: white; }
 svg.github-icon path { stroke-width: 0; }
-svg.github-icon:hover path { stroke-width: 0.3; }
+svg.github-icon:hover path { stroke-width: 0.4; }
+svg.discord-icon * { fill: white; }
+svg.discord-icon path { stroke-width: 0; }
+svg.discord-icon:hover path { stroke-width: 0.3; }
+svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
 
 
 /*
