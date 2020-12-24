@@ -602,10 +602,11 @@ function resizeDice() {
 }
 
 function layoutDice() {
+    const centeringDelta = (scoreWidth - diceWidth) / 2;
     if(leftPlayer.active) {
-        diceLeft = boardCanvasLeft - diceWidth;
+        diceLeft = boardCanvasLeft - diceWidth - centeringDelta;
     } else {
-        diceLeft = boardCanvasLeft + boardCanvasWidth;
+        diceLeft = boardCanvasLeft + boardCanvasWidth + centeringDelta;
     }
 
     diceTop = centreTop - diceHeight / 2;
