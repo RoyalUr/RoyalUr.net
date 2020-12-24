@@ -10,6 +10,7 @@ const SCREEN_LOADING = "loading",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
+const controlFadeDuration = 0.25;
 const screenState = {
     screen: SCREEN_LOADING,
     loadingTargetScreen: null,
@@ -24,12 +25,17 @@ const screenState = {
     playSelectFade: createFade(0.5),
     learnFade: createFade(0.5),
     boardFade: createFade(0.5),
-    settingsControlFade: createFade(0.25),
-    learnControlFade: createFade(0.25),
-    exitControlFade: createFade(0.25),
-    connectionFade: createFade(2, 0.5)
+    connectionFade: createFade(2, 0.5),
+
+    githubControlFade: createFade(controlFadeDuration),
+    settingsControlFade: createFade(controlFadeDuration),
+    learnControlFade: createFade(controlFadeDuration),
+    exitControlFade: createFade(controlFadeDuration),
 };
-const allControlFades = [screenState.settingsControlFade, screenState.learnControlFade, screenState.exitControlFade];
+const allControlFades = [
+    screenState.githubControlFade, screenState.settingsControlFade,
+    screenState.learnControlFade, screenState.exitControlFade
+];
 
 const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
@@ -42,7 +48,7 @@ screenRequiredLoadingStages[SCREEN_WIN] = 1;
 
 const screenActiveControlFades = {};
 screenActiveControlFades[SCREEN_LOADING] = [];
-screenActiveControlFades[SCREEN_MENU] = [];
+screenActiveControlFades[SCREEN_MENU] = [screenState.githubControlFade];
 screenActiveControlFades[SCREEN_PLAY_SELECT] = [screenState.exitControlFade];
 screenActiveControlFades[SCREEN_LEARN] = [screenState.exitControlFade];
 screenActiveControlFades[SCREEN_CONNECTING] = [screenState.exitControlFade];
@@ -98,11 +104,16 @@ function isOnScreen(screens) {
 function setVisibleControlButtons(controlFades, hasty) {
     const fadeDuration = (hasty ? 0 : undefined);
     for (let index = 0; index < allControlFades.length; ++index) {
-        allControlFades[index].fadeOut(fadeDuration);
+        const fade = allControlFades[index];
+        if (!controlFades.includes(fade)) {
+            fade.fadeOut(fadeDuration);
+        }
     }
-    for (let index = 0; index < controlFades.length; ++index) {
-        controlFades[index].fadeIn(fadeDuration);
-    }
+    setTimeout(() => {
+        for (let index = 0; index < controlFades.length; ++index) {
+            controlFades[index].fadeIn(fadeDuration);
+        }
+    }, controlFadeDuration * 1000);
 }
 
 function switchToScreen(screen, hasty) {

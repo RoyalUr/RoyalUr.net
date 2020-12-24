@@ -17,6 +17,7 @@ const menuDiv = document.getElementById("menu"),
       watchButtonCtx = watchButtonCanvas.getContext("2d");
 
 const controlsDiv = document.getElementById("controls"),
+      githubControlButton = document.getElementById("github-control"),
       settingsControlButton = document.getElementById("settings-control"),
       learnControlButton = document.getElementById("learn-control"),
       exitControlButton = document.getElementById("exit-control");

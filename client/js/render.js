@@ -99,6 +99,7 @@ function redrawMenu(forceRedraw) {
         totalControlFades += allControlFades[index].get();
     }
     controlsDiv.style.display = (totalControlFades > 0 ? "block" : "none");
+    githubControlButton.style.opacity = screenState.githubControlFade.get();
     settingsControlButton.style.opacity = screenState.settingsControlFade.get();
     learnControlButton.style.opacity = screenState.learnControlFade.get();
     exitControlButton.style.opacity = screenState.exitControlFade.get();

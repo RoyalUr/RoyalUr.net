@@ -505,6 +505,9 @@ svg.question-mark-icon:hover line { stroke-width: 24; }
 svg.question-mark-icon:hover path { stroke-width: 23; }
 svg.exit-icon line { stroke-width: 20; }
 svg.exit-icon:hover line { stroke-width: 24; }
+svg.github-icon * { fill: white; }
+svg.github-icon path { stroke-width: 0; }
+svg.github-icon:hover path { stroke-width: 0.3; }
 
 
 /*
