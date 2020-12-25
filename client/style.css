@@ -34,80 +34,47 @@ body {
 /*
  *  LOADING SCREEN
  */
-
 #loading-bar {
     position: fixed;
     top: 0;
     left: 0;
     width: 0;
-    height: 10px;
+    height: 1.5vh;
     background-color: white;
 }
-
-#loading svg {
+#loading-text {
     position: fixed;
-    top: 60%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%) scale(1);
-    transform: translate(-50%, -50%) scale(1);
-}
-
-#loading span {
-    position: fixed;
-    top: 60%;
+    top: 30%;
     width: 100%;
-    -webkit-transform: translate(0, -180px) scale(1);
-    transform: translate(0, -180px) scale(1);
-
     color: white;
-    font: 36px Serif;
+    font: 6vh Serif;
     text-align: center;
     vertical-align: baseline;
 }
-
-.stroke-still {
-    stroke: rgb(15, 18, 20);
+#loading-wheel {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    height: 30vh;
+    width: 30vh;
+    transform: translate(-50%, 0);
 }
-
+#loading-wheel polyline {
+    stroke-width: 10;
+    fill: none;
+}
+.stroke-still { stroke: rgb(15, 18, 20); }
 .stroke-animation {
-    -webkit-animation: stroke-spacing 1.2s ease-in, stroke-color 4.8s linear;
     animation: stroke-spacing 1.2s ease-in, stroke-color 4.8s linear;
-    -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
-    -webkit-animation-delay: 0;
     animation-delay: 0;
-    -webkit-animation-direction: normal;
     animation-direction: normal;
-    -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
-    -webkit-animation-play-state: running;
     animation-play-state: running;
-    -webkit-transform-origin: center center;
     transform-origin: center center;
 }
-
-@-webkit-keyframes stroke-spacing {
-    0% {
-        stroke-dasharray: 0 200;
-    }
-    45% {
-        stroke-dashoffset: 0;
-        stroke-dasharray: 200 200;
-    }
-    90% {
-        stroke-dashoffset: -200;
-        stroke-dasharray: 200 200;
-    }
-    100% {
-        stroke-dashoffset: -200;
-        stroke-dasharray: 200 200;
-    }
-}
-
 @keyframes stroke-spacing {
-    0% {
-        stroke-dasharray: 0 200;
-    }
+    0% { stroke-dasharray: 0 200; }
     45% {
         stroke-dashoffset: 0;
         stroke-dasharray: 200 200;
@@ -121,18 +88,6 @@ body {
         stroke-dasharray: 200 200;
     }
 }
-
-@-webkit-keyframes stroke-color {
-    0%  { stroke: #3498DB; }
-    24% { stroke: #643232; }
-    25% { stroke: #327864; }
-    49% { stroke: #327864; }
-    50% { stroke: #32326e; }
-    74% { stroke: #32326e; }
-    75% { stroke: #78325a; }
-    99% { stroke: #78325a; }
-}
-
 @keyframes stroke-color {
     0%  { stroke: #3498DB; }
     24% { stroke: #643232; }
@@ -154,7 +109,6 @@ body {
 .shadow {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
-
 .shadow:hover {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }

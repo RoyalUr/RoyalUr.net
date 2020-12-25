@@ -15,12 +15,11 @@
         <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
             <div id="loading-bar"></div>
             <span id="loading-text">The Royal Ur is Loading...</span>
-            <!-- This SVG holds a box that is animated through CSS. -->
-            <svg width="200" height="200" viewBox="0 0 100 100">
-                <polyline class="line-cornered stroke-still" points="0,0 100,0 100,100" stroke-width="10" fill="none" />
-                <polyline class="line-cornered stroke-still" points="0,0 0,100 100,100" stroke-width="10" fill="none" />
-                <polyline class="line-cornered stroke-animation" points="0,0 100,0 100,100" stroke-width="10" fill="none" />
-                <polyline class="line-cornered stroke-animation" points="0,0 0,100 100,100" stroke-width="10" fill="none" />
+            <svg id="loading-wheel" viewBox="0 0 100 100">
+                <polyline class="stroke-still" points="0,0 100,0 100,100" />
+                <polyline class="stroke-still" points="0,0 0,100 100,100" />
+                <polyline class="stroke-animation" points="0,0 100,0 100,100" />
+                <polyline class="stroke-animation" points="0,0 0,100 100,100" />
             </svg>
         </div>
 
