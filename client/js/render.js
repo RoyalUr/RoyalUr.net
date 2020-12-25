@@ -859,8 +859,7 @@ function redrawDice(forceRedraw) {
     diceCtx.font = (canBeRolled && diceHovered ? (space * 0.6) + "px DuranGo" : (space * 0.5) + "px DuranGo");
     diceCtx.fillText("Roll", diceWidth / 2, 0.75 * space);
 
-    const diceUpCount = (dice.values === null ? 0 : countDiceUp(dice.values.slice(0, dice.selected)));
-
+    const diceUpCount = (dice.selected > 0 ? countDiceUp() : 0);
     diceCtx.fillStyle = "white";
     diceCtx.font = (space * 0.8) + "px DuranGo";
     diceCtx.fillText("" + diceUpCount, diceWidth / 2, 2.3 * space);
