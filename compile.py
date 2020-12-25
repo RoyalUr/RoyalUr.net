@@ -8,6 +8,7 @@ import json
 import subprocess
 import shutil
 from PIL import Image as PILImage
+from datetime import datetime
 
 
 #
@@ -84,6 +85,10 @@ def execute_piped_commands(*commands, prefix=""):
 
 class CompilationSpec:
     def __init__(self, spec_json):
+        sitemap_spec = spec_json["sitemap"]
+        self.sitemap_source = sitemap_spec["source"]
+        self.sitemap_dest = sitemap_spec["dest"]
+
         css_spec = spec_json["css"]
         self.css_source = css_spec["source"]
         self.css_dest = css_spec["dest"]
@@ -321,6 +326,21 @@ def clean(target_folder, comp_spec, *, prefix=""):
     assert execute_command("mkdir", target_folder, prefix=prefix)
 
 
+def create_sitemap(target_folder, comp_spec, *, prefix=""):
+    """
+    Reads the sitemap template, fills in the last modified time, and outputs it.
+    """
+    date_w3c = datetime.now().strftime("%Y-%m-%d")
+    with open(comp_spec.sitemap_source) as source_file:
+        output_sitemap = ""
+        for line in source_file:
+            output_sitemap += line.replace("<lastmod/>", "<lastmod>" + date_w3c + "</lastmod>")
+
+    dest = os.path.join(target_folder, comp_spec.sitemap_dest)
+    with open(dest, "w") as dest_file:
+        dest_file.write(output_sitemap)
+
+
 def combine_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file.
@@ -443,8 +463,41 @@ def create_release_build(target_folder):
     print("\n1. Clean")
     clean(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n2. Combine & Minify Javascript")
+    print("\n2. Create a Sitemap")
+    create_sitemap(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n3. Combine & Minify Javascript")
     combine_minify_js(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n4. Minify CSS")
+    minify_css(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n5. Copy Resource Files")
+    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n6. Create Sprites")
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n7. Create Annotations File")
+    combine_annotations(target_folder, comp_spec, {
+        "sprites": sprite_annotations
+    }, prefix=" .. ")
+
+    print("\n8. Zip Development Resources Folder")
+    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
+
+    print("\nDone!\n")
+
+
+def create_dev_build(target_folder):
+    print("\nCompiling Development Build")
+    comp_spec = CompilationSpec.read("compilation.json")
+
+    print("\n1. Create a Sitemap")
+    create_sitemap(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n2. Combine Javascript")
+    combine_js(target_folder, comp_spec, prefix=" .. ")
 
     print("\n3. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
@@ -460,18 +513,15 @@ def create_release_build(target_folder):
         "sprites": sprite_annotations
     }, prefix=" .. ")
 
-    print("\n7. Zip Development Resources Folder")
-    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
-
     print("\nDone!\n")
 
 
-def create_dev_build(target_folder):
-    print("\nCompiling Development Build")
+def create_nojs_build(target_folder):
+    print("\nCompiling Development NoJS Build")
     comp_spec = CompilationSpec.read("compilation.json")
 
-    print("\n1. Combine Javascript")
-    combine_js(target_folder, comp_spec, prefix=" .. ")
+    print("\n1. Create a Sitemap")
+    create_sitemap(target_folder, comp_spec, prefix=" .. ")
 
     print("\n2. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
@@ -483,27 +533,6 @@ def create_dev_build(target_folder):
     sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
 
     print("\n5. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, {
-        "sprites": sprite_annotations
-    }, prefix=" .. ")
-
-    print("\nDone!\n")
-
-
-def create_nojs_build(target_folder):
-    print("\nCompiling Development NoJS Build")
-    comp_spec = CompilationSpec.read("compilation.json")
-
-    print("\n1. Minify CSS")
-    minify_css(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n2. Copy Resource Files")
-    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n3. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n4. Create Annotations File")
     combine_annotations(target_folder, comp_spec, {
         "sprites": sprite_annotations
     }, prefix=" .. ")
