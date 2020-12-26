@@ -22,13 +22,12 @@ body, html {
     height: 100%;
 }
 html { overflow: hidden; }
-body { overflow: auto; }
-
-canvas { position: absolute; }
 body {
+    overflow: auto;
     background: rgb(32, 41, 48) url(res/background.png) repeat;
     background-size: 40vh;
 }
+canvas { position: absolute; }
 
 
 /*
@@ -116,11 +115,9 @@ body {
 #play-button img, #play-canvas {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
-
 #play-button:hover canvas {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
 }
-
 #play-button img {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
@@ -148,30 +145,18 @@ body {
 }
 
 @keyframes bounce {
-    from {
-        transform: translateY(0px);
-    }
-    to {
-        transform: translateY(-2%);
-    }
+    from { transform: translateY(0px); }
+    to { transform: translateY(-2%);}
 }
 @-webkit-keyframes bounce {
-    from {
-        transform: translateY(0px);
-    }
-    to {
-        transform: translateY(-2%);
-    }
+    from { transform: translateY(0px); }
+    to { transform: translateY(-2%); }
 }
 
 .menu-button {
     margin: auto;
-}
-
-.menu-button:hover {
     cursor: pointer;
 }
-
 .menu-button canvas {
     margin: auto;
     position: relative;
