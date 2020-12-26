@@ -351,7 +351,6 @@ function createFade(defaultInDuration, defaultOutDuration) {
         } else {
             this.start -= (1 - currentValue) * this.duration;
         }
-
         return this;
     }.bind(fade);
 

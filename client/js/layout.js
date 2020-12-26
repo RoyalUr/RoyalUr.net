@@ -48,6 +48,8 @@ const messageContainerElement = document.getElementById("message-container"),
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
 
+const creditsDiv = document.getElementById("credits");
+
 const dynamicImagesByClass = {
     "logo_image": "logo",
     "play_local_image": "play_local",
@@ -129,7 +131,7 @@ function setupGameElements() {
     diceCanvas.addEventListener("mouseover", function() { diceHovered = true; });
     diceCanvas.addEventListener("mouseout",  function() { diceHovered = false; });
 
-    function updateMouse(loc, down) {
+    const updateMouse = function(loc, down) {
         mouseLoc = loc;
 
         const newHoveredTile = canvasToTile(loc);
@@ -151,28 +153,63 @@ function setupGameElements() {
             mouseDownLoc = VEC_NEG1;
             draggedTile = VEC_NEG1;
         }
-    }
-
+    };
     document.onmousemove = function(event) {
         if (!game) return;
-        const loc = vec(
+        updateMouse(vec(
             fromScreenPixels(event.clientX) - tilesLeft,
             fromScreenPixels(event.clientY) - tilesTop
-        );
-        updateMouse(loc);
+        ));
     };
-
     document.body.onmousedown = function(event) {
-        if (!game) return;
+        if (mouseDown) return;
         updateMouse(mouseLoc, true);
+        if (!game) return;
         game.onTileClick(hoveredTile);
         event.preventDefault();
     };
-
     document.onmouseup = function(event) {
+        if (!mouseDown) return;
+        try {
+            if (!game) return;
+            game.onTileRelease(hoveredTile);
+        } finally {
+            updateMouse(mouseLoc, false);
+        }
+    };
+    tilesCanvas.ontouchmove = function(event) {
+        if (!game || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        updateMouse(vec(
+            fromScreenPixels(touch.clientX) - tilesLeft,
+            fromScreenPixels(touch.clientY) - tilesTop
+        ));
+        event.preventDefault();
+    };
+    tilesCanvas.ontouchstart = function(event) {
+        if (event.touches.length !== 1) {
+            updateMouse(mouseLoc, false);
+            return;
+        } else if (mouseDown) return;
+        const touch = event.touches[0];
+        updateMouse(vec(
+            fromScreenPixels(touch.clientX) - tilesLeft,
+            fromScreenPixels(touch.clientY) - tilesTop
+        ), true);
+
         if (!game) return;
-        game.onTileRelease(hoveredTile);
-        updateMouse(mouseLoc, false);
+        game.onTileClick(hoveredTile);
+        event.preventDefault();
+    };
+    tilesCanvas.ontouchend = function(event) {
+        if (!mouseDown) return;
+        try {
+            if (!game) return;
+            game.onTileRelease(hoveredTile);
+            event.preventDefault();
+        } finally {
+            updateMouse(VEC_NEG1, false);
+        }
     };
 }
 
@@ -611,9 +648,9 @@ function layoutDice() {
     }
 
     diceTop = centreTop - diceHeight / 2;
-
     diceCanvas.style.top = screenPixels(diceTop);
     diceCanvas.style.left = screenPixels(diceLeft);
+    diceHovered = false;
 }
 
 

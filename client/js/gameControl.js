@@ -413,8 +413,8 @@ LocalGame.prototype.isRightTurn = function() {
     return this.turnPlayer === rightPlayer;
 };
 LocalGame.prototype._init = function() {
-    updatePlayerState(leftPlayer, 7, 0, this.isLeftTurn());
-    updatePlayerState(rightPlayer, 7, 0, this.isRightTurn());
+    updatePlayerState(leftPlayer, 1, 6, this.isLeftTurn());
+    updatePlayerState(rightPlayer, 1, 6, this.isRightTurn());
 
     board.clearTiles();
     resetDice();

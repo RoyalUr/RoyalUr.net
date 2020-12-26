@@ -44,7 +44,7 @@ body {
 }
 #loading-text {
     position: fixed;
-    top: 30%;
+    bottom: 65%;
     width: 100%;
     color: white;
     font: 6vh Serif;
@@ -305,7 +305,7 @@ body {
  */
 
 #board { z-index: 1; }
-#tiles { z-index: 3; }
+#tiles { z-index: 3; touch-action: none; }
 .score { z-index: 1; }
 #dice { z-index: 4; }
 
@@ -473,13 +473,15 @@ svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
  */
 
 #learn {
+    display: none;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     z-index: 10;
-    display: none;
+    overflow-y: scroll;
+    background: rgba(0,0,0,0.5);
 }
 
 #learn-title {
@@ -492,38 +494,28 @@ svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
 
 #learn-content {
     max-width: 1000px;
-    height: 100%;
     margin-left: auto;
     margin-right: auto;
     padding: 2vh;
     padding-left: 5vh;
     padding-right: 5vh;
-    background: rgba(0,0,0,0.5);
-    box-shadow: 0 0 40px 2px rgba(0,0,0,0.3);
 }
-
 #learn-content, #learn-content * {
     font-family: Nunito, sans-serif;
     font-size: 3.5vh;
     text-decoration: none;
     color: white;
 }
-
 #learn-content b {
     text-decoration: underline;
     margin-right: 0.75vh;
 }
-
 #learn-content .how-to-play {
     display: inline-block;
     margin-bottom: 0.8vh;
 }
-
 #learn-content .sub-text, #learn-content .inline-sub-text {
     font-size: 2.8vh;
     margin-top: 0.15vh;
 }
-
-#learn-content .inline-sub-text {
-    display: inline;
-}
+#learn-content .inline-sub-text { display: inline; }

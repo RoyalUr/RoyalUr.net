@@ -10,6 +10,8 @@ const SCREEN_LOADING = "loading",
       SCREEN_GAME = "game",
       SCREEN_WIN = "win";
 
+const GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN];
+
 const controlFadeDuration = 0.25;
 const screenState = {
     screen: SCREEN_LOADING,
@@ -26,6 +28,7 @@ const screenState = {
     learnFade: createFade(0.5),
     boardFade: createFade(0.5),
     connectionFade: createFade(2, 0.5),
+    creditsFade: createFade(0.25).visible(),
 
     discordControlFade: createFade(controlFadeDuration),
     githubControlFade: createFade(controlFadeDuration),
@@ -239,6 +242,7 @@ function onExitPlaySelectScreen(hasty) {
 }
 
 function onEnterLearnScreen(hasty) {
+    screenState.creditsFade.fadeOut();
     setTimeout(() => {
         if (isOnScreen(SCREEN_LEARN)) {
             screenState.learnFade.fadeIn(hasty ? 0 : undefined);
@@ -248,6 +252,7 @@ function onEnterLearnScreen(hasty) {
 
 function onExitLearnScreen(hasty) {
     screenState.learnFade.fadeOut(hasty ? 0 : undefined);
+    screenState.creditsFade.fadeIn();
 }
 
 function onEnterMenuScreens(hasty) {
@@ -282,7 +287,9 @@ function onEnterGameScreen(hasty) {
     game.init();
     redrawBoard(true);
 }
-function onExitGameScreen(hasty) {}
+function onExitGameScreen(hasty) {
+    redraw(true);
+}
 
 function onEnterWinScreen(hasty) {
     setMessage(

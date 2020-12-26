@@ -45,7 +45,8 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playSelectDiv, learnDiv, boardCanvas, tilesCanvas,
+            menuDiv, playSelectDiv, learnDiv, boardCanvas,
+            tilesCanvas, creditsDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
             exitControlButton,
@@ -93,6 +94,7 @@ function redrawButton(canvas, ctx, imageKey) {
 }
 
 function redrawMenu(forceRedraw) {
+    creditsDiv.style.opacity = screenState.creditsFade.get();
     menuDiv.style.opacity = screenState.menuFade.get();
     networkStatus.hidden = false;
 
@@ -182,7 +184,7 @@ function redrawLearn(forceRedraw) {
 //
 
 function redrawBoard(forceRedraw) {
-    if (!isOnScreen([SCREEN_GAME, SCREEN_WIN]) || !forceRedraw)
+    if (!isOnScreen(GAME_VISIBLE_SCREENS) || !forceRedraw)
         return;
 
     const ctx = boardCtx;
@@ -310,8 +312,7 @@ function finishTileMove() {
 }
 
 function redrawTiles(forceRedraw) {
-    // Avoid redrawing if we don't have to.
-    if (!isOnScreen(SCREEN_GAME))
+    if (!isOnScreen(GAME_VISIBLE_SCREENS))
         return;
 
     const ctx = tilesCtx,
@@ -697,8 +698,7 @@ function redrawPlayerScores(player, drawFromLeft) {
 }
 
 function redrawScores(forceRedraw) {
-    // Avoid redrawing if we don't have to.
-    if (!isOnScreen(SCREEN_GAME))
+    if (!isOnScreen(GAME_VISIBLE_SCREENS))
         return;
 
     redrawPlayerScores(leftPlayer, false);
@@ -738,7 +738,7 @@ let diceHovered = false,
 
 function redrawDice(forceRedraw) {
     // Avoid redrawing if we don't have to.
-    if (!isOnScreen(SCREEN_GAME))
+    if (!isOnScreen(GAME_VISIBLE_SCREENS))
         return;
 
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
