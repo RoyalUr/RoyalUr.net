@@ -3,12 +3,14 @@
     font-style: normal;
     font-weight: 400;
     src: local('Nunito Regular'), local('Nunito-Regular'), url(res/font_nunito.woff2) format('woff2');
+    font-display: swap;
 }
 @font-face {
     font-family: 'DuranGo';
     font-style: normal;
     font-weight: 400;
     src: url(res/font_durango.ttf) format('truetype');
+    font-display: swap;
 }
 
 * {
