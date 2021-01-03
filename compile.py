@@ -5,6 +5,7 @@
 import os
 import sys
 import json
+import time
 import subprocess
 import shutil
 from PIL import Image as PILImage
@@ -20,6 +21,28 @@ def getmtime(filename):
         return os.path.getmtime(filename)
     except FileNotFoundError:
         return -1
+
+
+def get_incomplete_file_mtime(file):
+    """ Supports the finding of modification times for images without their extensions. """
+    potentials = [file, file + ".png", file + ".webp"]
+    for potential_file in potentials:
+        if os.path.exists(potential_file):
+            return os.path.getmtime(potential_file)
+    raise Exception("Could not find version of file {}".format(file))
+
+
+def set_mtime(file, mtime):
+    os.utime(file, (time.time(), mtime))
+
+
+def update_mtime(file, source_files):
+    if not isinstance(source_files, list):
+        raise Exception("Expected list of source files")
+    latest_mtime = -1
+    for source_file in source_files:
+        latest_mtime = max(latest_mtime, getmtime(source_file))
+    set_mtime(file, latest_mtime)
 
 
 def append_size_class(path, size_class):
@@ -124,19 +147,6 @@ class CompilationSpec:
                     raise Exception("Unknown image {} for sprite {}".format(image_from_rel, to_rel))
                 images.append(self.images[image_from_rel])
             self.sprites[to_rel] = Sprite(to_rel, images)
-
-    def get_file_version(self, target_folder, file_rel):
-        """
-        Gets the file version used for the given file path.
-        For images, the file path will be missing an extension.
-        :return: the last modification time of the given file.
-        """
-        file = os.path.join(target_folder, file_rel)
-        potentials = [file, file + ".png", file + ".webp"]
-        for potential_file in potentials:
-            if os.path.exists(potential_file):
-                return int(os.path.getmtime(potential_file))
-        raise Exception("Could not find version of file {}".format(file_rel))
 
     @staticmethod
     def read(file):
@@ -249,8 +259,10 @@ class Image:
             # Save the scaled copies.
             scaled_image = self.get_scaled(size)
             scaled_image.save(scaled_file_png)
+            update_mtime(scaled_file_png, [self.from_rel])
             print("{}created {}".format(prefix, scaled_file_png))
             scaled_image.save(scaled_file_webp)
+            update_mtime(scaled_file_webp, [self.from_rel])
             print("{}created {}".format(prefix, scaled_file_webp))
 
 
@@ -258,8 +270,10 @@ class Sprite:
     def __init__(self, to_rel, images):
         self.to_rel = to_rel
         self.images = images
+        self.image_from_rels = []
         size_classes = self.get_size_classes()
         for image in images:
+            self.image_from_rels.append(image.from_rel)
             if image.sizes.keys() != size_classes:
                 raise Exception("Images have inconsistent sets of size classes")
 
@@ -294,8 +308,10 @@ class Sprite:
             # Generate the sprite image.
             sprite_image = self.generate_sprite_image(size_class, total_width, max_height)
             sprite_image.save(scaled_file_png)
+            update_mtime(scaled_file_png, self.image_from_rels)
             print("{}created {}".format(prefix, scaled_file_png))
             sprite_image.save(scaled_file_webp)
+            update_mtime(scaled_file_webp, self.image_from_rels)
             print("{}created {}".format(prefix, scaled_file_webp))
 
         return sprite_annotations
@@ -333,6 +349,29 @@ class Sprite:
 # Perform Compilation
 #
 
+class Annotations:
+    def __init__(self):
+        self.annotations = {}
+        self.source_files = []
+
+    def add(self, key, annotations, source_file):
+        """ The source file is used to determine the last modification time of the annotations. """
+        if key not in self.annotations:
+            self.annotations[key] = annotations
+        else:
+            self.annotations[key].update(annotations)
+        self.source_files.append(source_file)
+
+    def read(self, key, file):
+        with open(file, 'r') as f:
+            self.add(key, json.load(f), file)
+
+    def write(self, file):
+        with open(file, 'w') as f:
+            json.dump(self.annotations, f, separators=(',', ':'))
+        update_mtime(file, self.source_files)
+
+
 def clean(target_folder, comp_spec, *, prefix=""):
     """
     Completely empty the compilation folder.
@@ -364,6 +403,7 @@ def copy_html(target_folder, comp_spec, *, prefix=""):
         to_path = os.path.join(target_folder, to_rel)
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
         shutil.copyfile(from_path, to_path)
+        update_mtime(to_path, [from_path])
         print("{}copied {}".format(prefix, to_rel))
 
 
@@ -372,11 +412,13 @@ def combine_js(target_folder, comp_spec, *, prefix=""):
     Concatenate all javascript into a single source file.
     """
     for to_rel, file_list in comp_spec.js_files.items():
+        output_file = os.path.join(target_folder, to_rel)
         assert execute_piped_commands(
             ["npx", "babel", "--presets=@babel/env"] + file_list,
-            os.path.join(target_folder, to_rel),
+            output_file,
             prefix=prefix
         )
+        update_mtime(output_file, file_list)
 
 
 def combine_minify_js(target_folder, comp_spec, *, prefix=""):
@@ -384,33 +426,36 @@ def combine_minify_js(target_folder, comp_spec, *, prefix=""):
     Concatenate all javascript into a single source file, and minify it.
     """
     for to_rel, file_list in comp_spec.js_files.items():
+        output_file = os.path.join(target_folder, to_rel)
         assert execute_piped_commands(
             ["npx", "babel", "--presets=@babel/env"] + file_list,
             ["uglifyjs", "--compress", "--mangle"],
-            os.path.join(target_folder, to_rel),
+            output_file,
             prefix=prefix
         )
+        update_mtime(output_file, file_list)
 
 
 def minify_css(target_folder, comp_spec, *, prefix=""):
     """
     Minify the CSS of the website.
     """
+    output_file = os.path.join(target_folder, comp_spec.css_dest)
     assert execute_piped_commands(
         ["uglifycss", comp_spec.css_source],
-        os.path.join(target_folder, comp_spec.css_dest),
+        output_file,
         prefix=prefix
     )
+    update_mtime(output_file, [comp_spec.css_source])
 
 
-def create_sprites(target_folder, comp_spec, *, prefix=""):
+def create_sprites(target_folder, comp_spec, annotations, *, prefix=""):
     """
     Concatenate groups of images into a single image.
     """
-    sprite_annotations = {}
     for sprite in comp_spec.sprites.values():
-        sprite_annotations.update(sprite.save_sprite_copies(target_folder, prefix=prefix))
-    return sprite_annotations
+        sprite_annotations = sprite.save_sprite_copies(target_folder, prefix=prefix)
+        annotations.add("sprites", sprite_annotations, os.path.join(target_folder, sprite.to_rel))
 
 
 def copy_resource_files(target_folder, comp_spec, *, prefix=""):
@@ -425,6 +470,7 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
 
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
         shutil.copyfile(from_path, to_path)
+        update_mtime(to_path, [from_path])
         print("{}copied {}".format(prefix, to_rel))
 
     # Copy and scale images.
@@ -444,38 +490,13 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     favicon_16.save(os.path.join(target_folder, "favicon16.ico"), sizes=[(16, 16)])
 
 
-def combine_annotations(target_folder, comp_spec, additional_annotations, *, prefix=""):
+def combine_annotations(target_folder, comp_spec, annotations, *, prefix=""):
     """
     Combine all resource annotations into their own file.
     """
-    annotations = {**additional_annotations}
     for key, file in comp_spec.annotation_files.items():
-        with open(file, "r") as f:
-            annotations[key] = json.load(f)
-
-    with open(target_folder + "/res/annotations.json", 'w') as f:
-        json.dump(annotations, f, separators=(',', ':'))
-
-
-def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
-    """
-    Creates a zip file with the full contents of the development resources folder.
-    """
-    output_file = os.path.join(target_folder, "res.zip")
-    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
-
-
-def download_development_res_folder(*, prefix=""):
-    """
-    Downloads and unzips the development resources folder from https://royalur.net/res.zip.
-    """
-    assert not os.path.exists("./res"), "The ./res directory already exists"
-    assert not os.path.exists("./res.zip"), "The ./res.zip archive already exists"
-    assert execute_command("wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip", prefix=prefix)
-    try:
-        assert execute_command("unzip", "-q", "./res.zip", "res/*", prefix=prefix)
-    finally:
-        assert execute_command("rm", "-f", "./res.zip", prefix=prefix)
+        annotations.read(key, file)
+    annotations.write(os.path.join(target_folder, "res/annotations.json"))
 
 
 def add_file_versions(target_folder, comp_spec, *, prefix=""):
@@ -483,13 +504,17 @@ def add_file_versions(target_folder, comp_spec, *, prefix=""):
     Filters through all HTML, CSS, and JS files and replaces [ver]
     patterns in file paths with their last modification time.
     """
-    files_to_filter = []
-    files_to_filter.extend(comp_spec.html_files.values())
-    files_to_filter.append(comp_spec.css_dest)
-    files_to_filter.extend(comp_spec.js_files.keys())
+    # The order here is important!!
+    # The HTML files reference the CSS and JS files so they must be created first.
+    files_to_filter = [
+        comp_spec.css_dest,
+        *comp_spec.js_files.keys(),
+        *comp_spec.html_files.values()
+    ]
     for file_rel in files_to_filter:
         # Read the original file.
         file_path = os.path.join(target_folder, file_rel)
+        file_mtime = getmtime(file_path)
         with open(file_path, 'r') as file:
             original_content = file.read()
 
@@ -513,12 +538,36 @@ def add_file_versions(target_folder, comp_spec, *, prefix=""):
                 raise Exception("Found [ver] outside of string in file {}".format(file_path))
 
             ver_target_file = original_content[string_start + 1:string_end].replace(".[ver]", "")
-            version = comp_spec.get_file_version(target_folder, ver_target_file)
-            filtered += ".v{}".format(version)
+            file = os.path.join(target_folder, file_rel)
+            version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
+            file_mtime = max(file_mtime, version_mtime)
+            filtered += ".v{}".format(int(version_mtime))
 
         # Write out the filtered file.
         with open(file_path, 'w') as file:
             file.write(filtered)
+        set_mtime(file_path, file_mtime)
+
+
+def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
+    """
+    Creates a zip file with the full contents of the development resources folder.
+    """
+    output_file = os.path.join(target_folder, "res.zip")
+    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
+
+
+def download_development_res_folder(*, prefix=""):
+    """
+    Downloads and unzips the development resources folder from https://royalur.net/res.zip.
+    """
+    assert not os.path.exists("./res"), "The ./res directory already exists"
+    assert not os.path.exists("./res.zip"), "The ./res.zip archive already exists"
+    assert execute_command("wget", "-q", "https://royalur.net/res.zip", "-O", "./res.zip", prefix=prefix)
+    try:
+        assert execute_command("unzip", "-q", "./res.zip", "res/*", prefix=prefix)
+    finally:
+        assert execute_command("rm", "-f", "./res.zip", prefix=prefix)
 
 
 #
@@ -548,18 +597,17 @@ def create_release_build(target_folder):
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
     print("\n7. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+    annotations = Annotations()
+    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
 
     print("\n8. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, {
-        "sprites": sprite_annotations
-    }, prefix=" .. ")
+    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
 
-    print("\n9. Zip Development Resources Folder")
-    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n10. Add Dynamic File Versions")
+    print("\n9. Add Dynamic File Versions")
     add_file_versions(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n10. Zip Development Resources Folder")
+    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
 
     print("\nDone!\n")
 
@@ -584,12 +632,11 @@ def create_dev_build(target_folder):
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
     print("\n6. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+    annotations = Annotations()
+    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
 
     print("\n7. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, {
-        "sprites": sprite_annotations
-    }, prefix=" .. ")
+    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
 
     print("\n8. Add Dynamic File Versions")
     add_file_versions(target_folder, comp_spec, prefix=" .. ")
@@ -614,12 +661,11 @@ def create_nojs_build(target_folder):
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
     print("\n5. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+    annotations = Annotations()
+    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
 
     print("\n6. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, {
-        "sprites": sprite_annotations
-    }, prefix=" .. ")
+    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
 
     print("\n7. Add Dynamic File Versions")
     add_file_versions(target_folder, comp_spec, prefix=" .. ")
