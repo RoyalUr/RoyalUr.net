@@ -22,12 +22,20 @@ body, html {
     height: 100%;
 }
 html { overflow: hidden; }
-body {
-    overflow: auto;
-    background: rgb(32, 41, 48) url(res/background.png) repeat;
-    background-size: 40vh;
-}
+body { overflow: auto; }
 canvas { position: absolute; }
+
+body {
+    background: rgb(32, 41, 48);
+}
+body.webp {
+    background: rgb(32, 41, 48) url(res/background.webp) repeat;
+    background-size: 35vh;
+}
+body.no-webp {
+    background: rgb(32, 41, 48) url(res/background.png) repeat;
+    background-size: 35vh;
+}
 
 
 /*

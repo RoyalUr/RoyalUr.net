@@ -22,11 +22,13 @@ const imageExtension = (function() {
     // Check if Google WebP is supported.
     const webpCanvas = document.createElement('canvas');
     if (!!(webpCanvas.getContext && webpCanvas.getContext('2d'))) {
-        const webpData = webpCanvas.toDataURL('image/webp');
-        if (webpData.indexOf('data:image/webp') === 0)
+        if (webpCanvas.toDataURL('image/webp').indexOf('data:image/webp') === 0)
             return "webp";
     }
     return "png";
+})();
+(function() {
+    document.body.classList.add(imageExtension === "webp" ? "webp" : "no-webp");
 })();
 function completeURL(url, extension) {
     extension = (extension !== undefined ? extension : imageExtension);

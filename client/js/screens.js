@@ -2,13 +2,13 @@
 // This file manages the screens for the game.
 //
 
-const SCREEN_LOADING = "loading",
-      SCREEN_MENU = "menu",
-      SCREEN_PLAY_SELECT = "play_select",
-      SCREEN_LEARN = "learn",
-      SCREEN_CONNECTING = "connecting",
-      SCREEN_GAME = "game",
-      SCREEN_WIN = "win";
+const SCREEN_LOADING = "screen_loading",
+      SCREEN_MENU = "screen_menu",
+      SCREEN_PLAY_SELECT = "screen_play_select",
+      SCREEN_LEARN = "screen_learn",
+      SCREEN_CONNECTING = "screen_connecting",
+      SCREEN_GAME = "screen_game",
+      SCREEN_WIN = "screen_win";
 
 const GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN];
 

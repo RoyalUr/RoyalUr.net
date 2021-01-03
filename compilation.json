@@ -23,7 +23,7 @@
       "client/js/packets.js",
       "client/js/network.js",
       "client/js/simulation.js",
-      "client/js/gameControl.js",
+      "client/js/game.js",
       "client/js/screens.js",
       "client/js/client.js"
     ],
