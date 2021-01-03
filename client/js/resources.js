@@ -347,7 +347,7 @@ SpriteResource.prototype._onImageLoad = function() {
     annotationsResource.runOnLoad(function() {
         const annotations_id = completeURL(removeURLVersion(this.url), ""),
               annotations = annotationsResource.get("sprites")[annotations_id];
-        console.log(annotations_id, annotations);
+
         if (!annotations) {
             this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url);
             return;
