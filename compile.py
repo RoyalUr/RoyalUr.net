@@ -538,6 +538,9 @@ def add_file_versions(target_folder, comp_spec, *, prefix=""):
                 raise Exception("Found [ver] outside of string in file {}".format(file_path))
 
             ver_target_file = original_content[string_start + 1:string_end].replace(".[ver]", "")
+            if ver_target_file.startswith("https://royalur.net/"):
+                ver_target_file = ver_target_file[len("https://royalur.net/"):]
+
             file = os.path.join(target_folder, file_rel)
             version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
             file_mtime = max(file_mtime, version_mtime)

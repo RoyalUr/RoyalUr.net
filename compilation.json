@@ -39,6 +39,7 @@
   "resources": {
     "client/.htaccess": ".htaccess",
     "client/robots.txt": "robots.txt",
+    "banner.jpg": "banner.jpg",
     "res/font/DuranGo.ttf": "res/font_durango.ttf",
     "res/font/Nunito.woff2": "res/font_nunito.woff2",
     "res/audio/place_1.mp4": "res/audio_place_1.mp4",

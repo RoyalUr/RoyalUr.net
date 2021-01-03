@@ -8,7 +8,7 @@ ErrorDocument 404 /lost.html
     ExpiresDefault "access plus 10 years"
 </FilesMatch>
 RewriteRule ^res/(.+)\.(v[^.]+)(\..+)?\.(gif|png|jpg|webp|mp4|ttf|woff2|json)$ res/$1$3.$4 [L]
-RewriteRule ^(.+)\.(.+)\.(js|css)$ $1.$3 [L]
+RewriteRule ^(.+)\.(.+)\.(jpg|js|css)$ $1.$3 [L]
 
 # Compress text, html, javascript, css, xml.
 AddOutputFilterByType DEFLATE text/plain
