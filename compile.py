@@ -89,6 +89,8 @@ class CompilationSpec:
         self.sitemap_source = sitemap_spec["source"]
         self.sitemap_dest = sitemap_spec["dest"]
 
+        self.html_files = spec_json["html"]
+
         css_spec = spec_json["css"]
         self.css_source = css_spec["source"]
         self.css_dest = css_spec["dest"]
@@ -122,6 +124,19 @@ class CompilationSpec:
                     raise Exception("Unknown image {} for sprite {}".format(image_from_rel, to_rel))
                 images.append(self.images[image_from_rel])
             self.sprites[to_rel] = Sprite(to_rel, images)
+
+    def get_file_version(self, target_folder, file_rel):
+        """
+        Gets the file version used for the given file path.
+        For images, the file path will be missing an extension.
+        :return: the last modification time of the given file.
+        """
+        file = os.path.join(target_folder, file_rel)
+        potentials = [file, file + ".png", file + ".webp"]
+        for potential_file in potentials:
+            if os.path.exists(potential_file):
+                return int(os.path.getmtime(potential_file))
+        raise Exception("Could not find version of file {}".format(file_rel))
 
     @staticmethod
     def read(file):
@@ -341,6 +356,17 @@ def create_sitemap(target_folder, comp_spec, *, prefix=""):
         dest_file.write(output_sitemap)
 
 
+def copy_html(target_folder, comp_spec, *, prefix=""):
+    """
+    Copies all of the HTML files to the target folder.
+    """
+    for from_path, to_rel in comp_spec.html_files.items():
+        to_path = os.path.join(target_folder, to_rel)
+        os.makedirs(os.path.dirname(to_path), exist_ok=True)
+        shutil.copyfile(from_path, to_path)
+        print("{}copied {}".format(prefix, to_rel))
+
+
 def combine_js(target_folder, comp_spec, *, prefix=""):
     """
     Concatenate all javascript into a single source file.
@@ -452,6 +478,49 @@ def download_development_res_folder(*, prefix=""):
         assert execute_command("rm", "-f", "./res.zip", prefix=prefix)
 
 
+def add_file_versions(target_folder, comp_spec, *, prefix=""):
+    """
+    Filters through all HTML, CSS, and JS files and replaces [ver]
+    patterns in file paths with their last modification time.
+    """
+    files_to_filter = []
+    files_to_filter.extend(comp_spec.html_files.values())
+    files_to_filter.append(comp_spec.css_dest)
+    files_to_filter.extend(comp_spec.js_files.keys())
+    for file_rel in files_to_filter:
+        # Read the original file.
+        file_path = os.path.join(target_folder, file_rel)
+        with open(file_path, 'r') as file:
+            original_content = file.read()
+
+        # Filter out all [ver]'s in the file.
+        last_index = 0
+        filtered = ""
+        while True:
+            try:
+                current_index = original_content.index(".[ver]", last_index)
+            except ValueError:
+                filtered += original_content[last_index:]
+                break
+
+            filtered += original_content[last_index:current_index]
+            last_index = current_index + len(".[ver]")
+
+            try:
+                string_start = original_content.rindex("\"", 0, current_index)
+                string_end = original_content.index("\"", last_index)
+            except ValueError:
+                raise Exception("Found [ver] outside of string in file {}".format(file_path))
+
+            ver_target_file = original_content[string_start + 1:string_end].replace(".[ver]", "")
+            version = comp_spec.get_file_version(target_folder, ver_target_file)
+            filtered += ".v{}".format(version)
+
+        # Write out the filtered file.
+        with open(file_path, 'w') as file:
+            file.write(filtered)
+
+
 #
 # Create the different types of builds.
 #
@@ -466,8 +535,47 @@ def create_release_build(target_folder):
     print("\n2. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n3. Combine & Minify Javascript")
+    print("\n3. Copy HTML")
+    copy_html(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n4. Combine & Minify Javascript")
     combine_minify_js(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n5. Minify CSS")
+    minify_css(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n6. Copy Resource Files")
+    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n7. Create Sprites")
+    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n8. Create Annotations File")
+    combine_annotations(target_folder, comp_spec, {
+        "sprites": sprite_annotations
+    }, prefix=" .. ")
+
+    print("\n9. Zip Development Resources Folder")
+    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n10. Add Dynamic File Versions")
+    add_file_versions(target_folder, comp_spec, prefix=" .. ")
+
+    print("\nDone!\n")
+
+
+def create_dev_build(target_folder):
+    print("\nCompiling Development Build")
+    comp_spec = CompilationSpec.read("compilation.json")
+
+    print("\n1. Create a Sitemap")
+    create_sitemap(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n2. Copy HTML")
+    copy_html(target_folder, comp_spec, prefix=" .. ")
+
+    print("\n3. Combine Javascript")
+    combine_js(target_folder, comp_spec, prefix=" .. ")
 
     print("\n4. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
@@ -483,21 +591,21 @@ def create_release_build(target_folder):
         "sprites": sprite_annotations
     }, prefix=" .. ")
 
-    print("\n8. Zip Development Resources Folder")
-    zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
+    print("\n8. Add Dynamic File Versions")
+    add_file_versions(target_folder, comp_spec, prefix=" .. ")
 
     print("\nDone!\n")
 
 
-def create_dev_build(target_folder):
-    print("\nCompiling Development Build")
+def create_nojs_build(target_folder):
+    print("\nCompiling Development NoJS Build")
     comp_spec = CompilationSpec.read("compilation.json")
 
     print("\n1. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n2. Combine Javascript")
-    combine_js(target_folder, comp_spec, prefix=" .. ")
+    print("\n2. Copy HTML")
+    copy_html(target_folder, comp_spec, prefix=" .. ")
 
     print("\n3. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
@@ -513,29 +621,8 @@ def create_dev_build(target_folder):
         "sprites": sprite_annotations
     }, prefix=" .. ")
 
-    print("\nDone!\n")
-
-
-def create_nojs_build(target_folder):
-    print("\nCompiling Development NoJS Build")
-    comp_spec = CompilationSpec.read("compilation.json")
-
-    print("\n1. Create a Sitemap")
-    create_sitemap(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n2. Minify CSS")
-    minify_css(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n3. Copy Resource Files")
-    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n4. Create Sprites")
-    sprite_annotations = create_sprites(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n5. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, {
-        "sprites": sprite_annotations
-    }, prefix=" .. ")
+    print("\n7. Add Dynamic File Versions")
+    add_file_versions(target_folder, comp_spec, prefix=" .. ")
 
     print("\nDone!\n")
 

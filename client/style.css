@@ -2,14 +2,14 @@
     font-family: 'Nunito';
     font-style: normal;
     font-weight: 400;
-    src: local('Nunito Regular'), local('Nunito-Regular'), url(res/font_nunito.woff2) format('woff2');
+    src: local('Nunito Regular'), local('Nunito-Regular'), url("res/font_nunito.[ver].woff2") format('woff2');
     font-display: swap;
 }
 @font-face {
     font-family: 'DuranGo';
     font-style: normal;
     font-weight: 400;
-    src: url(res/font_durango.ttf) format('truetype');
+    src: url("res/font_durango.[ver].ttf") format('truetype');
     font-display: swap;
 }
 
@@ -31,11 +31,11 @@ body {
     background: rgb(32, 41, 48);
 }
 body.webp {
-    background: rgb(32, 41, 48) url(res/background.webp) repeat;
+    background: rgb(32, 41, 48) url("res/background.[ver].webp") repeat;
     background-size: 35vh;
 }
 body.no-webp {
-    background: rgb(32, 41, 48) url(res/background.png) repeat;
+    background: rgb(32, 41, 48) url("res/background.[ver].png") repeat;
     background-size: 35vh;
 }
 

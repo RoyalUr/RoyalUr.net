@@ -1,5 +1,14 @@
 Options -Indexes
+RewriteEngine On
 ErrorDocument 404 /lost.html
+
+# Add far into the future Expires header to allow caching.
+<FilesMatch "\.(gif|png|jpg|webp|mp4|ttf|woff2|json|js|css)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 10 years"
+</FilesMatch>
+RewriteRule ^res/(.+)\.(v[^.]+)(\..+)?\.(gif|png|jpg|webp|mp4|ttf|woff2|json)$ res/$1$3.$4 [L]
+RewriteRule ^(.+)\.(.+)\.(js|css)$ $1.$3 [L]
 
 # Compress text, html, javascript, css, xml.
 AddOutputFilterByType DEFLATE text/plain

@@ -230,6 +230,7 @@ Resource.prototype.runOnLoad = function(callback) {
 };
 Resource.prototype.onError = function(error) {
     this.updateState({errored: true, error: (error ? error : null)});
+    console.error(error);
 };
 Resource.prototype.hasMeaningfulLoadStats = () => true;
 
@@ -339,8 +340,14 @@ function SpriteResource(url, childrenIds) {
 }
 setSuperClass(SpriteResource, ImageResource);
 SpriteResource.prototype._onImageLoad = function() {
+    function removeURLVersion(url) {
+        return url.substring(0, url.lastIndexOf("."));
+    }
+
     annotationsResource.runOnLoad(function() {
-        const annotations = annotationsResource.get("sprites")[completeURL(this.url, "")];
+        const annotations_id = completeURL(removeURLVersion(this.url), ""),
+              annotations = annotationsResource.get("sprites")[annotations_id];
+        console.log(annotations_id, annotations);
         if (!annotations) {
             this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url);
             return;
@@ -534,31 +541,31 @@ function calcImageHeight(image, width) {
 // The resources to be loaded.
 //
 
-const annotationsResource = new AnnotationsResource("annotations", "/res/annotations.json");
+const annotationsResource = new AnnotationsResource("annotations", "res/annotations.[ver].json");
 const stagedResources = [
     [ // Menu
-        new ImageResource("logo", "res/logo"),
-        new ImageResource("tile_dark", "res/tile_dark"),
-        new ImageResource("play_local", "res/button_play_local"),
-        new ImageResource("play_online", "res/button_play_online"),
-        new ImageResource("play_computer", "res/button_play_computer"),
-        new SpriteResource("res/play_button", {
+        new ImageResource("logo", "res/logo.[ver]"),
+        new ImageResource("tile_dark", "res/tile_dark.[ver]"),
+        new ImageResource("play_local", "res/button_play_local.[ver]"),
+        new ImageResource("play_online", "res/button_play_online.[ver]"),
+        new ImageResource("play_computer", "res/button_play_computer.[ver]"),
+        new SpriteResource("res/play_button.[ver]", {
             "res/buttons/play.png": "play",
             "res/buttons/play_active.png": "play_active"
         }),
-        new SpriteResource("res/learn_button", {
+        new SpriteResource("res/learn_button.[ver]", {
             "res/buttons/learn.png": "learn",
             "res/buttons/learn_active.png": "learn_active"
         }),
-        new SpriteResource("res/watch_button", {
+        new SpriteResource("res/watch_button.[ver]", {
             "res/buttons/watch.png": "watch",
             "res/buttons/watch_active.png": "watch_active"
         }),
     ],
     [ // Game
-        new ImageResource("board", "res/board"),
-        new ImageResource("tile_light", "res/tile_light"),
-        new SpriteResource("res/dice", {
+        new ImageResource("board", "res/board.[ver]"),
+        new ImageResource("tile_light", "res/tile_light.[ver]"),
+        new SpriteResource("res/dice.[ver]", {
             "res/dice/up1.png": "diceUp1",
             "res/dice/up2.png": "diceUp2",
             "res/dice/up3.png": "diceUp3",
@@ -568,21 +575,21 @@ const stagedResources = [
             "res/dice/darkShadow.png": "diceDarkShadow",
             "res/dice/lightShadow.png": "diceLightShadow"
         }),
-        new AudioResource("place_1", "res/audio_place_1.mp4"),
-        new AudioResource("place_2", "res/audio_place_2.mp4"),
-        new AudioResource("place_3", "res/audio_place_3.mp4"),
-        new AudioResource("place_4", "res/audio_place_4.mp4"),
-        new AudioResource("pickup_1", "res/audio_pickup_1.mp4"),
-        new AudioResource("pickup_2", "res/audio_pickup_2.mp4"),
-        new AudioResource("pickup_3", "res/audio_pickup_3.mp4"),
-        new AudioResource("error", "res/audio_error.mp4", {instances: 3, volume: 0.5}),
-        new AudioResource("kill", "res/audio_kill.mp4", {volume: 0.5}),
-        new AudioResource("hover", "res/audio_hover.mp4", {instances: 3, volume: 0.5}),
-        new AudioResource("dice_click", "res/audio_dice_click.mp4", {instances: 5, volume: 0.5}),
-        new AudioResource("dice_hit", "res/audio_dice_hit.mp4", {instances: 4, volume: 0.3}),
-        new AudioResource("dice_select", "res/audio_dice_select.mp4", {instances: 4, volume: 0.5}),
-        new AudioResource("firework_rocket", "res/audio_firework_rocket.mp4", {instances: 4, volume: 0.05}),
-        new AudioResource("firework_explode", "res/audio_firework_explode.mp4", {instances: 4, volume: 0.5}),
+        new AudioResource("place_1", "res/audio_place_1.[ver].mp4"),
+        new AudioResource("place_2", "res/audio_place_2.[ver].mp4"),
+        new AudioResource("place_3", "res/audio_place_3.[ver].mp4"),
+        new AudioResource("place_4", "res/audio_place_4.[ver].mp4"),
+        new AudioResource("pickup_1", "res/audio_pickup_1.[ver].mp4"),
+        new AudioResource("pickup_2", "res/audio_pickup_2.[ver].mp4"),
+        new AudioResource("pickup_3", "res/audio_pickup_3.[ver].mp4"),
+        new AudioResource("error", "res/audio_error.[ver].mp4", {instances: 3, volume: 0.5}),
+        new AudioResource("kill", "res/audio_kill.[ver].mp4", {volume: 0.5}),
+        new AudioResource("hover", "res/audio_hover.[ver].mp4", {instances: 3, volume: 0.5}),
+        new AudioResource("dice_click", "res/audio_dice_click.[ver].mp4", {instances: 5, volume: 0.5}),
+        new AudioResource("dice_hit", "res/audio_dice_hit.[ver].mp4", {instances: 4, volume: 0.3}),
+        new AudioResource("dice_select", "res/audio_dice_select.[ver].mp4", {instances: 4, volume: 0.5}),
+        new AudioResource("firework_rocket", "res/audio_firework_rocket.[ver].mp4", {instances: 4, volume: 0.05}),
+        new AudioResource("firework_explode", "res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.5}),
     ],
     [ // Learn Screen
     ]
