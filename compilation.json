@@ -25,7 +25,6 @@
       "client/js/render.js",
       "client/js/packets.js",
       "client/js/network.js",
-      "client/js/simulation.js",
       "client/js/game.js",
       "client/js/screens.js",
       "client/js/client.js"
@@ -33,6 +32,12 @@
     "resources.js": [
       "client/js/utils.js",
       "client/js/resources.js"
+    ],
+    "simulation.js": [
+      "client/js/utils.js",
+      "client/js/board.js",
+      "client/js/packets.js",
+      "client/js/simulation.js"
     ]
   },
 

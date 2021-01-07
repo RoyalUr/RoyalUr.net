@@ -4,8 +4,30 @@
 
 const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
 
-let computerIntelligence = 5,
-    previousGameState = null;
+const DIFFICULTY_EASY = 1,
+      DIFFICULTY_MEDIUM = 2,
+      DIFFICULTY_HARD = 5;
+
+let computerWorker = null;
+
+function getComputerWorker() {
+    if (computerWorker === null) {
+        computerWorker = new Worker("simulation.[ver].js");
+        computerWorker.onmessage = onComputerWorkerMessage;
+    }
+    return computerWorker;
+}
+function onComputerWorkerMessage(event) {
+    // Read the response.
+    const packet = new PacketIn(event.data, true),
+          response = readSimWorkerResponse(packet);
+    packet.assertEmpty();
+
+    // See if the current game is waiting for a computer move.
+    if (!game || !(game instanceof ComputerGame))
+        return;
+    game.onReceiveComputerMove(response.moveFrom);
+}
 
 
 //
@@ -259,9 +281,11 @@ BrowserGame.prototype.onDiceClick = function() {
 // Represents games that are played against the computer.
 //
 
-function ComputerGame() {
+function ComputerGame(difficulty) {
     BrowserGame.call(this);
     this.__class_name__ = "ComputerGame";
+    getComputerWorker();
+    this.difficulty = difficulty;
 
     setOwnPlayer(randBool() ? "light" : "dark");
     ownPlayer.name = "Human";
@@ -345,23 +369,29 @@ ComputerGame.prototype.onFinishDice = function() {
     }
 
     if (this.isComputersTurn()) {
-        const start = getTime(),
-              move = this.determineComputerMove(availableMoves),
-              durationMS = (getTime() - start) * 1000;
-
-        setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 700 - durationMS)));
+        if (availableMoves.length === 1) {
+            const move = availableMoves[0];
+            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 700)));
+            return;
+        }
+        this.determineComputerMove();
     }
 };
-ComputerGame.prototype.determineComputerMove = function(availableMoves) {
-    const diceValue = countDiceUp();
-    let from = availableMoves[0];
+ComputerGame.prototype.determineComputerMove = function() {
+    // Get the AI involved.
+    const state = new GameState();
+    state.copyFromCurrentGame();
+    const workerRequest = writeSimWorkerRequest(state, countDiceUp(), this.difficulty);
+    getComputerWorker().postMessage(workerRequest.data);
+    this.waitingForComputerMove = true;
+    return null;
+};
+ComputerGame.prototype.onReceiveComputerMove = function(from) {
+    if (!this.waitingForComputerMove)
+        return;
 
-    if (availableMoves.length === 1)
-        return from;
-
-    // Get the AI involved
-    previousGameState = captureCurrentGameState();
-    return previousGameState.findBestMove(diceValue, computerIntelligence);
+    this.waitingForComputerMove = false;
+    this.performComputerMove(from);
 };
 ComputerGame.prototype.performComputerMove = function(from) {
     const diceValue = countDiceUp(),

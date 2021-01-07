@@ -45,8 +45,8 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playSelectDiv, learnDiv, boardCanvas,
-            tilesCanvas, creditsDiv,
+            menuDiv, playSelectDiv, difficultyDiv, learnDiv,
+            boardCanvas, tilesCanvas, creditsDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
             exitControlButton,
@@ -113,7 +113,9 @@ function redrawMenu(forceRedraw) {
     playSelectDiv.style.opacity = screenState.playSelectFade.get();
     playSelectDescriptionDiv.style.opacity = (screenState.playSelectFade.isFadeIn ? descriptionFade : 0);
 
-    if (forceRedraw || isOnScreen(SCREEN_MENU) || isOnScreen(SCREEN_PLAY_SELECT)) {
+    difficultyDiv.style.opacity = screenState.difficultyFade.get();
+
+    if (forceRedraw || isOnScreen([SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY])) {
         const playButtonActive = (menuState.playButton !== BUTTON_STATE_INACTIVE),
               learnButtonActive = (menuState.learnButton !== BUTTON_STATE_INACTIVE),
               watchButtonActive = (menuState.watchButton !== BUTTON_STATE_INACTIVE);

@@ -29,6 +29,11 @@ const playSelectDiv = document.getElementById("play-select"),
       playComputerButton = document.getElementById("play-computer"),
       playSelectDescriptionDiv = document.getElementById("play-select-description");
 
+const difficultyDiv = document.getElementById("computer-difficulty"),
+      playComputerEasyButton = document.getElementById("play-computer-easy"),
+      playComputerMediumButton = document.getElementById("play-computer-medium"),
+      playComputerHardButton = document.getElementById("play-computer-hard");
+
 const learnDiv = document.getElementById("learn");
 
 const loadingDiv = document.getElementById("loading"),
@@ -90,6 +95,7 @@ function setupMenuElements() {
     });
 
     playSelectDiv.addEventListener("click", onExitClick);
+    difficultyDiv.addEventListener("click", onExitClick);
 
     playLocalButton.addEventListener("click", onPlayLocal);
     playOnlineButton.addEventListener("click", onPlayOnline);
@@ -102,6 +108,10 @@ function setupMenuElements() {
     playLocalButton.addEventListener("mouseout", onPlayUnhover);
     playOnlineButton.addEventListener("mouseout", onPlayUnhover);
     playComputerButton.addEventListener("mouseout", onPlayUnhover);
+
+    playComputerEasyButton.addEventListener("click", onPlayComputerEasy);
+    playComputerMediumButton.addEventListener("click", onPlayComputerMedium);
+    playComputerHardButton.addEventListener("click", onPlayComputerHard);
 
     playButton.addEventListener("mouseover", function() { menuState.playButton = BUTTON_STATE_HOVERED; });
     playButton.addEventListener("mouseout", function() { menuState.playButton = BUTTON_STATE_INACTIVE; });

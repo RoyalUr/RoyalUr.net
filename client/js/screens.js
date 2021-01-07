@@ -5,6 +5,7 @@
 const SCREEN_LOADING = "screen_loading",
       SCREEN_MENU = "screen_menu",
       SCREEN_PLAY_SELECT = "screen_play_select",
+      SCREEN_DIFFICULTY = "screen_difficulty",
       SCREEN_LEARN = "screen_learn",
       SCREEN_CONNECTING = "screen_connecting",
       SCREEN_GAME = "screen_game",
@@ -25,6 +26,7 @@ const screenState = {
 
     menuFade: createFade(0.5),
     playSelectFade: createFade(0.5),
+    difficultyFade: createFade(0.5),
     learnFade: createFade(0.5),
     boardFade: createFade(0.5),
     connectionFade: createFade(2, 0.5),
@@ -45,6 +47,7 @@ const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
 screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
+screenRequiredLoadingStages[SCREEN_DIFFICULTY] = 0;
 screenRequiredLoadingStages[SCREEN_LEARN] = 2;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
@@ -60,6 +63,7 @@ const screenActiveControlFades = {};
     screenActiveControlFades[SCREEN_LOADING] = [];
     screenActiveControlFades[SCREEN_MENU] = [DISCORD, GITHUB];
     screenActiveControlFades[SCREEN_PLAY_SELECT] = [EXIT];
+    screenActiveControlFades[SCREEN_DIFFICULTY] = [EXIT];
     screenActiveControlFades[SCREEN_LEARN] = [DISCORD, EXIT];
     screenActiveControlFades[SCREEN_CONNECTING] = [EXIT];
     screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
@@ -199,6 +203,7 @@ function maybeSwitchOffLoadingScreen(stage) {
 registerScreenTransitionHandlers(SCREEN_LOADING,     onEnterLoadingScreen,    onExitLoadingScreen);
 registerScreenTransitionHandlers(SCREEN_MENU,        onEnterMenuScreen,       onExitMenuScreen);
 registerScreenTransitionHandlers(SCREEN_PLAY_SELECT, onEnterPlaySelectScreen, onExitPlaySelectScreen);
+registerScreenTransitionHandlers(SCREEN_DIFFICULTY,  onEnterDifficultyScreen, onExitDifficultyScreen);
 registerScreenTransitionHandlers(SCREEN_LEARN,       onEnterLearnScreen,      onExitLearnScreen);
 registerScreenTransitionHandlers(SCREEN_CONNECTING,  onEnterConnectingScreen, onExitConnectingScreen);
 registerScreenTransitionHandlers(SCREEN_GAME,        onEnterGameScreen,       onExitGameScreen);
@@ -206,7 +211,7 @@ registerScreenTransitionHandlers(SCREEN_WIN,         onEnterWinScreen,        on
 
 // Screens where the menu should be shown
 registerScreenTransitionHandlers(
-    [SCREEN_MENU, SCREEN_PLAY_SELECT], onEnterMenuScreens, onExitMenuScreens
+    [SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY], onEnterMenuScreens, onExitMenuScreens
 );
 
 // Screens where the game should not disconnect from the server
@@ -229,7 +234,6 @@ function onExitLoadingScreen(hasty) {
 }
 
 function onEnterMenuScreen(hasty) {}
-
 function onExitMenuScreen(hasty) {}
 
 function onEnterPlaySelectScreen(hasty) {
@@ -239,6 +243,14 @@ function onEnterPlaySelectScreen(hasty) {
 
 function onExitPlaySelectScreen(hasty) {
     screenState.playSelectFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterDifficultyScreen(hasty) {
+    screenState.difficultyFade.fadeIn(hasty ? 0 : undefined);
+}
+
+function onExitDifficultyScreen(hasty) {
+    screenState.difficultyFade.fadeOut(hasty ? 0 : undefined);
 }
 
 function onEnterLearnScreen(hasty) {

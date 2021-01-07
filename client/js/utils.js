@@ -49,19 +49,22 @@ function setSuperClass(subclass, superclass) {
 // COMPATIBILITY
 //
 
-window.requestAnimationFrame = window.requestAnimationFrame ||
-                               window.mozRequestAnimationFrame ||
-                               window.webkitRequestAnimationFrame ||
-                               window.msRequestAnimationFrame ||
-                               function(f) {setTimeout(f, 1000/60)};
+let getTime = null;
+if (typeof window !== "undefined") {
+    window.requestAnimationFrame = window.requestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function(f) {setTimeout(f, 1000/60)};
 
-let getTime;
+    if (window.performance.now) {
+        getTime = function() { return window.performance.now() / 1000; };
+    } else if (window.performance.webkitNow) {
+        getTime = function() { return window.performance.webkitNow() / 1000; };
+    }
+}
 
-if (window.performance.now) {
-    getTime = function() { return window.performance.now() / 1000; };
-} else if (window.performance.webkitNow) {
-    getTime = function() { return window.performance.webkitNow() / 1000; };
-} else {
+if (getTime === null) {
     getTime = function() { return new Date().getTime() / 1000; };
 }
 

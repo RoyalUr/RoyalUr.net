@@ -123,7 +123,24 @@ function onPlayOnline(event) {
 
 function onPlayComputer(event) {
     event.stopPropagation();
-    game = new ComputerGame();
+    switchToScreen(SCREEN_DIFFICULTY);
+}
+
+function onPlayComputerEasy(event) {
+    event.stopPropagation();
+    game = new ComputerGame(DIFFICULTY_EASY);
+    switchToScreen(SCREEN_GAME);
+}
+
+function onPlayComputerMedium(event) {
+    event.stopPropagation();
+    game = new ComputerGame(DIFFICULTY_MEDIUM);
+    switchToScreen(SCREEN_GAME);
+}
+
+function onPlayComputerHard(event) {
+    event.stopPropagation();
+    game = new ComputerGame(DIFFICULTY_HARD);
     switchToScreen(SCREEN_GAME);
 }
 

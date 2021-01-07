@@ -7,17 +7,18 @@ const TILES_WIDTH = 3,
       TILES_COUNT = TILES_WIDTH * TILES_HEIGHT;
 
 const TILE_LOCS = [];
-{
-    for(let x = 0; x < TILES_WIDTH; ++x) {
-        for(let y = 0; y < TILES_HEIGHT; ++y) {
-            TILE_LOCS.push(vec(x, y));
-        }
+for(let x = 0; x < TILES_WIDTH; ++x) {
+    for(let y = 0; y < TILES_HEIGHT; ++y) {
+        TILE_LOCS.push(vec(x, y));
     }
 }
 
 const TILE_EMPTY = 0,
       TILE_DARK = 1,
       TILE_LIGHT = 2;
+
+const LIGHT_PLAYER_NO = TILE_LIGHT,
+      DARK_PLAYER_NO = TILE_DARK;
 
 const LIGHT_PATH = vecList(
     0, 4,
@@ -133,103 +134,194 @@ function getTileMoveToLocation(playerNo, loc, moveDistance) {
 }
 
 
-function Board(tiles) {
+/**
+ * Holds all of the tiles on the game board.
+ */
+function Board() {
     // Initialise an empty board
-    if (tiles === undefined) {
-        tiles = [];
-        for(let x = 0; x < TILES_WIDTH; ++x) {
-            const col = [];
-            for(let y = 0; y < TILES_HEIGHT; ++y) {
-                col.push(TILE_EMPTY);
-            }
-            tiles.push(col);
-        }
+    this.tiles = [];
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        this.tiles.push(TILE_EMPTY);
     }
-
-    if (tiles.length !== TILES_WIDTH)
-        throw "tiles should be of length " + TILES_WIDTH + ", is length " + tiles.length;
-    for (let index = 0; index < TILES_WIDTH; ++index) {
-        if (tiles[index].length !== TILES_HEIGHT)
-            throw "tiles[" + index + "] should be of length " + TILES_HEIGHT + ", is length " + tiles[index].length;
-    }
-
-    this.tiles = tiles;
-
-    this.clone = function() {
-        const clone = new Board();
-        for(let x = 0; x < TILES_WIDTH; ++x) {
-            for(let y = 0; y < TILES_HEIGHT; ++y) {
-                clone.tiles[x][y] = this.tiles[x][y];
-            }
-        }
-        return clone;
-    }.bind(this);
-
-    this.getTile = function (loc) {
-        return (isTileLocValid(loc) ? this.tiles[loc.x][loc.y] : TILE_EMPTY);
-    }.bind(this);
-
-    this.setTile = function (loc, tile) {
-        assert(isTileLocValid(loc), "invalid tile location " + loc);
-        assert(isTileValid(tile), "invalid tile value " + tile);
-        this.tiles[loc.x][loc.y] = tile;
-    }.bind(this);
-    this.loadTileState = function(flat) {
-        assert(flat.length === TILES_COUNT, "Expected " + TILES_COUNT + " tiles, got " + flat.length);
-
-        for(let x = 0; x < TILES_WIDTH; ++x) {
-            for(let y = 0; y < TILES_HEIGHT; ++y) {
-                const tile = flat[x + y * TILES_WIDTH];
-
-                assert(isTileValid(tile), "invalid tile value at (" + x + ", " + y + "), " + tile);
-
-                this.tiles[x][y] = tile;
-            }
-        }
-    }.bind(this);
-
-    this.clearTiles = function() {
-        for(let x = 0; x < TILES_WIDTH; ++x) {
-            for(let y = 0; y < TILES_HEIGHT; ++y) {
-                this.tiles[x][y] = TILE_EMPTY;
-            }
-        }
-    }.bind(this);
-
-    this.isValidMoveFrom = function(playerNo, loc, moveDistance) {
-        if(moveDistance <= 0)
-            return false;
-
-        const to = getTileMoveToLocation(playerNo, loc, moveDistance);
-        if(to === null)
-            return false;
-
-        const toOwner = this.getTile(to),
-              fromOwner = this.getTile(loc);
-
-        if (fromOwner !== playerNo)
-            return false;
-        if(toOwner === fromOwner)
-            return false;
-        if(toOwner === TILE_EMPTY)
-            return true;
-
-        return !isLocusTile(to);
-    }.bind(this);
-
-    this.getAllValidMoves = function(playerNo, moveDistance) {
-        if (moveDistance <= 0)
-            return [];
-
-        const moves = [];
-        for (let index = 0; index < TILES_COUNT; ++index) {
-            const loc = TILE_LOCS[index];
-            if (!this.isValidMoveFrom(playerNo, loc, moveDistance))
-                continue;
-
-            moves.push(loc);
-        }
-        shuffle(moves);
-        return moves;
-    }.bind(this);
 }
+Board.prototype.copyFrom = function(other) {
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        this.tiles[index] = other.tiles[index];
+    }
+};
+Board.prototype.getTile = function (loc) {
+    return (isTileLocValid(loc) ? this.tiles[loc.x + loc.y * TILES_WIDTH] : TILE_EMPTY);
+};
+Board.prototype.setTile = function (loc, tile) {
+    assert(isTileLocValid(loc), "invalid tile location " + loc);
+    assert(isTileValid(tile), "invalid tile value " + tile);
+    this.tiles[loc.x + loc.y * TILES_WIDTH] = tile;
+};
+Board.prototype.loadTileState = function(flat) {
+    assert(flat.length === TILES_COUNT, "Expected " + TILES_COUNT + " tiles, got " + flat.length);
+
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        const tile = flat[index];
+        assert(isTileValid(tile), "invalid tile value at index " + index + ", " + tile);
+        this.tiles[index] = tile;
+    }
+};
+Board.prototype.clearTiles = function() {
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        this.tiles[index] = TILE_EMPTY;
+    }
+};
+Board.prototype.isValidMoveFrom = function(playerNo, loc, moveDistance) {
+    if(moveDistance <= 0)
+        return false;
+
+    const to = getTileMoveToLocation(playerNo, loc, moveDistance);
+    if(to === null)
+        return false;
+
+    const toOwner = this.getTile(to),
+        fromOwner = this.getTile(loc);
+
+    if (fromOwner !== playerNo)
+        return false;
+    if(toOwner === fromOwner)
+        return false;
+    if(toOwner === TILE_EMPTY)
+        return true;
+    return !isLocusTile(to);
+};
+Board.prototype.getAllValidMoves = function(playerNo, moveDistance, outList) {
+    if (outList === undefined) {
+        outList = [];
+    } else {
+        outList.length = 0;
+    }
+    if (moveDistance <= 0)
+        return outList;
+
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        const loc = TILE_LOCS[index];
+        if (this.isValidMoveFrom(playerNo, loc, moveDistance)) {
+            outList.push(loc);
+        }
+    }
+    return outList;
+};
+
+
+/**
+ * Represents the current state of a game.
+ */
+function GameState() {
+    this.board = new Board();
+    this.activePlayerNo = -1;
+    this.lightTiles = -1;
+    this.lightScore = -1;
+    this.darkTiles = -1;
+    this.darkScore = -1;
+    this.lightWon = false;
+    this.darkWon = false;
+    this.won = false;
+    this.lastMoveFrom = null;
+}
+GameState.prototype.copyFrom = function(other) {
+    this.board.copyFrom(other.board);
+    this.activePlayerNo = other.activePlayerNo;
+    this.lightTiles = other.lightTiles;
+    this.lightScore = other.lightScore;
+    this.darkTiles = other.darkTiles;
+    this.darkScore = other.darkScore;
+    this.lightWon = other.lightWon;
+    this.darkWon = other.darkWon;
+    this.won = other.won;
+};
+GameState.prototype.copyFromCurrentGame = function() {
+    this.board.copyFrom(board);
+    this.activePlayerNo = getActivePlayer().playerNo;
+    this.lightTiles = lightPlayer.tiles.current;
+    this.lightScore = lightPlayer.score.current;
+    this.darkTiles = darkPlayer.tiles.current;
+    this.darkScore = darkPlayer.score.current;
+    this.lightWon = (this.lightScore >= 7);
+    this.darkWon = (this.darkScore >= 7);
+    this.won = (this.lightWon || this.darkWon);
+};
+GameState.prototype.getValidMoves = function(diceValue, outList) {
+    this.board.setTile(LIGHT_START, (this.lightTiles > 0 ? TILE_LIGHT : TILE_EMPTY));
+    this.board.setTile(DARK_START, (this.darkTiles > 0 ? TILE_DARK : TILE_EMPTY));
+    return this.board.getAllValidMoves(this.activePlayerNo, diceValue, outList);
+};
+GameState.prototype.applyMove = function(from, diceValue) {
+    const to = getTileMoveToLocation(this.activePlayerNo, from, diceValue),
+        toTile = this.board.getTile(to);
+
+    // Remove the old tile.
+    this.board.setTile(from, TILE_EMPTY);
+
+    // Reduce the player's tile count if they moved a new tile onto the board.
+    if (isStartTile(this.activePlayerNo, from)) {
+        if (this.activePlayerNo === LIGHT_PLAYER_NO) {
+            this.lightTiles -= 1;
+        } else {
+            this.darkTiles -= 1;
+        }
+    }
+
+    // If the tile isn't being moved off the board, move the tile.
+    // Else, increase the player's score.
+    if (!isEndTile(this.activePlayerNo, to)) {
+        this.board.setTile(to, this.activePlayerNo);
+
+        // If the opponent's tile is taken off the board, add it back to their tile count.
+        if (toTile === TILE_LIGHT) {
+            this.lightTiles += 1;
+        } else if (toTile === TILE_DARK) {
+            this.darkTiles += 1;
+        }
+
+    } else if (this.activePlayerNo === LIGHT_PLAYER_NO) {
+        this.lightScore += 1;
+        if (this.lightScore >= 7) {
+            this.lightWon = true;
+            this.won = true;
+        }
+    } else {
+        this.darkScore += 1;
+        if (this.darkScore >= 7) {
+            this.darkWon = true;
+            this.won = true;
+        }
+    }
+
+    // If the tile isn't a rosette, swap the current player.
+    if (!isLocusTile(to)) {
+        this.swapActivePlayer();
+    }
+
+    // Update the last move that was applied.
+    this.lastMoveFrom = from;
+};
+GameState.prototype.swapActivePlayer = function() {
+    this.activePlayerNo = (this.activePlayerNo === LIGHT_PLAYER_NO ? DARK_PLAYER_NO : LIGHT_PLAYER_NO);
+    this.lastMoveFrom = null;
+};
+GameState.prototype.calculateUtility = function(playerNo) {
+    // We give 1 extra utility for taking a tile off the board.
+    let lightUtility = 16 * (this.lightScore - this.darkScore);
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        const loc = TILE_LOCS[index],
+            tile = this.board.getTile(loc);
+
+        // Ignore empty, start, and end tiles
+        if (tile === TILE_EMPTY || !isTileLocOnBoard(loc))
+            continue;
+
+        // Add utility based on how far each tile has been moved.
+        if (tile === TILE_LIGHT) {
+            lightUtility += vecListIndexOf(LIGHT_PATH, loc);
+        } else {
+            lightUtility -= vecListIndexOf(DARK_PATH, loc);
+        }
+    }
+    return playerNo === LIGHT_PLAYER_NO ? lightUtility : -lightUtility;
+};

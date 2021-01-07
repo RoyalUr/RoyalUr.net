@@ -11,6 +11,15 @@ const ZERO_CHAR_CODE = "0".charCodeAt(0),
 // INCOMING
 //
 
+const incomingPacketReaders = {
+    "error": readErrorPacket,
+    "setid": readSetIdPacket,
+    "invalid_game": readInvalidGamePacket,
+    "game": readGamePacket,
+    "message": readMessagePacket,
+    "state": readStatePacket,
+    "move": readMovePacket
+};
 const incomingPacketTypes = [
     "error",
     "setid",
@@ -21,39 +30,124 @@ const incomingPacketTypes = [
     "move"
 ];
 
-const incomingPacketReaders = {
-    "error": readErrorPacket,
-    "setid": readSetIdPacket,
-    "invalid_game": readInvalidGamePacket,
-    "game": readGamePacket,
-    "message": readMessagePacket,
-    "state": readStatePacket,
-    "move": readMovePacket
+/**
+ * Holds the data of a packet and facilitates the reading of that data.
+ * @param data a String holding the content of the packet.
+ * @param isWorkerPacket indicates whether this is packet used to communicate with a web worker.
+ */
+function PacketIn(data, isWorkerPacket) {
+    this.data = data;
+    this.index = 0;
+
+    // If this isn't a worker packet, read its type.
+    if (!isWorkerPacket) {
+        const typeID = this.nextChar().charCodeAt(0) - ZERO_CHAR_CODE;
+        assert(
+            typeID >= 0 && typeID <= incomingPacketTypes.length,
+            "invalid typeId " + typeID + "(" + data.charAt(0) + ")"
+        );
+        this.type = incomingPacketTypes[typeID];
+    } else {
+        this.type = "worker_packet"
+    }
+}
+PacketIn.prototype.consumeAll = function() {
+    const from = this.index;
+    this.index = this.data.length;
+    return this.data.substring(from, this.index);
 };
+PacketIn.prototype.nextChar = function() {
+    assert(this.index < this.data.length, "there are no characters left in the packet");
+    return this.data[this.index++];
+};
+PacketIn.prototype.nextString = function(length) {
+    assert(length >= 0, "length must be >= 0");
+    assert(this.index + length <= this.data.length, "there are not " + length + " characters left in the packet");
+
+    const from = this.index;
+    this.index += length;
+    return this.data.substring(from, this.index);
+};
+PacketIn.prototype.nextVarString = function(lengthCharacters) {
+    if(lengthCharacters === undefined) lengthCharacters = 2;
+    assert(lengthCharacters > 0, "lengthCharacters must be positive");
+    const length = this.nextInt(lengthCharacters);
+    return this.nextString(length);
+};
+PacketIn.prototype.nextInt = function(length) {
+    return parseInt(this.nextString(length));
+};
+PacketIn.prototype.nextDigit = function() {
+    return this.nextInt(1);
+};
+PacketIn.prototype.nextUUID = function() {
+    return this.nextString(36);
+};
+PacketIn.prototype.nextGameID = function() {
+    return this.nextString(GAME_ID_LENGTH);
+};
+PacketIn.prototype.nextBool = function() {
+    const char = this.nextChar();
+    if(char === 't') return true;
+    if(char === 'f') return false;
+    assert(false, "expected a boolean, 't' or 'f'");
+};
+PacketIn.prototype.nextLocation = function() {
+    return vec(this.nextDigit(), this.nextDigit());
+};
+PacketIn.prototype.nextPlayer = function() {
+    const player = this.nextDigit();
+    if(player === 1) return "dark";
+    if(player === 2) return "light";
+    assert(false, "invalid player " + player);
+};
+PacketIn.prototype.nextPlayerState = function() {
+    return {
+        tiles: this.nextDigit(),
+        score: this.nextDigit()
+    };
+};
+PacketIn.prototype.nextBoard = function() {
+    const owners = [];
+    for(let index = 0; index < TILES_COUNT; ++index) {
+        owners.push(this.nextDigit());
+    }
+    return owners;
+};
+PacketIn.prototype.nextGameState = function() {
+    const state = new GameState();
+    state.lightTiles = this.nextDigit();
+    state.lightScore = this.nextDigit();
+    state.darkTiles = this.nextDigit();
+    state.darkScore = this.nextDigit();
+    state.board.loadTileState(this.nextBoard());
+    state.activePlayerNo = this.nextDigit();
+    state.lightWon = (state.lightScore >= 7);
+    state.darkWon = (state.darkScore >= 7);
+    state.won = (state.lightWon || state.darkWon);
+    return state;
+};
+PacketIn.prototype.assertEmpty = function() {
+    assert(this.index === this.data.length, "expected packet " + this.type + " to be fully read");
+};
+
 
 function readPacket(data) {
     const packet = new PacketIn(data);
-
     assert(packet.type in incomingPacketReaders, "Unknown packet type " + packet.type);
 
     const out = incomingPacketReaders[packet.type](packet);
     out.type = packet.type;
-
     packet.assertEmpty();
-
     return out;
 }
 
 function readErrorPacket(packet) {
-    return {
-        error: packet.consumeAll()
-    };
+    return { error: packet.consumeAll() };
 }
 
 function readSetIdPacket(packet) {
-    return {
-        id: packet.nextUUID()
-    };
+    return { id: packet.nextUUID() };
 }
 
 function readInvalidGamePacket(packet) {
@@ -69,9 +163,7 @@ function readGamePacket(packet) {
 }
 
 function readMessagePacket(packet) {
-    return {
-        text: packet.nextVarString()
-    };
+    return { text: packet.nextVarString() };
 }
 
 function readStatePacket(packet) {
@@ -94,7 +186,6 @@ function readStatePacket(packet) {
         ];
         values.hasMoves = packet.nextBool();
     }
-
     return values;
 }
 
@@ -105,115 +196,16 @@ function readMovePacket(packet) {
     };
 }
 
-function PacketIn(data) {
-    assert(data.length > 0, "data must contain initial type character");
-
-    const typeId = data.charCodeAt(0) - ZERO_CHAR_CODE;
-
-    assert(typeId >= 0 && typeId <= incomingPacketTypes.length, "invalid typeId " + typeId + "(" + data.charAt(0) + ")");
-
-    this.type = incomingPacketTypes[typeId];
-    this.data = data;
-    this.index = 1;
-
-    this.consumeAll = function() {
-        const from = this.index;
-        this.index = this.data.length;
-
-        return this.data.substring(from, this.index);
+function readSimWorkerRequest(packet) {
+    return {
+        depth: packet.nextDigit(),
+        state: packet.nextGameState(),
+        diceValue: packet.nextDigit()
     };
+}
 
-    this.nextChar = function() {
-        assert(this.index < this.data.length, "there are no characters left in the packet");
-
-        return this.data[this.index++];
-    }.bind(this);
-
-    this.nextString = function(length) {
-        assert(length >= 0, "length must be >= 0");
-        assert(this.index + length <= this.data.length, "there are not " + length + " characters left in the packet");
-
-        const from = this.index;
-        this.index += length;
-
-        return this.data.substring(from, this.index);
-    }.bind(this);
-
-    this.nextVarString = function(lengthCharacters) {
-        if(lengthCharacters === undefined) lengthCharacters = 2;
-
-        assert(lengthCharacters > 0, "lengthCharacters must be positive");
-
-        const length = this.nextInt(lengthCharacters);
-
-        return this.nextString(length);
-    };
-
-    this.nextInt = function(length) {
-        const string = this.nextString(length);
-
-        return parseInt(string);
-    }.bind(this);
-
-    this.nextDigit = function() {
-        return this.nextInt(1);
-    }.bind(this);
-
-    this.nextUUID = function() {
-        return this.nextString(36);
-    }.bind(this);
-
-    this.nextGameID = function() {
-        return this.nextString(GAME_ID_LENGTH);
-    };
-    
-    this.nextBool = function() {
-        const char = this.nextChar();
-
-        if(char === 't') return true;
-        if(char === 'f') return false;
-
-        assert(false, "expected a boolean, 't' or 'f'");
-    }.bind(this);
-
-    this.nextLocation = function() {
-        return vec(this.nextDigit(), this.nextDigit());
-    }.bind(this);
-
-    this.nextPlayer = function() {
-        const player = this.nextDigit();
-
-        if(player === 1) return "dark";
-        if(player === 2) return "light";
-
-        assert(false, "invalid player " + player);
-    }.bind(this);
-
-    this.nextPlayerState = function(player) {
-        return {
-            player: player,
-            tiles: this.nextDigit(),
-            score: this.nextDigit()
-        };
-    }.bind(this);
-
-    this.nextBoard = function() {
-        const WIDTH = 3,
-              HEIGHT = 8,
-              TILE_COUNT = 24;
-
-        const owners = [];
-
-        for(let index = 0; index < TILE_COUNT; ++index) {
-            owners.push(this.nextDigit());
-        }
-
-        return owners;
-    }.bind(this);
-
-    this.assertEmpty = function() {
-        assert(this.index === this.data.length, "expected packet " + this.type + " to be fully read");
-    }.bind(this);
+function readSimWorkerResponse(packet) {
+    return { moveFrom: packet.nextLocation() };
 }
 
 
@@ -233,23 +225,48 @@ const outgoingPacketTypes = [
 ];
 
 function PacketOut(type) {
-    const typeId = outgoingPacketTypes.indexOf(type);
-
-    assert(typeId >= 0, "unknown type " + type);
-
     this.type = type;
-    this.data = String.fromCharCode(typeId + ZERO_CHAR_CODE);
-
-    this.write = function(value) {
-        this.data += value;
-    }.bind(this);
-
-    this.writeDigit = function(digit) {
-        assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive");
-
-        this.write(digit);
-    }.bind(this);
+    if (type !== "worker_packet") {
+        const typeId = outgoingPacketTypes.indexOf(type);
+        assert(typeId >= 0, "unknown type " + type);
+        this.data = String.fromCharCode(typeId + ZERO_CHAR_CODE);
+    } else {
+        this.data = "";
+    }
 }
+PacketOut.prototype.write = function(value) {
+    this.data += value;
+};
+PacketOut.prototype.writeDigit = function(digit) {
+    assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive");
+    this.write(digit);
+};
+PacketOut.prototype.writeLocation = function(loc) {
+    this.writeDigit(loc.x);
+    this.writeDigit(loc.y);
+};
+PacketOut.prototype.writePlayer = function(playerNo) {
+    assert(playerNo === 1 || playerNo === 2, "invalid playerNo " + playerNo);
+    this.writeDigit(playerNo);
+};
+PacketOut.prototype.writePlayerState = function(tiles, score) {
+    this.writeDigit(tiles);
+    this.writeDigit(score);
+};
+PacketOut.prototype.writeBoard = function(board) {
+    for (let index = 0; index < TILES_COUNT; ++index) {
+        this.writeDigit(board.tiles[index]);
+    }
+};
+PacketOut.prototype.writeGameState = function(state) {
+    this.writeDigit(state.lightTiles);
+    this.writeDigit(state.lightScore);
+    this.writeDigit(state.darkTiles);
+    this.writeDigit(state.darkScore);
+    this.writeBoard(state.board);
+    this.writePlayer(state.activePlayerNo);
+};
+
 
 function writeOpenPacket() {
     return new PacketOut("open");
@@ -257,21 +274,15 @@ function writeOpenPacket() {
 
 function writeReOpenPacket(previousId) {
     assert(previousId.length === 36, "previousId must be a uuid");
-
     const packet = new PacketOut("reopen");
-
     packet.write(previousId);
-
     return packet;
 }
 
 function writeJoinGamePacket(gameID) {
     assert(gameID.length === GAME_ID_LENGTH, "gameId must have " + GAME_ID_LENGTH + " characters");
-    
     const packet = new PacketOut("join_game");
-    
     packet.write(gameID);
-    
     return packet;
 }
 
@@ -285,9 +296,21 @@ function writeDiceRollPacket() {
 
 function writeMovePacket(from) {
     const packet = new PacketOut("move");
-
     packet.writeDigit(from.x);
     packet.writeDigit(from.y);
+    return packet;
+}
 
+function writeSimWorkerRequest(state, diceValue, depth) {
+    const packet = new PacketOut("worker_packet");
+    packet.writeDigit(depth);
+    packet.writeGameState(state);
+    packet.writeDigit(diceValue);
+    return packet;
+}
+
+function writeSimWorkerResponse(loc) {
+    const packet = new PacketOut("worker_packet");
+    packet.writeLocation(loc)
     return packet;
 }

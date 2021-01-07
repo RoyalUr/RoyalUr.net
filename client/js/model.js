@@ -72,11 +72,8 @@ function resetTiles() {
 // PLAYERS
 //
 
-const LIGHT_PLAYER_NO = TILE_LIGHT,
-      DARK_PLAYER_NO = TILE_DARK;
-
-const darkPlayer = initPlayer(1, "Dark"),
-      lightPlayer = initPlayer(2, "Light");
+const darkPlayer = initPlayer(TILE_DARK, "Dark"),
+      lightPlayer = initPlayer(TILE_LIGHT, "Light");
 
 let leftPlayer = darkPlayer,
     rightPlayer = lightPlayer;

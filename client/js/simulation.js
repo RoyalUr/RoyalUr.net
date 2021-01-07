@@ -3,198 +3,129 @@
 //
 
 const MOVE_PROBABILITIES = [
-    1 / 16,
-    4 / 16,
-    6 / 16,
-    4 / 16,
-    1 / 16,
+    1 / 16.0,
+    4 / 16.0,
+    6 / 16.0,
+    4 / 16.0,
+    1 / 16.0,
 ];
 
-function GameState(board, activePlayerNo, lightTiles, lightScore, darkTiles, darkScore) {
-    this.board = board;
-    this.activePlayerNo = activePlayerNo;
-    this.lightTiles = lightTiles;
-    this.lightScore = lightScore;
-    this.darkTiles = darkTiles;
-    this.darkScore = darkScore;
-    this.lightWon = (lightScore >= 7);
-    this.darkWon = (darkScore >= 7);
-    this.won = (this.lightWon || this.darkWon);
+/** Used to store the best move and utility that is tracked throughout simulations. **/
+function BestMoveAndUtility() {
+    this.from = null;
+    this.utility = 0;
+}
+BestMoveAndUtility.prototype.set = function(from, utility) {
+    this.from = from;
+    this.utility = utility;
+    return this;
+};
 
-    this.calculateUtility = function(playerNo) {
-        let lightUtility = 15 * (this.lightScore - this.darkScore);
-        for (let index = 0; index < TILES_COUNT; ++index) {
-            const loc = TILE_LOCS[index],
-                  tile = this.board.getTile(loc);
+/**
+ * A simulator that is able to simulate and calculate the
+ * utility of future moves to a certain depth into the future.
+ */
+function GameSimulator(depth) {
+    this.depth = depth;
 
-            // Ignore empty tiles, and start & end tiles
-            if (tile === TILE_EMPTY || !isTileLocOnBoard(loc))
-                continue;
+    // Objects we re-use to avoid allocations.
+    this.stateLists = [];
+    this.moveStateReturnLists = [];
+    this.validMoveLists = [];
+    this.bestMoveAndUtilityObjects = [];
+    for (let index = 0; index < depth; ++index) {
+        this.stateLists.push([]);
+        this.moveStateReturnLists.push([]);
+        this.validMoveLists.push([]);
+        this.bestMoveAndUtilityObjects.push(new BestMoveAndUtility());
+    }
+}
+GameSimulator.prototype.findBestMove = function(state, diceValue) {
+    return this.calculateBestMoveAndUtility(state, diceValue, 1).from;
+};
+GameSimulator.prototype.calculateBestMoveAndUtility = function(state, diceValue, depth) {
+    const moveStates = this.findMoveStates(state, diceValue, depth);
+    let bestFrom = null,
+        bestUtility = 0;
 
-            switch (tile) {
-                case TILE_LIGHT:
-                    lightUtility += vecListIndexOf(LIGHT_PATH, loc);
-                    break;
-                case TILE_DARK:
-                    lightUtility -= vecListIndexOf(DARK_PATH, loc);
-                    break;
-                default:
-                    throw "Invalid tile " + tile;
-            }
+    for (let index = 0; index < moveStates.length; ++index) {
+        const moveState = moveStates[index];
+
+        let utility = NaN;
+        if (depth >= this.depth || moveState.won) {
+            utility = moveState.calculateUtility(state.activePlayerNo);
+        } else {
+            utility = this.calculateProbabilityWeightedUtility(moveState, depth + 1);
+            // Correct for if the utility is for the other player
+            utility *= (state.activePlayerNo === moveState.activePlayerNo ? 1 : -1);
         }
 
-        switch (playerNo) {
-            case LIGHT_PLAYER_NO:
-                return lightUtility;
-            case DARK_PLAYER_NO:
-                return -lightUtility;
-            default:
-                throw "Invalid playerNo " + playerNo;
+        if (bestFrom === null || utility > bestUtility || (utility === bestUtility && randBool())) {
+            bestFrom = moveState.lastMoveFrom;
+            bestUtility = utility;
         }
-    }.bind(this);
-
-    this.setupStartTiles = function() {
-        this.board.setTile(LIGHT_START, (this.lightTiles > 0 ? TILE_LIGHT : TILE_EMPTY));
-        this.board.setTile(DARK_START, (this.darkTiles > 0 ? TILE_DARK : TILE_EMPTY));
-    }.bind(this);
-
-    this.findBestMove = function(moveDistance, depth) {
-        const bestMove = this.findTieredBestMoveAndUtility(moveDistance, depth);
-        return bestMove.from;
-    }.bind(this);
-
-    this.findTieredBestMoveAndUtility = function(moveDistance, depth) {
-        if (this.won) {
-            return {
-                from: null,
-                utility: this.calculateUtility(this.activePlayerNo)
-            };
-        }
-
-        const moveStates = this.findMoveStates(moveDistance);
-
-        let bestFrom = null,
-            bestUtility = 0;
-
-        for (let index = 0; index < moveStates.length; ++index) {
-            const move = moveStates[index];
-
-            let utility = NaN;
-            if (depth <= 1) {
-                utility = move.state.calculateUtility(this.activePlayerNo);
-            } else {
-                utility = move.state.findTieredWeightedUtility(depth - 1);
-                // Correct for if the utility is for the other player
-                utility *= (this.activePlayerNo === move.state.activePlayerNo ? 1 : -1);
-            }
-
-            if (bestFrom === null || utility > bestUtility) {
-                bestFrom = move.from;
-                bestUtility = utility;
-            }
-        }
-
-        return {
-            from: bestFrom,
-            utility: bestUtility
-        };
-    }.bind(this);
-
-    this.findTieredWeightedUtility = function(depth) {
-        if (this.won) {
-            return this.calculateUtility(this.activePlayerNo);
-        }
-
-        let weighted = 0;
-        for (let moveDistance = 0; moveDistance <= 4; ++moveDistance) {
-            const bestMove = this.findTieredBestMoveAndUtility(moveDistance, depth);
-
-            weighted += MOVE_PROBABILITIES[moveDistance] * bestMove.utility;
-        }
-        return weighted;
-    }.bind(this);
-
-    this.findMoveStates = function(moveDistance) {
-        this.setupStartTiles();
-
-        const moves = this.board.getAllValidMoves(this.activePlayerNo, moveDistance),
-              states = [];
-
+    }
+    return this.bestMoveAndUtilityObjects[depth - 1].set(bestFrom, bestUtility);
+};
+GameSimulator.prototype.calculateProbabilityWeightedUtility = function(state, depth) {
+    let utility = 0;
+    for (let diceValue = 0; diceValue <= 4; ++diceValue) {
+        const moveAndUtility = this.calculateBestMoveAndUtility(state, diceValue, depth);
+        utility += MOVE_PROBABILITIES[diceValue] * moveAndUtility.utility;
+    }
+    return utility;
+};
+GameSimulator.prototype.getStateObject = function(depth, index) {
+    const list = this.stateLists[depth - 1];
+    while (list.length <= index) {
+        list.push(new GameState());
+    }
+    return list[index];
+};
+GameSimulator.prototype.findMoveStates = function(state, diceValue, depth) {
+    const moves = state.getValidMoves(diceValue, this.validMoveLists[depth - 1]),
+          moveStates = this.moveStateReturnLists[depth - 1];
+    // Clear the moveStates list.
+    moveStates.length = 0;
+    if (moves.length > 0) {
+        // Find the new state after applying each available move.
         for (let index = 0; index < moves.length; ++index) {
-            const from = moves[index],
-                  to = getTileMoveToLocation(this.activePlayerNo, from, moveDistance),
-                  toTile = this.board.getTile(to),
-                  newBoard = this.board.clone();
-
-            let newLightTiles = this.lightTiles,
-                newLightScore = this.lightScore,
-                newDarkTiles = this.darkTiles,
-                newDarkScore = this.darkScore,
-                newActivePlayerNo = this.activePlayerNo;
-
-            if (!isLocusTile(to)) {
-                newActivePlayerNo = (this.activePlayerNo === LIGHT_PLAYER_NO ? DARK_PLAYER_NO : LIGHT_PLAYER_NO);
-            }
-
-            newBoard.setTile(from, TILE_EMPTY);
-            if (isStartTile(this.activePlayerNo, from)) {
-                if (this.activePlayerNo === LIGHT_PLAYER_NO) {
-                    newLightTiles -= 1;
-                } else {
-                    newDarkTiles -= 1;
-                }
-            }
-
-            if (!isEndTile(this.activePlayerNo, to)) {
-                newBoard.setTile(to, this.activePlayerNo);
-
-                if (toTile === TILE_LIGHT) {
-                    newLightTiles += 1;
-                } else if (toTile === TILE_DARK) {
-                    newDarkTiles += 1;
-                }
-
-            } else if (this.activePlayerNo === LIGHT_PLAYER_NO) {
-                newLightScore += 1;
-            } else {
-                newDarkScore += 1;
-            }
-
-            const newState = new GameState(
-                newBoard, newActivePlayerNo,
-                newLightTiles, newLightScore,
-                newDarkTiles, newDarkScore
-            );
-
-            states.push({
-                from: from,
-                state: newState
-            });
+            const moveState = this.getStateObject(depth, index);
+            moveState.copyFrom(state);
+            moveState.applyMove(moves[index], diceValue);
+            moveStates.push(moveState);
         }
+    } else {
+        // If there are no available moves, just swap the current player.
+        const moveState = this.getStateObject(depth, 0);
+        moveState.copyFrom(state);
+        moveState.swapActivePlayer();
+        moveStates.push(moveState);
+    }
+    return moveStates;
+};
 
-        // If there are no available moves
-        if (states.length === 0) {
-            const newActivePlayerNo = (this.activePlayerNo === LIGHT_PLAYER_NO ? DARK_PLAYER_NO : LIGHT_PLAYER_NO),
-                  newState = new GameState(
-                      this.board.clone(), newActivePlayerNo,
-                      this.lightTiles, this.lightScore,
-                      this.darkTiles, this.darkScore
-                  );
 
-            states.push({
-                from: null,
-                state: newState
-            });
-        }
+//
+// Web Worker Communication.
+//
 
-        return states;
-    }.bind(this);
+const simulators = {};
+function getSimulator(depth) {
+    if (!simulators.hasOwnProperty(depth)) {
+        simulators[depth] = new GameSimulator(depth);
+    }
+    return simulators[depth];
 }
 
-function captureCurrentGameState() {
-    return new GameState(
-        board.clone(), getActivePlayer().playerNo,
-        lightPlayer.tiles.current, lightPlayer.score.current,
-        darkPlayer.tiles.current, darkPlayer.score.current
-    );
-}
+onmessage = function(event) {
+    // Read the request.
+    const packet = new PacketIn(event.data, true),
+          request = readSimWorkerRequest(packet);
+    packet.assertEmpty();
+
+    // Find the best move and respond with it.
+    const bestMove = getSimulator(request.depth).findBestMove(request.state, request.diceValue),
+          response = writeSimWorkerResponse(bestMove);
+    postMessage(response.data)
+};

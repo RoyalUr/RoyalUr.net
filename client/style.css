@@ -205,10 +205,10 @@ body.no-webp {
 
 
 /*
- *  PLAY SELECTION SCREEN
+ *  PLAY SELECTION AND COMPUTER DIFFICULTY SCREENS
  */
 
-#play-select {
+#play-select, #computer-difficulty {
     position: absolute;
     left: 0;
     top: 0;
@@ -228,6 +228,34 @@ body.no-webp {
     align-items: center;
 }
 
+#computer-difficulty-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    width: 75vh;
+}
+#computer-difficulty-title, .difficulty-option {
+    color: white;
+    text-align: center;
+    font-family: DuranGo, sans-serif;
+    font-size: 7vh;
+    width: 100%;
+}
+#computer-difficulty-title {
+    margin-bottom: 1vh;
+}
+.difficulty-option {
+    cursor: pointer;
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
+    opacity: 0.6;
+}
+.difficulty-option:hover {
+    opacity: 1.0;
+}
+
 .play-select-option {
     position: absolute;
     display: inline-block;
@@ -238,7 +266,6 @@ body.no-webp {
     cursor: pointer;
     opacity: 0.6;
 }
-
 .play-select-option:hover {
     opacity: 1.0;
 }
