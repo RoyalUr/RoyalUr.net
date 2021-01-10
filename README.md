@@ -1,3 +1,6 @@
+# 🎲 The Royal Game of Ur
+A website for playing the ancient Mesopatamian board game, the Royal Game of Ur! 
+
 <p align="center"><a href="https://royalur.net">
   <img src="https://github.com/Sothatsit/RoyalUrClient/blob/master/banner.jpg?raw=true">
 </a></p>
