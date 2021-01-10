@@ -480,14 +480,13 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
 
     # Create the favicon images.
     favicon_image = PILImage.open("res/favicon.png")
-    favicon_96 = favicon_image.resize((96, 96), PILImage.LANCZOS)
-    favicon_32 = favicon_image.resize((32, 32), PILImage.LANCZOS)
-    favicon_16 = favicon_image.resize((16, 16), PILImage.LANCZOS)
-
-    favicon_96.save(os.path.join(target_folder, "favicon.ico"), sizes=[(96, 96)])
-    favicon_96.save(os.path.join(target_folder, "favicon96.ico"), sizes=[(96, 96)])
-    favicon_32.save(os.path.join(target_folder, "favicon32.ico"), sizes=[(32, 32)])
-    favicon_16.save(os.path.join(target_folder, "favicon16.ico"), sizes=[(16, 16)])
+    favicon_path = os.path.join(target_folder, "favicon{}.ico")
+    target_sizes = [16, 32, 64, 96, 128]
+    for size in target_sizes:
+        favicon_scaled = favicon_image.resize((size, size), PILImage.LANCZOS)
+        favicon_scaled.save(favicon_path.format(size), sizes=[(size, size)])
+        if size == max(target_sizes):
+            favicon_scaled.save(favicon_path.format(""), sizes=[(size, size) for size in target_sizes])
 
 
 def combine_annotations(target_folder, comp_spec, annotations, *, prefix=""):
