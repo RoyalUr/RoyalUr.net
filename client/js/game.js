@@ -138,7 +138,7 @@ Game.prototype.clearStartTiles = function() {
     board.setTile(DARK_START, TILE_EMPTY);
 };
 Game.prototype.onFinishMove = unimplemented("onFinishMove");
-Game.prototype.performMove = function(from, noAnimation) {
+Game.prototype.performMove = function(from, isDragMove) {
     const diceValue = countDiceUp(),
           fromTile = board.getTile(from),
           player = getPlayer(fromTile),
@@ -155,16 +155,17 @@ Game.prototype.performMove = function(from, noAnimation) {
         addTile(getPlayer(toTile));
     }
 
-    animateTileMove(from, to, this.onFinishMove.bind(this));
+    if (!isDragMove) {
+        animateTileMove(from, to, this.onFinishMove.bind(this));
+    } else {
+        animateTileDragMove(from, to, this.onFinishMove.bind(this));
+    }
     board.setTile(to, fromTile);
     board.setTile(from, TILE_EMPTY);
 
     unselectTile();
     player.active = false;
     this.clearStartTiles();
-    if (noAnimation) {
-        finishTileMove();
-    }
 };
 
 

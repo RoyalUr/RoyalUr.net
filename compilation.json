@@ -56,6 +56,7 @@
     "res/audio/pickup_3.mp4": "res/audio_pickup_3.mp4",
     "res/audio/error.mp4": "res/audio_error.mp4",
     "res/audio/kill.mp4": "res/audio_kill.mp4",
+    "res/audio/rosette_land.mp4": "res/rosette_land.mp4",
     "res/audio/hover.mp4": "res/audio_hover.mp4",
     "res/audio/dice_click.mp4": "res/audio_dice_click.mp4",
     "res/audio/dice_hit.mp4": "res/audio_dice_hit.mp4",

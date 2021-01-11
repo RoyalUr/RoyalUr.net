@@ -214,9 +214,30 @@ const tileMove = {
     replacingOwner: TILE_EMPTY,
     fromTile: VEC_NEG1,
     toTile: VEC_NEG1,
+    isRosette: false,
     startTime: LONG_TIME_AGO,
+    duration: -1,
+    age: 0,
+    ttl: -1,
+    rosetteLandPlayed: false,
+    hitSoundsPlayed: false,
     onComplete: null
 };
+
+function clearTileMove() {
+    tileMove.owner = TILE_EMPTY;
+    tileMove.replacingOwner = TILE_EMPTY;
+    tileMove.fromTile = VEC_NEG1;
+    tileMove.toTile = VEC_NEG1;
+    tileMove.isRosette = false;
+    tileMove.startTime = LONG_TIME_AGO;
+    tileMove.duration = -1;
+    tileMove.age = 0;
+    tileMove.ttl = -1;
+    tileMove.rosetteLandPlayed = false;
+    tileMove.hitSoundsPlayed = false;
+    tileMove.onComplete = null;
+}
 
 function updateTilePathAnchorTime() {
     const duration = getTime() - mouseDownTime,
@@ -265,22 +286,23 @@ function animateTileMove(fromTile, toTile, onComplete) {
     tileMove.replacingOwner = board.getTile(toTile);
     tileMove.fromTile = fromTile;
     tileMove.toTile = toTile;
+    tileMove.isRosette = isLocusTile(toTile);
     tileMove.startTime = getTime();
+    tileMove.rosetteLandPlayed = false;
+    tileMove.hitSoundsPlayed = false;
 
     const path = getTilePath(owner),
           moveLength = vecListIndexOf(path, toTile) - vecListIndexOf(path, fromTile);
 
     tileMove.duration = TILE_MOVE_DURATIONS[moveLength];
+    tileMove.age = 0;
+    tileMove.ttl = tileMove.duration;
     tileMove.onComplete = onComplete;
 }
 
-function clearTileMove() {
-    tileMove.owner = TILE_EMPTY;
-    tileMove.replacingOwner = TILE_EMPTY;
-    tileMove.fromTile = VEC_NEG1;
-    tileMove.toTile = VEC_NEG1;
-    tileMove.startTime = LONG_TIME_AGO;
-    tileMove.duration = -1;
+function animateTileDragMove(fromTile, toTile, onComplete) {
+    animateTileMove(fromTile, toTile, onComplete);
+    tileMove.startTime -= tileMove.duration;
 }
 
 function updateTileMove(time) {
@@ -288,8 +310,25 @@ function updateTileMove(time) {
     if (!isTileLocValid(tileMove.fromTile))
         return;
 
-    const age = (time - tileMove.startTime) / tileMove.duration;
-    if (age < 1)
+    tileMove.age = (time - tileMove.startTime) / tileMove.duration;
+    tileMove.ttl = (tileMove.startTime + tileMove.duration) - time;
+
+    if (tileMove.isRosette && tileMove.ttl < 0.05 && !tileMove.rosetteLandPlayed) {
+        tileMove.rosetteLandPlayed = true;
+        playSound("rosette_land");
+    }
+    if (tileMove.age < 1)
+        return;
+
+    if (!tileMove.hitSoundsPlayed) {
+        tileMove.hitSoundsPlayed = true;
+        if (tileMove.replacingOwner !== TILE_EMPTY) {
+            playSound("kill");
+        } else {
+            playSound("place");
+        }
+    }
+    if (tileMove.isRosette && tileMove.ttl > -0.3)
         return;
 
     finishTileMove();
@@ -298,18 +337,11 @@ function updateTileMove(time) {
 function finishTileMove() {
     const onComplete = tileMove.onComplete,
           fromTile = tileMove.fromTile,
-          toTile = tileMove.toTile,
-          replacingOwner = tileMove.replacingOwner;
+          toTile = tileMove.toTile;
 
     clearTileMove();
     if (onComplete !== null) {
         onComplete(fromTile, toTile);
-    }
-
-    if (replacingOwner !== TILE_EMPTY) {
-        playSound("kill");
-    } else {
-        playSound("place");
     }
 }
 
@@ -418,7 +450,7 @@ function drawMovingTile(ctx, time, tileWidth) {
           endIndex = vecListIndexOf(path, tileMove.toTile),
           curve = computePathCurve(startIndex, endIndex, tileMove.owner);
 
-    const age = (time - tileMove.startTime) / tileMove.duration,
+    const age = min(1, tileMove.age),
           startCurveIndex = min(curve.length - 1, Math.floor(easeInOutSine(age) * curve.length)),
           startLoc = curve[startCurveIndex],
           endLoc = curve[curve.length - 1];
@@ -427,9 +459,10 @@ function drawMovingTile(ctx, time, tileWidth) {
         paintTile(ctx, endLoc.x, endLoc.y, tileWidth, tileWidth, tileMove.replacingOwner, 0);
     }
 
-    const tileMovingWidth = tileWidth * (1 + 0.2 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5)));
+    const tileMovingWidth = tileWidth * (1 + 0.2 * 2 * (0.5 - Math.abs(easeInOutSine(age) - 0.5))),
+          tileShadowColour = (tileMove.age > 1 ? 255 : 0);
 
-    paintTile(ctx, startLoc.x, startLoc.y, tileMovingWidth, tileMovingWidth, tileMove.owner, 0);
+    paintTile(ctx, startLoc.x, startLoc.y, tileMovingWidth, tileMovingWidth, tileMove.owner, tileShadowColour);
 }
 
 function getDrawPotentialMoveTile() {
