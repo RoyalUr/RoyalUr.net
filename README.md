@@ -2,7 +2,7 @@
 A website for playing the ancient Mesopatamian board game, the Royal Game of Ur! 
 
 <p align="center"><a href="https://royalur.net">
-  <img src="https://github.com/Sothatsit/RoyalUrClient/blob/master/banner.jpg?raw=true">
+  <img src="https://github.com/Sothatsit/RoyalUrClient/blob/master/banner.jpg?raw=true" />
 </a></p>
 
 This repository holds the client code for The Royal Game of Ur, https://royalur.net.
@@ -15,6 +15,21 @@ the city-state of Ur in ancient Mesopotamia.  Learn more about the game on
 [Wikipedia](https://en.wikipedia.org/wiki/Royal_Game_of_Ur), or watch a fun match
 between Tom Scott and Irving Finkel on [YouTube](https://youtu.be/WZskjLq040I)!
 
+The game also has a Discord and a Reddit that you might want to check out! The Discord
+contains a changelog with a summary of all the changes being made to the website, as
+well as discussion about RoyalUr development.
+
+<p float="left">
+  <a href="https://discord.gg/saWJGZcy3V">
+    <img src="https://discord.com/assets/f8389ca1a741a115313bede9ac02e2c0.svg" height="80" valign="middle" />
+  </a>
+  <a href="https://www.reddit.com/r/GameofUr/">
+    <img src="https://www.redditinc.com/assets/images/site/reddit-logo.png" height="64" valign="middle" />
+  </a>&nbsp;
+  <a href="https://royalur.net">
+    <img src="https://royalur.net/favicon.ico" height="64" valign="middle" />
+  </a>
+</p>
 
 # 🖥️ Compilation
 This project uses Babel to transpile all Javascript to a single ES5 compatible file,
