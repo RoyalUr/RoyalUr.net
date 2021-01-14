@@ -544,7 +544,7 @@ function calcImageHeight(image, width) {
 const annotationsResource = new AnnotationsResource("annotations", "res/annotations.[ver].json");
 const stagedResources = [
     [ // Menu
-        new ImageResource("logo", "res/logo.[ver]"),
+        new ImageResource("logo_with_shadow", "res/logo_with_shadow.[ver]"),
         new ImageResource("tile_dark", "res/tile_dark.[ver]"),
         new ImageResource("play_local", "res/button_play_local.[ver]"),
         new ImageResource("play_online", "res/button_play_online.[ver]"),

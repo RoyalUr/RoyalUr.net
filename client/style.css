@@ -148,10 +148,10 @@ body.no-webp {
     display: block;
     width: 100%;
     animation: bounce ease-in-out 2s infinite alternate;
-    filter: drop-shadow(8px 8px 14px rgba(0, 0, 0, 0.6))
 }
 #title img.logo_image {
     width: 100%;
+    height: auto;
 }
 
 @keyframes bounce {

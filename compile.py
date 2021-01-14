@@ -6,6 +6,7 @@ import os
 import sys
 import json
 import time
+import math
 import subprocess
 import shutil
 from PIL import Image as PILImage
@@ -18,7 +19,7 @@ from datetime import datetime
 
 def getmtime(filename):
     try:
-        return os.path.getmtime(filename)
+        return math.ceil(os.path.getmtime(filename))
     except FileNotFoundError:
         return -1
 

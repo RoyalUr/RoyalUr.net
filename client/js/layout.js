@@ -5,6 +5,7 @@
 const maxWidthOnHeightRatio = 1.5;
 
 const menuDiv = document.getElementById("menu"),
+      menuTitleDiv = document.getElementById("title"),
       playButton = document.getElementById("play-button"),
       playButtonCanvas = document.getElementById("play-canvas"),
       playButtonCtx = playButtonCanvas.getContext("2d"),
@@ -56,7 +57,7 @@ const overlayCanvas = document.getElementById("overlay"),
 const creditsDiv = document.getElementById("credits");
 
 const dynamicImagesByClass = {
-    "logo_image": "logo",
+    "logo_image": "logo_with_shadow",
     "play_local_image": "play_local",
     "play_online_image": "play_online",
     "play_computer_image": "play_computer",

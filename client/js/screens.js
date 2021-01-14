@@ -25,6 +25,7 @@ const screenState = {
     exitHandlers: [],
 
     menuFade: createFade(0.5),
+    useStaggeredMenuFade: true,
     playSelectFade: createFade(0.5),
     difficultyFade: createFade(0.5),
     learnFade: createFade(0.5),
@@ -145,11 +146,12 @@ function setVisibleControlButtons(controlFades, hasty) {
         }
     }
     // Fade in all the controls after the controls have faded out.
+    const additionalFadeInDelay = (screenState.screen === SCREEN_MENU && screenState.useStaggeredMenuFade ? 0.5 : 0);
     setTimeout(() => {
         for (let index = 0; index < controlFades.length; ++index) {
             controlFades[index].fadeIn(fadeDuration);
         }
-    }, controlFadeDuration * 1000);
+    }, (controlFadeDuration + (additionalFadeInDelay ? additionalFadeInDelay : 0)) * 1000);
 }
 
 function switchToScreen(screen, hasty) {
@@ -163,6 +165,9 @@ function switchToScreen(screen, hasty) {
     } else {
         screenState.exitTargetScreen = SCREEN_MENU;
     }
+
+    // When we switch to the menu screen, we want it to only load staggered if we've just loaded the page.
+    screenState.useStaggeredMenuFade = (screen === SCREEN_MENU && fromScreen === SCREEN_LOADING);
 
     // Check if we have to wait for resources to load before switching.
     const requiredLoadingStage = screenRequiredLoadingStages[screen];
@@ -181,8 +186,8 @@ function setScreen(screen, hasty) {
     if (fromScreen === screen)
         return;
 
-    setVisibleControlButtons(screenActiveControlFades[screen]);
     screenState.screen = screen;
+    setVisibleControlButtons(screenActiveControlFades[screen], hasty);
     fireScreenHandlers(fromScreen, screen, !!hasty);
 }
 

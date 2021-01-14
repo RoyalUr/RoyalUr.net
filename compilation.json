@@ -110,6 +110,15 @@
         "u_720": "auto x 256"
       }
     },
+    "res/logo_with_shadow.png": {
+      "dest": "res/logo_with_shadow",
+      "sizes": {
+        "u_2160": "auto x 768",
+        "u_1440": "auto x 512",
+        "u_1080": "auto x 384",
+        "u_720": "auto x 256"
+      }
+    },
     "res/wood-blue-1.png": {
       "dest": "res/background",
       "sizes": {

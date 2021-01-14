@@ -87,15 +87,38 @@ const playTilesButtonMargin = 0.1,
 
 const playSelectDescriptionFade = createFade(0.1, 0.2).invisible();
 
-function redrawButton(canvas, ctx, imageKey) {
+const lastButtonImages = {};
+
+function redrawButton(name, canvas, ctx, imageKey, forceRedraw) {
+    // Avoid repainting if we don't need to!
+    const last = lastButtonImages[name];
+    if (!forceRedraw && last && last.key === imageKey && last.w === canvas.width && last.h === canvas.height)
+        return;
+    lastButtonImages[name] = {
+        key: imageKey, w: canvas.width, h: canvas.height
+    };
+
+    // We do need to repaint.
     const image = getImageResource(imageKey, canvas.width);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 }
 
 function redrawMenu(forceRedraw) {
+    const menuFade = screenState.menuFade.get(),
+          staggered = (screenState.useStaggeredMenuFade && screenState.menuFade.isFadeIn),
+          titleOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade, 0, 1)),
+          playOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.16, 0, 1)),
+          learnOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.33, 0, 1)),
+          watchOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.5, 0, 1));
+
+    menuDiv.style.opacity = (menuFade > 0 ? 1 : 0);
+    menuTitleDiv.style.opacity = titleOpacity;
+    playButton.style.opacity = playOpacity;
+    learnButton.style.opacity = learnOpacity;
+    watchButton.style.opacity = watchOpacity;
+
     creditsDiv.style.opacity = screenState.creditsFade.get();
-    menuDiv.style.opacity = screenState.menuFade.get();
     networkStatus.hidden = false;
 
     let totalControlFades = 0;
@@ -120,9 +143,24 @@ function redrawMenu(forceRedraw) {
               learnButtonActive = (menuState.learnButton !== BUTTON_STATE_INACTIVE),
               watchButtonActive = (menuState.watchButton !== BUTTON_STATE_INACTIVE);
 
-        redrawButton(playButtonCanvas, playButtonCtx, (playButtonActive ? "play_active" : "play"));
-        redrawButton(learnButtonCanvas, learnButtonCtx, (learnButtonActive ? "learn_active" : "learn"));
-        redrawButton(watchButtonCanvas, watchButtonCtx, (watchButtonActive ? "watch_active" : "watch"));
+        if (playOpacity > 0) {
+            redrawButton(
+                "play", playButtonCanvas, playButtonCtx,
+                (playButtonActive ? "play_active" : "play"), forceRedraw
+            );
+        }
+        if (learnOpacity > 0) {
+            redrawButton(
+                "learn", learnButtonCanvas, learnButtonCtx,
+                (learnButtonActive ? "learn_active" : "learn"), forceRedraw
+            );
+        }
+        if (watchOpacity > 0) {
+            redrawButton(
+                "watch", watchButtonCanvas, watchButtonCtx,
+                (watchButtonActive ? "watch_active" : "watch"), forceRedraw
+            );
+        }
 
         const playButtonHeight = playButton.getBoundingClientRect().height,
               playMargin = playButtonHeight * playTilesButtonMargin,
