@@ -254,6 +254,11 @@ function onPacketGame(gameInfo) {
     // TODO END
 
     switchToScreen(SCREEN_GAME);
+    // If the user has been waiting a while to find a game, notify them with a sound!
+    if (getTime() - networkConnectTime > 3) {
+        console.log("playSound game_found");
+        playSound("game_found");
+    }
 }
 
 function onPacketGameEnd(data) {
@@ -270,7 +275,9 @@ function onPacketMessage(data) {
 }
 
 function onPacketPlayerStatus(data) {
-    game.onPacketPlayerStatus(data);
+    if (game != null) {
+        game.onPacketPlayerStatus(data);
+    }
 }
 
 function onPacketMove(move) {

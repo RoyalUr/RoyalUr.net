@@ -19,7 +19,8 @@ function printDebug(message) {
 
 let socket = null,
     socketState = "closed",
-    uniqueId = null;
+    uniqueId = null,
+    networkConnectTime = LONG_TIME_AGO;
 
 // Fix for bug in FireFox.
 window.onbeforeunload = function() { disconnect(); };
@@ -76,6 +77,7 @@ function connectSocket() {
 
         socketState = "opened";
         uniqueId = sessionStorage.getItem("uniqueId");
+        networkConnectTime = getTime();
 
         if(uniqueId) {
             sendPacket(writeReOpenPacket(uniqueId));

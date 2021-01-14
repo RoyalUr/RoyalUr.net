@@ -234,7 +234,6 @@ function clearTileMove() {
     tileMove.duration = -1;
     tileMove.age = 0;
     tileMove.ttl = -1;
-    tileMove.rosetteLandPlayed = false;
     tileMove.hitSoundsPlayed = false;
     tileMove.onComplete = null;
 }
@@ -288,7 +287,6 @@ function animateTileMove(fromTile, toTile, onComplete) {
     tileMove.toTile = toTile;
     tileMove.isRosette = isLocusTile(toTile);
     tileMove.startTime = getTime();
-    tileMove.rosetteLandPlayed = false;
     tileMove.hitSoundsPlayed = false;
 
     const path = getTilePath(owner),
@@ -312,11 +310,6 @@ function updateTileMove(time) {
 
     tileMove.age = (time - tileMove.startTime) / tileMove.duration;
     tileMove.ttl = (tileMove.startTime + tileMove.duration) - time;
-
-    if (tileMove.isRosette && tileMove.ttl < 0.05 && !tileMove.rosetteLandPlayed) {
-        tileMove.rosetteLandPlayed = true;
-        playSound("rosette_land");
-    }
     if (tileMove.age < 1)
         return;
 

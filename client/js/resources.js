@@ -575,6 +575,7 @@ const stagedResources = [
             "res/dice/darkShadow.png": "diceDarkShadow",
             "res/dice/lightShadow.png": "diceLightShadow"
         }),
+        new AudioResource("game_found", "res/game_found.[ver].mp4", {volume: 0.3}),
         new AudioResource("place_1", "res/audio_place_1.[ver].mp4"),
         new AudioResource("place_2", "res/audio_place_2.[ver].mp4"),
         new AudioResource("place_3", "res/audio_place_3.[ver].mp4"),
@@ -584,7 +585,6 @@ const stagedResources = [
         new AudioResource("pickup_3", "res/audio_pickup_3.[ver].mp4"),
         new AudioResource("error", "res/audio_error.[ver].mp4", {instances: 3, volume: 0.5}),
         new AudioResource("kill", "res/audio_kill.[ver].mp4", {volume: 0.5}),
-        new AudioResource("rosette_land", "res/rosette_land.[ver].mp4", {volume: 0.2}),
         new AudioResource("hover", "res/audio_hover.[ver].mp4", {instances: 3, volume: 0.5}),
         new AudioResource("dice_click", "res/audio_dice_click.[ver].mp4", {instances: 5, volume: 0.5}),
         new AudioResource("dice_hit", "res/audio_dice_hit.[ver].mp4", {instances: 4, volume: 0.3}),
