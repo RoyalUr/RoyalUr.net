@@ -323,7 +323,7 @@ function animateTileMove(fromTile, toTile, onComplete) {
     tileMove.replacingOwner = board.getTile(toTile);
     tileMove.fromTile = fromTile;
     tileMove.toTile = toTile;
-    tileMove.isRosette = isLocusTile(toTile);
+    tileMove.isRosette = isRosetteTile(toTile);
     tileMove.startTime = getTime();
     tileMove.hitSoundsPlayed = false;
 
@@ -860,7 +860,7 @@ function redrawDice(forceRedraw) {
 
         let sizeModifier = (dice.rolling ? 1 : 0),
             down = false;
-        
+
         if(timeToSelect > 0 && timeToSelect < 0.5) {
             const t = 1 - 2 * timeToSelect;
 
@@ -882,7 +882,7 @@ function redrawDice(forceRedraw) {
         } else if(animTime < 0.5) {
             sizeModifier = easeOutSine(2 * animTime);
         }
-        
+
         const diceWidth = (1 + 0.2 * sizeModifier) * width,
               diceIsSelected = (index < dice.selected),
               diceValue = (diceIsSelected ? dice.values[index] : dice.rollingValues[index]),
@@ -894,7 +894,7 @@ function redrawDice(forceRedraw) {
             playSound("dice_hit");
         }
         diceDown[index] = down;
-        
+
         if(diceValue !== lastDice[index] && (time - lastDiceSound) > 0.1) {
             lastDice[index] = diceValue;
             lastDiceSound = time;

@@ -350,7 +350,7 @@ ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
         }
     }
 
-    if (!isLocusTile(toTile)) {
+    if (!isRosetteTile(toTile)) {
         this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
     }
 
@@ -486,7 +486,7 @@ LocalGame.prototype.onFinishMove = function(fromTile, toTile) {
         }
     }
 
-    if (!isLocusTile(toTile)) {
+    if (!isRosetteTile(toTile)) {
         this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
     }
 
