@@ -38,6 +38,9 @@ body.no-webp {
     background: rgb(32, 41, 48) url("res/background.[ver].png") repeat;
     background-size: 35vh;
 }
+img {
+    height: auto;
+}
 
 
 /*

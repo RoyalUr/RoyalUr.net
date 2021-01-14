@@ -512,6 +512,8 @@ function getImageResource(key, width) {
     const imageResource = findImageResource(key);
     if(!imageResource)
         throw "Missing image resource " + key;
+    if (!width)
+        return imageResource.image;
     return imageResource.getScaledImage(width);
 }
 

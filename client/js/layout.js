@@ -128,10 +128,16 @@ function setupMenuElements() {
         if (!dynamicImagesByClass.hasOwnProperty(className))
             continue;
 
-        const imageURL = getImageURL(dynamicImagesByClass[className]),
+        const imageKey = dynamicImagesByClass[className],
+              image = getImageResource(imageKey),
+              imageURL = getImageURL(imageKey),
               elements = document.getElementsByClassName(className);
+
         for (let index = 0; index < elements.length; ++index) {
-            elements[index].src = imageURL;
+            const element = elements[index];
+            element.width = image.width;
+            element.height = image.height;
+            element.src = imageURL;
         }
     }
     window.onresize = () => {window.requestAnimationFrame(resize);};
