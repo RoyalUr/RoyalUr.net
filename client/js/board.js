@@ -63,7 +63,7 @@ const LIGHT_START = LIGHT_PATH[0],
       DARK_START = DARK_PATH[0],
       DARK_END = DARK_PATH[DARK_PATH.length - 1];
 
-const LOCUS_LOCATIONS = vecList(
+const ROSETTE_LOCATIONS = vecList(
     0, 0,
     2, 0,
     1, 3,
@@ -121,8 +121,8 @@ function isEndTile(playerNo, loc) {
     return vecEquals(getEndTile(playerNo), loc);
 }
 
-function isLocusTile(loc) {
-    return vecListContains(LOCUS_LOCATIONS, loc);
+function isRosetteTile(loc) {
+    return vecListContains(ROSETTE_LOCATIONS, loc);
 }
 
 function getTileMoveToLocation(playerNo, loc, moveDistance) {
@@ -188,7 +188,7 @@ Board.prototype.isValidMoveFrom = function(playerNo, loc, moveDistance) {
         return false;
     if(toOwner === TILE_EMPTY)
         return true;
-    return !isLocusTile(to);
+    return !isRosetteTile(to);
 };
 Board.prototype.getAllValidMoves = function(playerNo, moveDistance, outList) {
     if (outList === undefined) {
@@ -294,7 +294,7 @@ GameState.prototype.applyMove = function(from, diceValue) {
     }
 
     // If the tile isn't a rosette, swap the current player.
-    if (!isLocusTile(to)) {
+    if (!isRosettesTile(to)) {
         this.swapActivePlayer();
     }
 
