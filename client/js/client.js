@@ -209,7 +209,7 @@ function onNetworkConnected() {
     if (gameID !== null) {
         sendPacket(writeJoinGamePacket(gameID));
     } else {
-        sendPacket(writeFindGamePacket())
+        sendPacket(writeFindGamePacket("Name" + randInt(100, 1000)))
     }
 }
 
@@ -229,6 +229,11 @@ function onNetworkDisconnect() {
 // Interactions with a networked game.
 //
 
+function onPacketError(data) {
+    setMessage("An unexpected error occurred", 0, 1, 1)
+    console.error("Error: " + data.error);
+}
+
 function onPacketInvalidGame() {
     disconnect();
     resetNetworkStatus();
@@ -240,12 +245,32 @@ function onPacketGame(gameInfo) {
     game = new OnlineGame();
     setHash(gameInfo.gameID);
     setOwnPlayer(gameInfo.ownPlayer);
+    ownPlayer.name = gameInfo.ownName;
     otherPlayer.name = gameInfo.opponentName;
+
+    // TODO : Remove this when users are actually able to set their own names!
+    lightPlayer.name = "Light";
+    darkPlayer.name = "Dark";
+    // TODO END
+
     switchToScreen(SCREEN_GAME);
+}
+
+function onPacketGameEnd(data) {
+    if (game == null)
+        return;
+
+    game = null;
+    setMessage("Game was ended due to " + data.reason, 0, 2, 1);
+    switchToScreen(SCREEN_MENU);
 }
 
 function onPacketMessage(data) {
     game.onPacketMessage(data);
+}
+
+function onPacketPlayerStatus(data) {
+    game.onPacketPlayerStatus(data);
 }
 
 function onPacketMove(move) {

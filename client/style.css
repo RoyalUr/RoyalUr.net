@@ -328,7 +328,6 @@ body.no-webp {
 /*
  *  GAME ELEMENTS
  */
-
 #board { z-index: 1; }
 #tiles { z-index: 3; touch-action: none; }
 .score { z-index: 1; }
@@ -355,7 +354,6 @@ body.no-webp {
     text-shadow: 0 0 10px rgb(0, 0, 0);
     color: white;
 }
-
 #message-container {
     position: absolute;
     left: 0;
@@ -365,25 +363,21 @@ body.no-webp {
     z-index: 10;
 
     background-color: rgba(0, 0, 0, 0.25);
-    opacity: 0;
-
     pointer-events: none;
-
-    display: table;
-    text-align: center;
 }
-
 #message {
-    display: table-cell;
-    vertical-align: middle;
+    display: block;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
     font-family: Nunito, sans-serif;
     font-weight: 600;
     font-size: 50px;
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
-
-    white-space: pre;
+    text-align: center;
 }
 
 
@@ -391,7 +385,6 @@ body.no-webp {
 /*
  *  OVERLAY
  */
-
 #overlay {
     display: block;
     position: absolute;
@@ -409,15 +402,13 @@ body.no-webp {
 /*
  *  CREDITS
  */
-
 #credits {
     position: absolute;
     left: 0;
     bottom: 0;
-    z-index: 100;
+    z-index: 50;
     vertical-align: baseline;
 }
-
 #created-by {
     padding: 10px;
     padding-bottom: 6px;
@@ -425,7 +416,6 @@ body.no-webp {
     font-size: 2.5vh;
     text-shadow: black 0 0 10px;
 }
-
 #created-by a {
     display: inline-block;
     text-decoration: none;
@@ -438,7 +428,6 @@ body.no-webp {
 /*
  * CONTROLS
  */
-
 #controls {
     display: none;
     position: absolute;

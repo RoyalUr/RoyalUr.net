@@ -46,10 +46,10 @@ function redraw(forceRedraw) {
 
         updateElementVisibilities([
             menuDiv, playSelectDiv, difficultyDiv, learnDiv,
-            boardCanvas, tilesCanvas, creditsDiv,
+            boardCanvas, tilesCanvas, diceCanvas, creditsDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
-            exitControlButton,
+            exitControlButton, messageContainerElement,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -947,36 +947,7 @@ function redrawNetworkStatus(forceRedraw) {
 //
 
 function redrawMessage(forceRedraw) {
-    let messageText = message.text;
-
-    if (message.typewriter) {
-        const percentPerKey = 1 / messageText.length;
-
-        const percentUnclamped = (getTime() - message.text_set_time) / message.typewriter,
-              percent = clamp(percentUnclamped, 0, 1);
-
-        const characters = Math.floor(percent * messageText.length);
-
-        if (characters !== message.typewriter_last_length) {
-            message.typewriter_last_length = characters;
-
-            if (characters === messageText.length) {
-                // If the tab has been closed/reopened we don't want to play the 'ding'
-                if (percentUnclamped < 1 + 2 * percentPerKey) {
-                    playSound("typewriter_end");
-                }
-
-                message.typewriter_last_length = 0;
-                message.typewriter = 0;
-            } else if (messageText[characters - 1] !== ' ') {
-                playSound("typewriter_key");
-            }
-        }
-
-        messageText = messageText.substr(0, characters);
-    }
-
-    messageElement.textContent = messageText;
+    messageElement.textContent = message.text;
     messageContainerElement.style.opacity = message.fade.get();
 }
 

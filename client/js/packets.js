@@ -3,7 +3,8 @@
 //
 
 const ZERO_CHAR_CODE = "0".charCodeAt(0),
-      GAME_ID_LENGTH = 6;
+      GAME_ID_LENGTH = 6,
+      PROTOCOL_VERSION = 1;
 
 
 
@@ -11,24 +12,22 @@ const ZERO_CHAR_CODE = "0".charCodeAt(0),
 // INCOMING
 //
 
-const incomingPacketReaders = {
-    "error": readErrorPacket,
-    "setid": readSetIdPacket,
-    "invalid_game": readInvalidGamePacket,
-    "game": readGamePacket,
-    "message": readMessagePacket,
-    "state": readStatePacket,
-    "move": readMovePacket
-};
-const incomingPacketTypes = [
-    "error",
-    "setid",
-    "invalid_game",
-    "game",
-    "message",
-    "state",
-    "move"
-];
+const incomingPacketReaders = {};
+const incomingPacketTypes = [];
+registerPacketType("error", readErrorPacket);
+registerPacketType("set_id", readSetIdPacket);
+registerPacketType("invalid_game", readInvalidGamePacket);
+registerPacketType("game", readGamePacket);
+registerPacketType("game_end", readGameEndPacket);
+registerPacketType("message", readMessagePacket);
+registerPacketType("player_status", readPlayerStatusPacket);
+registerPacketType("state", readStatePacket);
+registerPacketType("move", readMovePacket);
+
+function registerPacketType(name, readFn) {
+    incomingPacketReaders[name] = readFn;
+    incomingPacketTypes.push(name);
+}
 
 /**
  * Holds the data of a packet and facilitates the reading of that data.
@@ -151,19 +150,34 @@ function readSetIdPacket(packet) {
 }
 
 function readInvalidGamePacket(packet) {
-    return {};
+    return { gameID: packet.nextGameID() };
 }
 
 function readGamePacket(packet) {
     return {
         gameID: packet.nextGameID(),
         ownPlayer: packet.nextPlayer(),
+        ownName: packet.nextVarString(),
         opponentName: packet.nextVarString()
     };
 }
 
+function readGameEndPacket(packet) {
+    return { reason: packet.consumeAll() };
+}
+
 function readMessagePacket(packet) {
-    return { text: packet.nextVarString() };
+    return {
+        text: packet.nextVarString(),
+        subText: packet.nextVarString()
+    };
+}
+
+function readPlayerStatusPacket(packet) {
+    return {
+        player: packet.nextPlayer(),
+        connected: packet.nextBool()
+    };
 }
 
 function readStatePacket(packet) {
@@ -234,60 +248,81 @@ function PacketOut(type) {
         this.data = "";
     }
 }
-PacketOut.prototype.write = function(value) {
+PacketOut.prototype.pushRaw = function(value) {
     this.data += value;
 };
-PacketOut.prototype.writeDigit = function(digit) {
+PacketOut.prototype.pushDigit = function(digit) {
     assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive");
-    this.write(digit);
+    this.pushRaw(digit);
 };
-PacketOut.prototype.writeLocation = function(loc) {
-    this.writeDigit(loc.x);
-    this.writeDigit(loc.y);
+PacketOut.prototype.pushInt = function(value, digits) {
+    assert(Number.isInteger(value), "value must be an integer");
+    assert(value >= 0, "value must be >= 0");
+    assert(digits > 0, "digits must be positive");
+
+    let encoded = value.toString();
+    assert(encoded.length <= digits, "value has too many digits");
+
+    while (encoded.length < digits) {
+        encoded = "0" + encoded;
+    }
+    this.pushRaw(encoded);
 };
-PacketOut.prototype.writePlayer = function(playerNo) {
+PacketOut.prototype.pushVarString = function(string, lengthCharacters) {
+    if(lengthCharacters === undefined) lengthCharacters = 2;
+    assert(lengthCharacters > 0, "lengthCharacters must be positive");
+    assert(lengthCharacters > Math.log10(string.length), "the string is too long");
+    this.pushRaw(string.length.toString().padStart(lengthCharacters, "0"));
+    this.pushRaw(string);
+}
+PacketOut.prototype.pushLocation = function(loc) {
+    this.pushDigit(loc.x);
+    this.pushDigit(loc.y);
+};
+PacketOut.prototype.pushPlayer = function(playerNo) {
     assert(playerNo === 1 || playerNo === 2, "invalid playerNo " + playerNo);
-    this.writeDigit(playerNo);
+    this.pushDigit(playerNo);
 };
-PacketOut.prototype.writePlayerState = function(tiles, score) {
-    this.writeDigit(tiles);
-    this.writeDigit(score);
-};
-PacketOut.prototype.writeBoard = function(board) {
+PacketOut.prototype.pushBoard = function(board) {
     for (let index = 0; index < TILES_COUNT; ++index) {
-        this.writeDigit(board.tiles[index]);
+        this.pushDigit(board.tiles[index]);
     }
 };
-PacketOut.prototype.writeGameState = function(state) {
-    this.writeDigit(state.lightTiles);
-    this.writeDigit(state.lightScore);
-    this.writeDigit(state.darkTiles);
-    this.writeDigit(state.darkScore);
-    this.writeBoard(state.board);
-    this.writePlayer(state.activePlayerNo);
+PacketOut.prototype.pushGameState = function(state) {
+    this.pushDigit(state.lightTiles);
+    this.pushDigit(state.lightScore);
+    this.pushDigit(state.darkTiles);
+    this.pushDigit(state.darkScore);
+    this.pushBoard(state.board);
+    this.pushPlayer(state.activePlayerNo);
 };
 
 
 function writeOpenPacket() {
-    return new PacketOut("open");
+    const packet = new PacketOut("open");
+    packet.pushInt(PROTOCOL_VERSION, 4);
+    return packet;
 }
 
 function writeReOpenPacket(previousId) {
     assert(previousId.length === 36, "previousId must be a uuid");
     const packet = new PacketOut("reopen");
-    packet.write(previousId);
+    packet.pushInt(PROTOCOL_VERSION, 4);
+    packet.pushRaw(previousId);
     return packet;
 }
 
 function writeJoinGamePacket(gameID) {
     assert(gameID.length === GAME_ID_LENGTH, "gameId must have " + GAME_ID_LENGTH + " characters");
     const packet = new PacketOut("join_game");
-    packet.write(gameID);
+    packet.pushRaw(gameID);
     return packet;
 }
 
-function writeFindGamePacket() {
-    return new PacketOut("find_game");
+function writeFindGamePacket(name) {
+    const packet = new PacketOut("find_game");
+    packet.pushVarString(name);
+    return packet;
 }
 
 function writeDiceRollPacket() {
@@ -296,21 +331,21 @@ function writeDiceRollPacket() {
 
 function writeMovePacket(from) {
     const packet = new PacketOut("move");
-    packet.writeDigit(from.x);
-    packet.writeDigit(from.y);
+    packet.pushDigit(from.x);
+    packet.pushDigit(from.y);
     return packet;
 }
 
 function writeSimWorkerRequest(state, diceValue, depth) {
     const packet = new PacketOut("worker_packet");
-    packet.writeDigit(depth);
-    packet.writeGameState(state);
-    packet.writeDigit(diceValue);
+    packet.pushDigit(depth);
+    packet.pushGameState(state);
+    packet.pushDigit(diceValue);
     return packet;
 }
 
 function writeSimWorkerResponse(loc) {
     const packet = new PacketOut("worker_packet");
-    packet.writeLocation(loc)
+    packet.pushLocation(loc)
     return packet;
 }

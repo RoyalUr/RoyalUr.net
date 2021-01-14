@@ -47,6 +47,7 @@ function Game(exitLosesGame) {
 }
 
 Game.prototype.onPacketMessage = unimplemented("onPacketMessage");
+Game.prototype.onPacketPlayerStatus = unimplemented("onPacketPlayerStatus");
 Game.prototype.onPacketMove = unimplemented("onPacketMove");
 Game.prototype.onPacketState = unimplemented("onPacketState");
 Game.prototype.onDiceClick = unimplemented("onDiceClick");
@@ -193,6 +194,13 @@ OnlineGame.prototype.onPacketMessage = function(data) {
 
     setMessage(data.text);
 };
+OnlineGame.prototype.onPacketPlayerStatus = function(data) {
+    if (data.player === "light") {
+        lightPlayer.connected = data.connected;
+    } else if (data.player === "dark") {
+        darkPlayer.connected = data.connected;
+    }
+};
 OnlineGame.prototype.onPacketMove = function(move) {
     const tile = board.getTile(move.from);
 
@@ -303,8 +311,8 @@ ComputerGame.prototype.isHumansTurn = function() {
     return this.turnPlayer === ownPlayer;
 };
 ComputerGame.prototype._init = function() {
-    updatePlayerState(ownPlayer, 7, 0, this.isHumansTurn());
-    updatePlayerState(otherPlayer, 7, 0, this.isComputersTurn());
+    resetPlayerState(ownPlayer, 7, 0, this.isHumansTurn());
+    resetPlayerState(otherPlayer, 7, 0, this.isComputersTurn());
 
     board.clearTiles();
     resetDice();
@@ -444,8 +452,8 @@ LocalGame.prototype.isRightTurn = function() {
     return this.turnPlayer === rightPlayer;
 };
 LocalGame.prototype._init = function() {
-    updatePlayerState(leftPlayer, 7, 0, this.isLeftTurn());
-    updatePlayerState(rightPlayer, 7, 0, this.isRightTurn());
+    resetPlayerState(leftPlayer, 7, 0, this.isLeftTurn());
+    resetPlayerState(rightPlayer, 7, 0, this.isRightTurn());
 
     board.clearTiles();
     resetDice();

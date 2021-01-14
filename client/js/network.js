@@ -124,20 +124,18 @@ function receiveMessage(message) {
 //
 
 const packetHandlers = {
-    "error": onPacketError,
-    "setid": onPacketSetID,
+    "set_id": onPacketSetID,
 
     // client.js
+    "error": onPacketError,
     "invalid_game": onPacketInvalidGame,
     "game": onPacketGame,
+    "game_end": onPacketGameEnd,
     "message": onPacketMessage,
+    "player_status": onPacketPlayerStatus,
     "state": onPacketState,
     "move": onPacketMove
 };
-
-function onPacketError(data) {
-    console.error("Error: " + data.error);
-}
 
 function onPacketSetID(data) {
     uniqueId = data.id;

@@ -103,6 +103,11 @@ function initPlayer(playerNo, name) {
     };
 }
 
+function resetPlayerState(player, tiles, score, active) {
+    updatePlayerState(player, tiles, score, active);
+    player.connected = true;
+}
+
 function updatePlayerState(player, tiles, score, active) {
     while(player.tiles.current < tiles) addTile(player);
     while(player.tiles.current > tiles) takeTile(player);
@@ -294,13 +299,12 @@ function fadeNetworkStatusOut() {
 
 function createDots() {
     const time = getTime() - networkStatus.lastChange,
-        dotCount = Math.floor((time * 3) % 3) + 1;
+          dotCount = Math.floor((time * 3) % 3) + 1;
 
     let dots = "";
-    for(let i=0; i < dotCount; ++i) {
-        dots += ".";
+    for (let i=0; i < 3; ++i) {
+        dots += (i < dotCount ? "." : "\u00a0" /*&nbsp;*/);
     }
-
     return dots;
 }
 
@@ -320,44 +324,25 @@ function getNetworkStatus() {
 
 const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
       DEFAULT_MESSAGE_STAY_DURATION     = 2,
-      DEFAULT_TYPEWRITER_CHAR_DURATION  = 0.09,
       DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
 
 const message = {
     text: "",
     text_set_time: 0,
-    typewriter: 0,
-    typewriter_last_length: 0,
     fade: createFade(0)
 };
 
-function setMessageAndFade(statusMessage, fade, typewriterDuration) {
+function setMessageAndFade(statusMessage, fade) {
     message.text = statusMessage;
     message.text_set_time = getTime();
-    message.typewriter = (typewriterDuration ? typewriterDuration : 0);
     message.fade = fade;
 }
 
-function setMessageTypewriter(statusMessage, typewriterDuration, fadeInDuration, stayDuration, fadeOutDuration) {
-    if (typewriterDuration === undefined) {
-        typewriterDuration = DEFAULT_TYPEWRITER_CHAR_DURATION * statusMessage.length;
-    }
-
-    // We don't want the message to disappear before its completely shown
-    if (stayDuration === undefined) {
-        stayDuration = typewriterDuration;
-    }
-
-    setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration);
-}
-
-function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration, typewriterDuration) {
+function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
     fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_DURATION);
     stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_DURATION);
     fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_DURATION);
-    typewriterDuration = (typewriterDuration !== undefined ? typewriterDuration : 0);
 
     const fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
-
-    setMessageAndFade(statusMessage, fade, typewriterDuration);
+    setMessageAndFade(statusMessage, fade);
 }

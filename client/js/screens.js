@@ -30,7 +30,7 @@ const screenState = {
     learnFade: createFade(0.5),
     boardFade: createFade(0.5),
     connectionFade: createFade(2, 0.5),
-    creditsFade: createFade(0.25).visible(),
+    creditsFade: createFade(0.25),
 
     discordControlFade: createFade(controlFadeDuration),
     githubControlFade: createFade(controlFadeDuration),
@@ -209,20 +209,28 @@ registerScreenTransitionHandlers(SCREEN_CONNECTING,  onEnterConnectingScreen, on
 registerScreenTransitionHandlers(SCREEN_GAME,        onEnterGameScreen,       onExitGameScreen);
 registerScreenTransitionHandlers(SCREEN_WIN,         onEnterWinScreen,        onExitWinScreen);
 
-// Screens where the menu should be shown
+// Screens where the menu should be shown.
 registerScreenTransitionHandlers(
     [SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY], onEnterMenuScreens, onExitMenuScreens
 );
 
-// Screens where the game should not disconnect from the server
+// Screens where the game should not disconnect from the server.
 registerScreenTransitionHandlers(
     [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_LEARN], onEnterServerScreen, onExitServerScreen
 );
 
-// Screens where the game board should be shown
+// Screens where the game board should be shown.
 registerScreenTransitionHandlers(
     [SCREEN_GAME, SCREEN_WIN], onEnterBoardScreen, onExitBoardScreen
 );
+
+// Screens where the credits should be hidden.
+registerScreenTransitionHandlers(
+    [SCREEN_LOADING, SCREEN_LEARN], onEnterCreditsHiddenScreen, onExitCreditsHiddenScreen
+);
+
+function onEnterCreditsHiddenScreen(hasty) { screenState.creditsFade.fadeOut(hasty ? 0 : undefined); }
+function onExitCreditsHiddenScreen(hasty) { screenState.creditsFade.fadeIn(hasty ? 0 : undefined); }
 
 function onEnterLoadingScreen(hasty) {
     loadingFade.fadeIn(hasty ? 0 : undefined);
@@ -240,31 +248,22 @@ function onEnterPlaySelectScreen(hasty) {
     fitty.fitAll();
     screenState.playSelectFade.fadeIn(hasty ? 0 : undefined);
 }
-
 function onExitPlaySelectScreen(hasty) {
     screenState.playSelectFade.fadeOut(hasty ? 0 : undefined);
 }
 
-function onEnterDifficultyScreen(hasty) {
-    screenState.difficultyFade.fadeIn(hasty ? 0 : undefined);
-}
-
-function onExitDifficultyScreen(hasty) {
-    screenState.difficultyFade.fadeOut(hasty ? 0 : undefined);
-}
+function onEnterDifficultyScreen(hasty) { screenState.difficultyFade.fadeIn(hasty ? 0 : undefined); }
+function onExitDifficultyScreen(hasty) { screenState.difficultyFade.fadeOut(hasty ? 0 : undefined); }
 
 function onEnterLearnScreen(hasty) {
-    screenState.creditsFade.fadeOut();
     setTimeout(() => {
         if (isOnScreen(SCREEN_LEARN)) {
             screenState.learnFade.fadeIn(hasty ? 0 : undefined);
         }
     }, (hasty ? 0 : 500));
 }
-
 function onExitLearnScreen(hasty) {
     screenState.learnFade.fadeOut(hasty ? 0 : undefined);
-    screenState.creditsFade.fadeIn();
 }
 
 function onEnterMenuScreens(hasty) {
@@ -275,7 +274,6 @@ function onEnterMenuScreens(hasty) {
         }
     }, (hasty ? 0 : 500));
 }
-
 function onExitMenuScreens(hasty) {
     screenState.menuFade.fadeOut(hasty ? 0 : undefined);
 }
@@ -289,7 +287,6 @@ function onEnterConnectingScreen(hasty) {
         }
     }, (hasty ? 0 : 500));
 }
-
 function onExitConnectingScreen(hasty) {
     screenState.connectionFade.fadeOut();
 }
@@ -309,7 +306,6 @@ function onEnterWinScreen(hasty) {
         0.25, -1, -1
     );
 }
-
 function onExitWinScreen(hasty) {
     setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
 }
@@ -326,7 +322,6 @@ function onEnterBoardScreen(hasty) {
         }
     }, (hasty ? 0 : 500))
 }
-
 function onExitBoardScreen(hasty) {
     screenState.boardFade.fadeOut(hasty ? 0 : undefined);
 }
