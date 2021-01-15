@@ -4,7 +4,8 @@
 
 const maxWidthOnHeightRatio = 1.5;
 
-const menuDiv = document.getElementById("menu"),
+const menuOuterDiv = document.getElementById("menu-outer"),
+      menuDiv = document.getElementById("menu"),
       menuTitleDiv = document.getElementById("title"),
       playButton = document.getElementById("play-button"),
       playButtonCanvas = document.getElementById("play-canvas"),
@@ -49,7 +50,8 @@ const tilesCanvas = document.getElementById("tiles"),
 const networkStatusElement = document.getElementById("network-status");
 
 const messageContainerElement = document.getElementById("message-container"),
-      messageElement = document.getElementById("message");
+      messageElement = document.getElementById("message"),
+      joinDiscordElement = document.getElementById("join-discord");
 
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");

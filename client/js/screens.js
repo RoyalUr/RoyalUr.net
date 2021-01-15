@@ -16,6 +16,7 @@ const GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN];
 const controlFadeDuration = 0.25;
 const screenState = {
     screen: SCREEN_LOADING,
+    lastScreenSwitchTime: LONG_TIME_AGO,
     loadingTargetScreen: null,
     loadingTargetStage: 0,
 
@@ -38,6 +39,8 @@ const screenState = {
     settingsControlFade: createFade(controlFadeDuration),
     learnControlFade: createFade(controlFadeDuration),
     exitControlFade: createFade(controlFadeDuration),
+
+    joinDiscordFade: createFade(2.5, 0.5)
 };
 const allControlFades = [
     screenState.discordControlFade, screenState.githubControlFade,
@@ -187,6 +190,7 @@ function setScreen(screen, hasty) {
         return;
 
     screenState.screen = screen;
+    screenState.lastScreenSwitchTime = getTime();
     setVisibleControlButtons(screenActiveControlFades[screen], hasty);
     fireScreenHandlers(fromScreen, screen, !!hasty);
 }
@@ -288,12 +292,14 @@ function onEnterConnectingScreen(hasty) {
     setMessageAndFade("", screenState.connectionFade.invisible());
     setTimeout(() => {
         if (isOnScreen(SCREEN_CONNECTING)) {
-            screenState.connectionFade.fadeIn();
+            screenState.connectionFade.fadeIn(hasty ? 0 : undefined);
+            screenState.joinDiscordFade.fadeIn(hasty ? 0 : undefined);
         }
     }, (hasty ? 0 : 500));
 }
 function onExitConnectingScreen(hasty) {
-    screenState.connectionFade.fadeOut();
+    screenState.joinDiscordFade.fadeOut(hasty ? 0 : undefined);
+    screenState.connectionFade.fadeOut(hasty ? 0 : undefined);
 }
 
 function onEnterGameScreen(hasty) {

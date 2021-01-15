@@ -118,7 +118,7 @@ img {
  *  MENU
  */
 
-.shadow {
+.shadow, .shadow-no-hover {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 .shadow:hover {
@@ -142,7 +142,6 @@ img {
 }
 
 #menu {
-    opacity: 0;
     z-index: 5;
     margin: auto;
 }
@@ -220,7 +219,6 @@ img {
     z-index: 10;
 
     background-color: rgba(0, 0, 0, 0.85);
-    opacity: 0;
 
     display: -webkit-box;
     display: -ms-flexbox;
@@ -347,7 +345,6 @@ img {
     top: 0;
     z-index: 5;
 
-    opacity: 0;
     padding: 5px;
     padding-left: 10px;
 
@@ -370,10 +367,10 @@ img {
 }
 #message {
     display: block;
-    position: relative;
+    position: absolute;
+    width: 100%;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(0, -100%);
 
     font-family: Nunito, sans-serif;
     font-weight: 600;
@@ -381,6 +378,19 @@ img {
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
     text-align: center;
+    pointer-events: all;
+}
+#join-discord {
+    display: block;
+    position: absolute;
+    width: 50vh;
+    top: 52.5%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    pointer-events: all;
+}
+#join-discord img {
+    width: 100%;
 }
 
 
@@ -432,7 +442,6 @@ img {
  * CONTROLS
  */
 #controls {
-    display: none;
     position: absolute;
     top: 0;
     right: 0;
@@ -490,7 +499,6 @@ svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
  */
 
 #learn {
-    display: none;
     position: absolute;
     left: 0;
     top: 0;

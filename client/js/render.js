@@ -9,7 +9,7 @@ function updateElementVisibilities(elements) {
         if (element.style.opacity === "0") {
             element.style.display = "none";
         } else {
-            element.style.display = "block";
+            element.style.display = "";
         }
     }
 }
@@ -45,11 +45,12 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playSelectDiv, difficultyDiv, learnDiv,
+            menuOuterDiv, playSelectDiv, difficultyDiv, learnDiv,
             boardCanvas, tilesCanvas, diceCanvas, creditsDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
             exitControlButton, messageContainerElement,
+            joinDiscordElement,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -112,7 +113,7 @@ function redrawMenu(forceRedraw) {
           learnOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.33, 0, 1)),
           watchOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.5, 0, 1));
 
-    menuDiv.style.opacity = (menuFade > 0 ? 1 : 0);
+    menuOuterDiv.style.opacity = (menuFade > 0 ? 1 : 0);
     menuTitleDiv.style.opacity = titleOpacity;
     playButton.style.opacity = playOpacity;
     learnButton.style.opacity = learnOpacity;
@@ -980,6 +981,7 @@ function redrawNetworkStatus(forceRedraw) {
 function redrawMessage(forceRedraw) {
     messageElement.textContent = message.text;
     messageContainerElement.style.opacity = message.fade.get();
+    joinDiscordElement.style.opacity = max(0, 2.5 * screenState.joinDiscordFade.get() - 1.5);
 }
 
 
