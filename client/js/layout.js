@@ -217,14 +217,14 @@ function setupGameElements() {
         ), true);
 
         if (!game) return;
-        game.onTileClick(hoveredTile);
+        game.onTileTouchClick(hoveredTile);
         event.preventDefault();
     };
     tilesCanvas.ontouchend = function(event) {
         if (!mouseDown) return;
         try {
             if (!game) return;
-            game.onTileRelease(hoveredTile);
+            game.onTileTouchRelease(hoveredTile);
             event.preventDefault();
         } finally {
             updateMouse(VEC_NEG1, false);

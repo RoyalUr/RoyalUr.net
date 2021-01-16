@@ -455,7 +455,8 @@ function redrawTiles(forceRedraw) {
         }
 
         if(!draggingTile) {
-            renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, (isTileSelected(pathTile) ? 255 : 0));
+            const shadowShade = (isTileSelected(pathTile) || isTileHovered(pathTile) ? 255 : 0);
+            renderTile(ctx, pathTile, tileHoverWidth, tileHoverWidth, owner, shadowShade);
         } else {
             if (dragLoc === null)
                 throw "This def shouldn't happen";

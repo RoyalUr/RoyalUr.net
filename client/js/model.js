@@ -172,7 +172,7 @@ function isAwaitingMove() {
 /**
  * The time to roll the dice for before selecting their values.
  */
-const DEFAULT_DICE_SELECT_DELAY = 0.75;
+const DEFAULT_DICE_SELECT_DELAY = 0.25;
 
 const dice = {
     active: false,

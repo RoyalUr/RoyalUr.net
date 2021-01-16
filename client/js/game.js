@@ -2,8 +2,6 @@
 // This file stores the logic for controlling the game.
 //
 
-const DOUBLE_CLICK_MOVE_TIME_SECONDS = 0.3;
-
 const DIFFICULTY_EASY = 1,
       DIFFICULTY_MEDIUM = 2,
       DIFFICULTY_HARD = 5;
@@ -39,10 +37,6 @@ function Game(exitLosesGame) {
     this.initialised = false;
     this.exitLosesGame = exitLosesGame;
 
-    this.lastTileClickWasSelect = false;
-    this.lastTileReleaseTime = LONG_TIME_AGO;
-    this.lastTileReleaseTile = [-1, -1];
-
     layoutDice();
 }
 
@@ -66,17 +60,13 @@ Game.prototype.onTileHover = function(loc) {
     }
 };
 Game.prototype.onTileClick = function(loc) {
-    this.lastTileClickWasSelect = false;
-
     if(isTileSelected()) {
         const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
-        if(vecEquals(loc, to)) {
+        if(isTileSelected(loc) || vecEquals(loc, to)) {
             this.performMove(selectedTile);
             return;
         }
     }
-    if(isTileSelected(loc))
-        return;
 
     const tileOwner = board.getTile(loc);
     if(!isAwaitingMove() || tileOwner !== ownPlayer.playerNo
@@ -89,35 +79,51 @@ Game.prototype.onTileClick = function(loc) {
         return;
     }
 
-    this.lastTileClickWasSelect = true;
+    this.performMove(loc);
+};
+Game.prototype.onTileRelease = function(loc) {};
+Game.prototype.onTileTouchClick = function(loc) {
+    if(isTileSelected()) {
+        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
+        if(isTileSelected(loc) || vecEquals(loc, to)) {
+            this.performMove(selectedTile);
+            return;
+        }
+    }
+
+    const tileOwner = board.getTile(loc);
+    if(!isAwaitingMove() || tileOwner !== ownPlayer.playerNo
+        || !board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
+
+        if(tileOwner !== TILE_EMPTY) {
+            playSound("error");
+        }
+        unselectTile();
+        return;
+    }
+
     selectTile(loc);
     playSound("pickup");
 };
-Game.prototype.onTileRelease = function(loc) {
-    if(getTime() - this.lastTileReleaseTime < DOUBLE_CLICK_MOVE_TIME_SECONDS
-        && vecEquals(loc, this.lastTileReleaseTile)
-        && isAwaitingMove()
-        && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
-
-        this.performMove(selectedTile);
-        return;
-    }
-
-    this.lastTileReleaseTime = getTime();
-    this.lastTileReleaseTile = loc;
+Game.prototype.onTileTouchRelease = function(loc) {
     updateTilePathAnchorTime();
 
-    if(!this.lastTileClickWasSelect && isTileSelected(loc)) {
-        unselectTile();
-        playSound("place");
-        return;
-    }
-
+    // Detect if a user dragged a tile to its end point.
     const diceValue = countDiceUp();
     if(isTileSelected(draggedTile)
         && board.isValidMoveFrom(ownPlayer.playerNo, draggedTile, diceValue)
         && vecEquals(loc, getTileMoveToLocation(ownPlayer.playerNo, draggedTile, diceValue))) {
         this.performMove(selectedTile, true);
+        return;
+    }
+
+    // If a user ended a drag over a tile, select it.
+    const tileOwner = board.getTile(loc);
+    if (isAwaitingMove() && !isTileSelected() && tileOwner === ownPlayer.playerNo
+         && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
+
+        selectTile(loc);
+        playSound("pickup");
     }
 };
 Game.prototype.setupStartTiles = function() {
