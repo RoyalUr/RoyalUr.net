@@ -639,30 +639,26 @@ let renderedScoreText = {
 };
 
 function drawScoreText(text, isActive, scale) {
-    return renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
-        // Render the text on another canvas, and then onto this one so that the alpha stacks correctly
-        const renderedText = renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
-            const tileWidth = getTileWidth();
+    const renderedText = { width: NaN, img: null };
+    renderedText.img = renderResource(scoreWidth, scoreHeight * scale, function(ctx) {
+        const tileWidth = getTileWidth();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = Math.round(tileWidth * 1.6 * scale) + "px DuranGo";
 
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.font = Math.round(tileWidth * 1.6 * scale) + "px DuranGo";
-
-            if (isActive) {
-                ctx.save();
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = rgba(255, 255, 255, 0.7);
-                ctx.fillText(text, scoreWidth / 2, scoreHeight * scale / 2);
-                ctx.restore();
-            }
-
-            ctx.fillStyle = rgb(255);
+        if (isActive) {
+            ctx.save();
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = rgba(255, 255, 255, 0.7);
             ctx.fillText(text, scoreWidth / 2, scoreHeight * scale / 2);
-        });
+            ctx.restore();
+        }
 
-        ctx.globalAlpha = (isActive ? 1.0 : 0.8);
-        ctx.drawImage(renderedText, 0, 0);
+        ctx.fillStyle = rgb(255);
+        ctx.fillText(text, scoreWidth / 2, scoreHeight * scale / 2);
+        renderedText.width = ctx.measureText(text).width;
     });
+    return renderedText;
 }
 
 function drawName(player, isActive) {
@@ -742,8 +738,8 @@ function redrawPlayerScores(player, drawFromLeft) {
           startTile = getStartTile(ownPlayer.playerNo),
           diceValue = countDiceUp();
 
-    const potentialMoveTile = getDrawPotentialMoveTile(),
-          highlightStartTile = (
+    const potentialMoveTile = getDrawPotentialMoveTile();
+    const highlightStartTile = (
         player === ownPlayer
         && ownPlayer.active
         && board.isValidMoveFrom(ownPlayer.playerNo, startTile, diceValue)
@@ -760,9 +756,33 @@ function redrawPlayerScores(player, drawFromLeft) {
         player.score.current, false
     );
 
-    tilesCtx.drawImage(getRenderedPlayerName(player), 0, 0);
-    tilesCtx.drawImage(getRenderedTilesText(), 0, 1.25 * tileWidth);
-    scoreCtx.drawImage(getRenderedScoreText(), 0, 0.7 * tileWidth);
+    tilesCtx.drawImage(getRenderedTilesText().img, 0, 1.25 * tileWidth);
+    scoreCtx.drawImage(getRenderedScoreText().img, 0, 0.7 * tileWidth);
+
+    tilesCtx.save();
+    const renderedPlayerName = getRenderedPlayerName(player);
+    tilesCtx.globalAlpha = (!player.active || !player.connected ? 0.8 : 1);
+    tilesCtx.drawImage(renderedPlayerName.img, 0, 0);
+    if (!player.connected) {
+        const x = renderedPlayerName.img.width/2 + renderedPlayerName.width/2 + 0.25*tileWidth,
+              y = (isLastCharCapitalised(player.name) ? 0.2 : 0.225) * tileWidth,
+              width = 0.5 * tileWidth,
+              angle = (getTime() % 1) * 2*Math.PI;
+
+        tilesCtx.strokeStyle = "#FFFFFF";
+        tilesCtx.lineWidth = 0.2*width;
+        tilesCtx.lineCap = "butt";
+
+        tilesCtx.beginPath();
+        tilesCtx.arc(x, y, 0.125*tileWidth, angle, angle + 1.6*Math.PI);
+        tilesCtx.stroke();
+    }
+    tilesCtx.restore();
+}
+
+function isLastCharCapitalised(string) {
+    const last = string[string.length - 1];
+    return last === last.toUpperCase();
 }
 
 function redrawScores(forceRedraw) {

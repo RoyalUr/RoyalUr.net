@@ -190,6 +190,9 @@ setSuperClass(OnlineGame, Game);
 OnlineGame.prototype._init = function() {
     connect();
     resetDice();
+    // Until we learn otherwise, assume both players are connected.
+    darkPlayer.connected = true;
+    lightPlayer.connected = true;
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
     if (data.text === "No moves") {
