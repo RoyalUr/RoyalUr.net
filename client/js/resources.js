@@ -409,7 +409,7 @@ AudioResource.prototype.updateElementSettings = function() {
     }
 };
 AudioResource.prototype.play = function(onCompleteCallback) {
-    onCompleteCallback = (onCompleteCallback !== undefined ? onCompleteCallback : ()=>{});
+    onCompleteCallback = (onCompleteCallback ? onCompleteCallback : ()=>{});
     if (!this.loaded) {
         onCompleteCallback();
         return null;

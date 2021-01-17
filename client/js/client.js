@@ -257,7 +257,7 @@ function onPacketGame(gameInfo) {
     // If the user has been waiting a while to find a game, notify them with a sound!
     if (getTime() - networkConnectTime > 3) {
         console.log("playSound game_found");
-        playSound("game_found");
+        playSound("game_found", null, true);
     }
 }
 
