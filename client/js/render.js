@@ -137,24 +137,26 @@ function redrawMenu(forceRedraw) {
 
     difficultyDiv.style.opacity = screenState.difficultyFade.get();
 
-    if (forceRedraw || isOnScreen([SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY])) {
+    const menuVisible = isOnScreen([SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY]);
+    if (forceRedraw || menuVisible) {
         const playButtonActive = (menuState.playButton !== BUTTON_STATE_INACTIVE),
               learnButtonActive = (menuState.learnButton !== BUTTON_STATE_INACTIVE),
               watchButtonActive = (menuState.watchButton !== BUTTON_STATE_INACTIVE);
 
-        if (playOpacity > 0) {
+        const offMenuForceRedraw = (forceRedraw && !menuVisible);
+        if (offMenuForceRedraw || playOpacity > 0) {
             redrawButton(
                 "play", playButtonCanvas, playButtonCtx,
                 (playButtonActive ? "play_active" : "play"), forceRedraw
             );
         }
-        if (learnOpacity > 0) {
+        if (offMenuForceRedraw || learnOpacity > 0) {
             redrawButton(
                 "learn", learnButtonCanvas, learnButtonCtx,
                 (learnButtonActive ? "learn_active" : "learn"), forceRedraw
             );
         }
-        if (watchOpacity > 0) {
+        if (offMenuForceRedraw || watchOpacity > 0) {
             redrawButton(
                 "watch", watchButtonCanvas, watchButtonCtx,
                 (watchButtonActive ? "watch_active" : "watch"), forceRedraw
@@ -808,7 +810,6 @@ function redrawDice(forceRedraw) {
         return;
 
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
-
     if(canBeRolled) {
         diceCanvas.style.cursor = "pointer";
     } else {
@@ -925,10 +926,9 @@ function redrawDice(forceRedraw) {
     diceCtx.font = (canBeRolled && diceHovered ? (space * 0.6) + "px DuranGo" : (space * 0.5) + "px DuranGo");
     diceCtx.fillText("Roll", diceWidth / 2, 0.75 * space);
 
-    const diceUpCount = (dice.selected > 0 ? countDiceUp() : 0);
     diceCtx.fillStyle = "white";
     diceCtx.font = (space * 0.8) + "px DuranGo";
-    diceCtx.fillText("" + diceUpCount, diceWidth / 2, 2.3 * space);
+    diceCtx.fillText((dice.selected === 0 ? "0" : "" + countDiceUp()), diceWidth / 2, 2.3 * space);
 
     diceCtx.restore();
 }
@@ -952,7 +952,6 @@ function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
     ctx.save();
 
     const shadow = getImageResource((lightShadow ? "diceLightShadow" : "diceDarkShadow"), width);
-
     ctx.drawImage(shadow, centreLeft - width / 2, centreTop - width / 2, width, width);
     ctx.drawImage(diceImage, centreLeft - width / 2, centreTop - width / 2, width, width);
 
