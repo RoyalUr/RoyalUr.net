@@ -25,22 +25,23 @@ const screenState = {
     enterHandlers: [],
     exitHandlers: [],
 
-    menuFade: createFade(0.5),
+    loadingFade: new Fade(0.5).visible(),
+    menuFade: new Fade(0.5),
     useStaggeredMenuFade: true,
-    playSelectFade: createFade(0.5),
-    difficultyFade: createFade(0.5),
-    learnFade: createFade(0.5),
-    boardFade: createFade(0.5),
-    connectionFade: createFade(2, 0.5),
-    creditsFade: createFade(0.25),
+    playSelectFade: new Fade(0.5),
+    difficultyFade: new Fade(0.5),
+    learnFade: new Fade(0.5),
+    boardFade: new Fade(0.5),
+    connectionFade: new Fade(2, 0.5),
+    creditsFade: new Fade(0.25),
 
-    discordControlFade: createFade(controlFadeDuration),
-    githubControlFade: createFade(controlFadeDuration),
-    settingsControlFade: createFade(controlFadeDuration),
-    learnControlFade: createFade(controlFadeDuration),
-    exitControlFade: createFade(controlFadeDuration),
+    discordControlFade: new Fade(controlFadeDuration),
+    githubControlFade: new Fade(controlFadeDuration),
+    settingsControlFade: new Fade(controlFadeDuration),
+    learnControlFade: new Fade(controlFadeDuration),
+    exitControlFade: new Fade(controlFadeDuration),
 
-    joinDiscordFade: createFade(2.5, 0.5)
+    joinDiscordFade: new Fade(2.5, 0.5)
 };
 const allControlFades = [
     screenState.discordControlFade, screenState.githubControlFade,
@@ -124,7 +125,7 @@ function getVisibleControlFades() {
     const fades = [];
     for (let index = 0; index < allControlFades.length; ++index) {
         const fade = allControlFades[index];
-        if (fade.isFadeIn) {
+        if (fade.isFadeIn()) {
             fades.push(fade);
         }
     }
@@ -242,12 +243,12 @@ function onEnterCreditsHiddenScreen(hasty) { screenState.creditsFade.fadeOut(has
 function onExitCreditsHiddenScreen(hasty) { screenState.creditsFade.fadeIn(hasty ? 0 : undefined); }
 
 function onEnterLoadingScreen(hasty) {
-    loadingFade.fadeIn(hasty ? 0 : undefined);
+    screenState.loadingFade.fadeIn(hasty ? 0 : undefined);
     redrawLoadingBar();
 }
 
 function onExitLoadingScreen(hasty) {
-    loadingFade.fadeOut(hasty ? 0 : undefined);
+    screenState.loadingFade.fadeOut(hasty ? 0 : undefined);
 }
 
 function onEnterMenuScreen(hasty) {}

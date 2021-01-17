@@ -154,42 +154,6 @@ function drawLine(ctx, x1, y1, x2, y2) {
     ctx.stroke();
 }
 
-function measureDrawn(image) {
-    const pixels = image.getContext("2d").getImageData(0, 0, image.width, image.height).data;
-
-    let left = image.width,
-        right = 0,
-        top = image.height,
-        bottom = 0;
-
-    for(let y = 0; y < image.height; ++y) {
-        for(let x = 0; x < image.width; ++x) {
-            const index = (y * image.width + x) * 4;
-
-            if(pixels[index + 3] === 0)
-                continue;
-
-            if(x < left) left = x;
-            if(x > right) right = x;
-            if(y < top) top = y;
-            if(y > bottom) bottom = y;
-        }
-    }
-
-    // No filled in pixels
-    if(left > right)
-        return null;
-
-    return {
-        left: left,
-        right: right,
-        top: top,
-        bottom: bottom,
-        width: (right - left) + 1,
-        height: (bottom - top) + 1
-    };
-}
-
 function convertHSVtoRGB(h, s, v) {
     let r, g, b, i, f, p, q, t;
     i = Math.floor(h * 6);
@@ -323,107 +287,112 @@ function formatNumber(num, totalLength, decimalPlaces) {
     return pad(string, totalLength);
 }
 
-// Initially faded out
-function createFade(defaultInDuration, defaultOutDuration) {
-    if(defaultInDuration === undefined) {
-        defaultInDuration = -1;
-    }
-
-    if(defaultOutDuration === undefined) {
-        defaultOutDuration = defaultInDuration;
-    }
-
-    const fade = {
-        defaultInDuration: defaultInDuration,
-        defaultOutDuration: defaultOutDuration,
-
-        isFadeIn: false,
-        start: LONG_TIME_AGO,
-        duration: -1
-    };
-
-    fade.fade = function(isFadeIn, duration) {
-        const currentValue = this.get();
-
-        this.start = getTime();
-        this.isFadeIn = isFadeIn;
-        this.duration = (duration !== undefined ? duration : (isFadeIn ? this.defaultInDuration : this.defaultOutDuration));
-
+/** Allows the controlling of animations based on linearly interpolating between 0 and 1. **/
+function Fade(defaultInDuration, defaultOutDuration) {
+    this.__class_name__ = "Fade";
+    this.defaultInDuration = (defaultInDuration === undefined ? -1 : defaultInDuration);
+    this.defaultOutDuration = (defaultOutDuration === undefined ? this.defaultInDuration : defaultOutDuration);
+    this.direction = "out";
+    this.start = LONG_TIME_AGO;
+    this.duration = -1;
+}
+Fade.prototype.fade = function(isFadeIn, duration, fromStart) {
+    const currentValue = this.get();
+    this.start = getTime();
+    this.direction = (isFadeIn ? "in" : "out");
+    this.duration = (duration !== undefined ? duration : (isFadeIn ? this.defaultInDuration : this.defaultOutDuration));
+    // Correct the start time so the get() value never jumps.
+    if (!fromStart) {
         if(isFadeIn) {
             this.start -= currentValue * this.duration;
         } else {
             this.start -= (1 - currentValue) * this.duration;
         }
-        return this;
-    }.bind(fade);
+    }
+    return this;
+};
+Fade.prototype.isFadeIn = function() {
+    return this.direction === "in";
+};
+Fade.prototype.isFadeOut = function() {
+    return this.direction === "out";
+};
+Fade.prototype.fadeIn = function(duration) {
+    return this.fade(true, duration);
+};
+Fade.prototype.fadeOut = function(duration) {
+    return this.fade(false, duration);
+};
+Fade.prototype.visible = function() {
+    return this.fade(true, 0);
+};
+Fade.prototype.invisible = function() {
+    return this.fade(false, 0);
+};
+Fade.prototype.getRaw0To1 = function() {
+    const time = getTime();
+    if(time >= this.start + this.duration)
+        return 1;
+    if(time <= this.start)
+        return 0;
+    return (time - this.start) / this.duration;
+};
+Fade.prototype.get = function() {
+    const raw = this.getRaw0To1();
+    return (this.direction === "in" ? raw : 1 - raw);
+};
 
-    fade.fadeIn = function(duration) {
-        return this.fade(true, duration);
-    }.bind(fade);
 
-    fade.fadeOut = function(duration) {
-        return this.fade(false, duration);
-    }.bind(fade);
-
-    fade.visible = function() {
-        return this.fade(true, 0);
-    }.bind(fade);
-
-    fade.invisible = function() {
-        return this.fade(false, 0);
-    }.bind(fade);
-
-    const getRaw0To1 = function() {
-        const time = getTime();
-
-        if(time >= this.start + this.duration)
-            return 1;
-        if(time <= this.start)
-            return 0;
-
-        return (time - this.start) / this.duration;
-    }.bind(fade);
-
-    fade.get = function() {
-        const raw = getRaw0To1();
-
-        return (this.isFadeIn ? raw : 1 - raw);
-    }.bind(fade);
-
-    return fade;
-}
-
-function createStagedFade(inDuration, stayDuration, outDuration) {
+/** An asymmetric fade which fades in, waits, and then fades out. **/
+function StagedFade(inDuration, stayDuration, outDuration) {
     if(inDuration === undefined || stayDuration === undefined || outDuration === undefined)
-        throw "createStagedFade: Must specify inDuration, stayDuration and outDuration";
+        throw "Must specify inDuration, stayDuration, and outDuration";
 
-    const fade = {
-        start: getTime(),
-
-        fade: createFade(inDuration, outDuration),
-
-        inDuration: inDuration,
-        stayDuration: stayDuration,
-        outDuration: outDuration
-    };
-
-    fade.get = function() {
-        const time = getTime() - this.start;
-
-        if(stayDuration >= 0 && this.fade.isFadeIn && time >= inDuration + stayDuration) {
-            const timeDiff = time - (inDuration + stayDuration);
-
-            this.fade.fadeOut();
-            this.fade.start -= timeDiff;
-        }
-
-        return this.fade.get();
-    }.bind(fade);
-
-    fade.fade.fadeIn();
-
-    return fade;
+    Fade.call(this, inDuration + stayDuration + outDuration, outDuration);
+    this.__class_name__ = "StagedFade";
+    this.inDuration = inDuration;
+    this.stayDuration = stayDuration;
+    this.outDuration = outDuration;
+    this.inRatio = inDuration / this.defaultInDuration;
+    this.stayRatio = stayDuration / this.defaultInDuration;
+    this.outRatio = outDuration / this.defaultInDuration;
 }
+setSuperClass(StagedFade, Fade);
+
+StagedFade.prototype.fade = function(isFadeIn, duration, fromStart) {
+    const currentValue = this.get();
+    Fade.prototype.fade.call(this, isFadeIn, duration, true);
+
+    // Correct the start time so that the fades line up.
+    if (!fromStart) {
+        if (isFadeIn) {
+            this.start += currentValue * this.inDuration;
+        } else {
+            this.start -= (1 - currentValue) * this.outDuration;
+        }
+    }
+    return this;
+};
+StagedFade.prototype.get = function() {
+    let value = Fade.prototype.get.call(this);
+    if (Fade.prototype.isFadeOut.call(this))
+        return value;
+    if (value <= this.inRatio)
+        return value / this.inRatio;
+    if (value <= this.inRatio + this.stayRatio)
+        return 1;
+    return (1 - value) / this.outRatio;
+};
+StagedFade.prototype.isFadeIn = function() {
+    if (Fade.prototype.isFadeOut.call(this))
+        return false;
+    return Fade.prototype.get.call(this) <= this.inDuration + this.stayDuration;
+};
+StagedFade.prototype.isFadeOut = function() {
+    if (Fade.prototype.isFadeOut.call(this))
+        return true;
+    return Fade.prototype.get.call(this) > this.inDuration + this.stayDuration;
+};
 
 
 
@@ -434,13 +403,10 @@ function createStagedFade(inDuration, stayDuration, outDuration) {
 function pad(value, length, prefix) {
     if(value.length >= length) return value;
     if(prefix === undefined) prefix = ' ';
-
     let string = value;
-
     while(string.length < length) {
         string = prefix + string;
     }
-
     return string.substring(string.length - length, string.length);
 }
 

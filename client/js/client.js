@@ -332,61 +332,94 @@ function onHashChange() {
 // Game interactions.
 //
 
+const KEY_SPACE = [" ", "Space", 32],
+      KEY_ESCAPE = ["Escape", "Esc", 27],
+      KEY_ENTER = ["Enter", 13],
+      KEY_Q = ["q", "KeyQ", 81];
+
+function isKey(event, key) {
+    const keyCode = event.key || event.keyCode;
+    for (let index = 0; index < key.length; ++index) {
+        if (keyCode === key[index])
+            return true;
+    }
+    return false;
+}
+
 function handleKeyPress(event) {
     if (event.defaultPrevented)
         return;
 
-    const key = event.key || event.keyCode,
-          keyIsEnter = (key === "Enter" || key === 13),
-          keyIsSpace = (key === " " || key === "Space" || key === 32);
+    // Pressing any key while a message is shown will dismiss that message.
+    if (tryDismissMessage())
+        return;
 
-    if (keyIsEnter || keyIsSpace) {
-        tryTakeSingleAction(event, keyIsSpace);
-    } else if (key === "Escape" || key === "Esc" || key === 27) {
-        if (screenState.exitControlFade.isFadeIn) {
+    if (isKey(event, KEY_SPACE)) {
+        tryTakeSingleAction(event, true);
+        return;
+    }
+    if (isKey(event, KEY_ENTER) || isKey(event, KEY_Q)) {
+        tryTakeSingleAction(event, false);
+        return;
+    }
+    if (isKey(event, KEY_ESCAPE)) {
+        if (screenState.exitControlFade.isFadeIn()) {
             onExitClick(event);
         }
     }
 }
 
-function tryTakeSingleAction(event, keyIsSpace) {
-    if (game) {
-        event.stopPropagation();
-        // Try roll the dice.
-        if (game.onDiceClick())
-            return;
-
-        // Check that the player can make a move.
-        const currentPlayer = getActivePlayer();
-        if (!currentPlayer || !isAwaitingMove())
-            return;
-
-        // See if there is a single tile that can be moved, or if space is pressed any available moves.
-        const availableMoves = board.getAllValidMoves(currentPlayer.playerNo, countDiceUp());
-        if (availableMoves.length === 0)
-            return;
-
-        // Sort the available moves so that they are in a predictable order.
-        const playerPath = getTilePath(currentPlayer.playerNo);
-        availableMoves.sort(function(from1, from2) {
-            return vecListIndexOf(playerPath, from1) - vecListIndexOf(playerPath, from2);
-        });
-
-        // If space is pressed we cycle through available tiles to move.
-        if (keyIsSpace && availableMoves.length > 1) {
-            const selectedIndex = vecListIndexOf(availableMoves, selectedTile),
-                  selectIndex = (selectedIndex + 1) % availableMoves.length;
-            selectTile(availableMoves[selectIndex]);
-            return;
-        }
-
-        // If there is one available move, or enter is pressed, try move the selected tile.
-        if (!isTileSelected()) {
-            if (availableMoves.length === 1) {
-                selectTile(availableMoves[0]);
-            }
-            return;
-        }
-        game.performMove(selectedTile);
+/** If there is a message on the screen, fade it out. **/
+function tryDismissMessage() {
+    if (message.fade.get() > 0.5) {
+        message.fade.fadeOut();
+        return true;
+    } else {
+        return false;
     }
+}
+
+function tryTakeSingleAction(event, keyIsSpace) {
+    if (!game)
+        return false;
+
+    event.stopPropagation();
+    // Try roll the dice.
+    if (game.onDiceClick())
+        return true;
+
+    // Check that the player can make a move.
+    const currentPlayer = getActivePlayer();
+    if (!currentPlayer || !isAwaitingMove())
+        return false;
+
+    // See if there is a single tile that can be moved, or if space is pressed any available moves.
+    const availableMoves = board.getAllValidMoves(currentPlayer.playerNo, countDiceUp());
+    if (availableMoves.length === 0)
+        return false;
+
+    // Sort the available moves so that they are in a predictable order.
+    const playerPath = getTilePath(currentPlayer.playerNo);
+    availableMoves.sort(function(from1, from2) {
+        return vecListIndexOf(playerPath, from1) - vecListIndexOf(playerPath, from2);
+    });
+
+    // If space is pressed we cycle through available tiles to move.
+    if (keyIsSpace && availableMoves.length > 1) {
+        const selectedIndex = vecListIndexOf(availableMoves, selectedTile),
+              selectIndex = (selectedIndex + 1) % availableMoves.length;
+        selectTile(availableMoves[selectIndex]);
+        return true;
+    }
+
+    // If there is one available move, or enter is pressed, try move the selected tile.
+    if (!isTileSelected()) {
+        if (availableMoves.length === 1) {
+            selectTile(availableMoves[0]);
+            return true;
+        }
+        return false;
+    }
+    game.performMove(selectedTile);
+    return true;
 }

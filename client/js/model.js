@@ -266,7 +266,7 @@ const networkStatus = {
     status: "",
     connected: false,
 
-    fade: createFade(1.0),
+    fade: new Fade(1.0),
     hidden: false,
 
     dots: false,
@@ -329,7 +329,7 @@ const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
 const message = {
     text: "",
     text_set_time: 0,
-    fade: createFade(0)
+    fade: new Fade(0)
 };
 
 function setMessageAndFade(statusMessage, fade) {
@@ -343,6 +343,6 @@ function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration
     stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_DURATION);
     fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_DURATION);
 
-    const fade = createStagedFade(fadeInDuration, stayDuration, fadeOutDuration);
+    const fade = new StagedFade(fadeInDuration, stayDuration, fadeOutDuration).fadeIn();
     setMessageAndFade(statusMessage, fade);
 }

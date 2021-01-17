@@ -65,13 +65,11 @@ function redraw(forceRedraw) {
 // Rendering of the loading screen.
 //
 
-const loadingFade = createFade(0.5).visible();
-
 function redrawLoading(forceRedraw) {
-    const opacity = loadingFade.get();
+    const opacity = screenState.loadingFade.get();
     loadingDiv.style.opacity = opacity;
     loadingDiv.style.display = (opacity === 0 ? "none" : "")
-    if (loadingFade.isFadeIn) {
+    if (screenState.loadingFade.isFadeIn()) {
         loadingTextSpan.textContent = getStageLoadingMessage(loading.stage);
     }
 }
@@ -86,7 +84,7 @@ const playTilesButtonMargin = 0.1,
       playTilesHeightInactive = 0.6,
       playTilesHeightActive = 0.75;
 
-const playSelectDescriptionFade = createFade(0.1, 0.2).invisible();
+const playSelectDescriptionFade = new Fade(0.1, 0.2).invisible();
 
 const lastButtonImages = {};
 
@@ -107,7 +105,7 @@ function redrawButton(name, canvas, ctx, imageKey, forceRedraw) {
 
 function redrawMenu(forceRedraw) {
     const menuFade = screenState.menuFade.get(),
-          staggered = (screenState.useStaggeredMenuFade && screenState.menuFade.isFadeIn),
+          staggered = (screenState.useStaggeredMenuFade && screenState.menuFade.isFadeIn()),
           titleOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade, 0, 1)),
           playOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.16, 0, 1)),
           learnOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.33, 0, 1)),
@@ -135,7 +133,7 @@ function redrawMenu(forceRedraw) {
 
     const descriptionFade = playSelectDescriptionFade.get();
     playSelectDiv.style.opacity = screenState.playSelectFade.get();
-    playSelectDescriptionDiv.style.opacity = (screenState.playSelectFade.isFadeIn ? descriptionFade : 0);
+    playSelectDescriptionDiv.style.opacity = (screenState.playSelectFade.isFadeIn() ? descriptionFade : 0);
 
     difficultyDiv.style.opacity = screenState.difficultyFade.get();
 
