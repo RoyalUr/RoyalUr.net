@@ -4,7 +4,7 @@
 
 const ZERO_CHAR_CODE = "0".charCodeAt(0),
       GAME_ID_LENGTH = 6,
-      PROTOCOL_VERSION = 1;
+      PROTOCOL_VERSION = 2;
 
 
 
