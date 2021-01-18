@@ -246,7 +246,9 @@ function onPacketGame(gameInfo) {
     setHash(gameInfo.gameID);
     setOwnPlayer(gameInfo.ownPlayer);
     ownPlayer.name = gameInfo.ownName;
+    ownPlayer.connected = true;
     otherPlayer.name = gameInfo.opponentName;
+    otherPlayer.connected = gameInfo.opponentConnected;
 
     // TODO : Remove this when users are actually able to set their own names!
     lightPlayer.name = "Light";

@@ -103,11 +103,6 @@ function initPlayer(playerNo, name) {
     };
 }
 
-function resetPlayerState(player, tiles, score, active) {
-    updatePlayerState(player, tiles, score, active);
-    player.connected = true;
-}
-
 function updatePlayerState(player, tiles, score, active) {
     while(player.tiles.current < tiles) addTile(player);
     while(player.tiles.current > tiles) takeTile(player);

@@ -190,9 +190,6 @@ setSuperClass(OnlineGame, Game);
 OnlineGame.prototype._init = function() {
     connect();
     resetDice();
-    // Until we learn otherwise, assume both players are connected.
-    darkPlayer.connected = true;
-    lightPlayer.connected = true;
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
     if (data.text === "No moves") {
@@ -282,7 +279,26 @@ function BrowserGame() {
 }
 setSuperClass(BrowserGame, Game);
 
+BrowserGame.prototype.setupRoll = unimplemented("setupRoll");
+BrowserGame.prototype.setupRoll = unimplemented("setupRoll");
 BrowserGame.prototype.onFinishDice = unimplemented("onFinishDice");
+BrowserGame.prototype.getTurnPlayer = unimplemented("getTurnPlayer");
+BrowserGame.prototype.isLeftTurn = function() {
+    return this.getTurnPlayer() === leftPlayer;
+};
+BrowserGame.prototype.isRightTurn = function() {
+    return this.getTurnPlayer() === rightPlayer;
+};
+BrowserGame.prototype._init = function() {
+    updatePlayerState(leftPlayer, 7, 0, this.isLeftTurn());
+    updatePlayerState(rightPlayer, 7, 0, this.isRightTurn());
+    leftPlayer.connected = true;
+    rightPlayer.connected = true;
+
+    board.clearTiles();
+    resetDice();
+    this.setupRoll(true);
+};
 BrowserGame.prototype.onDiceClick = function() {
     if(!dice.active || dice.rolling || !ownPlayer.active)
         return false;
@@ -313,19 +329,14 @@ function ComputerGame(difficulty) {
 }
 setSuperClass(ComputerGame, BrowserGame);
 
+ComputerGame.prototype.getTurnPlayer = function() {
+    return this.turnPlayer;
+};
 ComputerGame.prototype.isComputersTurn = function() {
     return this.turnPlayer === otherPlayer;
 };
 ComputerGame.prototype.isHumansTurn = function() {
     return this.turnPlayer === ownPlayer;
-};
-ComputerGame.prototype._init = function() {
-    resetPlayerState(ownPlayer, 7, 0, this.isHumansTurn());
-    resetPlayerState(otherPlayer, 7, 0, this.isComputersTurn());
-
-    board.clearTiles();
-    resetDice();
-    this.setupRoll(true);
 };
 ComputerGame.prototype.updateActivePlayer = function() {
     ownPlayer.active = this.isHumansTurn();
@@ -454,19 +465,8 @@ function LocalGame() {
 }
 setSuperClass(LocalGame, BrowserGame);
 
-LocalGame.prototype.isLeftTurn = function() {
-    return this.turnPlayer === leftPlayer;
-};
-LocalGame.prototype.isRightTurn = function() {
-    return this.turnPlayer === rightPlayer;
-};
-LocalGame.prototype._init = function() {
-    resetPlayerState(leftPlayer, 7, 0, this.isLeftTurn());
-    resetPlayerState(rightPlayer, 7, 0, this.isRightTurn());
-
-    board.clearTiles();
-    resetDice();
-    this.setupRoll();
+LocalGame.prototype.getTurnPlayer = function() {
+    return this.turnPlayer;
 };
 LocalGame.prototype.updateActivePlayer = function() {
     leftPlayer.active = this.isLeftTurn();

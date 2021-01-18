@@ -158,7 +158,8 @@ function readGamePacket(packet) {
         gameID: packet.nextGameID(),
         ownPlayer: packet.nextPlayer(),
         ownName: packet.nextVarString(),
-        opponentName: packet.nextVarString()
+        opponentName: packet.nextVarString(),
+        opponentConnected: packet.nextBool()
     };
 }
 
