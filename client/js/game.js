@@ -379,10 +379,26 @@ ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
 ComputerGame.prototype.onFinishDice = function() {
     this.setupStartTiles();
 
-    const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
-    if (availableMoves.length === 0) {
+    const diceUp = countDiceUp();
+
+    const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, diceUp);
+    if (availableMoves.length === 0 && diceUp === 0) {
         setMessage(
-            "No moves",
+            "No moves - rolled a zero",
+            DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION
+        );
+        setTimeout(function() {
+            playSound("error");
+        }, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+        setTimeout(function() {
+            this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+            this.setupRoll();
+        }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
+        return;
+    }
+    else if (availableMoves.length === 0) {
+        setMessage(
+            "No moves - all moves blocked",
             DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION
         );
         setTimeout(function() {
