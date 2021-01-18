@@ -58,6 +58,8 @@ const overlayCanvas = document.getElementById("overlay"),
 
 const creditsDiv = document.getElementById("credits");
 
+const learnBackButton = document.getElementById("learn-back-button");
+
 const dynamicImagesByClass = {
     "logo_image": "logo_with_shadow",
     "play_local_image": "play_local",
@@ -90,6 +92,7 @@ function setupMenuElements() {
     settingsControlButton.addEventListener("click", onSettingsControlClick);
     learnControlButton.addEventListener("click", onLearnControlClick);
     exitControlButton.addEventListener("click", onExitClick);
+    learnBackButton.addEventListener("click", onExitClick);
 
     // Adjust the font sizes of the play select options to fit their bounding boxes.
     fitty(".play-select-text", {

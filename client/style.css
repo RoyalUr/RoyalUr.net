@@ -544,3 +544,25 @@ svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
     margin-top: 0.15vh;
 }
 #learn-content .inline-sub-text { display: inline; }
+#learn-back-button {
+    display: inline;
+    border: 3px solid white;
+    border-radius: 1vh;
+    padding: 0.5vh 2vh;
+
+    font-family: Nunito,sans-serif;
+    font-size: 4vh;
+    color: white;
+    cursor: pointer;
+
+    opacity: 0.75;
+    transition: opacity 0.1s ease-in-out;
+}
+#learn-back-button:hover {
+    opacity: 1;
+    transition: opacity 0.1s ease-in-out;
+}
+.centre-text {
+    display: block;
+    text-align: center;
+}

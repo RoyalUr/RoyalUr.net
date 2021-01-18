@@ -215,7 +215,7 @@ function redrawLearn(forceRedraw) {
     if (!isOnScreen(SCREEN_LEARN) && !forceRedraw)
         return;
 
-    // Do more fancy redrawing stuff here.
+    learnBackButton.innerText = "Back to " + (screenState.exitTargetScreen === SCREEN_GAME ? "Game" : "Menu");
 }
 
 
