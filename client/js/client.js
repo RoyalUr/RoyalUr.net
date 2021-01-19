@@ -230,7 +230,7 @@ function onNetworkDisconnect() {
 //
 
 function onPacketError(data) {
-    setMessage("An unexpected error occurred", "", 0, 1, 1)
+    setMessage("An unexpected error occurred", "", 0, 2, 1)
     console.error("Error: " + data.error);
 }
 
@@ -268,7 +268,7 @@ function onPacketGameEnd(data) {
         return;
 
     game = null;
-    setMessage("Your game ended ", data.reason, 0, 2, 1);
+    setMessage("Your game ended ", data.reason, 0, 5, 1);
     switchToScreen(SCREEN_MENU);
 }
 

@@ -75,7 +75,6 @@ let width = NaN,
     height = NaN,
     useWidth = NaN,
     useHeight = NaN,
-    viewport = null,
     centreLeft = NaN,
     centreTop = NaN;
 
@@ -95,6 +94,8 @@ function setupMenuElements() {
     learnControlButton.addEventListener("click", onLearnControlClick);
     exitControlButton.addEventListener("click", onExitClick);
     learnBackButton.addEventListener("click", onExitClick);
+
+    messageContainerElement.addEventListener("click", tryDismissMessage);
 
     // Adjust the font sizes of the play select options to fit their bounding boxes.
     fitty(".play-select-text", {
