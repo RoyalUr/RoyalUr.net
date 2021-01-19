@@ -314,10 +314,10 @@ function onExitGameScreen(hasty) {
 }
 
 function onEnterWinScreen(hasty) {
-    setMessage(
-        getActivePlayer().name + " wins!", "",
-        0.25, -1, -1
-    );
+    const fade = new Fade(0.25, -1);
+    fade.fadeOut = () => {};
+    fade.fadeIn();
+    setMessageAndFade(getActivePlayer().name + " wins!", "", fade);
 }
 function onExitWinScreen(hasty) {
     setMessage(message.title, message.subtitle, 0, 0, DEFAULT_MESSAGE_FADE_OUT_TIME);

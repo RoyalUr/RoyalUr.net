@@ -363,7 +363,6 @@ img {
     z-index: 10;
 
     background-color: rgba(0, 0, 0, 0.25);
-    pointer-events: none;
 }
 #message {
     display: block;
@@ -378,7 +377,6 @@ img {
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
     text-align: center;
-    pointer-events: all;
 }
 #message-title {
     font-size: 9vh;
@@ -393,7 +391,6 @@ img {
     top: 52.5%;
     left: 50%;
     transform: translate(-50%, 0);
-    pointer-events: all;
 }
 #join-discord, #star-github {
     filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.8));
