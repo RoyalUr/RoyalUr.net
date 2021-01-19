@@ -41,7 +41,7 @@ const screenState = {
     learnControlFade: new Fade(controlFadeDuration),
     exitControlFade: new Fade(controlFadeDuration),
 
-    joinDiscordFade: new Fade(2.5, 0.5)
+    socialsFade: new Fade(2.5, 0.5)
 };
 const allControlFades = [
     screenState.discordControlFade, screenState.githubControlFade,
@@ -293,13 +293,14 @@ function onEnterConnectingScreen(hasty) {
     setMessageAndFade("", screenState.connectionFade.invisible());
     setTimeout(() => {
         if (isOnScreen(SCREEN_CONNECTING)) {
+            socialsFadeAnchorTime = getTime();
             screenState.connectionFade.fadeIn(hasty ? 0 : undefined);
-            screenState.joinDiscordFade.fadeIn(hasty ? 0 : undefined);
+            screenState.socialsFade.fadeIn(hasty ? 0 : undefined);
         }
     }, (hasty ? 0 : 500));
 }
 function onExitConnectingScreen(hasty) {
-    screenState.joinDiscordFade.fadeOut(hasty ? 0 : undefined);
+    screenState.socialsFade.fadeOut(hasty ? 0 : undefined);
     screenState.connectionFade.fadeOut(hasty ? 0 : undefined);
 }
 

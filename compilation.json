@@ -63,7 +63,8 @@
     "res/audio/dice_select.mp4": "res/audio_dice_select.mp4",
     "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4",
-    "res/discord_logo.svg": "res/discord_logo.svg"
+    "res/social/join_the_discord.svg": "res/join_the_discord.svg",
+    "res/social/star_on_github.svg": "res/star_on_github.svg"
   },
 
   "image_size_classes": {

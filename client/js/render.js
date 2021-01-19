@@ -50,7 +50,7 @@ function redraw(forceRedraw) {
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
             exitControlButton, messageContainerElement,
-            joinDiscordElement,
+            joinDiscordElement, starGithubElement,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
             rightPlayerRenderTarget.tilesCanvas,
@@ -996,10 +996,36 @@ function redrawNetworkStatus(forceRedraw) {
 // Rendering of messages shown on the screen.
 //
 
+const SOCIALS_TRANSITION_DURATION = 10,
+      SOCIALS_FADE_DURATION = 0.5,
+      SOCIALS_FADE_RATIO = SOCIALS_FADE_DURATION / SOCIALS_TRANSITION_DURATION;
+
+let socialsFadeAnchorTime = LONG_TIME_AGO;
+
 function redrawMessage(forceRedraw) {
     messageElement.textContent = message.text;
     messageContainerElement.style.opacity = message.fade.get();
-    joinDiscordElement.style.opacity = max(0, 2.5 * screenState.joinDiscordFade.get() - 1.5);
+
+    const socialsOpacity = max(0, 2.5 * screenState.socialsFade.get() - 1.5);
+    if (socialsOpacity <= 0) {
+        joinDiscordElement.style.opacity = 0;
+        starGithubElement.style.opacity = 0;
+        return;
+    }
+
+    const timeSinceSwitch = getTime() - socialsFadeAnchorTime,
+          transitionValue = (timeSinceSwitch % (2 * SOCIALS_TRANSITION_DURATION)) / SOCIALS_TRANSITION_DURATION,
+          ratio = SOCIALS_FADE_RATIO,
+          value = transitionValue % 1,
+          opacity = socialsOpacity * (value < ratio ? value : (1 - value < ratio ? 1 - value : ratio)) / ratio;
+
+    if (transitionValue < 1) {
+        joinDiscordElement.style.opacity = opacity;
+        starGithubElement.style.opacity = 0;
+    } else {
+        joinDiscordElement.style.opacity = 0;
+        starGithubElement.style.opacity = opacity;
+    }
 }
 
 

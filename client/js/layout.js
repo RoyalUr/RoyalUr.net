@@ -51,7 +51,8 @@ const networkStatusElement = document.getElementById("network-status");
 
 const messageContainerElement = document.getElementById("message-container"),
       messageElement = document.getElementById("message"),
-      joinDiscordElement = document.getElementById("join-discord");
+      joinDiscordElement = document.getElementById("join-discord"),
+      starGithubElement = document.getElementById("star-github");
 
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");

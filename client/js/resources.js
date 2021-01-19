@@ -262,6 +262,24 @@ AnnotationsResource.prototype.get = function(key) {
 }
 
 
+/** Used to preload an image. **/
+function PreloadImageResource(name, url) {
+    Resource.call(this, name, url);
+    this.__class_name__ = "PreloadImageResource";
+    this.image = null;
+}
+setSuperClass(PreloadImageResource, Resource);
+PreloadImageResource.prototype._load = function() {
+    this.image = new Image();
+    this.image.onerror = function() {
+        this.onError("Image Error: " + this.image.error);
+    }.bind(this);
+    this.image.src = this.url;
+    // We don't want this to block the loading of the page.
+    this.onLoad();
+};
+
+
 /** Images to be displayed. **/
 function ImageResource(name, url) {
     Resource.call(this, name, url);
@@ -563,6 +581,8 @@ const stagedResources = [
             "res/buttons/watch.png": "watch",
             "res/buttons/watch_active.png": "watch_active"
         }),
+        new PreloadImageResource("join_the_discord", "res/join_the_discord.svg"),
+        new PreloadImageResource("star_on_github", "res/star_on_github.svg")
     ],
     [ // Game
         new ImageResource("board", "res/board.[ver]"),

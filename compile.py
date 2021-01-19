@@ -698,5 +698,5 @@ if __name__ == "__main__":
             print("Invalid compilation mode", mode)
 
         print("Usage:")
-        print("  python -m compile <dev:release>")
+        print("  python -m compile <dev:release:nojs>")
         sys.exit(1)

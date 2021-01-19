@@ -118,7 +118,7 @@ img {
  *  MENU
  */
 
-.shadow, .shadow-no-hover {
+.shadow {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 .shadow:hover {
@@ -380,7 +380,7 @@ img {
     text-align: center;
     pointer-events: all;
 }
-#join-discord {
+#join-discord, #star-github {
     display: block;
     position: absolute;
     width: 50vh;
@@ -389,7 +389,10 @@ img {
     transform: translate(-50%, 0);
     pointer-events: all;
 }
-#join-discord img {
+#join-discord, #star-github {
+    filter: drop-shadow(3px 3px 10px rgba(0, 0, 0, 0.8));
+}
+#join-discord img, #star-github img {
     width: 100%;
 }
 
