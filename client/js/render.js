@@ -184,10 +184,10 @@ function redrawMenu(forceRedraw) {
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {
-            setMessageAndFade("Searching for a Game" + createDots(), screenState.connectionFade);
+            setMessageAndFade("Searching for a Game" + createDots(), "", screenState.connectionFade);
         } else {
             networkStatus.hidden = true;
-            setMessageAndFade(getNetworkStatus(), screenState.connectionFade);
+            setMessageAndFade(getNetworkStatus(), "", screenState.connectionFade);
         }
     }
 
@@ -1003,7 +1003,9 @@ const SOCIALS_TRANSITION_DURATION = 10,
 let socialsFadeAnchorTime = LONG_TIME_AGO;
 
 function redrawMessage(forceRedraw) {
-    messageElement.textContent = message.text;
+    messageTitleElement.textContent = message.title;
+    messageSubtitleElement.textContent = message.subtitle;
+    messageSubtitleElement.style.display = (message.subtitle.length === 0 ? "none" : "");
     messageContainerElement.style.opacity = message.fade.get();
 
     const socialsOpacity = max(0, 2.5 * screenState.socialsFade.get() - 1.5);

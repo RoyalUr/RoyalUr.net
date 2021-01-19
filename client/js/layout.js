@@ -50,7 +50,8 @@ const tilesCanvas = document.getElementById("tiles"),
 const networkStatusElement = document.getElementById("network-status");
 
 const messageContainerElement = document.getElementById("message-container"),
-      messageElement = document.getElementById("message"),
+      messageTitleElement = document.getElementById("message-title"),
+      messageSubtitleElement = document.getElementById("message-subtitle"),
       joinDiscordElement = document.getElementById("join-discord"),
       starGithubElement = document.getElementById("star-github");
 

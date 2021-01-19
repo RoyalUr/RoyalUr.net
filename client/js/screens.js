@@ -290,7 +290,7 @@ function onExitMenuScreens(hasty) {
 
 function onEnterConnectingScreen(hasty) {
     reconnect();
-    setMessageAndFade("", screenState.connectionFade.invisible());
+    setMessageAndFade("", "", screenState.connectionFade.invisible());
     setTimeout(() => {
         if (isOnScreen(SCREEN_CONNECTING)) {
             socialsFadeAnchorTime = getTime();
@@ -305,7 +305,7 @@ function onExitConnectingScreen(hasty) {
 }
 
 function onEnterGameScreen(hasty) {
-    setMessageAndFade("Found your Game", screenState.connectionFade);
+    setMessageAndFade("Found your Game", "", screenState.connectionFade);
     game.init();
     redrawBoard(true);
 }
@@ -315,12 +315,12 @@ function onExitGameScreen(hasty) {
 
 function onEnterWinScreen(hasty) {
     setMessage(
-        getActivePlayer().name + " wins!",
+        getActivePlayer().name + " wins!", "",
         0.25, -1, -1
     );
 }
 function onExitWinScreen(hasty) {
-    setMessage(message.text, 0, 0, DEFAULT_MESSAGE_FADE_OUT_DURATION);
+    setMessage(message.title, message.subtitle, 0, 0, DEFAULT_MESSAGE_FADE_OUT_TIME);
 }
 
 function onEnterServerScreen(hasty) {}

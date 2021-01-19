@@ -371,14 +371,20 @@ img {
     width: 100%;
     top: 50%;
     transform: translate(0, -100%);
-
+}
+#message-title, #message-subtitle {
     font-family: Nunito, sans-serif;
     font-weight: 600;
-    font-size: 50px;
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
     text-align: center;
     pointer-events: all;
+}
+#message-title {
+    font-size: 9vh;
+}
+#message-subtitle {
+    font-size: 5vh;
 }
 #join-discord, #star-github {
     display: block;

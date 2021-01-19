@@ -2,6 +2,9 @@
 // This file stores the logic for controlling the game.
 //
 
+const NO_MOVES_DURATION = 2,
+      NO_MOVES_TOTAL_DURATION = DEFAULT_MESSAGE_FADE_IN_TIME + NO_MOVES_DURATION + DEFAULT_MESSAGE_FADE_OUT_TIME;
+
 const DIFFICULTY_EASY = 1,
       DIFFICULTY_MEDIUM = 2,
       DIFFICULTY_HARD = 5;
@@ -144,6 +147,10 @@ Game.prototype.clearStartTiles = function() {
     board.setTile(LIGHT_START, TILE_EMPTY);
     board.setTile(DARK_START, TILE_EMPTY);
 };
+Game.prototype.triggerNoMovesMessage = function(reason) {
+    setMessage("No moves", reason, undefined, NO_MOVES_DURATION, undefined);
+    setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_TIME + 0.25));
+};
 Game.prototype.onFinishMove = unimplemented("onFinishMove");
 Game.prototype.performMove = function(from, isDragMove) {
     const diceValue = countDiceUp(),
@@ -192,13 +199,12 @@ OnlineGame.prototype._init = function() {
     resetDice();
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
-    if (data.text === "No moves") {
-        setMessage(data.text, DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION);
-        setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+    if (data.title === "No moves") {
+        this.triggerNoMovesMessage(data.subtitle);
         return;
     }
 
-    setMessage(data.text);
+    setMessage(data.title, data.subtitle);
 };
 OnlineGame.prototype.onPacketPlayerStatus = function(data) {
     if (data.player === "light") {
@@ -381,17 +387,11 @@ ComputerGame.prototype.onFinishDice = function() {
 
     const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
     if (availableMoves.length === 0) {
-        setMessage(
-            "No moves",
-            DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION
-        );
-        setTimeout(function() {
-            playSound("error");
-        }, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+        this.triggerNoMovesMessage("");
         setTimeout(function() {
             this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
             this.setupRoll();
-        }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
+        }.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
         return;
     } else if (availableMoves.length === 1 && this.isHumansTurn()) {
         selectTile(availableMoves[0]);
@@ -505,19 +505,12 @@ LocalGame.prototype.onFinishDice = function() {
     this.setupStartTiles();
 
     const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
-
     if (availableMoves.length === 0) {
-        setMessage(
-            "No moves",
-            DEFAULT_MESSAGE_FADE_IN_DURATION, 1, DEFAULT_MESSAGE_FADE_OUT_DURATION
-        );
-        setTimeout(function() {
-            playSound("error");
-        }, 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 0.25));
+        this.triggerNoMovesMessage("");
         setTimeout(function() {
             this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
             this.setupRoll();
-        }.bind(this), 1000 * (DEFAULT_MESSAGE_FADE_IN_DURATION + 1 + DEFAULT_MESSAGE_FADE_OUT_DURATION));
+        }.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
     } else if (availableMoves.length === 1) {
         selectTile(availableMoves[0]);
     }

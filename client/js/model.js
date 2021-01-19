@@ -317,27 +317,27 @@ function getNetworkStatus() {
 // MESSAGES
 //
 
-const DEFAULT_MESSAGE_FADE_IN_DURATION  = 0.25,
-      DEFAULT_MESSAGE_STAY_DURATION     = 2,
-      DEFAULT_MESSAGE_FADE_OUT_DURATION = 0.25;
+const DEFAULT_MESSAGE_FADE_IN_TIME  = 0.25,
+      DEFAULT_MESSAGE_STAY_TIME     = 2,
+      DEFAULT_MESSAGE_FADE_OUT_TIME = 0.25;
 
 const message = {
-    text: "",
-    text_set_time: 0,
+    title: "",
+    subtitle: "",
     fade: new Fade(0)
 };
 
-function setMessageAndFade(statusMessage, fade) {
-    message.text = statusMessage;
-    message.text_set_time = getTime();
+function setMessageAndFade(title, subtitle, fade) {
+    message.title = title;
+    message.subtitle = subtitle;
     message.fade = fade;
 }
 
-function setMessage(statusMessage, fadeInDuration, stayDuration, fadeOutDuration) {
-    fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_DURATION);
-    stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_DURATION);
-    fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_DURATION);
+function setMessage(title, subtitle, fadeInDuration, stayDuration, fadeOutDuration) {
+    fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_TIME);
+    stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_TIME);
+    fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_TIME);
 
     const fade = new StagedFade(fadeInDuration, stayDuration, fadeOutDuration).fadeIn();
-    setMessageAndFade(statusMessage, fade);
+    setMessageAndFade(title, subtitle, fade);
 }

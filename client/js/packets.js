@@ -169,8 +169,8 @@ function readGameEndPacket(packet) {
 
 function readMessagePacket(packet) {
     return {
-        text: packet.nextVarString(),
-        subText: packet.nextVarString()
+        title: packet.nextVarString(),
+        subtitle: packet.nextVarString()
     };
 }
 
