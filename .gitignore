@@ -8,3 +8,4 @@ __pycache__
 /node_modules
 /post_compile.sh
 /res.zip
+/.vs
