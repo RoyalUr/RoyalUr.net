@@ -389,9 +389,9 @@ ComputerGame.prototype.onFinishDice = function() {
     const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, diceCount);
     if (availableMoves.length === 0) {
         if (diceCount === 0) {
-            this.triggerNoMovesMessage("You rolled a zero");
-        }
-        else {
+            const player = (this.isHumansTurn() ? "You" : "Computer");
+            this.triggerNoMovesMessage(player + " rolled a zero");
+        } else {
             this.triggerNoMovesMessage("All moves are blocked");
         }
         setTimeout(function() {
@@ -510,9 +510,14 @@ LocalGame.prototype.onFinishMove = function(fromTile, toTile) {
 LocalGame.prototype.onFinishDice = function() {
     this.setupStartTiles();
 
-    const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, countDiceUp());
+    const diceCount = countDiceUp();
+    const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, diceCount);
     if (availableMoves.length === 0) {
-        this.triggerNoMovesMessage("");
+        if (diceCount === 0) {
+            this.triggerNoMovesMessage(this.turnPlayer.name + " rolled a zero");
+        } else {
+            this.triggerNoMovesMessage("All moves are blocked");
+        }
         setTimeout(function() {
             this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
             this.setupRoll();
