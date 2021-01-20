@@ -39,9 +39,6 @@ The following commands will compile the site to _./compiled_: \
 `./compile.sh release` -- Full clean compilation, with minified JS. \
 `./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder.
 
-To install the NPM dependencies used in the compilation, run: \
-`npm install`
-
 
 # 📂 Project Structure
 `/client/` contains the source files for the site, as well as site config files. \
