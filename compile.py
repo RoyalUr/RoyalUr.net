@@ -80,9 +80,9 @@ def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
 
         print(prefix + command_print)
         if last_process is None:
-            last_process = subprocess.Popen(command, stdout=pipe_out)
+            last_process = subprocess.Popen(command, stdout=pipe_out, shell=True)
         else:
-            last_process = subprocess.Popen(command, stdin=last_process.stdout, stdout=pipe_out)
+            last_process = subprocess.Popen(command, stdin=last_process.stdout, stdout=pipe_out, shell=True)
 
     try:
         stdout, stderr = last_process.communicate()
@@ -443,7 +443,7 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
     """
     output_file = os.path.join(target_folder, comp_spec.css_dest)
     assert execute_piped_commands(
-        ["uglifycss", comp_spec.css_source],
+        ["npx", "uglifycss", comp_spec.css_source],
         output_file,
         prefix=prefix
     )
