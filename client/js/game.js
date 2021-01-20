@@ -63,8 +63,9 @@ Game.prototype.onTileHover = function(loc) {
     }
 };
 Game.prototype.onTileClick = function(loc) {
+    const diceUp = countDiceUp();
     if(isTileSelected()) {
-        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, countDiceUp());
+        const to = getTileMoveToLocation(ownPlayer.playerNo, selectedTile, diceUp);
         if(isTileSelected(loc) || vecEquals(loc, to)) {
             this.performMove(selectedTile);
             return;
@@ -72,9 +73,7 @@ Game.prototype.onTileClick = function(loc) {
     }
 
     const tileOwner = board.getTile(loc);
-    if(!isAwaitingMove() || tileOwner !== ownPlayer.playerNo
-        || !board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
-
+    if(!isAwaitingMove() || tileOwner !== ownPlayer.playerNo || !board.isValidMoveFrom(tileOwner, loc, diceUp)) {
         if(tileOwner !== TILE_EMPTY) {
             playSound("error");
         }
@@ -82,7 +81,13 @@ Game.prototype.onTileClick = function(loc) {
         return;
     }
 
-    this.performMove(loc);
+    // If a tile is already selected, then we want clicking a tile to select it instead of move it.
+    if (isTileSelected()) {
+        selectTile(loc);
+        playSound("pickup");
+    } else {
+        this.performMove(loc);
+    }
 };
 Game.prototype.onTileRelease = function(loc) {};
 Game.prototype.onTileTouchClick = function(loc) {
