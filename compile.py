@@ -56,7 +56,7 @@ def execute_command(*command, **kwargs):
     return execute_piped_commands(command, **kwargs)
 
 
-def execute_piped_commands(*commands, prefix=""):
+def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
     """
     Executes the given commands where the output of each is piped to the next.
     The last command can be a string filename, in which case the final output will be written to the file.
@@ -86,13 +86,13 @@ def execute_piped_commands(*commands, prefix=""):
 
     try:
         stdout, stderr = last_process.communicate()
-        stdout = ("" if stdout is None else stdout.decode('utf-8'))
-        stderr = ("" if stderr is None else stderr.decode('utf-8'))
+        stdout = ("" if stdout is None else stdout.decode('utf-8').strip())
+        stderr = ("" if stderr is None else stderr.decode('utf-8').strip())
         ret_code = last_process.returncode
         if stdout != "":
-            print(prefix + "STDOUT:", stdout)
+            print(output_prefix + stdout.replace("\n", "\n" + output_prefix))
         if stderr != "":
-            print(prefix + "STDERR:", stderr, file=sys.stderr)
+            print(output_prefix + stderr.replace("\n", "\n" + output_prefix), file=sys.stderr)
         if ret_code < 0:
             print(prefix + "Execution of", commands[-1], "was terminated by signal:", -ret_code, file=sys.stderr)
         elif ret_code != 0:
@@ -573,6 +573,14 @@ def download_development_res_folder(*, prefix=""):
         assert execute_command("rm", "-f", "./res.zip", prefix=prefix)
 
 
+def install_dependencies(*, prefix=""):
+    """
+    Installs the NPM dependencies required for this script to run.
+    """
+    assert execute_command("npm", "install", prefix=prefix)
+
+
+
 #
 # Create the different types of builds.
 #
@@ -682,8 +690,19 @@ def create_nojs_build(target_folder):
 if __name__ == "__main__":
     # Download the resources folder if it doesn't exist.
     if not os.path.exists("./res"):
-        print("Could not find ./res directory, attempting to download it...")
+        print("\nCould not find ./res directory, attempting to download it...")
         download_development_res_folder(prefix=" .. ")
+
+    # Create the compiled folder if it doesn't exist.
+    if not os.path.exists("./compiled"):
+        print("\nCould not find ./compiled directory, creating it...")
+        os.mkdir("./compiled")
+
+    # Create the compiled folder if it doesn't exist.
+    if not os.path.exists("./node_modules"):
+        print("\nDetected missing NPM dependencies as ./node_modules is missing, installing them...")
+        install_dependencies(prefix=" .. ")
+
 
     # Detect the compilation mode, and start it.
     mode = (sys.argv[1] if len(sys.argv) == 2 else "")
