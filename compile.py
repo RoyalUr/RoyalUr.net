@@ -56,7 +56,7 @@ def execute_command(*command, **kwargs):
     return execute_piped_commands(command, **kwargs)
 
 
-def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
+def execute_piped_commands(*commands, prefix="", output_prefix=" -- ", use_shell=True):
     """
     Executes the given commands where the output of each is piped to the next.
     The last command can be a string filename, in which case the final output will be written to the file.
@@ -79,25 +79,25 @@ def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
             command_print += " > " + output_file
 
         print(prefix + command_print)
-        if last_process is None:
-            last_process = subprocess.Popen(command, stdout=pipe_out, shell=True)
-        else:
-            last_process = subprocess.Popen(command, stdin=last_process.stdout, stdout=pipe_out, shell=True)
+        previous_output = (None if last_process is None else last_process.stdout)
+        last_process = subprocess.Popen(
+            command, stdin=previous_output, stdout=pipe_out, stderr=subprocess.STDOUT,
+            shell=use_shell, close_fds=True)
 
     try:
         stdout, stderr = last_process.communicate()
         stdout = ("" if stdout is None else stdout.decode('utf-8').strip())
         stderr = ("" if stderr is None else stderr.decode('utf-8').strip())
-        ret_code = last_process.returncode
+        code = last_process.returncode
         if stdout != "":
             print(output_prefix + stdout.replace("\n", "\n" + output_prefix))
         if stderr != "":
             print(output_prefix + stderr.replace("\n", "\n" + output_prefix), file=sys.stderr)
-        if ret_code < 0:
-            print(prefix + "Execution of", commands[-1], "was terminated by signal:", -ret_code, file=sys.stderr)
-        elif ret_code != 0:
-            print(prefix + "Command", commands[-1], "resulted in the non-zero return code:", ret_code, file=sys.stderr)
-        return ret_code == 0
+        if code < 0:
+            print(prefix + "Execution of", commands[-1], "was terminated by signal:", -code, file=sys.stderr)
+        elif code != 0:
+            print(prefix + "Command", commands[-1], "resulted in the non-zero return code:", code, file=sys.stderr)
+        return code == 0
     except OSError as error:
         print(prefix + "Execution of", commands[-1], "failed:", error, file=sys.stderr)
         return False
@@ -377,8 +377,8 @@ def clean(target_folder, comp_spec, *, prefix=""):
     """
     Completely empty the compilation folder.
     """
-    assert execute_command("rm", "-rf", target_folder, prefix=prefix)
-    assert execute_command("mkdir", target_folder, prefix=prefix)
+    shutil.rmtree("compiled")
+    os.makedirs("compiled")
 
 
 def create_sitemap(target_folder, comp_spec, *, prefix=""):
@@ -499,7 +499,7 @@ def combine_annotations(target_folder, comp_spec, annotations, *, prefix=""):
     annotations.write(os.path.join(target_folder, "res/annotations.json"))
 
 
-def add_file_versions(target_folder, comp_spec, *, prefix=""):
+def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=False):
     """
     Filters through all HTML, CSS, and JS files and replaces [ver]
     patterns in file paths with their last modification time.
@@ -544,7 +544,11 @@ def add_file_versions(target_folder, comp_spec, *, prefix=""):
             file = os.path.join(target_folder, file_rel)
             version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
             file_mtime = max(file_mtime, version_mtime)
-            filtered += ".v{}".format(int(version_mtime))
+
+            # We still find the version even if skip_versions is True,
+            # just to make sure that everything works.
+            if not skip_versions:
+                filtered += ".v{}".format(int(version_mtime))
 
         # Write out the filtered file.
         with open(file_path, 'w') as file:
@@ -557,7 +561,8 @@ def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
     Creates a zip file with the full contents of the development resources folder.
     """
     output_file = os.path.join(target_folder, "res.zip")
-    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
+    # For some reason the zip command never exits if shell=True is used in subprocess.Popen...
+    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix, use_shell=False)
 
 
 def download_development_res_folder(*, prefix=""):
@@ -649,8 +654,8 @@ def create_dev_build(target_folder):
     print("\n7. Create Annotations File")
     combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
 
-    print("\n8. Add Dynamic File Versions")
-    add_file_versions(target_folder, comp_spec, prefix=" .. ")
+    print("\n8. Remove File Version Tags from Filenames")
+    add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
 
     print("\nDone!\n")
 
@@ -678,8 +683,8 @@ def create_nojs_build(target_folder):
     print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
 
-    print("\n7. Add Dynamic File Versions")
-    add_file_versions(target_folder, comp_spec, prefix=" .. ")
+    print("\n7. Remove File Version Tags from Filenames")
+    add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
 
     print("\nDone!\n")
 
