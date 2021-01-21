@@ -39,6 +39,7 @@ function Game(exitLosesGame) {
     this.__class_name__ = "Game";
     this.initialised = false;
     this.exitLosesGame = exitLosesGame;
+    this.noMovesSwapPlayerTimeout = null;
 
     layoutDice();
 }
@@ -48,6 +49,8 @@ Game.prototype.onPacketPlayerStatus = unimplemented("onPacketPlayerStatus");
 Game.prototype.onPacketMove = unimplemented("onPacketMove");
 Game.prototype.onPacketState = unimplemented("onPacketState");
 Game.prototype.onDiceClick = unimplemented("onDiceClick");
+Game.prototype.swapPlayerAfterNoMoves = unimplemented("swapPlayerAfterNoMoves");
+Game.prototype.onFinishMove = unimplemented("onFinishMove");
 Game.prototype._init = unimplemented("_init");
 
 Game.prototype.init = function() {
@@ -155,8 +158,15 @@ Game.prototype.clearStartTiles = function() {
 Game.prototype.triggerNoMovesMessage = function(reason) {
     setMessage("No moves", reason, undefined, NO_MOVES_DURATION, undefined);
     setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_TIME + 0.25));
+    this.noMovesSwapPlayerTimeout = setTimeout(this.swapPlayerAfterNoMoves.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
 };
-Game.prototype.onFinishMove = unimplemented("onFinishMove");
+Game.prototype.onMessageDismissed = function(title, subtitle) {
+    if (title === "No moves" && this.noMovesSwapPlayerTimeout !== null) {
+        clearTimeout(this.noMovesSwapPlayerTimeout);
+        this.noMovesSwapPlayerTimeout = null;
+        this.swapPlayerAfterNoMoves();
+    }
+}
 Game.prototype.performMove = function(from, isDragMove) {
     const diceValue = countDiceUp(),
           fromTile = board.getTile(from),
@@ -211,6 +221,7 @@ OnlineGame.prototype.onPacketMessage = function(data) {
 
     setMessage(data.title, data.subtitle);
 };
+OnlineGame.prototype.swapPlayerAfterNoMoves = function() { /* Do nothing, we will get sent a state packet. */ };
 OnlineGame.prototype.onPacketPlayerStatus = function(data) {
     if (data.player === "light") {
         lightPlayer.connected = data.connected;
@@ -399,10 +410,6 @@ ComputerGame.prototype.onFinishDice = function() {
         } else {
             this.triggerNoMovesMessage("All moves are blocked");
         }
-        setTimeout(function() {
-            this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
-            this.setupRoll();
-        }.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
         return;
     } else if (availableMoves.length === 1 && this.isHumansTurn()) {
         selectTile(availableMoves[0]);
@@ -416,6 +423,10 @@ ComputerGame.prototype.onFinishDice = function() {
         }
         this.determineComputerMove();
     }
+};
+ComputerGame.prototype.swapPlayerAfterNoMoves = function() {
+    this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+    this.setupRoll();
 };
 ComputerGame.prototype.determineComputerMove = function() {
     // Get the AI involved.
@@ -523,11 +534,11 @@ LocalGame.prototype.onFinishDice = function() {
         } else {
             this.triggerNoMovesMessage("All moves are blocked");
         }
-        setTimeout(function() {
-            this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
-            this.setupRoll();
-        }.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
     } else if (availableMoves.length === 1) {
         selectTile(availableMoves[0]);
     }
+};
+LocalGame.prototype.swapPlayerAfterNoMoves = function() {
+    this.turnPlayer = (this.isLeftTurn() ? rightPlayer : leftPlayer);
+    this.setupRoll();
 };

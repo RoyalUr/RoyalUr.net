@@ -375,6 +375,9 @@ function handleKeyPress(event) {
 function tryDismissMessage() {
     if (message.fade.get() > 0.5) {
         message.fade.fadeOut();
+        if (game) {
+            game.onMessageDismissed(message.title, message.subtitle);
+        }
         return true;
     } else {
         return false;
