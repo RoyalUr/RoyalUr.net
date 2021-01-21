@@ -7,6 +7,7 @@ import sys
 import json
 import time
 import math
+import shlex
 import subprocess
 import shutil
 from PIL import Image as PILImage
@@ -56,7 +57,7 @@ def execute_command(*command, **kwargs):
     return execute_piped_commands(command, **kwargs)
 
 
-def execute_piped_commands(*commands, prefix="", output_prefix=" -- ", use_shell=True):
+def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
     """
     Executes the given commands where the output of each is piped to the next.
     The last command can be a string filename, in which case the final output will be written to the file.
@@ -70,19 +71,14 @@ def execute_piped_commands(*commands, prefix="", output_prefix=" -- ", use_shell
 
     last_process = None
     for index in range(len(commands)):
-        command = commands[index]
-        command_print = (" | " if index > 0 else "") + " ".join(command)
-
-        pipe_out = subprocess.PIPE
+        command = " ".join([shlex.quote(arg) for arg in commands[index]])
         if index == len(commands) - 1 and output_file is not None:
-            pipe_out = open(output_file, 'w')
-            command_print += " > " + output_file
+            command += " > " + output_file
 
-        print(prefix + command_print)
+        print(prefix + (" | " if index > 0 else "") + command)
         previous_output = (None if last_process is None else last_process.stdout)
         last_process = subprocess.Popen(
-            command, stdin=previous_output, stdout=pipe_out, stderr=subprocess.STDOUT,
-            shell=use_shell, close_fds=True)
+            command, stdin=previous_output, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
     try:
         stdout, stderr = last_process.communicate()
@@ -562,7 +558,7 @@ def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
     """
     output_file = os.path.join(target_folder, "res.zip")
     # For some reason the zip command never exits if shell=True is used in subprocess.Popen...
-    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix, use_shell=False)
+    assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
 
 
 def download_development_res_folder(*, prefix=""):

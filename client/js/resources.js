@@ -30,9 +30,18 @@ const imageExtension = (function() {
 (function() {
     document.body.classList.add(imageExtension === "webp" ? "webp" : "no-webp");
 })();
+
+/** Adds the resolution to the URL. **/
 function completeURL(url, extension) {
     extension = (extension !== undefined ? extension : imageExtension);
     return url + (resolution !== "u_u" ? "." + resolution : "") + (extension.length > 0 ? "." + extension : "");
+}
+
+/** Removes the version from URLs. **/
+function removeURLVersion(url) {
+    const verIndex = url.lastIndexOf(".v"),
+        extIndex = url.indexOf(".", verIndex + 1);
+    return (verIndex < 0 ? url : url.substring(0, verIndex) + (extIndex >= 0 ? url.substring(extIndex) : ""));
 }
 
 
@@ -358,16 +367,13 @@ function SpriteResource(url, childrenIds) {
 }
 setSuperClass(SpriteResource, ImageResource);
 SpriteResource.prototype._onImageLoad = function() {
-    function removeURLVersion(url) {
-        return url.substring(0, url.lastIndexOf("."));
-    }
-
     annotationsResource.runOnLoad(function() {
         const annotations_id = completeURL(removeURLVersion(this.url), ""),
               annotations = annotationsResource.get("sprites")[annotations_id];
 
         if (!annotations) {
-            this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url);
+            this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url
+                + " (id " + annotations_id + ")");
             return;
         }
 
