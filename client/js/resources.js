@@ -417,9 +417,11 @@ AudioResource.prototype._load = function() {
     this.element.src = this.url;
     this.element.load();
     this.elements = [this.element];
-    for (let index = 1; index < this.instances; ++index) {
-        this.elements.push(this.element.cloneNode());
-    }
+    setTimeout(function() {
+        for (let instance = 1; instance < this.instances; ++instance) {
+            this.elements.push(this.element.cloneNode(false));
+        }
+    }.bind(this));
     this.onLoad(); // Browsers sometimes only load audio when it is played.
     this.updateElementSettings();
 };
@@ -438,27 +440,31 @@ AudioResource.prototype.play = function(onCompleteCallback) {
         onCompleteCallback();
         return null;
     }
+    // Find an Audio instance to play the sound.
+    let element = null;
     for (let index = 0; index < this.elements.length; ++index) {
-        const element = this.elements[index];
-        if (isAudioElementPlaying(element))
-            continue;
-
-        element.onended = onCompleteCallback;
-        const playPromise = element.play();
-
-        // The audio can sometimes be stopped from playing randomly.
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                element.play().catch((error2) => {
-                    console.error("Unable to play sound " + this.name + " : " + error2);
-                    onCompleteCallback();
-                });
-            });
+        if (!isAudioElementPlaying(this.elements[index])) {
+            element = this.elements[index];
         }
-        return element;
     }
-    onCompleteCallback();
-    return null;
+    // If there are no available Audio elements to play the sound.
+    if (element === null) {
+        onCompleteCallback();
+        return null;
+    }
+    // Play the sound!
+    element.onended = onCompleteCallback;
+    const playPromise = element.play();
+    // The audio can sometimes be stopped from playing randomly.
+    if (playPromise !== undefined) {
+        playPromise.catch(() => { setTimeout(() => {
+            element.play().catch((error2) => {
+                console.error("Unable to play sound " + this.name + " : " + error2);
+                onCompleteCallback();
+            });
+        })});
+    }
+    return element;
 };
 AudioResource.prototype.hasMeaningfulLoadStats = () => false;
 
