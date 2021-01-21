@@ -20,7 +20,7 @@ from datetime import datetime
 
 def getmtime(filename):
     try:
-        return math.ceil(os.path.getmtime(filename))
+        return math.floor(os.path.getmtime(filename))
     except FileNotFoundError:
         return -1
 
@@ -250,7 +250,7 @@ class Image:
             scaled_file = append_size_class(output_file, size_class)
             scaled_file_png = scaled_file + ".png"
             scaled_file_webp = scaled_file + ".webp"
-            if mtime <= getmtime(scaled_file_png) and mtime <= getmtime(scaled_file_webp):
+            if mtime == getmtime(scaled_file_png) and mtime == getmtime(scaled_file_webp):
                 continue
 
             # Save the scaled copies.
@@ -275,7 +275,7 @@ class Sprite:
                 raise Exception("Images have inconsistent sets of size classes")
 
     def get_mod_time(self):
-        return min(getmtime(image.from_rel) for image in self.images)
+        return max([getmtime(image.from_rel) for image in self.images])
 
     def get_size_classes(self):
         return set().union(*(image.sizes.keys() for image in self.images))
@@ -299,7 +299,7 @@ class Sprite:
             scaled_file = append_size_class(output_file, size_class)
             scaled_file_png = scaled_file + ".png"
             scaled_file_webp = scaled_file + ".webp"
-            if mtime <= getmtime(scaled_file_png) and mtime <= getmtime(scaled_file_webp):
+            if mtime == getmtime(scaled_file_png) and mtime == getmtime(scaled_file_webp):
                 continue
 
             # Generate the sprite image.
