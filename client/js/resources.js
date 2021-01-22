@@ -406,6 +406,8 @@ function AudioResource(name, url, options) {
     this.__class_name__ = "AudioResource";
     this.volume = getOrDefault(options, "volume", 1);
     this.instances = getOrDefault(options, "instances", 1);
+    this.errors = [];
+    this.lastErrorTime = LONG_TIME_AGO;
 }
 setSuperClass(AudioResource, Resource);
 AudioResource.prototype._load = function() {
@@ -436,7 +438,10 @@ AudioResource.prototype.updateElementSettings = function() {
 };
 AudioResource.prototype.play = function(onCompleteCallback) {
     onCompleteCallback = (onCompleteCallback ? onCompleteCallback : ()=>{});
-    if (!this.loaded) {
+
+    // If we've received two errors trying to play this sound, stop trying for a minute.
+    const errored = (this.errors.length >= 2 && getTime() - this.lastErrorTime < 60);
+    if (!this.loaded || errored || isAudioErrored()) {
         onCompleteCallback();
         return null;
     }
@@ -457,12 +462,18 @@ AudioResource.prototype.play = function(onCompleteCallback) {
     const playPromise = element.play();
     // The audio can sometimes be stopped from playing randomly.
     if (playPromise !== undefined) {
-        playPromise.catch(() => { setTimeout(() => {
-            element.play().catch((error2) => {
-                console.error("Unable to play sound " + this.name + " : " + error2);
-                onCompleteCallback();
-            });
-        })});
+        playPromise.then(function() {
+            this.errors.length = 0;
+            audioSettings.errors.length = 0;
+        }.bind(this)).catch(function(error) {
+            console.error("Unable to play sound " + this.name + " : " + error);
+            this.errors.push(error);
+            this.lastErrorTime = getTime();
+            audioSettings.errors.push(error);
+            audioSettings.lastErrorTime = getTime();
+            onCompleteCallback();
+        }.bind(this));
+
     }
     return element;
 };
@@ -475,8 +486,14 @@ AudioResource.prototype.hasMeaningfulLoadStats = () => false;
 
 const audioSettings = {
     muted: false,
-    volume: 0.5
+    volume: 0.5,
+    errors: [],
+    lastErrorTime: LONG_TIME_AGO
 };
+
+function isAudioErrored() {
+    return audioSettings.errors.length >= 5 && getTime() - audioSettings.lastErrorTime < 60;
+}
 
 function setAudioMuted(soundMuted) {
     audioSettings.muted = soundMuted;
