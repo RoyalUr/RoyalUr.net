@@ -47,6 +47,10 @@ const boardCanvas = document.getElementById("board"),
 const tilesCanvas = document.getElementById("tiles"),
       tilesCtx = tilesCanvas.getContext("2d");
 
+const winDiv = document.getElementById("win"),
+      winMessageDiv = document.getElementById("winner-message"),
+      winBackButton = document.getElementById("win-back-button");
+
 const networkStatusElement = document.getElementById("network-status");
 
 const messageContainerElement = document.getElementById("message-container"),
@@ -59,7 +63,6 @@ const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
 
 const creditsDiv = document.getElementById("credits");
-
 const learnBackButton = document.getElementById("learn-back-button");
 
 const dynamicImagesByClass = {
@@ -94,6 +97,7 @@ function setupMenuElements() {
     learnControlButton.addEventListener("click", onLearnControlClick);
     exitControlButton.addEventListener("click", onExitClick);
     learnBackButton.addEventListener("click", onExitClick);
+    winBackButton.addEventListener("click", onExitClick);
 
     messageContainerElement.addEventListener("click", tryDismissMessage);
 

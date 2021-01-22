@@ -45,7 +45,7 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuOuterDiv, playSelectDiv, difficultyDiv, learnDiv,
+            menuOuterDiv, playSelectDiv, difficultyDiv, learnDiv, winDiv,
             boardCanvas, tilesCanvas, diceCanvas, creditsDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
@@ -1073,6 +1073,8 @@ const nextFireworkTimes = []; {
 }
 
 function redrawWinScreen(forceRedraw) {
+    winDiv.style.opacity = screenState.winFade.get();
+
     if (isOnScreen(SCREEN_WIN)) {
         spawnWinFireworks();
     }

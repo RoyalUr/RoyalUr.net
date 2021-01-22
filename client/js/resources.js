@@ -641,8 +641,8 @@ const stagedResources = [
         new AudioResource("dice_click", "res/audio_dice_click.[ver].mp4", {instances: 5, volume: 0.5}),
         new AudioResource("dice_hit", "res/audio_dice_hit.[ver].mp4", {instances: 4, volume: 0.3}),
         new AudioResource("dice_select", "res/audio_dice_select.[ver].mp4", {instances: 4, volume: 0.5}),
-        new AudioResource("firework_rocket", "res/audio_firework_rocket.[ver].mp4", {instances: 4, volume: 0.05}),
-        new AudioResource("firework_explode", "res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.5}),
+        new AudioResource("firework_rocket", "res/audio_firework_rocket.[ver].mp4", {instances: 4, volume: 0.03}),
+        new AudioResource("firework_explode", "res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.3}),
     ],
     [ // Learn Screen
     ]

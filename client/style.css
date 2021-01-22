@@ -412,7 +412,7 @@ img {
     top: 0;
     width: 100%;
     height: 100%;
-    z-index: 20;
+    z-index: 9;
 
     pointer-events: none;
 }
@@ -551,25 +551,58 @@ svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
     margin-top: 0.15vh;
 }
 #learn-content .inline-sub-text { display: inline; }
-#learn-back-button {
+.text-button {
     display: inline;
     border: 3px solid white;
     border-radius: 1vh;
     padding: 0.5vh 2vh;
+    margin-bottom: 3vh;
 
     font-family: Nunito,sans-serif;
-    font-size: 4vh;
+    font-size: 5vh;
     color: white;
     cursor: pointer;
 
-    opacity: 0.75;
-    transition: opacity 0.1s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.8);
+    transition: background-color 0.1s ease-in-out;
 }
-#learn-back-button:hover {
-    opacity: 1;
-    transition: opacity 0.1s ease-in-out;
+.text-button:hover {
+    background-color: rgba(0, 0, 0, 1);
+    transition: background-color 0.1s ease-in-out;
 }
+#learn-back-button { background-color: rgba(0, 0, 0, 0.4); }
+#learn-back-button:hover { background-color: rgba(0, 0, 0, 0.8); }
 .centre-text {
     display: block;
     text-align: center;
+}
+
+
+
+/*
+ * WIN SCREEN
+ */
+#win {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.4);
+}
+#winner-message {
+    display: block;
+    width: 100%;
+    font-family: Nunito, sans-serif;
+    font-weight: 600;
+    text-shadow: 0 0 20px rgb(0, 0, 0);
+    color: white;
+    text-align: center;
+    font-size: 12vh;
+    margin-bottom: 5vh;
 }

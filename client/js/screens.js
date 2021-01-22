@@ -34,6 +34,7 @@ const screenState = {
     boardFade: new Fade(0.5),
     connectionFade: new Fade(2, 0.5),
     creditsFade: new Fade(0.25),
+    winFade: new Fade(0.5),
 
     discordControlFade: new Fade(controlFadeDuration),
     githubControlFade: new Fade(controlFadeDuration),
@@ -314,13 +315,11 @@ function onExitGameScreen(hasty) {
 }
 
 function onEnterWinScreen(hasty) {
-    const fade = new Fade(0.25, -1);
-    fade.fadeOut = () => {};
-    fade.fadeIn();
-    setMessageAndFade(getActivePlayer().name + " wins!", "", fade);
+    winMessageDiv.textContent = getActivePlayer().name + " wins!";
+    screenState.winFade.fadeIn();
 }
 function onExitWinScreen(hasty) {
-    setMessage(message.title, message.subtitle, 0, 0, DEFAULT_MESSAGE_FADE_OUT_TIME);
+    screenState.winFade.fadeOut();
 }
 
 function onEnterServerScreen(hasty) {}
