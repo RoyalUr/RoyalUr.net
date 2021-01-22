@@ -18,11 +18,20 @@ from datetime import datetime
 # Utility Functions
 #
 
-def getmtime(filename):
+def getmtime(files):
+    # If files is a list of files, get the maximum modification time of all the files.
+    if isinstance(files, list):
+        return max([getmtime(file) for file in files])
+
+    # Otherwise, get the modification time of the single file.
     try:
-        return math.floor(os.path.getmtime(filename))
+        return math.floor(os.path.getmtime(files))
     except FileNotFoundError:
         return -1
+
+
+def setmtime(file, mtime):
+    os.utime(file, (time.time(), mtime))
 
 
 def get_incomplete_file_mtime(file):
@@ -30,21 +39,8 @@ def get_incomplete_file_mtime(file):
     potentials = [file, file + ".png", file + ".webp"]
     for potential_file in potentials:
         if os.path.exists(potential_file):
-            return os.path.getmtime(potential_file)
+            return getmtime(potential_file)
     raise Exception("Could not find version of file {}".format(file))
-
-
-def set_mtime(file, mtime):
-    os.utime(file, (time.time(), mtime))
-
-
-def update_mtime(file, source_files):
-    if not isinstance(source_files, list):
-        raise Exception("Expected list of source files")
-    latest_mtime = -1
-    for source_file in source_files:
-        latest_mtime = max(latest_mtime, getmtime(source_file))
-    set_mtime(file, latest_mtime)
 
 
 def append_size_class(path, size_class):
@@ -69,6 +65,7 @@ def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
         output_file = commands[-1]
         commands = commands[:-1]
 
+    processes = []
     last_process = None
     for index in range(len(commands)):
         command = " ".join([shlex.quote(arg) for arg in commands[index]])
@@ -78,7 +75,8 @@ def execute_piped_commands(*commands, prefix="", output_prefix=" -- "):
         print(prefix + (" | " if index > 0 else "") + command)
         previous_output = (None if last_process is None else last_process.stdout)
         last_process = subprocess.Popen(
-            command, stdin=previous_output, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                command, stdin=previous_output, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        processes.append(last_process)
 
     try:
         stdout, stderr = last_process.communicate()
@@ -256,10 +254,10 @@ class Image:
             # Save the scaled copies.
             scaled_image = self.get_scaled(size)
             scaled_image.save(scaled_file_png)
-            update_mtime(scaled_file_png, [self.from_rel])
+            setmtime(scaled_file_png, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_png))
             scaled_image.save(scaled_file_webp)
-            update_mtime(scaled_file_webp, [self.from_rel])
+            setmtime(scaled_file_webp, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_webp))
 
 
@@ -275,7 +273,7 @@ class Sprite:
                 raise Exception("Images have inconsistent sets of size classes")
 
     def get_mod_time(self):
-        return max([getmtime(image.from_rel) for image in self.images])
+        return getmtime([image.from_rel for image in self.images])
 
     def get_size_classes(self):
         return set().union(*(image.sizes.keys() for image in self.images))
@@ -305,10 +303,10 @@ class Sprite:
             # Generate the sprite image.
             sprite_image = self.generate_sprite_image(size_class, total_width, max_height)
             sprite_image.save(scaled_file_png)
-            update_mtime(scaled_file_png, self.image_from_rels)
+            setmtime(scaled_file_png, getmtime(self.image_from_rels))
             print("{}created {}".format(prefix, scaled_file_png))
             sprite_image.save(scaled_file_webp)
-            update_mtime(scaled_file_webp, self.image_from_rels)
+            setmtime(scaled_file_webp, getmtime(self.image_from_rels))
             print("{}created {}".format(prefix, scaled_file_webp))
 
         return sprite_annotations
@@ -366,7 +364,7 @@ class Annotations:
     def write(self, file):
         with open(file, 'w') as f:
             json.dump(self.annotations, f, separators=(',', ':'))
-        update_mtime(file, self.source_files)
+        setmtime(file, getmtime(self.source_files))
 
 
 def clean(target_folder, comp_spec, *, prefix=""):
@@ -398,39 +396,35 @@ def copy_html(target_folder, comp_spec, *, prefix=""):
     """
     for from_path, to_rel in comp_spec.html_files.items():
         to_path = os.path.join(target_folder, to_rel)
+        source_mtime = getmtime(from_path)
+        # Skip this file if it hasn't changed.
+        if source_mtime == getmtime(to_path):
+            continue
+
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
         shutil.copyfile(from_path, to_path)
-        update_mtime(to_path, [from_path])
+        setmtime(to_path, source_mtime)
         print("{}copied {}".format(prefix, to_rel))
 
 
-def combine_js(target_folder, comp_spec, *, prefix=""):
+def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
     """
-    Concatenate all javascript into a single source file.
-    """
-    for to_rel, file_list in comp_spec.js_files.items():
-        output_file = os.path.join(target_folder, to_rel)
-        assert execute_piped_commands(
-            ["npx", "babel", "--presets=@babel/env"] + file_list,
-            output_file,
-            prefix=prefix
-        )
-        update_mtime(output_file, file_list)
-
-
-def combine_minify_js(target_folder, comp_spec, *, prefix=""):
-    """
-    Concatenate all javascript into a single source file, and minify it.
+    Concatenate all javascript into a single source file, and optionally minify it.
     """
     for to_rel, file_list in comp_spec.js_files.items():
         output_file = os.path.join(target_folder, to_rel)
-        assert execute_piped_commands(
-            ["npx", "babel", "--presets=@babel/env"] + file_list,
-            ["uglifyjs", "--compress", "--mangle"],
-            output_file,
-            prefix=prefix
-        )
-        update_mtime(output_file, file_list)
+        source_mtime = getmtime(file_list)
+        # Skip this output if none of its sources have changed.
+        if source_mtime == getmtime(output_file):
+            continue
+
+        commands = [["npx", "babel", "--presets=@babel/env"] + file_list]
+        if (minify):
+            commands.append(["uglifyjs", "--compress", "--mangle"])
+        commands.append(output_file)
+
+        assert execute_piped_commands(*commands, prefix=prefix)
+        setmtime(output_file, source_mtime)
 
 
 def minify_css(target_folder, comp_spec, *, prefix=""):
@@ -438,12 +432,17 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
     Minify the CSS of the website.
     """
     output_file = os.path.join(target_folder, comp_spec.css_dest)
+    source_mtime = getmtime(comp_spec.css_source)
+    # Skip minifying the CSS if it hasn't changed.
+    if source_mtime == getmtime(output_file):
+        return
+
     assert execute_piped_commands(
         ["npx", "uglifycss", comp_spec.css_source],
         output_file,
         prefix=prefix
     )
-    update_mtime(output_file, [comp_spec.css_source])
+    setmtime(output_file, source_mtime)
 
 
 def create_sprites(target_folder, comp_spec, annotations, *, prefix=""):
@@ -467,7 +466,7 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
 
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
         shutil.copyfile(from_path, to_path)
-        update_mtime(to_path, [from_path])
+        setmtime(to_path, getmtime(from_path))
         print("{}copied {}".format(prefix, to_rel))
 
     # Copy and scale images.
@@ -495,6 +494,57 @@ def combine_annotations(target_folder, comp_spec, annotations, *, prefix=""):
     annotations.write(os.path.join(target_folder, "res/annotations.json"))
 
 
+def filter_file(target_folder, file, *, prefix="", skip_versions=False):
+    """
+    Filters through all HTML, CSS, and JS files and replaces [ver] patterns in file paths.
+    :return: The filtered content of the file, and its calculated modification time.
+    """
+    # We want the modification times when skipping versions
+    # to be different than when including versions.
+    source_mtime = getmtime(file) + (0 if skip_versions else 1)
+    with open(file, 'r') as f:
+        original_content = f.read()
+
+    # Filter out all [ver]'s in the file.
+    last_index = 0
+    filtered = ""
+    changed = False
+    while True:
+        # Search for the next [ver] to replace.
+        try:
+            current_index = original_content.index(".[ver]", last_index)
+            changed = True
+        except ValueError:
+            # If there are no more [ver]'s to replace, break out from the loop.
+            filtered += original_content[last_index:]
+            break
+
+        # Add the content up to the [ver] tag.
+        filtered += original_content[last_index:current_index]
+        last_index = current_index + len(".[ver]")
+
+        # Find the filename that the [ver] is embedded in.
+        try:
+            string_start = original_content.rindex("\"", 0, current_index)
+            string_end = original_content.index("\"", last_index)
+        except ValueError:
+            raise Exception("Found [ver] outside of string in file {}".format(file_path))
+
+        ver_target_file = original_content[string_start + 1:string_end].replace(".[ver]", "")
+        if ver_target_file.startswith("https://royalur.net/"):
+            ver_target_file = ver_target_file[len("https://royalur.net/"):]
+
+        # Find the modification time of the resource that we are versioning.
+        version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
+
+        # In dev builds we don't add the versions to the URLs.
+        if not skip_versions:
+            filtered += ".v{}".format(int(version_mtime))
+            source_mtime = max(source_mtime, version_mtime)
+
+    return source_mtime, filtered, changed
+
+
 def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=False):
     """
     Filters through all HTML, CSS, and JS files and replaces [ver]
@@ -508,48 +558,17 @@ def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=Fals
         *comp_spec.html_files.values()
     ]
     for file_rel in files_to_filter:
-        # Read the original file.
+        # Read and filter the file.
         file_path = os.path.join(target_folder, file_rel)
-        file_mtime = getmtime(file_path)
-        with open(file_path, 'r') as file:
-            original_content = file.read()
+        file_mtime, filtered, changed = filter_file(
+                target_folder, file_path, prefix=prefix, skip_versions=skip_versions)
 
-        # Filter out all [ver]'s in the file.
-        last_index = 0
-        filtered = ""
-        while True:
-            try:
-                current_index = original_content.index(".[ver]", last_index)
-            except ValueError:
-                filtered += original_content[last_index:]
-                break
-
-            filtered += original_content[last_index:current_index]
-            last_index = current_index + len(".[ver]")
-
-            try:
-                string_start = original_content.rindex("\"", 0, current_index)
-                string_end = original_content.index("\"", last_index)
-            except ValueError:
-                raise Exception("Found [ver] outside of string in file {}".format(file_path))
-
-            ver_target_file = original_content[string_start + 1:string_end].replace(".[ver]", "")
-            if ver_target_file.startswith("https://royalur.net/"):
-                ver_target_file = ver_target_file[len("https://royalur.net/"):]
-
-            file = os.path.join(target_folder, file_rel)
-            version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
-            file_mtime = max(file_mtime, version_mtime)
-
-            # We still find the version even if skip_versions is True,
-            # just to make sure that everything works.
-            if not skip_versions:
-                filtered += ".v{}".format(int(version_mtime))
-
-        # Write out the filtered file.
-        with open(file_path, 'w') as file:
-            file.write(filtered)
-        set_mtime(file_path, file_mtime)
+        # Write the new filtered file.
+        if changed:
+            with open(file_path, 'w') as file:
+                file.write(filtered)
+            setmtime(file_path, file_mtime)
+            print(prefix + "filtered " + file_path)
 
 
 def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
@@ -600,7 +619,7 @@ def create_release_build(target_folder):
     copy_html(target_folder, comp_spec, prefix=" .. ")
 
     print("\n4. Combine & Minify Javascript")
-    combine_minify_js(target_folder, comp_spec, prefix=" .. ")
+    combine_js(target_folder, comp_spec, prefix=" .. ", minify=True)
 
     print("\n5. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
@@ -656,34 +675,6 @@ def create_dev_build(target_folder):
     print("\nDone!\n")
 
 
-def create_nojs_build(target_folder):
-    print("\nCompiling Development NoJS Build")
-    comp_spec = CompilationSpec.read("compilation.json")
-
-    print("\n1. Create a Sitemap")
-    create_sitemap(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n2. Copy HTML")
-    copy_html(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n3. Minify CSS")
-    minify_css(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n4. Copy Resource Files")
-    copy_resource_files(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n5. Create Sprites")
-    annotations = Annotations()
-    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
-
-    print("\n6. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
-
-    print("\n7. Remove File Version Tags from Filenames")
-    add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
-
-    print("\nDone!\n")
-
 
 #
 # Run the Compilation
@@ -711,8 +702,6 @@ if __name__ == "__main__":
         create_release_build("compiled")
     elif mode == "dev":
         create_dev_build("compiled")
-    elif mode == "nojs":
-        create_nojs_build("compiled")
     else:
         if mode != "":
             print("Invalid compilation mode", mode)

@@ -4,29 +4,8 @@
 
 const LONG_TIME_AGO = -1000;
 
-function shuffle(array) {
-    let currentIndex = array.length, temporaryValue, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-}
-
 function unimplemented(name) {
-    return function() {
-        error(name + " is not implemented within " + this.__class_name__);
-    };
+    return () => { error(name + " is not implemented within " + this.__class_name__); };
 }
 
 function getOrDefault(dict, key, defaultValue) {
@@ -88,9 +67,7 @@ if (!Array.prototype.includes) {
 //
 
 function error(cause) {
-    const error = "[ERROR] " + cause;
-    console.error(error);
-    throw error;
+    throw "[ERROR] " + cause;
 }
 
 function assert(predicate, message) {
@@ -110,7 +87,6 @@ function rgb(r, g, b) {
         g = r;
         b = r;
     }
-
     return "rgb(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ")";
 }
 
@@ -120,9 +96,7 @@ function rgba(r, g, b, a) {
         g = r;
         b = r;
     }
-
     a = (a === undefined ? 1 : a);
-
     return "rgba(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ", " + a + ")";
 }
 
@@ -152,19 +126,6 @@ function drawCircularShadow(ctx, x, y, radius, r, g, b) {
     ctx.fill();
 
     ctx.restore();
-}
-
-function fillCircle(ctx, x, y, radius) {
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fill();
-}
-
-function drawLine(ctx, x1, y1, x2, y2) {
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
 }
 
 function convertHSVtoRGB(h, s, v) {
@@ -235,26 +196,6 @@ function randBool() {
     return rand() < 0.5;
 }
 
-function signum(num) {
-    return (num < 0 ? -1 : (num > 0 ? 1 : 0));
-}
-
-function abs(num) {
-    return (num < 0 ? -num : num);
-}
-
-function square(num) {
-    return num * num;
-}
-
-function ascending(num1, num2) {
-    return num1 - num2;
-}
-
-function descending(num1, num2) {
-    return num2 - num1;
-}
-
 function easeInOutSine(value) {
     return (1 - Math.cos(value * Math.PI)) / 2;
 }
@@ -265,39 +206,6 @@ function easeOutSine(value) {
 
 function easeInSine(value) {
     return 1 - easeOutSine(1 - value);
-}
-
-function isWithin(x, y, left, top, width, height) {
-    return x >= left && y >= top && x <= left + width && y <= top + height;
-}
-
-function formatNumber(num, totalLength, decimalPlaces) {
-    if(decimalPlaces === undefined) decimalPlaces = 0;
-
-    let string = num.toString(),
-        dotIndex = string.indexOf('.');
-
-    if(decimalPlaces === 0) {
-        if(dotIndex !== -1) string = string.substring(0, dotIndex);
-    } else {
-        if(dotIndex === -1) {
-            dotIndex = string.length;
-            string += '.';
-        }
-
-        let decimals = string.length - dotIndex - 1,
-            expectedLength = string.length + decimalPlaces - decimals;
-
-        if(expectedLength < string.length) {
-            string = string.substring(0, expectedLength);
-        } else {
-            while(string.length < expectedLength) {
-                string += '0';
-            }
-        }
-    }
-
-    return pad(string, totalLength);
 }
 
 /** Allows the controlling of animations based on linearly interpolating between 0 and 1. **/
