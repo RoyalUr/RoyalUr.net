@@ -134,15 +134,6 @@ class CompilationSpec:
                     raise Exception("Unknown size group {} for image {}".format(image.size_group, from_rel))
                 image.sizes = self.image_size_groups[image.size_group]
 
-        self.sprites = {}
-        for to_rel, input_images in spec_json["sprites"].items():
-            images = []
-            for image_from_rel in input_images:
-                if image_from_rel not in self.images:
-                    raise Exception("Unknown image {} for sprite {}".format(image_from_rel, to_rel))
-                images.append(self.images[image_from_rel])
-            self.sprites[to_rel] = Sprite(to_rel, images)
-
     @staticmethod
     def read(file):
         with open(file, 'r') as f:
@@ -261,84 +252,6 @@ class Image:
             print("{}created {}".format(prefix, scaled_file_webp))
 
 
-class Sprite:
-    def __init__(self, to_rel, images):
-        self.to_rel = to_rel
-        self.images = images
-        self.image_from_rels = []
-        size_classes = self.get_size_classes()
-        for image in images:
-            self.image_from_rels.append(image.from_rel)
-            if image.sizes.keys() != size_classes:
-                raise Exception("Images have inconsistent sets of size classes")
-
-    def get_mod_time(self):
-        return getmtime([image.from_rel for image in self.images])
-
-    def get_size_classes(self):
-        return set().union(*(image.sizes.keys() for image in self.images))
-
-    def save_sprite_copies(self, target_folder, *, prefix=""):
-        mtime = self.get_mod_time()
-
-        # Make sure the directory to create the sprites in exists.
-        output_file = os.path.join(target_folder, self.to_rel)
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-
-        # Create the scaled sprites.
-        sprite_annotations = {}
-        for size_class in self.get_size_classes():
-            # Generate the sprite's annotations.
-            to_rel = append_size_class(self.to_rel, size_class)
-            annotations, total_width, max_height = self.generate_sprite_annotations(size_class)
-            sprite_annotations[to_rel] = annotations
-
-            # Determine whether we need to generate the sprite image itself.
-            scaled_file = append_size_class(output_file, size_class)
-            scaled_file_png = scaled_file + ".png"
-            scaled_file_webp = scaled_file + ".webp"
-            if mtime == getmtime(scaled_file_png) and mtime == getmtime(scaled_file_webp):
-                continue
-
-            # Generate the sprite image.
-            sprite_image = self.generate_sprite_image(size_class, total_width, max_height)
-            sprite_image.save(scaled_file_png)
-            setmtime(scaled_file_png, getmtime(self.image_from_rels))
-            print("{}created {}".format(prefix, scaled_file_png))
-            sprite_image.save(scaled_file_webp)
-            setmtime(scaled_file_webp, getmtime(self.image_from_rels))
-            print("{}created {}".format(prefix, scaled_file_webp))
-
-        return sprite_annotations
-
-    def generate_sprite_annotations(self, size_class):
-        annotations = {}
-        total_width = 0
-        max_height = 0
-        for image in self.images:
-            size = image.sizes[size_class]
-            width = size.calc_width(*image.get_original().size)
-            height = size.calc_height(*image.get_original().size)
-            annotations[image.from_rel] = {
-                "width": width,
-                "height": height,
-                "x_offset": total_width,
-                "y_offset": 0
-            }
-            total_width += width
-            max_height = max(max_height, height)
-
-        return annotations, total_width, max_height
-
-    def generate_sprite_image(self, size_class, total_width, max_height):
-        sprite_image = PILImage.new('RGBA', (total_width, max_height))
-        x_offset = 0
-        for image in self.images:
-            scaled_image = image.get_scaled(image.sizes[size_class])
-            sprite_image.paste(scaled_image, (x_offset, 0))
-            x_offset += scaled_image.size[0]
-        return sprite_image
-
 
 #
 # Perform Compilation
@@ -445,15 +358,6 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
     setmtime(output_file, source_mtime)
 
 
-def create_sprites(target_folder, comp_spec, annotations, *, prefix=""):
-    """
-    Concatenate groups of images into a single image.
-    """
-    for sprite in comp_spec.sprites.values():
-        sprite_annotations = sprite.save_sprite_copies(target_folder, prefix=prefix)
-        annotations.add("sprites", sprite_annotations, os.path.join(target_folder, sprite.to_rel))
-
-
 def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     """
     Copy all the resource files for the page into the target folder.
@@ -485,10 +389,11 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
             favicon_scaled.save(favicon_path.format(""), sizes=[(size, size) for size in target_sizes])
 
 
-def combine_annotations(target_folder, comp_spec, annotations, *, prefix=""):
+def combine_annotations(target_folder, comp_spec, *, prefix=""):
     """
     Combine all resource annotations into their own file.
     """
+    annotations = Annotations()
     for key, file in comp_spec.annotation_files.items():
         annotations.read(key, file)
     annotations.write(os.path.join(target_folder, "res/annotations.json"))
@@ -627,17 +532,13 @@ def create_release_build(target_folder):
     print("\n6. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n7. Create Sprites")
-    annotations = Annotations()
-    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
+    print("\n7. Create Annotations File")
+    combine_annotations(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n8. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
-
-    print("\n9. Add Dynamic File Versions")
+    print("\n8. Add Dynamic File Versions")
     add_file_versions(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n10. Zip Development Resources Folder")
+    print("\n9. Zip Development Resources Folder")
     zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
 
     print("\nDone!\n")
@@ -662,14 +563,10 @@ def create_dev_build(target_folder):
     print("\n5. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n6. Create Sprites")
-    annotations = Annotations()
-    create_sprites(target_folder, comp_spec, annotations, prefix=" .. ")
+    print("\n6. Create Annotations File")
+    combine_annotations(target_folder, comp_spec, prefix=" .. ")
 
-    print("\n7. Create Annotations File")
-    combine_annotations(target_folder, comp_spec, annotations, prefix=" .. ")
-
-    print("\n8. Remove File Version Tags from Filenames")
+    print("\n7. Remove File Version Tags from Filenames")
     add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
 
     print("\nDone!\n")

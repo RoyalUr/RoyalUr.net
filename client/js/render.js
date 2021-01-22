@@ -93,14 +93,19 @@ function redrawButton(name, canvas, ctx, imageKey, forceRedraw) {
     const last = lastButtonImages[name];
     if (!forceRedraw && last && last.key === imageKey && last.w === canvas.width && last.h === canvas.height)
         return;
+
+    // We do need to repaint.
+    const imageResource = findImageResource(imageKey);
+    if (!imageResource)
+        throw "Could not find button image resource " + imageKey;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const image = imageResource.getScaledImage(canvas.width);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     lastButtonImages[name] = {
         key: imageKey, w: canvas.width, h: canvas.height
     };
-
-    // We do need to repaint.
-    const image = getImageResource(imageKey, canvas.width);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 }
 
 function redrawMenu(forceRedraw) {
@@ -958,11 +963,11 @@ function getDiceImageFromValue(diceValue, width) {
         case 1:
         case 2:
         case 3:
-            return getImageResource("diceUp" + diceValue, width);
+            return getImageResource("dice_up" + diceValue, width);
         case 4:
         case 5:
         case 6:
-            return getImageResource("diceDown" + (diceValue - 3), width);
+            return getImageResource("dice_down" + (diceValue - 3), width);
         default:
             return null;
     }
@@ -971,7 +976,7 @@ function getDiceImageFromValue(diceValue, width) {
 function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
     ctx.save();
 
-    const shadow = getImageResource((lightShadow ? "diceLightShadow" : "diceDarkShadow"), width);
+    const shadow = getImageResource((lightShadow ? "dice_light_shadow" : "dice_dark_shadow"), width);
     ctx.drawImage(shadow, centreLeft - width / 2, centreTop - width / 2, width, width);
     ctx.drawImage(diceImage, centreLeft - width / 2, centreTop - width / 2, width, width);
 

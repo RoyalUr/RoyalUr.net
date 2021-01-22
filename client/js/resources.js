@@ -359,47 +359,6 @@ GeneratedImageResource.prototype._load = () => {};
 GeneratedImageResource.prototype.hasMeaningfulLoadStats = () => false;
 
 
-/** An image that gets split up into multiple smaller images. **/
-function SpriteResource(url, childrenIds) {
-    ImageResource.call(this, url, url);
-    this.__class_name__ = "SpriteResource";
-    this.childrenIds = childrenIds;
-}
-setSuperClass(SpriteResource, ImageResource);
-SpriteResource.prototype._onImageLoad = function() {
-    annotationsResource.runOnLoad(function() {
-        const annotations_id = completeURL(removeURLVersion(this.url), ""),
-              annotations = annotationsResource.get("sprites")[annotations_id];
-
-        if (!annotations) {
-            this.onError("[FATAL] Could not find sprite annotations for sprite " + this.url
-                + " (id " + annotations_id + ")");
-            return;
-        }
-
-        for (let childURL in this.childrenIds) {
-            if (!this.childrenIds.hasOwnProperty(childURL))
-                continue;
-
-            const childAnnotations = annotations[childURL];
-            if (!childAnnotations) {
-                this.onError("[FATAL] Could not find annotations for image " + childURL + " in sprite " + this.url);
-                return;
-            }
-
-            const childImage = renderResource(childAnnotations["width"], childAnnotations["height"], function(ctx) {
-                ctx.drawImage(this.image, -childAnnotations["x_offset"], -childAnnotations["y_offset"]);
-            }.bind(this));
-
-            const childImageResource = new GeneratedImageResource(this.childrenIds[childURL], childURL, childImage);
-            imageResourcesFromSprites.push(childImageResource);
-            updateAllResourcesArray();
-        }
-        this.onLoad();
-    }.bind(this));
-};
-
-
 /** Sounds to be played. **/
 function AudioResource(name, url, options) {
     Resource.call(this, name, url);
@@ -560,6 +519,8 @@ function getImageResource(key, width) {
     const imageResource = findImageResource(key);
     if(!imageResource)
         throw "Missing image resource " + key;
+    if(!imageResource.loaded)
+        throw "Image resource " + key + " is not yet loaded!";
     if (!width)
         return imageResource.image;
     return imageResource.getScaledImage(width);
@@ -595,38 +556,31 @@ const annotationsResource = new AnnotationsResource("annotations", "res/annotati
 const stagedResources = [
     [ // Menu
         new ImageResource("logo_with_shadow", "res/logo_with_shadow.[ver]"),
+        new ImageResource("play", "res/button_play.[ver]"),
+        new ImageResource("play_active", "res/button_play_active.[ver]"),
+        new ImageResource("learn", "res/button_learn.[ver]"),
+        new ImageResource("learn_active", "res/button_learn_active.[ver]"),
+        new ImageResource("watch", "res/button_watch.[ver]"),
+        new ImageResource("watch_active", "res/button_watch_active.[ver]"),
         new ImageResource("tile_dark", "res/tile_dark.[ver]"),
         new ImageResource("play_local", "res/button_play_local.[ver]"),
         new ImageResource("play_online", "res/button_play_online.[ver]"),
         new ImageResource("play_computer", "res/button_play_computer.[ver]"),
-        new SpriteResource("res/play_button.[ver]", {
-            "res/buttons/play.png": "play",
-            "res/buttons/play_active.png": "play_active"
-        }),
-        new SpriteResource("res/learn_button.[ver]", {
-            "res/buttons/learn.png": "learn",
-            "res/buttons/learn_active.png": "learn_active"
-        }),
-        new SpriteResource("res/watch_button.[ver]", {
-            "res/buttons/watch.png": "watch",
-            "res/buttons/watch_active.png": "watch_active"
-        }),
         new PreloadImageResource("join_the_discord", "res/join_the_discord.svg"),
         new PreloadImageResource("star_on_github", "res/star_on_github.svg")
     ],
     [ // Game
         new ImageResource("board", "res/board.[ver]"),
         new ImageResource("tile_light", "res/tile_light.[ver]"),
-        new SpriteResource("res/dice.[ver]", {
-            "res/dice/up1.png": "diceUp1",
-            "res/dice/up2.png": "diceUp2",
-            "res/dice/up3.png": "diceUp3",
-            "res/dice/down1.png": "diceDown1",
-            "res/dice/down2.png": "diceDown2",
-            "res/dice/down3.png": "diceDown3",
-            "res/dice/darkShadow.png": "diceDarkShadow",
-            "res/dice/lightShadow.png": "diceLightShadow"
-        }),
+        new ImageResource("dice_up1", "res/dice_up1.[ver]"),
+        new ImageResource("dice_up2", "res/dice_up2.[ver]"),
+        new ImageResource("dice_up3", "res/dice_up3.[ver]"),
+        new ImageResource("dice_down1", "res/dice_down1.[ver]"),
+        new ImageResource("dice_down2", "res/dice_down2.[ver]"),
+        new ImageResource("dice_down3", "res/dice_down3.[ver]"),
+        new ImageResource("dice_down1", "res/dice_down1.[ver]"),
+        new ImageResource("dice_dark_shadow", "res/dice_dark_shadow.[ver]"),
+        new ImageResource("dice_light_shadow", "res/dice_light_shadow.[ver]"),
         new AudioResource("game_found", "res/game_found.[ver].mp4", {volume: 0.3}),
         new AudioResource("place_1", "res/audio_place_1.[ver].mp4"),
         new AudioResource("place_2", "res/audio_place_2.[ver].mp4"),
@@ -647,14 +601,12 @@ const stagedResources = [
     [ // Learn Screen
     ]
 ];
-const imageResourcesFromSprites = [];
 const allResources = [];
 
 /** Should be called as the underlying arrays holding the resources are changed. **/
 function updateAllResourcesArray() {
     allResources.splice(0, allResources.length);
     allResources.push(annotationsResource);
-    allResources.push.apply(allResources, imageResourcesFromSprites);
     for (let index = 0; index < stagedResources.length; ++index) {
         allResources.push.apply(allResources, stagedResources[index]);
     }

@@ -163,46 +163,63 @@
       "size_group": "play-select-button"
     },
 
-    "res/buttons/play.png":         {"size_group": "menu-button"},
-    "res/buttons/play_active.png":  {"size_group": "menu-button"},
-    "res/buttons/learn.png":        {"size_group": "menu-button"},
-    "res/buttons/learn_active.png": {"size_group": "menu-button"},
-    "res/buttons/watch.png":        {"size_group": "menu-button"},
-    "res/buttons/watch_active.png": {"size_group": "menu-button"},
+    "res/buttons/play.png": {
+      "dest": "res/button_play",
+      "size_group": "menu-button"
+    },
+    "res/buttons/play_active.png":  {
+      "dest": "res/button_play_active",
+      "size_group": "menu-button"
+    },
+    "res/buttons/learn.png": {
+      "dest": "res/button_learn",
+      "size_group": "menu-button"
+    },
+    "res/buttons/learn_active.png": {
+      "dest": "res/button_learn_active",
+      "size_group": "menu-button"
+    },
+    "res/buttons/watch.png": {
+      "dest": "res/button_watch",
+      "size_group": "menu-button"
+    },
+    "res/buttons/watch_active.png": {
+      "dest": "res/button_watch_active",
+      "size_group": "menu-button"
+    },
 
-    "res/dice/up1.png": {"size_group":  "dice"},
-    "res/dice/up2.png": {"size_group":  "dice"},
-    "res/dice/up3.png": {"size_group":  "dice"},
-    "res/dice/down1.png": {"size_group":  "dice"},
-    "res/dice/down2.png": {"size_group":  "dice"},
-    "res/dice/down3.png": {"size_group":  "dice"},
-    "res/dice/darkShadow.png": {"size_group":  "dice"},
-    "res/dice/lightShadow.png": {"size_group":  "dice"}
-  },
-
-  "sprites": {
-    "res/play_button": [
-      "res/buttons/play.png",
-      "res/buttons/play_active.png"
-    ],
-    "res/learn_button": [
-      "res/buttons/learn.png",
-      "res/buttons/learn_active.png"
-    ],
-    "res/watch_button": [
-      "res/buttons/watch.png",
-      "res/buttons/watch_active.png"
-    ],
-    "res/dice": [
-      "res/dice/up1.png",
-      "res/dice/up2.png",
-      "res/dice/up3.png",
-      "res/dice/down1.png",
-      "res/dice/down2.png",
-      "res/dice/down3.png",
-      "res/dice/darkShadow.png",
-      "res/dice/lightShadow.png"
-    ]
+    "res/dice/up1.png": {
+      "dest": "res/dice_up1",
+      "size_group":  "dice"
+    },
+    "res/dice/up2.png": {
+      "dest": "res/dice_up2",
+      "size_group":  "dice"
+    },
+    "res/dice/up3.png": {
+      "dest": "res/dice_up3",
+      "size_group":  "dice"
+    },
+    "res/dice/down1.png": {
+      "dest": "res/dice_down1",
+      "size_group":  "dice"
+    },
+    "res/dice/down2.png": {
+      "dest": "res/dice_down2",
+      "size_group":  "dice"
+    },
+    "res/dice/down3.png": {
+      "dest": "res/dice_down3",
+      "size_group":  "dice"
+    },
+    "res/dice/darkShadow.png": {
+      "dest": "res/dice_dark_shadow",
+      "size_group":  "dice"
+    },
+    "res/dice/lightShadow.png": {
+      "dest": "res/dice_light_shadow",
+      "size_group":  "dice"
+    }
   },
 
   "annotations": {

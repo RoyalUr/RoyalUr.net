@@ -20,7 +20,6 @@ and does not yet cover all major aspects of the codebase._
     * 🗂️ Resources are loaded in stages.
     * 💻 Users on smaller devices load smaller assets
     * 🖼 WebP is used to serve images if supported
-    * 🎨 Some images are combined into Sprites
     * 🏛️ Resources are versioned
     * 📝 Resource metadata is served in annotations.json
 
@@ -41,8 +40,7 @@ The `compile.py` script does many small tasks to prepare the site:
 * Minifies the CSS.
 * Copies resource files.
 * Generates different image sizes for different device resolutions.
-* Generates sprites to group some images.
-* Generates annotations to describe the board and sprites.
+* Generates annotations to describe the board.
 * Filters the HTML, JS, and CSS code to add resource versions to URLs.
 * Zips the `/res` folder to be distributed for development.
 
@@ -75,11 +73,6 @@ so that the site can be compiled more quickly.
 * `./compile.sh dev` skips minification of the JavaScript code,
   doesn't add the version numbers, and only generates assets that
   are missing or have changed.
-
-* `./compile.sh nojs` is similar to the dev mode, however it skips
-  updating the JavaScript completely. This is sometimes nice when
-  you are just updating the HTML or CSS, as compiling the JavaScript
-  can sometimes be slow.
 
 ## ⚙ The files to compile are set in compilation.json
 The source files, all resource files, and the target
@@ -131,13 +124,6 @@ smaller file sizes than PNG. Therefore, if your browser
 has support for WebP, we load WebP versions of the
 assets instead of the PNG versions.
 
-## 🎨 Some images are combined into Sprites
-The images for the dice and menu buttons are combined
-into sprites so that they can be loaded all at once
-instead of in several requests. This is only used for
-images where it is unlikely that any one image would
-change without the others having to change.
-
 ## 🏛️ Resources are versioned
 The assets loaded by the client include a version number in their
 URLs. This allows us to give those assets 10-year cache times,
@@ -150,8 +136,6 @@ automatically change. The Apache webserver is then configured
 to ignore the version numbers when assets are requested.
 
 ## 📝 Resource metadata is served in annotations.json
-When sprites are loaded, `resources.js` needs to know which images
-are stored in each sprite. Additionally, the rendering script needs
-to know where to place each tile on the board. This information is
-served alongside the other assets in an `annotations.json` file that
+The rendering script needs to know where to place each tile on the
+board. This information is served in an `annotations.json` file that
 is generated at compile time.
