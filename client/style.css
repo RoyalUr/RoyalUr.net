@@ -273,7 +273,8 @@ img {
 
 #play-select-description {
     position: absolute;
-    display: inline-block;
+    display: block;
+    left: 0;
 
     cursor: default;
     color: white;

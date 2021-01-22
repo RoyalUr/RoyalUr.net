@@ -49,6 +49,7 @@ function setSuperClass(subclass, superclass) {
 // COMPATIBILITY
 //
 
+// Timing.
 let getTime = null;
 if (typeof window !== "undefined") {
     window.requestAnimationFrame = window.requestAnimationFrame ||
@@ -63,9 +64,21 @@ if (typeof window !== "undefined") {
         getTime = function() { return window.performance.webkitNow() / 1000; };
     }
 }
-
 if (getTime === null) {
     getTime = function() { return new Date().getTime() / 1000; };
+}
+// Check if an array includes an element.
+if (!Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, "includes", {
+        enumerable: false,
+        value: function(obj) {
+            for (let index = 0; index < this.length; ++index) {
+                if (this[index] === obj)
+                    return true;
+            }
+            return false;
+        }
+    });
 }
 
 
