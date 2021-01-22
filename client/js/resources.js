@@ -423,6 +423,7 @@ AudioResource.prototype._load = function() {
         for (let instance = 1; instance < this.instances; ++instance) {
             this.elements.push(this.element.cloneNode(false));
         }
+        this.updateElementSettings();
     }.bind(this));
     this.onLoad(); // Browsers sometimes only load audio when it is played.
     this.updateElementSettings();
