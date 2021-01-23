@@ -88,7 +88,7 @@ const playSelectDescriptionFade = new Fade(0.1, 0.2).invisible();
 
 const lastButtonImages = {};
 
-function redrawButton(name, canvas, ctx, imageKey, forceRedraw) {
+function redrawButton(name, canvas, ctx, imageKey, text, isActive, forceRedraw) {
     // Avoid repainting if we don't need to!
     const last = lastButtonImages[name];
     if (!forceRedraw && last && last.key === imageKey && last.w === canvas.width && last.h === canvas.height)
@@ -101,11 +101,30 @@ function redrawButton(name, canvas, ctx, imageKey, forceRedraw) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const image = imageResource.getScaledImage(canvas.width);
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    lastButtonImages[name] = {
-        key: imageKey, w: canvas.width, h: canvas.height
-    };
+    if (imageResource.loaded) {
+        const image = imageResource.getScaledImage(canvas.width);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        lastButtonImages[name] = {
+            key: imageKey, w: canvas.width, h: canvas.height
+        };
+    } else {
+        const pad = 0.015 * canvas.width,
+              radius = 0.1 * canvas.width,
+              borderWidth = 0.015 * canvas.width,
+              fontSize = (text === "Play" ? 0.25 : 0.2) * canvas.width;
+
+        ctx.fillStyle = (isActive ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.5)");
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = borderWidth;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        pathRoundedRect(ctx, pad, pad, canvas.width - 2*pad, canvas.height - 2*pad, radius).fill();
+        pathRoundedRect(ctx, pad, pad, canvas.width - 2*pad, canvas.height - 2*pad, radius).stroke();
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = fontSize + "px Nunito, sans-serif";
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 0.015*canvas.width);
+    }
 }
 
 function redrawMenu(forceRedraw) {
@@ -152,19 +171,22 @@ function redrawMenu(forceRedraw) {
         if (offMenuForceRedraw || playOpacity > 0) {
             redrawButton(
                 "play", playButtonCanvas, playButtonCtx,
-                (playButtonActive ? "play_active" : "play"), forceRedraw
+                (playButtonActive ? "play_active" : "play"),
+                "Play", playButtonActive, forceRedraw
             );
         }
         if (offMenuForceRedraw || learnOpacity > 0) {
             redrawButton(
                 "learn", learnButtonCanvas, learnButtonCtx,
-                (learnButtonActive ? "learn_active" : "learn"), forceRedraw
+                (learnButtonActive ? "learn_active" : "learn"),
+                "Learn", learnButtonActive, forceRedraw
             );
         }
         if (offMenuForceRedraw || watchOpacity > 0) {
             redrawButton(
                 "watch", watchButtonCanvas, watchButtonCtx,
-                (watchButtonActive ? "watch_active" : "watch"), forceRedraw
+                (watchButtonActive ? "watch_active" : "watch"),
+                "Watch", watchButtonActive, forceRedraw
             );
         }
 

@@ -284,8 +284,8 @@ const menuWidthOnHeightRatio = 760 / 840,
       buttonMenuWidthPercentage = 0.5;
 
 function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWidth) {
-    const image = getImageResource(imageKey, buttonWidth),
-          height = calcImageHeight(image, buttonWidth);
+    const imageResource = findImageResource(imageKey),
+          height = imageResource.calcImageHeight(buttonWidth);
 
     buttonElem.style.width = screenPixels(menuWidth);
     buttonElem.style.height = screenPixels(height);

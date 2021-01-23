@@ -4,19 +4,20 @@
 
 const resolutions = ["u_720", "u_1080", "u_1440", "u_2160", "u_u"];
 const resolution = (function() {
-    const width = document.documentElement.clientWidth * window.devicePixelRatio,
-          height = document.documentElement.clientHeight * window.devicePixelRatio;
-    for (let index = 0; index < resolutions.length; ++index) {
-        const resolution = resolutions[index],
-              wh_specs = resolution.split("_"),
-              res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
-              res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
-        if (res_width > 0 && width > res_width)
-            continue;
-        if (res_height > 0 && height > res_height)
-            continue;
-        return resolution;
-    }
+    // const width = document.documentElement.clientWidth * window.devicePixelRatio,
+    //       height = document.documentElement.clientHeight * window.devicePixelRatio;
+    // for (let index = 0; index < resolutions.length; ++index) {
+    //     const resolution = resolutions[index],
+    //           wh_specs = resolution.split("_"),
+    //           res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
+    //           res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
+    //     if (res_width > 0 && width > res_width)
+    //         continue;
+    //     if (res_height > 0 && height > res_height)
+    //         continue;
+    //     return resolution;
+    // }
+    return "u_u";
 })();
 const imageExtension = (function() {
     // Check if Google WebP is supported.
@@ -63,7 +64,7 @@ function getPercentageLoaded() {
     let loaded = 0, total = 0;
     for (let index = 0; index < resources.length; ++index) {
         const resource = resources[index];
-        if (!resource.hasMeaningfulLoadStats())
+        if (!resource.hasMeaningfulLoadStats() || !resource.blocksLoading)
             continue;
 
         total += 1;
@@ -129,7 +130,8 @@ function onResourceLoaded(resource) {
 
     // Check that there are no resources that are not yet loaded.
     for (let index = 0; index < resources.length; ++index) {
-        if (!resources[index].loaded)
+        const resource = resources[index];
+        if (resource.blocksLoading && !resource.loaded)
             return;
     }
 
@@ -204,7 +206,7 @@ function Resource(name, url) {
     this.loaded = false;
     this.errored = false;
     this.error = null;
-    this.onLoadCallbacks = [];
+    this.blocksLoading = true;
 }
 Resource.prototype.updateState = function(state) {
     this.loading = getOrDefault(state, "loading", false);
@@ -224,22 +226,15 @@ Resource.prototype.onLoad = function() {
     this.updateState({loaded: true});
     this.loadEnd = getTime();
     this.loadDuration = this.loadEnd - this.loadStart;
-    for (let index = 0; index < this.onLoadCallbacks.length; ++index) {
-        this.onLoadCallbacks[index]();
-    }
-    this.onLoadCallbacks = [];
     onResourceLoaded(this);
-};
-Resource.prototype.runOnLoad = function(callback) {
-    if (!this.loaded) {
-        this.onLoadCallbacks.push(callback);
-    } else {
-        callback();
-    }
 };
 Resource.prototype.onError = function(error) {
     this.updateState({errored: true, error: (error ? error : null)});
     console.error(error);
+};
+Resource.prototype.doesntBlockLoading = function() {
+    this.blocksLoading = false;
+    return this;
 };
 Resource.prototype.hasMeaningfulLoadStats = () => true;
 
@@ -290,14 +285,18 @@ PreloadImageResource.prototype._load = function() {
 
 
 /** Images to be displayed. **/
-function ImageResource(name, url) {
+function ImageResource(name, url, maxWidth, maxHeight) {
     Resource.call(this, name, url);
     this.__class_name__ = "ImageResource";
     this.image = null;
+    this.maxWidth = maxWidth;
+    this.maxHeight = maxHeight;
+    this.aspectRatio = (maxWidth && maxHeight ? maxWidth / maxHeight : null);
     this.scaledImages = [];
 }
 setSuperClass(ImageResource, Resource);
 ImageResource.prototype._onImageLoad = function() {
+    this.aspectRatio = this.image.width / this.image.height;
     this.onLoad();
 };
 ImageResource.prototype._load = function() {
@@ -317,6 +316,11 @@ ImageResource.prototype._load = function() {
     }.bind(this);
     this.image.src = completeURL(this.url);
 };
+ImageResource.prototype.calcImageHeight = function(width) {
+    if (!this.aspectRatio)
+        throw "Image is not yet loaded, and no aspect ratio has been given in resources.js";
+    return width / this.aspectRatio;
+}
 ImageResource.prototype.getScaledImage = function(width) {
     if (width <= 0)
         throw "Width must be positive: " + width;
@@ -345,18 +349,6 @@ ImageResource.prototype.getScaledImage = function(width) {
     // Return the required scaled image.
     return (scaleDowns <= 0 ? this.image : this.scaledImages[scaleDowns - 1]);
 };
-
-
-/** An ImageResource that should never be loaded. **/
-function GeneratedImageResource(name, url, image) {
-    ImageResource.call(this, name, url);
-    this.image = image;
-    this.load();
-    this.onLoad();
-}
-setSuperClass(GeneratedImageResource, ImageResource);
-GeneratedImageResource.prototype._load = () => {};
-GeneratedImageResource.prototype.hasMeaningfulLoadStats = () => false;
 
 
 /** Sounds to be played. **/
@@ -543,10 +535,6 @@ function renderResource(width, height, renderFunction) {
     return canvas;
 }
 
-function calcImageHeight(image, width) {
-    return Math.ceil(image.height / image.width * width);
-}
-
 
 //
 // The resources to be loaded.
@@ -556,18 +544,19 @@ const annotationsResource = new AnnotationsResource("annotations", "res/annotati
 const stagedResources = [
     [ // Menu
         new ImageResource("logo_with_shadow", "res/logo_with_shadow.[ver]"),
-        new ImageResource("play", "res/button_play.[ver]"),
-        new ImageResource("play_active", "res/button_play_active.[ver]"),
-        new ImageResource("learn", "res/button_learn.[ver]"),
-        new ImageResource("learn_active", "res/button_learn_active.[ver]"),
-        new ImageResource("watch", "res/button_watch.[ver]"),
-        new ImageResource("watch_active", "res/button_watch_active.[ver]"),
         new ImageResource("tile_dark", "res/tile_dark.[ver]"),
         new ImageResource("play_local", "res/button_play_local.[ver]"),
         new ImageResource("play_online", "res/button_play_online.[ver]"),
         new ImageResource("play_computer", "res/button_play_computer.[ver]"),
-        new PreloadImageResource("join_the_discord", "res/join_the_discord.svg"),
-        new PreloadImageResource("star_on_github", "res/star_on_github.svg")
+
+        new PreloadImageResource("join_the_discord", "res/join_the_discord.svg").doesntBlockLoading(),
+        new PreloadImageResource("star_on_github", "res/star_on_github.svg").doesntBlockLoading(),
+        new ImageResource("play", "res/button_play.[ver]",  764, 335).doesntBlockLoading(),
+        new ImageResource("play_active", "res/button_play_active.[ver]", 764, 335).doesntBlockLoading(),
+        new ImageResource("learn", "res/button_learn.[ver]", 1037, 329).doesntBlockLoading(),
+        new ImageResource("learn_active", "res/button_learn_active.[ver]", 1037, 329).doesntBlockLoading(),
+        new ImageResource("watch", "res/button_watch.[ver]", 1037, 329).doesntBlockLoading(),
+        new ImageResource("watch_active", "res/button_watch_active.[ver]", 1037, 329).doesntBlockLoading(),
     ],
     [ // Game
         new ImageResource("board", "res/board.[ver]"),
