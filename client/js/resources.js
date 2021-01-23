@@ -4,19 +4,19 @@
 
 const resolutions = ["u_720", "u_1080", "u_1440", "u_2160", "u_u"];
 const resolution = (function() {
-    // const width = document.documentElement.clientWidth * window.devicePixelRatio,
-    //       height = document.documentElement.clientHeight * window.devicePixelRatio;
-    // for (let index = 0; index < resolutions.length; ++index) {
-    //     const resolution = resolutions[index],
-    //           wh_specs = resolution.split("_"),
-    //           res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
-    //           res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
-    //     if (res_width > 0 && width > res_width)
-    //         continue;
-    //     if (res_height > 0 && height > res_height)
-    //         continue;
-    //     return resolution;
-    // }
+    const width = document.documentElement.clientWidth * window.devicePixelRatio,
+          height = document.documentElement.clientHeight * window.devicePixelRatio;
+    for (let index = 0; index < resolutions.length; ++index) {
+        const resolution = resolutions[index],
+              wh_specs = resolution.split("_"),
+              res_width = (wh_specs[0] === "u" ? -1 : parseInt(wh_specs[0])),
+              res_height = (wh_specs[1] === "u" ? -1 : parseInt(wh_specs[1]));
+        if (res_width > 0 && width > res_width)
+            continue;
+        if (res_height > 0 && height > res_height)
+            continue;
+        return resolution;
+    }
     return "u_u";
 })();
 const imageExtension = (function() {
