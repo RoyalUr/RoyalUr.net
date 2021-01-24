@@ -17,11 +17,14 @@ and does not yet cover all major aspects of the codebase._
     * 🚧️ Compilation Modes
     * ⚙ The files to compile are set in compilation.json
 - [2. Resource Loading](#2-resource-loading)
-    * 🗂️ Resources are loaded in stages.
+    * 🗂️ Resources are loaded in stages
     * 💻 Users on smaller devices load smaller assets
     * 🖼 WebP is used to serve images if supported
     * 🏛️ Resources are versioned
     * 📝 Resource metadata is served in annotations.json
+- [3. Screen System](#2-screen-system)
+  * 🌫️ Fades are used to control element visibility
+  * 👾 Rendering based on Screens
 
 
 # 1. Compilation
@@ -99,7 +102,7 @@ but led to load times of up to 12 seconds... Nowadays
 thanks to some optimisations the client is able to get
 to the menu in ~3 seconds, even with the cache disabled!
 
-## 🗂️ Resources are loaded in stages.
+## 🗂️ Resources are loaded in stages
 The resources are not all loaded at once. Instead,
 the assets needed for the menu are loaded first, and
 once they are loaded the game assets are loaded.
@@ -139,3 +142,32 @@ to ignore the version numbers when assets are requested.
 The rendering script needs to know where to place each tile on the
 board. This information is served in an `annotations.json` file that
 is generated at compile time.
+
+
+# 3. Screen System
+
+| File       | Purpose                                      |
+| ---------- |--------------------------------------------- |
+| screens.js | Handles transitioning between screens.       |
+| utils.js   | Contains fading logic.                       |
+| render.js  | Sets the opacity of elements based on Fades. |
+
+The Royal Game of Ur uses a screen system to control what content
+is visible at any given time. Only one screen is visible at a time,
+and transition functions are used to fade content in and out for
+each screen.
+
+## 🌫️ Fades are used to control element visibility
+One of the main ways that content is shown and hidden is using
+fades. Fades simply control a number that can linearly transition
+between 0 and 1. Screens commonly use fades to control the opacity
+of elements, and a lot of transition functions will `fadeIn` or
+`fadeOut` the elements that should be visible on that screen.
+
+## 👾 Rendering based on Screens
+Some elements are only shown on certain screens. Therefore,
+`render.js` will avoid rendering some elements if they are not
+on screen. This has led to some strange bugs around screen
+transitions and the game board not updating. Consequently, some
+care needs to be taken to make sure that switching screens and
+element rendering play nicely together.
