@@ -1,20 +1,22 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Feature Request
+about: Suggest new idea to improve The Royal Game of Ur
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+_Describe the feature you'd like to see added to The Royal Game of Ur._
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Please add:
+1. A clear and descriptive title to this issue.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+2. What is the current behaviour?
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+3. If applicable, screenshots can help a lot to convey your proposed changes.
+
+4. Explain why this change would be useful.
+
+
+Thankyou for suggesting a new feature for The Royal Game of Ur!

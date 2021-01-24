@@ -20,7 +20,7 @@ contains a changelog with a summary of all the changes being made to the website
 well as discussion about RoyalUr development.
 
 <p float="left">
-  <a href="https://discord.gg/saWJGZcy3V">
+  <a href="https://discord.gg/Ea49VVru5N">
     <img src="https://discord.com/assets/f8389ca1a741a115313bede9ac02e2c0.svg" height="80" valign="middle" />
   </a>
   <a href="https://www.reddit.com/r/GameofUr/">

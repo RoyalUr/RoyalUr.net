@@ -1,26 +1,29 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug Report
+about: Create a bug report to help us improve The Royal Game of Ur
 title: ''
 labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Describe the Bug:** \
+_A description of what the bug is._
 
-**To Reproduce**
-Steps to reproduce the behavior.
+**Steps to Reproduce:** \
+_Steps to reproduce the behavior._
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Expected Behavior:** \
+_A description of what you expected to happen._
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshots:** \
+_If applicable, add screenshots to help explain your problem._
 
-**Browser and Operation System versions:**
-What browser were you using, and what operating system was being used.
+**Browser and Operating System Versions:** \
+_What browser and operating systems were you using?_
 
-**Additional context**
-Add any other context about the problem here.
+**Additional Context:** \
+_Add any other context about the problem here._
+
+
+Thankyou for reporting a bug in The Royal Game of Ur!
