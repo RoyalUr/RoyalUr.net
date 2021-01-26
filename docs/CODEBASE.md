@@ -171,3 +171,23 @@ on screen. This has led to some strange bugs around screen
 transitions and the game board not updating. Consequently, some
 care needs to be taken to make sure that switching screens and
 element rendering play nicely together.
+
+
+# 4. Client Input
+
+| File      | Purpose                                              |
+| --------- |----------------------------------------------------- |
+| client.js | Coordinates page load, networking, and client input. |
+| layout.js | Adds listeners to elements on the page.              |
+
+Inputs related to the keyboard, networking events, and browser events
+are all handled by `client.js`. In this way, the client file acts as
+a hub between different parts of the application. The exception to
+this is that `layout.js` handles most of the interactions related to
+elements on the page such as clicks and mouse movements.
+
+If there is a game running, these inputs are also forwarded to the
+game, so that it can handle them. This is often needed because
+different game modes need to handle input differently. For example,
+online games may need to send a packet while a computer game may
+need to calculate a move.
