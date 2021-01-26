@@ -324,20 +324,30 @@ const DEFAULT_MESSAGE_FADE_IN_TIME  = 0.25,
 const message = {
     title: "",
     subtitle: "",
+    dismissable: true,
     fade: new Fade(0)
 };
 
-function setMessageAndFade(title, subtitle, fade) {
+/**
+ * Sets the current message shown on the screen.
+ *
+ * @param title The main text of the message.
+ * @param subtitle The clarifying smaller text of the message.
+ * @param dismissable Whether the message can be dismissed.
+ * @param fade The fade that controls the messages visibility.
+ */
+function setMessageAndFade(title, subtitle, dismissable, fade) {
     message.title = title;
     message.subtitle = subtitle;
+    message.dismissable = dismissable;
     message.fade = fade;
 }
 
-function setMessage(title, subtitle, fadeInDuration, stayDuration, fadeOutDuration) {
+function setMessage(title, subtitle, dismissable, fadeInDuration, stayDuration, fadeOutDuration) {
     fadeInDuration     = (fadeInDuration !== undefined     ? fadeInDuration     : DEFAULT_MESSAGE_FADE_IN_TIME);
     stayDuration       = (stayDuration !== undefined       ? stayDuration       : DEFAULT_MESSAGE_STAY_TIME);
     fadeOutDuration    = (fadeOutDuration !== undefined    ? fadeOutDuration    : DEFAULT_MESSAGE_FADE_OUT_TIME);
 
     const fade = new StagedFade(fadeInDuration, stayDuration, fadeOutDuration).fadeIn();
-    setMessageAndFade(title, subtitle, fade);
+    setMessageAndFade(title, subtitle, dismissable, fade);
 }

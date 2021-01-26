@@ -211,10 +211,10 @@ function redrawMenu(forceRedraw) {
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {
-            setMessageAndFade("Searching for a Game" + createDots(), "", screenState.connectionFade);
+            setMessageAndFade("Searching for a Game" + createDots(), "", false, screenState.connectionFade);
         } else {
             networkStatus.hidden = true;
-            setMessageAndFade(getNetworkStatus(), "", screenState.connectionFade);
+            setMessageAndFade(getNetworkStatus(), "", false, screenState.connectionFade);
         }
     }
 

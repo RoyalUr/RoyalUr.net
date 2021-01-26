@@ -230,7 +230,7 @@ function onNetworkDisconnect() {
 //
 
 function onPacketError(data) {
-    setMessage("An unexpected error occurred", "", 0, 2, 1)
+    setMessage("An unexpected error occurred", "", true, 0, 2, 1)
     console.error("Error: " + data.error);
 }
 
@@ -238,7 +238,7 @@ function onPacketInvalidGame() {
     disconnect();
     resetNetworkStatus();
     switchToScreen(SCREEN_MENU, true);
-    setMessage("Your game could not be found", "", 0, 2, 1)
+    setMessage("Your game could not be found", "", true, 0, 5, 1)
 }
 
 function onPacketGame(gameInfo) {
@@ -268,7 +268,7 @@ function onPacketGameEnd(data) {
         return;
 
     game = null;
-    setMessage("Your game ended ", data.reason, 0, 5, 1);
+    setMessage("Your game ended ", data.reason, true, 0, 5, 1);
     switchToScreen(SCREEN_MENU);
 }
 
@@ -373,7 +373,7 @@ function handleKeyPress(event) {
 
 /** If there is a message on the screen, fade it out. **/
 function tryDismissMessage() {
-    if (message.fade.get() > 0.5) {
+    if (message.dismissable && message.fade.isFadeIn() && message.fade.get() > 0.5) {
         message.fade.fadeOut();
         if (game) {
             game.onMessageDismissed(message.title, message.subtitle);

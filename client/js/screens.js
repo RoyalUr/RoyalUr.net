@@ -291,7 +291,7 @@ function onExitMenuScreens(hasty) {
 
 function onEnterConnectingScreen(hasty) {
     reconnect();
-    setMessageAndFade("", "", screenState.connectionFade.invisible());
+    setMessageAndFade("", "", false, screenState.connectionFade.invisible());
     setTimeout(() => {
         if (isOnScreen(SCREEN_CONNECTING)) {
             socialsFadeAnchorTime = getTime();
@@ -306,7 +306,7 @@ function onExitConnectingScreen(hasty) {
 }
 
 function onEnterGameScreen(hasty) {
-    setMessageAndFade("Found your Game", "", screenState.connectionFade);
+    setMessageAndFade("Found your Game", "", true, screenState.connectionFade);
     game.init();
     redrawBoard(true);
 }

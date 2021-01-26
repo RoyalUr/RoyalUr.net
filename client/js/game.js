@@ -156,7 +156,7 @@ Game.prototype.clearStartTiles = function() {
     board.setTile(DARK_START, TILE_EMPTY);
 };
 Game.prototype.triggerNoMovesMessage = function(reason) {
-    setMessage("No moves", reason, undefined, NO_MOVES_DURATION, undefined);
+    setMessage("No moves", reason, true, undefined, NO_MOVES_DURATION, undefined);
     setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_TIME + 0.25));
     this.noMovesSwapPlayerTimeout = setTimeout(this.swapPlayerAfterNoMoves.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
 };
@@ -219,7 +219,7 @@ OnlineGame.prototype.onPacketMessage = function(data) {
         return;
     }
 
-    setMessage(data.title, data.subtitle);
+    setMessage(data.title, data.subtitle, true);
 };
 OnlineGame.prototype.swapPlayerAfterNoMoves = function() { /* Do nothing, we will get sent a state packet. */ };
 OnlineGame.prototype.onPacketPlayerStatus = function(data) {
