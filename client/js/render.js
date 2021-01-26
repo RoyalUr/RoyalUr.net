@@ -1030,10 +1030,18 @@ const SOCIALS_TRANSITION_DURATION = 10,
 let socialsFadeAnchorTime = LONG_TIME_AGO;
 
 function redrawMessage(forceRedraw) {
+    const messageFade = message.fade.get();
     messageTitleElement.textContent = message.title;
     messageSubtitleElement.textContent = message.subtitle;
     messageSubtitleElement.style.display = (message.subtitle.length === 0 ? "none" : "");
-    messageContainerElement.style.opacity = message.fade.get();
+    messageContainerElement.style.opacity = messageFade;
+
+    // When messages cannot be dismissed, they should not block access to the controls.
+    if (messageFade === 0 || message.dismissable) {
+        messageContainerElement.classList.remove("below-controls");
+    } else {
+        messageContainerElement.classList.add("below-controls");
+    }
 
     const socialsOpacity = max(0, 2.5 * screenState.socialsFade.get() - 1.5);
     if (socialsOpacity <= 0) {

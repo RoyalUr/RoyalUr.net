@@ -90,7 +90,6 @@ const loading = {
 };
 
 function loadResources() {
-    annotationsResource.load();
     startLoadingStage();
 }
 
@@ -262,7 +261,7 @@ AnnotationsResource.prototype._load = function() {
     client.send();
 };
 AnnotationsResource.prototype.get = function(key) {
-    return this.data !== undefined ? this.data[key] : undefined;
+    return this.data ? this.data[key] : undefined;
 }
 
 
@@ -543,6 +542,7 @@ function renderResource(width, height, renderFunction) {
 const annotationsResource = new AnnotationsResource("annotations", "res/annotations.[ver].json");
 const stagedResources = [
     [ // Menu
+        annotationsResource,
         new ImageResource("logo_with_shadow", "res/logo_with_shadow.[ver]"),
         new ImageResource("tile_dark", "res/tile_dark.[ver]"),
         new ImageResource("play_local", "res/button_play_local.[ver]"),
@@ -595,7 +595,6 @@ const allResources = [];
 /** Should be called as the underlying arrays holding the resources are changed. **/
 function updateAllResourcesArray() {
     allResources.splice(0, allResources.length);
-    allResources.push(annotationsResource);
     for (let index = 0; index < stagedResources.length; ++index) {
         allResources.push.apply(allResources, stagedResources[index]);
     }
