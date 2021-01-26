@@ -22,6 +22,20 @@ function setSuperClass(subclass, superclass) {
     });
 }
 
+function selectText(textBox) {
+    textBox.select();
+    textBox.setSelectionRange(0, 99999);
+    textBox.focus();
+}
+
+function copyText(textBoxID) {
+    const textBox = document.getElementById(textBoxID);
+    selectText(textBox);
+    document.execCommand("copy");
+    textBox.selectionStart = textBox.selectionEnd;
+    textBox.blur();
+}
+
 
 
 //

@@ -8,6 +8,7 @@ const SCREEN_LOADING = "screen_loading",
       SCREEN_DIFFICULTY = "screen_difficulty",
       SCREEN_LEARN = "screen_learn",
       SCREEN_CONNECTING = "screen_connecting",
+      SCREEN_WAITING_FOR_FRIEND = "screen_waiting_for_friend",
       SCREEN_GAME = "screen_game",
       SCREEN_WIN = "screen_win";
 
@@ -33,6 +34,7 @@ const screenState = {
     learnFade: new Fade(0.5),
     boardFade: new Fade(0.5),
     connectionFade: new Fade(2, 0.5),
+    waitingForFriendFade: new Fade(0.5, 0.5),
     creditsFade: new Fade(0.25),
     winFade: new Fade(0.5),
 
@@ -56,6 +58,7 @@ screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
 screenRequiredLoadingStages[SCREEN_DIFFICULTY] = 0;
 screenRequiredLoadingStages[SCREEN_LEARN] = 2;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
+screenRequiredLoadingStages[SCREEN_WAITING_FOR_FRIEND] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
 screenRequiredLoadingStages[SCREEN_WIN] = 1;
 
@@ -71,7 +74,8 @@ const screenActiveControlFades = {};
     screenActiveControlFades[SCREEN_PLAY_SELECT] = [EXIT];
     screenActiveControlFades[SCREEN_DIFFICULTY] = [EXIT];
     screenActiveControlFades[SCREEN_LEARN] = [DISCORD, EXIT];
-    screenActiveControlFades[SCREEN_CONNECTING] = [EXIT];
+    screenActiveControlFades[SCREEN_CONNECTING] = [DISCORD, GITHUB, EXIT];
+    screenActiveControlFades[SCREEN_WAITING_FOR_FRIEND] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
     screenActiveControlFades[SCREEN_WIN] = [DISCORD, LEARN, EXIT];
 })();
@@ -212,13 +216,14 @@ function maybeSwitchOffLoadingScreen(stage) {
 //
 
 registerScreenTransitionHandlers(SCREEN_LOADING,     onEnterLoadingScreen,    onExitLoadingScreen);
-registerScreenTransitionHandlers(SCREEN_MENU,        onEnterMenuScreen,       onExitMenuScreen);
 registerScreenTransitionHandlers(SCREEN_PLAY_SELECT, onEnterPlaySelectScreen, onExitPlaySelectScreen);
 registerScreenTransitionHandlers(SCREEN_DIFFICULTY,  onEnterDifficultyScreen, onExitDifficultyScreen);
 registerScreenTransitionHandlers(SCREEN_LEARN,       onEnterLearnScreen,      onExitLearnScreen);
 registerScreenTransitionHandlers(SCREEN_CONNECTING,  onEnterConnectingScreen, onExitConnectingScreen);
 registerScreenTransitionHandlers(SCREEN_GAME,        onEnterGameScreen,       onExitGameScreen);
 registerScreenTransitionHandlers(SCREEN_WIN,         onEnterWinScreen,        onExitWinScreen);
+registerScreenTransitionHandlers(
+    SCREEN_WAITING_FOR_FRIEND, onEnterWaitingForFriendScreen, onExitWaitingForFriendScreen);
 
 // Screens where the menu should be shown.
 registerScreenTransitionHandlers(
@@ -227,7 +232,8 @@ registerScreenTransitionHandlers(
 
 // Screens where the game should not disconnect from the server.
 registerScreenTransitionHandlers(
-    [SCREEN_CONNECTING, SCREEN_GAME, SCREEN_LEARN], onEnterServerScreen, onExitServerScreen
+    [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME, SCREEN_LEARN],
+    onEnterServerScreen, onExitServerScreen
 );
 
 // Screens where the game board should be shown.
@@ -251,9 +257,6 @@ function onEnterLoadingScreen(hasty) {
 function onExitLoadingScreen(hasty) {
     screenState.loadingFade.fadeOut(hasty ? 0 : undefined);
 }
-
-function onEnterMenuScreen(hasty) {}
-function onExitMenuScreen(hasty) {}
 
 function onEnterPlaySelectScreen(hasty) {
     screenState.playSelectFade.fadeIn(hasty ? 0 : undefined);
@@ -302,6 +305,15 @@ function onEnterConnectingScreen(hasty) {
 function onExitConnectingScreen(hasty) {
     screenState.socialsFade.fadeOut(hasty ? 0 : undefined);
     screenState.connectionFade.fadeOut(hasty ? 0 : undefined);
+}
+
+function onEnterWaitingForFriendScreen() {
+    waitingForFriendLinkTextBox.value = window.location.href;
+    screenState.waitingForFriendFade.fadeIn();
+}
+
+function onExitWaitingForFriendScreen() {
+    screenState.waitingForFriendFade.fadeOut();
 }
 
 function onEnterGameScreen(hasty) {

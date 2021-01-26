@@ -203,7 +203,7 @@ Game.prototype.performMove = function(from, isDragMove) {
 // Represents games that are played online.
 //
 
-function OnlineGame() {
+function OnlineGame(hashID) {
     Game.call(this, false);
     this.__class_name__ = "OnlineGame";
 }
@@ -212,6 +212,9 @@ setSuperClass(OnlineGame, Game);
 OnlineGame.prototype._init = function() {
     connect();
     resetDice();
+};
+OnlineGame.prototype.sendOpenGamePacket = function() {
+    sendPacket(writeFindGamePacket("Name" + randInt(100, 1000)));
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
     if (data.title === "No moves") {
@@ -288,6 +291,22 @@ OnlineGame.prototype.performMove = function(from, noAnimation) {
     sendPacket(writeMovePacket(from));
 };
 OnlineGame.prototype.onFinishMove = function() { /* Do nothing. */ };
+
+
+
+//
+// Represents an online game that is played against a friend.
+//
+
+function FriendGame() {
+    OnlineGame.call(this);
+    this.__class_name__ = "FriendGame";
+}
+setSuperClass(FriendGame, OnlineGame);
+
+FriendGame.prototype.sendOpenGamePacket = function() {
+    sendPacket(writeCreateGamePacket("Name" + randInt(100, 1000)));
+};
 
 
 

@@ -11,6 +11,7 @@ const STAT_OVERALL = "overall",
       STAT_DICE = "dice",
       STAT_SCORES = "scores",
       STAT_NETWORK_STATUS = "network_status",
+      STAT_WAITING_FOR_FRIEND = "waiting_for_friend",
       STAT_MESSAGE = "message",
       STAT_WIN_SCREEN = "win_screen",
       STAT_OVERLAY = "overlay";

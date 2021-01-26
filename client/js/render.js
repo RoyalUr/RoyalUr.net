@@ -40,13 +40,15 @@ function redraw(forceRedraw) {
         callRedraw(STAT_DICE, redrawDice);
         callRedraw(STAT_SCORES, redrawScores);
         callRedraw(STAT_NETWORK_STATUS, redrawNetworkStatus);
+        callRedraw(STAT_WAITING_FOR_FRIEND, renderWaitingForFriendScreen);
         callRedraw(STAT_MESSAGE, redrawMessage);
         callRedraw(STAT_WIN_SCREEN, redrawWinScreen);
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuOuterDiv, playSelectDiv, difficultyDiv, learnDiv, winDiv,
-            boardCanvas, tilesCanvas, diceCanvas, creditsDiv,
+            menuOuterDiv, playSelectDiv, difficultyDiv,
+            learnDiv, winDiv, boardCanvas, tilesCanvas,
+            diceCanvas, creditsDiv, waitingForFriendDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
             exitControlButton, messageContainerElement,
@@ -1015,6 +1017,16 @@ function redrawNetworkStatus(forceRedraw) {
     networkStatusElement.style.display = (networkStatus.hidden ? "none" : "block");
     networkStatusElement.style.opacity = networkStatus.fade.get();
     networkStatusElement.textContent = getNetworkStatus();
+}
+
+
+
+//
+// Rendering of the waiting for a friend screen.
+//
+
+function renderWaitingForFriendScreen(forceRedraw) {
+    waitingForFriendDiv.style.opacity = screenState.waitingForFriendFade.get();
 }
 
 

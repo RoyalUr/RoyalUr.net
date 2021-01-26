@@ -275,10 +275,11 @@ img {
     position: absolute;
     display: block;
     left: 0;
+    width: 100%;
 
     cursor: default;
     color: white;
-    font-size: 26px;
+    font-size: 4vmin;
     text-align: center;
     vertical-align: middle;
 }
@@ -310,19 +311,24 @@ img {
     white-space: pre;
 }
 
-.play-select-icon {
+#play-local .play-select-icon {
+    padding-top: 1%;
+    width: 85%;
+}
+
+#play-online .play-select-icon {
+    padding-top: 0;
+    width: 80%;
+}
+
+#play-computer .play-select-icon {
     padding-top: 5%;
     width: 75%;
 }
 
-#play-online .play-select-icon {
-    padding-top: 3%;
-    width: 70%;
-}
-
-#play-computer .play-select-icon {
-    padding-top: 1%;
-    width: 70%;
+#play-friend .play-select-icon {
+    padding-top: 0;
+    width: 75%;
 }
 
 
@@ -402,6 +408,54 @@ img {
 #join-discord img, #star-github img {
     width: 100%;
 }
+
+
+/*
+ *  WAITING FOR A FRIEND
+ */
+#waiting-for-friend {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+#waiting-for-friend * {
+    display: inline-block;
+    height: 8vmin;
+
+    color: black;
+    font-family: Nunito, sans-serif;
+    font-size: 7vmin;
+    line-height: 7vmin;
+    text-align: center;
+    vertical-align: middle;
+}
+#waiting-for-friend label {
+    display: block;
+    margin-bottom: 8vmin;
+
+    font-size: 8vmin;
+    color: white;
+}
+#waiting-for-friend button {
+    width: 20vmin;
+    cursor: pointer;
+    margin-left: 1vmin;
+    font-size: 5vmin;
+    line-height: 5vmin;
+}
+#waiting-for-friend .flex-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
 
 
 

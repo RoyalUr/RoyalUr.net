@@ -28,6 +28,7 @@ const controlsDiv = document.getElementById("controls"),
 const playSelectDiv = document.getElementById("play-select"),
       playLocalButton = document.getElementById("play-local"),
       playOnlineButton = document.getElementById("play-online"),
+      playFriendButton = document.getElementById("play-friend"),
       playComputerButton = document.getElementById("play-computer"),
       playSelectDescriptionDiv = document.getElementById("play-select-description");
 
@@ -35,6 +36,9 @@ const difficultyDiv = document.getElementById("computer-difficulty"),
       playComputerEasyButton = document.getElementById("play-computer-easy"),
       playComputerMediumButton = document.getElementById("play-computer-medium"),
       playComputerHardButton = document.getElementById("play-computer-hard");
+
+const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
+      waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
 
 const learnDiv = document.getElementById("learn");
 
@@ -102,16 +106,19 @@ function setupMenuElements() {
     difficultyDiv.addEventListener("click", onExitClick);
 
     playLocalButton.addEventListener("click", onPlayLocal);
-    playOnlineButton.addEventListener("click", onPlayOnline);
     playComputerButton.addEventListener("click", onPlayComputer);
+    playOnlineButton.addEventListener("click", onPlayOnline);
+    playFriendButton.addEventListener("click", onPlayFriend);
 
     playLocalButton.addEventListener("mouseover", onHoverPlayLocal);
-    playOnlineButton.addEventListener("mouseover", onHoverPlayOnline);
     playComputerButton.addEventListener("mouseover", onHoverPlayComputer);
+    playOnlineButton.addEventListener("mouseover", onHoverPlayOnline);
+    playFriendButton.addEventListener("mouseover", onHoverPlayFriend);
 
     playLocalButton.addEventListener("mouseout", onPlayUnhover);
-    playOnlineButton.addEventListener("mouseout", onPlayUnhover);
     playComputerButton.addEventListener("mouseout", onPlayUnhover);
+    playOnlineButton.addEventListener("mouseout", onPlayUnhover);
+    playFriendButton.addEventListener("mouseout", onPlayUnhover);
 
     playComputerEasyButton.addEventListener("click", onPlayComputerEasy);
     playComputerMediumButton.addEventListener("click", onPlayComputerMedium);
@@ -125,6 +132,14 @@ function setupMenuElements() {
 
     watchButton.addEventListener("mouseover", function() { menuState.watchButton = BUTTON_STATE_HOVERED; });
     watchButton.addEventListener("mouseout", function() { menuState.watchButton = BUTTON_STATE_INACTIVE; });
+
+    waitingForFriendLinkTextBox.addEventListener("click", function() {
+        if (document.activeElement === waitingForFriendLinkTextBox) {
+            waitingForFriendLinkTextBox.blur();
+        } else {
+            selectText(waitingForFriendLinkTextBox);
+        }
+    });
 
     // Set the src properties of all the dynamic images.
     for (let className in dynamicImagesByClass) {
@@ -307,21 +322,21 @@ function resizeMenu() {
     learnButton.style.marginBottom = screenPixels(0.05 * buttonWidth);
 
     // Set the size and spacing of the play selection buttons
-    const numButtons = 3,
+    const numButtons = 4,
           playButtonWidth = min(buttonWidth, width / numButtons),
           playButtonSpacing = min(playButtonWidth / 2, (width - playButtonWidth * numButtons) / (numButtons + 1)),
           buttonSeparation = playButtonSpacing / numButtons + playButtonWidth,
-          middleAnchor = width / 2 - 0.5 * playButtonWidth;
+          middleAnchor = width / 2;
 
     function layoutPlayButton(elem, left) {
         elem.style.width = screenPixels(playButtonWidth);
         elem.style.left = screenPixels(left);
     }
-    layoutPlayButton(playLocalButton, middleAnchor - buttonSeparation);
+    layoutPlayButton(playLocalButton, middleAnchor - 2 * buttonSeparation);
+    layoutPlayButton(playComputerButton, middleAnchor - buttonSeparation);
     layoutPlayButton(playOnlineButton, middleAnchor);
-    layoutPlayButton(playComputerButton, middleAnchor + buttonSeparation);
+    layoutPlayButton(playFriendButton, middleAnchor + buttonSeparation);
 
-    playSelectDescriptionDiv.style.width = screenPixels(width);
     playSelectDescriptionDiv.style.top = screenPixels(0.5 * height + buttonSeparation / 2);
 }
 

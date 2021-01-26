@@ -4,7 +4,7 @@
 
 const ZERO_CHAR_CODE = "0".charCodeAt(0),
       GAME_ID_LENGTH = 6,
-      PROTOCOL_VERSION = 2;
+      PROTOCOL_VERSION = 3;
 
 
 
@@ -17,6 +17,7 @@ const incomingPacketTypes = [];
 registerPacketType("error", readErrorPacket);
 registerPacketType("set_id", readSetIdPacket);
 registerPacketType("invalid_game", readInvalidGamePacket);
+registerPacketType("game_pending", readGamePendingPacket);
 registerPacketType("game", readGamePacket);
 registerPacketType("game_end", readGameEndPacket);
 registerPacketType("message", readMessagePacket);
@@ -150,6 +151,10 @@ function readSetIdPacket(packet) {
 }
 
 function readInvalidGamePacket(packet) {
+    return { gameID: packet.nextGameID() };
+}
+
+function readGamePendingPacket(packet) {
     return { gameID: packet.nextGameID() };
 }
 
@@ -322,6 +327,12 @@ function writeJoinGamePacket(gameID) {
 
 function writeFindGamePacket(name) {
     const packet = new PacketOut("find_game");
+    packet.pushVarString(name);
+    return packet;
+}
+
+function writeCreateGamePacket(name) {
+    const packet = new PacketOut("create_game");
     packet.pushVarString(name);
     return packet;
 }

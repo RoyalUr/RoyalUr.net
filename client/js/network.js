@@ -131,6 +131,7 @@ const packetHandlers = {
     // client.js
     "error": onPacketError,
     "invalid_game": onPacketInvalidGame,
+    "game_pending": onPacketGamePending,
     "game": onPacketGame,
     "game_end": onPacketGameEnd,
     "message": onPacketMessage,

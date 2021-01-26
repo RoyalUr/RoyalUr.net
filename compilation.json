@@ -66,6 +66,7 @@
     "res/social/star_on_github.svg": "res/star_on_github.svg",
     "res/buttons/play_local.svg": "res/play_local.svg",
     "res/buttons/play_online.svg": "res/play_online.svg",
+    "res/buttons/play_friend.svg": "res/play_friend.svg",
     "res/buttons/play_computer.svg": "res/play_computer.svg",
     "res/buttons/controls/discord.svg": "res/control_discord.svg",
     "res/buttons/controls/exit.svg": "res/control_exit.svg",

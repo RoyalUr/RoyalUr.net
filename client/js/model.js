@@ -5,7 +5,6 @@
 let game = null;
 
 function resetGame() {
-    game = null;
     resetTiles();
     resetDice();
     resetNetworkStatus();

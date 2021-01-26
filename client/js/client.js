@@ -28,7 +28,7 @@ function setup() {
     document.addEventListener("keyup", handleKeyPress);
     window.onhashchange = onHashChange;
     if (getHashGameID() !== null) {
-        connectToGame(true);
+        connectToGame(new OnlineGame());
     } else {
         switchToScreen(SCREEN_MENU);
     }
@@ -116,14 +116,19 @@ function onPlayLocal(event) {
     switchToScreen(SCREEN_GAME);
 }
 
-function onPlayOnline(event) {
-    event.stopPropagation();
-    connectToGame();
-}
-
 function onPlayComputer(event) {
     event.stopPropagation();
     switchToScreen(SCREEN_DIFFICULTY);
+}
+
+function onPlayOnline(event) {
+    event.stopPropagation();
+    connectToGame(new OnlineGame())
+}
+
+function onPlayFriend(event) {
+    event.stopPropagation();
+    connectToGame(new FriendGame())
 }
 
 function onPlayComputerEasy(event) {
@@ -151,6 +156,11 @@ function onHoverPlayLocal() {
 
 function onHoverPlayOnline() {
     playSelectDescriptionDiv.textContent = "Play people across the globe.";
+    playSelectDescriptionFade.fadeIn();
+}
+
+function onHoverPlayFriend() {
+    playSelectDescriptionDiv.textContent = "Play with a friend over the internet.";
     playSelectDescriptionFade.fadeIn();
 }
 
@@ -182,10 +192,6 @@ function onExitClick(event) {
     switchToScreen(screenState.exitTargetScreen);
 }
 
-function connectToGame() {
-    switchToScreen(SCREEN_CONNECTING);
-}
-
 
 
 //
@@ -209,7 +215,7 @@ function onNetworkConnected() {
     if (gameID !== null) {
         sendPacket(writeJoinGamePacket(gameID));
     } else {
-        sendPacket(writeFindGamePacket("Name" + randInt(100, 1000)))
+        game.sendOpenGamePacket();
     }
 }
 
@@ -241,8 +247,12 @@ function onPacketInvalidGame() {
     setMessage("Your game could not be found", "", true, 0, 5, 1)
 }
 
+function onPacketGamePending(gameInfo) {
+    setHash(gameInfo.gameID);
+    switchToScreen(SCREEN_WAITING_FOR_FRIEND);
+}
+
 function onPacketGame(gameInfo) {
-    game = new OnlineGame();
     setHash(gameInfo.gameID);
     setOwnPlayer(gameInfo.ownPlayer);
     ownPlayer.name = gameInfo.ownName;
@@ -323,10 +333,15 @@ function getHashGameID() {
 
 function onHashChange() {
     if (getHashGameID() !== null) {
-        connectToGame();
+        connectToGame(new OnlineGame());
     } else {
         switchToScreen(SCREEN_MENU);
     }
+}
+
+function connectToGame(newGame) {
+    game = newGame;
+    switchToScreen(SCREEN_CONNECTING);
 }
 
 
