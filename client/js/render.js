@@ -444,7 +444,7 @@ function redrawTiles(forceRedraw) {
         if (tile === TILE_EMPTY || vecListContains(ignoreDrawTiles, loc))
             continue;
 
-        const tileDrawWidth = tileWidth * (vecEquals(pathTile, loc) ? HOVER_WIDTH_RATIO : 1),
+        const tileDrawWidth = tileWidth * (vecEquals(hoveredTile, loc) ? HOVER_WIDTH_RATIO : 1),
               shadowColour = (isTileSelected(loc) ? 255 : 0);
 
         renderTile(ctx, loc, tileDrawWidth, tileDrawWidth, tile, shadowColour);
@@ -532,11 +532,11 @@ function getDrawPotentialMoveTile() {
     if (isTileSelected(draggedTile))
         return draggedTile;
 
-    if (board.getTile(hoveredTile) === ownPlayer.playerNo)
-        return hoveredTile;
-
     if (isTileSelected())
         return selectedTile;
+
+    if (board.getTile(hoveredTile) === ownPlayer.playerNo)
+        return hoveredTile;
 
     return VEC_NEG1;
 }
