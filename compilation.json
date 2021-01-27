@@ -64,7 +64,12 @@
     "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
-    "res/social/star_on_github.svg": "res/star_on_github.svg"
+    "res/social/star_on_github.svg": "res/star_on_github.svg",
+    "res/buttons/controls/discord.svg": "res/control_discord.svg",
+    "res/buttons/controls/exit.svg": "res/control_exit.svg",
+    "res/buttons/controls/github.svg": "res/control_github.svg",
+    "res/buttons/controls/learn.svg": "res/control_learn.svg",
+    "res/buttons/controls/settings.svg": "res/control_settings.svg"
   },
 
   "image_size_classes": {

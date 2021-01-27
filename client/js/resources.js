@@ -231,9 +231,8 @@ Resource.prototype.onError = function(error) {
     this.updateState({errored: true, error: (error ? error : null)});
     console.error(error);
 };
-Resource.prototype.doesntBlockLoading = function() {
-    this.blocksLoading = false;
-    return this;
+Resource.prototype.setBlocksLoading = function(blocksLoading) {
+    this.blocksLoading = blocksLoading;
 };
 Resource.prototype.hasMeaningfulLoadStats = () => true;
 
@@ -270,6 +269,7 @@ function PreloadImageResource(name, url) {
     Resource.call(this, name, url);
     this.__class_name__ = "PreloadImageResource";
     this.image = null;
+    this.setBlocksLoading(false);
 }
 setSuperClass(PreloadImageResource, Resource);
 PreloadImageResource.prototype._load = function() {
@@ -549,14 +549,20 @@ const stagedResources = [
         new ImageResource("play_online", "res/button_play_online.[ver]"),
         new ImageResource("play_computer", "res/button_play_computer.[ver]"),
 
-        new PreloadImageResource("join_the_discord", "res/join_the_discord.svg").doesntBlockLoading(),
-        new PreloadImageResource("star_on_github", "res/star_on_github.svg").doesntBlockLoading(),
-        new ImageResource("play", "res/button_play.[ver]",  764, 335).doesntBlockLoading(),
-        new ImageResource("play_active", "res/button_play_active.[ver]", 764, 335).doesntBlockLoading(),
-        new ImageResource("learn", "res/button_learn.[ver]", 1037, 329).doesntBlockLoading(),
-        new ImageResource("learn_active", "res/button_learn_active.[ver]", 1037, 329).doesntBlockLoading(),
-        new ImageResource("watch", "res/button_watch.[ver]", 1037, 329).doesntBlockLoading(),
-        new ImageResource("watch_active", "res/button_watch_active.[ver]", 1037, 329).doesntBlockLoading(),
+        new PreloadImageResource("join_the_discord", "res/join_the_discord.svg"),
+        new PreloadImageResource("star_on_github", "res/star_on_github.svg"),
+        new PreloadImageResource("control_discord", "res/control_discord.svg"),
+        new PreloadImageResource("control_exit", "res/control_exit.svg"),
+        new PreloadImageResource("control_github", "res/control_github.svg"),
+        new PreloadImageResource("control_learn", "res/control_learn.svg"),
+        new PreloadImageResource("control_settings", "res/control_settings.svg"),
+
+        new ImageResource("play", "res/button_play.[ver]",  764, 335),
+        new ImageResource("play_active", "res/button_play_active.[ver]", 764, 335),
+        new ImageResource("learn", "res/button_learn.[ver]", 1037, 329),
+        new ImageResource("learn_active", "res/button_learn_active.[ver]", 1037, 329),
+        new ImageResource("watch", "res/button_watch.[ver]", 1037, 329),
+        new ImageResource("watch_active", "res/button_watch_active.[ver]", 1037, 329),
     ],
     [ // Game
         new ImageResource("board", "res/board.[ver]"),

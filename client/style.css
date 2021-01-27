@@ -459,7 +459,7 @@ img {
     margin-right: 1.2vh;
     z-index: 14;
 
-    opacity: 0.7;
+    opacity: 0.8;
     transition: opacity 0.2s ease-in-out;
 }
 #controls:hover {
@@ -468,40 +468,17 @@ img {
 #controls .control {
     display: inline-block;
     float: right;
+    cursor: pointer;
 }
 
-#controls svg {
-    height: 5.5vh;
-    opacity: 0.7;
+#controls img {
+    height: 6vh;
+    opacity: 0.6;
     transition: opacity 0.2s ease-in-out;
 }
-#controls svg:hover {
+#controls img:hover {
     opacity: 1;
 }
-
-svg.control-icon { cursor: pointer; }
-svg.control-icon line, svg.control-icon path {
-    stroke: white;
-    stroke-linecap: round;
-    transition: stroke-width 0.2s ease-in-out;
-}
-svg.settings-icon * { fill: white; }
-svg.settings-icon path { stroke-width: 0; }
-svg.settings-icon:hover path { stroke-width: 0.75; }
-svg.question-mark-icon * { fill: none; }
-svg.question-mark-icon line { stroke-width: 21; }
-svg.question-mark-icon path { stroke-width: 19; }
-svg.question-mark-icon:hover line { stroke-width: 24; }
-svg.question-mark-icon:hover path { stroke-width: 23; }
-svg.exit-icon line { stroke-width: 20; }
-svg.exit-icon:hover line { stroke-width: 24; }
-svg.github-icon * { fill: white; }
-svg.github-icon path { stroke-width: 0; }
-svg.github-icon:hover path { stroke-width: 0.4; }
-svg.discord-icon * { fill: white; }
-svg.discord-icon path { stroke-width: 0; }
-svg.discord-icon:hover path { stroke-width: 0.3; }
-svg.discord-icon:hover path.discord-eyes {stroke-width: 0; }
 
 
 /*
