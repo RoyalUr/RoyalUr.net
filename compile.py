@@ -280,14 +280,6 @@ class Annotations:
         setmtime(file, getmtime(self.source_files))
 
 
-def clean(target_folder, comp_spec, *, prefix=""):
-    """
-    Completely empty the compilation folder.
-    """
-    shutil.rmtree("compiled")
-    os.makedirs("compiled")
-
-
 def create_sitemap(target_folder, comp_spec, *, prefix=""):
     """
     Reads the sitemap template, fills in the last modified time, and outputs it.
@@ -513,96 +505,98 @@ def install_dependencies(*, prefix=""):
 def create_release_build(target_folder):
     print("\nCompiling Release Build")
     comp_spec = CompilationSpec.read("compilation.json")
-
-    print("\n1. Clean")
-    clean(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n2. Create a Sitemap")
+    print("\n1. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n3. Copy HTML")
+    print("\n2. Copy HTML")
     copy_html(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n4. Combine & Minify Javascript")
+    print("\n3. Combine & Minify Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ", minify=True)
-
-    print("\n5. Minify CSS")
+    print("\n4. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n6. Copy Resource Files")
+    print("\n5. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n7. Create Annotations File")
+    print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n8. Add Dynamic File Versions")
+    print("\n7. Add Dynamic File Versions")
     add_file_versions(target_folder, comp_spec, prefix=" .. ")
-
-    print("\n9. Zip Development Resources Folder")
+    print("\n8. Zip Development Resources Folder")
     zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
-
-    print("\nDone!\n")
 
 
 def create_dev_build(target_folder):
     print("\nCompiling Development Build")
     comp_spec = CompilationSpec.read("compilation.json")
-
     print("\n1. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
-
     print("\n2. Copy HTML")
     copy_html(target_folder, comp_spec, prefix=" .. ")
-
     print("\n3. Combine Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ")
-
     print("\n4. Minify CSS")
     minify_css(target_folder, comp_spec, prefix=" .. ")
-
     print("\n5. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
-
     print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, prefix=" .. ")
-
     print("\n7. Remove File Version Tags from Filenames")
     add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
-
-    print("\nDone!\n")
 
 
 
 #
 # Run the Compilation
 #
+def exit_with_usage():
+    """ Prints the program help and then exits. """
+    print("Usage:")
+    print("  python -m compile [clean] <clean:dev:release>")
+    sys.exit(1)
+
+
 if __name__ == "__main__":
+    # Read the program arguments.
+    arg_count = len(sys.argv)
+    if arg_count <= 1 or arg_count >= 4:
+        exit_with_usage()
+
+    mode = sys.argv[1]
+    do_clean = (mode == "clean" or mode == "release")
+    target_folder = "./compiled"
+    if arg_count == 3:
+        if mode != "clean":
+            exit_with_usage()
+        mode = sys.argv[2]
+
+    # Check that the requested compilation mode exists.
+    if mode != "release" and mode != "dev" and mode != "clean":
+        print("Invalid compilation mode:", mode)
+        exit_with_usage()
+
     # Download the resources folder if it doesn't exist.
     if not os.path.exists("./res"):
         print("\nCould not find ./res directory, attempting to download it...")
         download_development_res_folder(prefix=" .. ")
 
-    # Create the compiled folder if it doesn't exist.
-    if not os.path.exists("./compiled"):
-        print("\nCould not find ./compiled directory, creating it...")
-        os.mkdir("./compiled")
+    # Create the target directory if it doesn't already exist.
+    if not do_clean and not os.path.exists(target_folder):
+        print("\nCould not find the target directory, " + target_folder + ", creating it...")
+        os.mkdir(target_folder)
 
-    # Create the compiled folder if it doesn't exist.
+    # Install the NPM dependencies if they are not already installed.
     if not os.path.exists("./node_modules"):
         print("\nDetected missing NPM dependencies as ./node_modules is missing, installing them...")
         install_dependencies(prefix=" .. ")
 
+    # If needed, perform a clean of the target directory.
+    if do_clean:
+        print("\nCleaning the target directory " + target_folder + "...")
+        shutil.rmtree(target_folder)
+        os.makedirs(target_folder)
 
-    # Detect the compilation mode, and start it.
-    mode = (sys.argv[1] if len(sys.argv) == 2 else "")
+    # Start the compilation.
     if mode == "release":
-        create_release_build("compiled")
+        create_release_build(target_folder)
     elif mode == "dev":
-        create_dev_build("compiled")
-    else:
-        if mode != "":
-            print("Invalid compilation mode", mode)
+        create_dev_build(target_folder)
 
-        print("Usage:")
-        print("  python -m compile <dev:release:nojs>")
-        sys.exit(1)
+    print("\nDone!\n")
