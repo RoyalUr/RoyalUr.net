@@ -67,9 +67,6 @@ const learnBackButton = document.getElementById("learn-back-button");
 
 const dynamicImagesByClass = {
     "logo_image": "logo_with_shadow",
-    "play_local_image": "play_local",
-    "play_online_image": "play_online",
-    "play_computer_image": "play_computer",
     "tile_dark_image": "tile_dark",
 };
 

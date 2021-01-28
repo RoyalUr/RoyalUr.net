@@ -545,10 +545,10 @@ const stagedResources = [
         annotationsResource,
         new ImageResource("logo_with_shadow", "res/logo_with_shadow.[ver]"),
         new ImageResource("tile_dark", "res/tile_dark.[ver]"),
-        new ImageResource("play_local", "res/button_play_local.[ver]"),
-        new ImageResource("play_online", "res/button_play_online.[ver]"),
-        new ImageResource("play_computer", "res/button_play_computer.[ver]"),
 
+        new PreloadImageResource("play_local", "res/play_local.svg"),
+        new PreloadImageResource("play_online", "res/play_online.svg"),
+        new PreloadImageResource("play_computer", "res/play_computer.svg"),
         new PreloadImageResource("join_the_discord", "res/join_the_discord.svg"),
         new PreloadImageResource("star_on_github", "res/star_on_github.svg"),
         new PreloadImageResource("control_discord", "res/control_discord.svg"),

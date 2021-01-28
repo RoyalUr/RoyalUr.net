@@ -65,6 +65,9 @@
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
     "res/social/star_on_github.svg": "res/star_on_github.svg",
+    "res/buttons/play_local.svg": "res/play_local.svg",
+    "res/buttons/play_online.svg": "res/play_online.svg",
+    "res/buttons/play_computer.svg": "res/play_computer.svg",
     "res/buttons/controls/discord.svg": "res/control_discord.svg",
     "res/buttons/controls/exit.svg": "res/control_exit.svg",
     "res/buttons/controls/github.svg": "res/control_github.svg",
@@ -153,19 +156,6 @@
     "res/lightTile.png": {
       "dest": "res/tile_light",
       "size_group": "tile"
-    },
-
-    "res/buttons/play_local.png": {
-      "dest": "res/button_play_local",
-      "size_group": "play-select-button"
-    },
-    "res/buttons/play_online.png": {
-      "dest": "res/button_play_online",
-      "size_group": "play-select-button"
-    },
-    "res/buttons/play_computer.png": {
-      "dest": "res/button_play_computer",
-      "size_group": "play-select-button"
     },
 
     "res/buttons/play.png": {
