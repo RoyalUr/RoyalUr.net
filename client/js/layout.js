@@ -98,12 +98,6 @@ function setupMenuElements() {
 
     messageContainerElement.addEventListener("click", tryDismissMessage);
 
-    // Adjust the font sizes of the play select options to fit their bounding boxes.
-    fitty(".play-select-text", {
-        couplingGroup: "play-select-text", // Ensure all play select options have the same font size.
-        padding: 0.05
-    });
-
     playSelectDiv.addEventListener("click", onExitClick);
     difficultyDiv.addEventListener("click", onExitClick);
 

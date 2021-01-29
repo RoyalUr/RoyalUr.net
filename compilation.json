@@ -15,7 +15,6 @@
   "javascript": {
     "index.js": [
       "client/js/lib/reconnecting-websocket.js",
-      "client/js/lib/fitty.js",
       "client/js/stats.js",
       "client/js/board.js",
       "client/js/model.js",

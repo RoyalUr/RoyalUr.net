@@ -256,7 +256,6 @@ function onEnterMenuScreen(hasty) {}
 function onExitMenuScreen(hasty) {}
 
 function onEnterPlaySelectScreen(hasty) {
-    fitty.fitAll();
     screenState.playSelectFade.fadeIn(hasty ? 0 : undefined);
 }
 function onExitPlaySelectScreen(hasty) {

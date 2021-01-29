@@ -304,7 +304,7 @@ img {
 .play-select-text {
     font-family: Nunito, sans-serif;
     font-weight: 600;
-    font-size: 50px;
+    font-size: 5vmin;
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
     white-space: pre;
