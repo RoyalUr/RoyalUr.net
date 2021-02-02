@@ -32,6 +32,22 @@
         <link rel="preload" href="res/font_durango.[ver].ttf" as="font" type="font/ttf" crossorigin="anonymous" />
         <link rel="preload" href="res/font_nunito.[ver].woff2" as="font" type="font/woff2" crossorigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+        <!-- Matomo -->
+        <script type="text/javascript">
+            var _paq = window._paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+                var u="//matomo.royalur.net/";
+                _paq.push(['setTrackerUrl', u+'matomo.php']);
+                _paq.push(['setSiteId', '1']);
+                var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+            })();
+        </script>
+        <!-- End Matomo Code -->
     </head>
     <body>
         <!-- LOADING SCREEN -->
@@ -225,13 +241,5 @@
 
         <!-- JavaScript that doesn't need to be running straight away. -->
         <script src="index.[ver].js"></script>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-HV8Y3J2N0X"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-HV8Y3J2N0X');
-        </script>
     </body>
 </html>
