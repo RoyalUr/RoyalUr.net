@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest new idea to improve The Royal Game of Ur
+about: Suggest a new idea to improve The Royal Game of Ur
 title: ''
 labels: ''
 assignees: ''

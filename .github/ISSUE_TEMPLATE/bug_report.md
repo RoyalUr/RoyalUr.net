@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a bug report to help us improve The Royal Game of Ur
+about: Report a bug to help us improve The Royal Game of Ur
 title: ''
 labels: bug
 assignees: ''
