@@ -108,11 +108,7 @@ class CompilationSpec:
         self.sitemap_dest = sitemap_spec["dest"]
 
         self.html_files = spec_json["html"]
-
-        css_spec = spec_json["css"]
-        self.css_source = css_spec["source"]
-        self.css_dest = css_spec["dest"]
-
+        self.css_files = spec_json["css"]
         self.js_files = spec_json["javascript"]
         self.res_files = spec_json["resources"]
         self.annotation_files = spec_json["annotations"]
@@ -323,7 +319,7 @@ def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
         if source_mtime == getmtime(output_file):
             continue
 
-        commands = [["npx", "babel", "--presets=@babel/env"] + file_list]
+        commands = [["npx", "babel", "--presets=@babel/env", *file_list]]
         if (minify):
             commands.append(["uglifyjs", "--compress", "--mangle"])
         commands.append(output_file)
@@ -336,18 +332,19 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
     """
     Minify the CSS of the website.
     """
-    output_file = os.path.join(target_folder, comp_spec.css_dest)
-    source_mtime = getmtime(comp_spec.css_source)
-    # Skip minifying the CSS if it hasn't changed.
-    if source_mtime == getmtime(output_file):
-        return
+    for to_rel, file_list in comp_spec.css_files.items():
+        output_file = os.path.join(target_folder, to_rel)
+        source_mtime = getmtime(file_list)
+        # Skip this output if none of its sources have changed.
+        if source_mtime == getmtime(output_file):
+            continue
 
-    assert execute_piped_commands(
-        ["npx", "uglifycss", comp_spec.css_source],
-        output_file,
-        prefix=prefix
-    )
-    setmtime(output_file, source_mtime)
+        assert execute_piped_commands(
+            ["npx", "uglifycss", *file_list],
+            output_file,
+            prefix=prefix
+        )
+        setmtime(output_file, source_mtime)
 
 
 def copy_resource_files(target_folder, comp_spec, *, prefix=""):
@@ -450,7 +447,7 @@ def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=Fals
     # The order here is important!!
     # The HTML files reference the CSS and JS files so they must be created first.
     files_to_filter = [
-        comp_spec.css_dest,
+        *comp_spec.css_files.keys(),
         *comp_spec.js_files.keys(),
         *comp_spec.html_files.values()
     ]

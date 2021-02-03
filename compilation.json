@@ -9,8 +9,10 @@
     "client/lost.html": "lost.html"
   },
   "css": {
-    "source": "client/style.css",
-    "dest": "style.css"
+    "index.css": [
+      "client/base.css",
+      "client/index.css"
+    ]
   },
   "javascript": {
     "index.js": [
