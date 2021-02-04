@@ -22,7 +22,7 @@
               content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!">
         <meta name="twitter:image" content="https://royalur.net/banner.[ver].jpg">
 
-        <link rel="stylesheet" href="style.[ver].css" />
+        <link rel="stylesheet" href="index.[ver].css" />
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" sizes="16x16 32x32 64x64 96x96 128x128" />
         <link rel="shortcut icon" type="image/x-icon" href="favicon16.ico" sizes="16x16" />
         <link rel="shortcut icon" type="image/x-icon" href="favicon32.ico" sizes="32x32" />
@@ -205,38 +205,40 @@
 
         <!-- LEARN SCREEN -->
         <div id="learn" style="display: none">
-            <div id="learn-content">
-                <img id="learn-title" class="logo_image dynamic_image" width="1024" height="472" src="" alt="" />
-                <b>Goal:</b> Get all of your pieces around and off the board!
-                <br/><br/>
+            <div id="learn-scrollable-area" class="wood-background"><div id="learn-content">
+                <h1>Learn to play The Royal Game of Ur</h1>
 
-                <b class="how-to-play">How to Play:</b><br/>
+                <h2>Goal</h2>
+                <p>Get all of your pieces around and off the board!</p>
+                <img class="board_paths_image dynamic_image shadow-no-highlight" src="" alt="Piece paths" />
+
+                <h2>How to Play</h2>
                 <b>1.</b> Roll the Dice.<br/>
+                <p class="sub-text">Click on your dice to roll them.</p>
                 <p class="sub-text">The value shown is how far you can move one of your pieces!</p>
                 <br/>
 
                 <b>2.</b> Move a Piece.<br/>
-                <p class="sub-text">
-                    Pieces can be moved by dragging, double clicking,
-                    or by clicking them and then their destination.
-                </p>
+                <p class="sub-text">On desktop, click a piece to move it.</p>
+                <p class="sub-text">On mobile, you can drag or double tap the piece you wish to move.</p>
                 <br/>
 
-                <b>Rosette Tiles:</b><br/>
+                <h2>Rosette Tiles</h2>
                 <p style="display: inline">Extra Moves:</p>
                 <p class="inline-sub-text">Moving your tiles onto rosette tiles gives you another move!</p><br/>
 
                 <p style="display: inline">Safe:</p>
                 <p class="inline-sub-text">Pieces on rosette tiles cannot be taken!</p><br/>
+                <img class="board_rosettes_image dynamic_image shadow-no-highlight" src="" alt="Rosette tiles" />
 
                 <br/>
-                <div class="centre-text">
-                    <div id="learn-back-button" class="text-button">
-                        Back to Menu
+                <div id="learn-back-button" class="centre-text">
+                    <div class="text-button">
+                        Back to Game
                     </div>
                 </div>
                 <br/>
-            </div>
+            </div></div>
         </div>
 
         <!-- JavaScript that doesn't need to be running straight away. -->

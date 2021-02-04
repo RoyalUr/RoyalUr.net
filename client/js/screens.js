@@ -169,7 +169,7 @@ function switchToScreen(screen, hasty) {
         return;
 
     // When the learn screen is exited, it should return to its previous screen.
-    if (screen === SCREEN_LEARN) {
+    if (screen === SCREEN_LEARN && fromScreen !== SCREEN_LOADING) {
         screenState.exitTargetScreen = fromScreen;
     } else {
         screenState.exitTargetScreen = SCREEN_MENU;

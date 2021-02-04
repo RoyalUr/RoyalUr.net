@@ -241,10 +241,8 @@ function redrawMenu(forceRedraw) {
 
 function redrawLearn(forceRedraw) {
     learnDiv.style.opacity = screenState.learnFade.get();
-    if (!isOnScreen(SCREEN_LEARN) && !forceRedraw)
-        return;
-
-    learnBackButton.innerText = "Back to " + (screenState.exitTargetScreen === SCREEN_GAME ? "Game" : "Menu");
+    // if (!isOnScreen(SCREEN_LEARN) && !forceRedraw)
+    //     return;
 }
 
 

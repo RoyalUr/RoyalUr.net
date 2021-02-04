@@ -86,6 +86,12 @@
   },
 
   "image_size_groups": {
+    "logo": {
+      "u_2160": "auto x 768",
+      "u_1440": "auto x 512",
+      "u_1080": "auto x 384",
+      "u_720": "auto x 256"
+    },
     "menu-button": {
       "u_2160": "auto x 384",
       "u_1440": "auto x 256",
@@ -109,27 +115,23 @@
       "u_1440": "auto x 192",
       "u_1080": "auto x 144",
       "u_720": "auto x 96"
+    },
+    "learn_board": {
+      "u_2160": "1536 x auto",
+      "u_1440": "1280 x auto",
+      "u_1080": "1024 x auto",
+      "u_720": "768 x auto"
     }
   },
 
   "images": {
     "res/logo.png": {
       "dest": "res/logo",
-      "sizes": {
-        "u_2160": "auto x 768",
-        "u_1440": "auto x 512",
-        "u_1080": "auto x 384",
-        "u_720": "auto x 256"
-      }
+      "size_group": "logo"
     },
     "res/logo_with_shadow.png": {
       "dest": "res/logo_with_shadow",
-      "sizes": {
-        "u_2160": "auto x 768",
-        "u_1440": "auto x 512",
-        "u_1080": "auto x 384",
-        "u_720": "auto x 256"
-      }
+      "size_group": "logo"
     },
     "res/wood-blue-1.png": {
       "dest": "res/background",
@@ -149,6 +151,14 @@
         "u_1080": "auto x 1152",
         "u_720": "auto x 768"
       }
+    },
+    "res/board_paths.png": {
+      "dest": "res/board_paths",
+      "size_group": "learn_board"
+    },
+    "res/board_rosettes.png": {
+      "dest": "res/board_rosettes",
+      "size_group": "learn_board"
     },
 
     "res/darkTile.png": {

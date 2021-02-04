@@ -72,6 +72,8 @@ const learnBackButton = document.getElementById("learn-back-button");
 const dynamicImagesByClass = {
     "logo_image": "logo_with_shadow",
     "tile_dark_image": "tile_dark",
+    "board_paths_image": "board_paths",
+    "board_rosettes_image": "board_rosettes"
 };
 
 
@@ -141,23 +143,6 @@ function setupMenuElements() {
         }
     });
 
-    // Set the src properties of all the dynamic images.
-    for (let className in dynamicImagesByClass) {
-        if (!dynamicImagesByClass.hasOwnProperty(className))
-            continue;
-
-        const imageKey = dynamicImagesByClass[className],
-              image = getImageResource(imageKey),
-              imageURL = getImageURL(imageKey),
-              elements = document.getElementsByClassName(className);
-
-        for (let index = 0; index < elements.length; ++index) {
-            const element = elements[index];
-            element.width = image.width;
-            element.height = image.height;
-            element.src = imageURL;
-        }
-    }
     window.onresize = () => {window.requestAnimationFrame(resize);};
 }
 
@@ -246,6 +231,33 @@ function setupGameElements() {
             updateMouse(VEC_NEG1, false);
         }
     };
+}
+
+/**
+ * Sets the src, width, and height attributes of dynamically loaded image elements.
+ */
+function populateDynamicImages() {
+    for (let className in dynamicImagesByClass) {
+        if (!dynamicImagesByClass.hasOwnProperty(className))
+            continue;
+
+        const imageKey = dynamicImagesByClass[className],
+              image = getImageResource(imageKey, null, true);
+
+        // The image isn't loaded yet, try again later.
+        if (!image)
+            continue;
+
+        const imageURL = getImageURL(imageKey),
+              elements = document.getElementsByClassName(className);
+
+        for (let index = 0; index < elements.length; ++index) {
+            const element = elements[index];
+            element.width = image.width;
+            element.height = image.height;
+            element.src = imageURL;
+        }
+    }
 }
 
 function toScreenPixels(size) {

@@ -27,14 +27,14 @@ html { overflow: hidden; }
 body { overflow: auto; }
 canvas { position: absolute; }
 
-body {
+body, body .wood-background {
     background: rgb(32, 41, 48);
 }
-body.webp {
+body.webp, body.webp .wood-background {
     background: rgb(32, 41, 48) url("res/background.[ver].webp") repeat;
     background-size: 35vh;
 }
-body.no-webp {
+body.no-webp, body.no-webp .wood-background {
     background: rgb(32, 41, 48) url("res/background.[ver].png") repeat;
     background-size: 35vh;
 }

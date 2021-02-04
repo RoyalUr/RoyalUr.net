@@ -73,7 +73,7 @@
  *  MENU
  */
 
-.shadow {
+.shadow, .shadow-no-highlight {
     filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
 }
 .shadow:hover {
@@ -502,7 +502,6 @@
     height: 100%;
     z-index: 10;
     overflow-y: scroll;
-    background: rgba(0,0,0,0.5);
 }
 
 #learn-title {
@@ -513,8 +512,15 @@
     margin-bottom: 5vh;
 }
 
+#learn-scrollable-area {
+    width: 100%;
+}
 #learn-content {
-    max-width: 1000px;
+    border-left: 1.5vh solid black;
+    border-right: 1.5vh solid black;
+    background-color: rgb(32, 41, 48);
+
+    max-width: 840px;
     margin-left: auto;
     margin-right: auto;
     padding: 2vh;
@@ -527,19 +533,33 @@
     text-decoration: none;
     color: white;
 }
+#learn-content h1 {
+    font-family: DuranGo, sans-serif;
+    font-size: 6vh;
+    margin-top: 5vh;
+    margin-bottom: 3vh;
+}
+#learn-content h2 {
+    text-decoration: underline;
+    font-size: 5vh;
+    margin-top: 3vh;
+    margin-bottom: 1vh;
+}
 #learn-content b {
     text-decoration: underline;
     margin-right: 0.75vh;
-}
-#learn-content .how-to-play {
-    display: inline-block;
-    margin-bottom: 0.8vh;
 }
 #learn-content .sub-text, #learn-content .inline-sub-text {
     font-size: 2.8vh;
     margin-top: 0.15vh;
 }
 #learn-content .inline-sub-text { display: inline; }
+#learn-content .board_paths_image, #learn-content .board_rosettes_image {
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 5vh;
+    padding-bottom: 2.5vh;
+}
 .text-button {
     display: inline;
     border: 3px solid white;
@@ -559,8 +579,9 @@
     background-color: rgba(0, 0, 0, 1);
     transition: background-color 0.1s ease-in-out;
 }
-#learn-back-button { background-color: rgba(0, 0, 0, 0.4); }
-#learn-back-button:hover { background-color: rgba(0, 0, 0, 0.8); }
+#learn-back-button { margin-top: 3vh; }
+#learn-back-button .text-button { background-color: rgba(0, 0, 0, 0.4); }
+#learn-back-button:hover .text-button { background-color: rgba(0, 0, 0, 0.8); }
 .centre-text {
     display: block;
     text-align: center;

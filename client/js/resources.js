@@ -506,12 +506,15 @@ function getImageURL(key) {
     return completeURL(findImageResource(key).url);
 }
 
-function getImageResource(key, width) {
+function getImageResource(key, width, nullOnMissing) {
     const imageResource = findImageResource(key);
     if(!imageResource)
         throw "Missing image resource " + key;
-    if(!imageResource.loaded)
+    if(!imageResource.loaded) {
+        if (nullOnMissing)
+            return null;
         throw "Image resource " + key + " is not yet loaded!";
+    }
     if (!width)
         return imageResource.image;
     return imageResource.getScaledImage(width);
@@ -595,6 +598,8 @@ const stagedResources = [
         new AudioResource("firework_explode", "res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.3}),
     ],
     [ // Learn Screen
+        new ImageResource("board_paths", "res/board_paths.[ver]"),
+        new ImageResource("board_rosettes", "res/board_rosettes.[ver]")
     ]
 ];
 const allResources = [];

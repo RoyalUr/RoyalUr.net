@@ -15,6 +15,7 @@ function onStageLoaded(stage) {
     } else if (stage === 1) {
         setupGameElements();
     }
+    populateDynamicImages();
     resize();
     maybeSwitchOffLoadingScreen(stage);
 }
@@ -27,11 +28,7 @@ function setup() {
 
     document.addEventListener("keyup", handleKeyPress);
     window.onhashchange = onHashChange;
-    if (getHashGameID() !== null) {
-        connectToGame(new OnlineGame());
-    } else {
-        switchToScreen(SCREEN_MENU);
-    }
+    onHashChange();
 
     window.requestAnimationFrame(function() {
         resize();
@@ -108,6 +105,9 @@ function onPlayClick(event) {
 function onLearnClick(event) {
     event.stopPropagation();
     switchToScreen(SCREEN_LEARN);
+    if (screenState.exitTargetScreen === SCREEN_MENU) {
+        setHash("learn");
+    }
 }
 
 function onPlayLocal(event) {
@@ -189,6 +189,9 @@ function onExitClick(event) {
     if (message && !window.confirm(message))
         return;
 
+    if (screenState.exitTargetScreen === SCREEN_MENU) {
+        resetHash();
+    }
     switchToScreen(screenState.exitTargetScreen);
 }
 
@@ -332,7 +335,10 @@ function getHashGameID() {
 }
 
 function onHashChange() {
-    if (getHashGameID() !== null) {
+    const rawHash = getHashRaw();
+    if (rawHash === "learn") {
+        switchToScreen(SCREEN_LEARN)
+    } else if (getHashGameID() !== null) {
         connectToGame(new OnlineGame());
     } else {
         switchToScreen(SCREEN_MENU);
