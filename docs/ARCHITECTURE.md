@@ -1,10 +1,10 @@
-# 🛠️ Code Summary
+# 🛠️ The Royal Architecture of Ur
 
 This file contains a summary of the codebase to help
 new contributors become familiar with the way the
-codebase fits together. In a perfect world this would
-be kept 100% consistent as changes are made, but in
-reality small details might have changed since this
+whole project fits together. In a perfect world this
+would be kept 100% consistent as changes are made, but
+in reality small details might have changed since this
 was updated. If you find any inconsistencies, please
 make an issue, and we can sort them out ASAP!
 
@@ -12,22 +12,37 @@ make an issue, and we can sort them out ASAP!
 and does not yet cover all major aspects of the codebase._
 
 ## Table of Contents
-- [1. Compilation](#1-compilation)
+- [1. Important Files & Directories](#1-important-files--directories)
+- [2. Compilation](#2-compilation)
     * 🏗️ Compilation Preparation
     * 🚧️ Compilation Modes
     * ⚙ The files to compile are set in compilation.json
-- [2. Resource Loading](#2-resource-loading)
+- [3. Resource Loading](#3-resource-loading)
     * 🗂️ Resources are loaded in stages
     * 💻 Users on smaller devices load smaller assets
     * 🖼 WebP is used to serve images if supported
     * 🏛️ Resources are versioned
     * 📝 Resource metadata is served in annotations.json
-- [3. Screen System](#2-screen-system)
+- [4. Screen System](#4-screen-system)
   * 🌫️ Fades are used to control element visibility
   * 👾 Rendering based on Screens
+- [5. Client Input](#5-client-input)
 
 
-# 1. Compilation
+# 1. Important Files & Directories
+| File or Directory | Description |
+| ----------------- | ----------- |
+| [/docs/](/docs) | Documentation about the project. |
+| /res/ | Source images, audio, & annotations of the website.<br/>Hosted off GitHub at https://royalur.net/res.zip. |
+| [/client/](/client) | Source code and configuration files. |
+| [/client/js/](/client/js) | JavaScript source files. |
+| [/client/js/lib/](/client/js/lib) | JavaScript libraries used by the client. |
+| [/compilation.json](/compilation.json) | Specification used to compile the site. |
+| [/compile.sh](/compile.sh) & [/compile.py](/compile.py) | Scripts that compile the site. |
+| /compiled/ | The compiled site. |
+
+
+# 2. Compilation
 
 | File             | Purpose                                      |
 | ---------------- |--------------------------------------------- |
@@ -85,7 +100,7 @@ new annotations to be included, they just have to be added
 to `compilation.json` and they'll be added during compilation.
 
 
-# 2. Resource Loading
+# 3. Resource Loading
 
 | File             | Purpose                                   |
 | ---------------- |------------------------------------------ |
@@ -144,7 +159,7 @@ board. This information is served in an `annotations.json` file that
 is generated at compile time.
 
 
-# 3. Screen System
+# 4. Screen System
 
 | File       | Purpose                                      |
 | ---------- |--------------------------------------------- |
@@ -173,7 +188,7 @@ care needs to be taken to make sure that switching screens and
 element rendering play nicely together.
 
 
-# 4. Client Input
+# 5. Client Input
 
 | File      | Purpose                                              |
 | --------- |----------------------------------------------------- |

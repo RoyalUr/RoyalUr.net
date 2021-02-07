@@ -70,7 +70,7 @@ When submitting a feature request, please include the following:
 If you are able, a code contribution to the repository is a
 great way to help out and make the changes you want to see in
 the project! Before making a code contribution it may be helpful
-to have a read of [the codebase summary](docs/CODEBASE.md) to
+to have a read of [the codebase summary](ARCHITECTURE.md) to
 familiarise yourself with the project better.
 
 To submit a code contribution please create a **new pull request**

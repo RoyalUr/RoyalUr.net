@@ -40,24 +40,16 @@ The following commands will compile the site to _./compiled_: \
 `./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder.
 
 
-# 📂 Project Structure
-`/client/` contains the source files for the site, as well as site config files. \
-`/client/js/` contains the JavaScript of the client. \
-`/client/js/lib/` contains the JavaScript libraries used by the client. \
-`package.json` contains the NPM dependencies for compiling the site. \
-`/compilation.json` contains the specification for how to compile the project. \
-`/compile.sh` is a convenience script for running compile.py and optionally post_compile.sh. \
-`/compile.py` is the Python script that actually performs the compilation. \
-`/compiled/` is the directory where the site is compiled to.
+# 🛠️ Project Architecture
+A summary of the architecture of The Royal Game of Ur can be found in
+[ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 
 # 💾 Resource Files
-The resource files of this project are not stored in git, but can be downloaded
-from https://royalur.net/res.zip. Place the _res_ folder in the root folder of the
-project so that the compilation script can find it.
-
-Alternatively, if you run the compilation script without the _res_ folder in the root
-directory of the repository, the script will attempt to download it for you.
+The image, audio, and annotation assets required by the project are not actually
+stored in git, due to git's poor handling of binary files. Instead, the script
+to compile the site will automatically download the resources for you from
+https://royalur.net/res.zip.
 
 ### Updating your ./res folder
 To update the contents of your ./res folder as the resources used by RoyalUrClient
