@@ -39,21 +39,23 @@ The following commands will compile the site to _./compiled_: \
 `./compile.sh release` -- Full clean compilation, with minified JS. \
 `./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder.
 
+**If you run into ./res file related issues during
+compilation, try updating your ./res folder.**
+
+To update the contents of your ./res folder as the resources used by RoyalUrClient
+change, simply delete it and let the compilation script download it again for you.
+
 
 # 🛠️ Project Architecture
 A summary of the architecture of The Royal Game of Ur can be found in
 [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-
-# 💾 Resource Files
+### 💾 Resource Files
 The image, audio, and annotation assets required by the project are not actually
 stored in git, due to git's poor handling of binary files. Instead, the script
 to compile the site will automatically download the resources for you from
 https://royalur.net/res.zip.
 
-### Updating your ./res folder
-To update the contents of your ./res folder as the resources used by RoyalUrClient
-change, simply delete it and let the compilation script download it again for you.
 
 # 📝 License
 This program is free software: you can redistribute it and/or modify
