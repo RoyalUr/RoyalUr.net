@@ -339,7 +339,7 @@ function onHashChange() {
     if (rawHash === "learn") {
         switchToScreen(SCREEN_LEARN)
     } else if (getHashGameID() !== null) {
-        connectToGame(new OnlineGame());
+        connectToGame(new FriendGame());
     } else {
         switchToScreen(SCREEN_MENU);
     }

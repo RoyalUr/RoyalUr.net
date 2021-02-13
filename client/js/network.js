@@ -78,6 +78,7 @@ function connectSocket() {
         socketState = "opened";
         uniqueId = sessionStorage.getItem("uniqueId");
         networkConnectTime = getTime();
+        analytics.recordConnected(address);
 
         if(uniqueId) {
             sendPacket(writeReOpenPacket(uniqueId));
@@ -92,9 +93,19 @@ function connectSocket() {
         const lastState = socketState;
         socketState = "closed";
 
-        if(socket !== this || lastState !== "opened")
+        // When the connection has been intentionally closed.
+        if (socket !== this) {
+            analytics.recordCloseConnection(address);
             return;
+        }
+        // When the connection was closed without connecting in the first place.
+        if(lastState !== "opened")  {
+            analytics.recordConnectionFailed(address);
+            return;
+        }
 
+        // When the socket was connected, but then lost connection.
+        analytics.recordLoseConnection(address);
         onNetworkLoseConnection();
         console.info("Connection lost, attempting to reconnect...");
     }.bind(socket);
@@ -103,9 +114,7 @@ function connectSocket() {
         receiveMessage(event.data);
     }.bind(socket);
 
-    socket.onerror = function() {
-
-    }.bind(socket);
+    socket.onerror = function() {}.bind(socket);
 }
 
 function receiveMessage(message) {

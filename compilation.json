@@ -5,18 +5,24 @@
   },
 
   "html": {
-    "client/index.html": "index.html",
-    "client/lost.html": "lost.html"
+    "client/html/index.html": "index.html",
+    "client/html/privacy.html": "privacy/index.html",
+    "client/html/lost.html": "lost.html"
   },
   "css": {
     "index.css": [
-      "client/base.css",
-      "client/index.css"
+      "client/css/base.css",
+      "client/css/index.css"
+    ],
+    "privacy/index.css": [
+      "client/css/base.css",
+      "client/css/article.css"
     ]
   },
   "javascript": {
     "index.js": [
       "client/js/lib/reconnecting-websocket.js",
+      "client/js/analytics.js",
       "client/js/stats.js",
       "client/js/board.js",
       "client/js/model.js",
@@ -128,6 +134,10 @@
     "res/logo.png": {
       "dest": "res/logo",
       "size_group": "logo"
+    },
+    "res/favicon.png": {
+      "dest": "res/small_logo",
+      "sizes": {}
     },
     "res/logo_with_shadow.png": {
       "dest": "res/logo_with_shadow",

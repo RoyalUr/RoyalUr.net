@@ -52,6 +52,9 @@ Game.prototype.onDiceClick = unimplemented("onDiceClick");
 Game.prototype.swapPlayerAfterNoMoves = unimplemented("swapPlayerAfterNoMoves");
 Game.prototype.onFinishMove = unimplemented("onFinishMove");
 Game.prototype._init = unimplemented("_init");
+Game.prototype.onGameStart = unimplemented("onGameStart");
+Game.prototype.onGameAborted = unimplemented("onGameAborted");
+Game.prototype.onGameFinished = unimplemented("onGameFinished");
 
 Game.prototype.init = function() {
     if (this.initialised)
@@ -209,11 +212,16 @@ function OnlineGame(hashID) {
 }
 setSuperClass(OnlineGame, Game);
 
+OnlineGame.prototype.onGameStart = () => analytics.recordStartGame(EVENT_ONLINE_GAME);
+OnlineGame.prototype.onGameAborted = () => analytics.recordAbortGame(EVENT_ONLINE_GAME);
+OnlineGame.prototype.onGameFinished = () => analytics.recordFinishGame(EVENT_ONLINE_GAME);
+
 OnlineGame.prototype._init = function() {
     connect();
     resetDice();
 };
 OnlineGame.prototype.sendOpenGamePacket = function() {
+    analytics.recordSearchForOnlineGame();
     sendPacket(writeFindGamePacket("Name" + randInt(100, 1000)));
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
@@ -304,7 +312,12 @@ function FriendGame() {
 }
 setSuperClass(FriendGame, OnlineGame);
 
+FriendGame.prototype.onGameStart = () => analytics.recordStartGame(EVENT_FRIEND_GAME);
+FriendGame.prototype.onGameAborted = () => analytics.recordAbortGame(EVENT_FRIEND_GAME);
+FriendGame.prototype.onGameFinished = () => analytics.recordFinishGame(EVENT_FRIEND_GAME);
+
 FriendGame.prototype.sendOpenGamePacket = function() {
+    analytics.recordCreateGame();
     sendPacket(writeCreateGamePacket("Name" + randInt(100, 1000)));
 };
 
@@ -369,6 +382,23 @@ function ComputerGame(difficulty) {
     this.turnPlayer = lightPlayer;
 }
 setSuperClass(ComputerGame, BrowserGame);
+
+ComputerGame.prototype.getAnalyticsDifficultyId = function() {
+    if (this.difficulty <= DIFFICULTY_EASY)
+        return EVENT_COMPUTER_EASY;
+    if (this.difficulty <= DIFFICULTY_MEDIUM)
+        return EVENT_COMPUTER_MEDIUM;
+    return EVENT_COMPUTER_HARD;
+};
+ComputerGame.prototype.onGameStart = function() {
+    analytics.recordStartGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+};
+ComputerGame.prototype.onGameAborted = function() {
+    analytics.recordAbortGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+};
+ComputerGame.prototype.onGameFinished = function() {
+    analytics.recordFinishGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+};
 
 ComputerGame.prototype.getTurnPlayer = function() {
     return this.turnPlayer;
@@ -505,6 +535,10 @@ function LocalGame() {
     darkPlayer.name = "Dark";
 }
 setSuperClass(LocalGame, BrowserGame);
+
+LocalGame.prototype.onGameStart = () => analytics.recordStartGame(EVENT_LOCAL_GAME);
+LocalGame.prototype.onGameAborted = () => analytics.recordAbortGame(EVENT_LOCAL_GAME);
+LocalGame.prototype.onGameFinished = () => analytics.recordFinishGame(EVENT_LOCAL_GAME);
 
 LocalGame.prototype.getTurnPlayer = function() {
     return this.turnPlayer;

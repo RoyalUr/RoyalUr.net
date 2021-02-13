@@ -18,6 +18,15 @@ from datetime import datetime
 # Utility Functions
 #
 
+def resolve_path(root_dir, path):
+    """
+    Similar to os.path.join, except that it acts like a webserver for paths beginning with "/".
+    This means that a preceding slash "/" is treated as a "./".
+    """
+    if os.path.isabs(path):
+        path = os.path.relpath(path, start=os.path.abspath(os.sep))
+    return os.path.join(root_dir, path)
+
 def getmtime(files):
     # If files is a list of files, get the maximum modification time of all the files.
     if isinstance(files, list):
@@ -226,7 +235,7 @@ class Image:
         mtime = getmtime(self.from_rel)
 
         # Make sure the directory to copy the image to exists.
-        output_file = os.path.join(target_folder, self.to_rel)
+        output_file = resolve_path(target_folder, self.to_rel)
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
         # Create the scaled copies.
@@ -286,7 +295,7 @@ def create_sitemap(target_folder, comp_spec, *, prefix=""):
         for line in source_file:
             output_sitemap += line.replace("<lastmod/>", "<lastmod>" + date_w3c + "</lastmod>")
 
-    dest = os.path.join(target_folder, comp_spec.sitemap_dest)
+    dest = resolve_path(target_folder, comp_spec.sitemap_dest)
     with open(dest, "w") as dest_file:
         dest_file.write(output_sitemap)
 
@@ -296,7 +305,7 @@ def copy_html(target_folder, comp_spec, *, prefix=""):
     Copies all of the HTML files to the target folder.
     """
     for from_path, to_rel in comp_spec.html_files.items():
-        to_path = os.path.join(target_folder, to_rel)
+        to_path = resolve_path(target_folder, to_rel)
         source_mtime = getmtime(from_path)
         # Skip this file if it hasn't changed.
         if source_mtime == getmtime(to_path):
@@ -313,7 +322,7 @@ def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
     Concatenate all javascript into a single source file, and optionally minify it.
     """
     for to_rel, file_list in comp_spec.js_files.items():
-        output_file = os.path.join(target_folder, to_rel)
+        output_file = resolve_path(target_folder, to_rel)
         source_mtime = getmtime(file_list)
         # Skip this output if none of its sources have changed.
         if source_mtime == getmtime(output_file):
@@ -333,7 +342,7 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
     Minify the CSS of the website.
     """
     for to_rel, file_list in comp_spec.css_files.items():
-        output_file = os.path.join(target_folder, to_rel)
+        output_file = resolve_path(target_folder, to_rel)
         source_mtime = getmtime(file_list)
         # Skip this output if none of its sources have changed.
         if source_mtime == getmtime(output_file):
@@ -353,7 +362,7 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     """
     # Copy static files.
     for from_path, to_rel in comp_spec.res_files.items():
-        to_path = os.path.join(target_folder, to_rel)
+        to_path = resolve_path(target_folder, to_rel)
         if getmtime(from_path) <= getmtime(to_path):
             continue
 
@@ -369,7 +378,7 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
 
     # Create the favicon images.
     favicon_image = PILImage.open("res/favicon.png")
-    favicon_path = os.path.join(target_folder, "favicon{}.ico")
+    favicon_path = resolve_path(target_folder, "favicon{}.ico")
     target_sizes = [16, 32, 64, 96, 128]
     for size in target_sizes:
         favicon_scaled = favicon_image.resize((size, size), PILImage.LANCZOS)
@@ -385,7 +394,7 @@ def combine_annotations(target_folder, comp_spec, *, prefix=""):
     annotations = Annotations()
     for key, file in comp_spec.annotation_files.items():
         annotations.read(key, file)
-    annotations.write(os.path.join(target_folder, "res/annotations.json"))
+    annotations.write(resolve_path(target_folder, "res/annotations.json"))
 
 
 def filter_file(target_folder, file, *, prefix="", skip_versions=False):
@@ -429,7 +438,7 @@ def filter_file(target_folder, file, *, prefix="", skip_versions=False):
             ver_target_file = ver_target_file[len("https://royalur.net/"):]
 
         # Find the modification time of the resource that we are versioning.
-        version_mtime = get_incomplete_file_mtime(os.path.join(target_folder, ver_target_file))
+        version_mtime = get_incomplete_file_mtime(resolve_path(target_folder, ver_target_file))
 
         # In dev builds we don't add the versions to the URLs.
         if not skip_versions:
@@ -453,7 +462,7 @@ def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=Fals
     ]
     for file_rel in files_to_filter:
         # Read and filter the file.
-        file_path = os.path.join(target_folder, file_rel)
+        file_path = resolve_path(target_folder, file_rel)
         file_mtime, filtered, changed = filter_file(
                 target_folder, file_path, prefix=prefix, skip_versions=skip_versions)
 
@@ -469,7 +478,7 @@ def zip_development_res_folder(target_folder, comp_spec, *, prefix=""):
     """
     Creates a zip file with the full contents of the development resources folder.
     """
-    output_file = os.path.join(target_folder, "res.zip")
+    output_file = resolve_path(target_folder, "res.zip")
     # For some reason the zip command never exits if shell=True is used in subprocess.Popen...
     assert execute_command("zip", "-q", "-r", output_file, "./res", prefix=prefix)
 
