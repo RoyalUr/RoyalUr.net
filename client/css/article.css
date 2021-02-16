@@ -7,7 +7,7 @@
     margin-right: auto;
 
     font-size: 1.5rem;
-    background: #202930;
+    background: #151A1F;
     box-shadow: 0 0 10px 5px rgba(0,0,0,1);
 }
 #header {
@@ -127,7 +127,7 @@
 
 
 #call-to-action {
-    background: rgb(21, 26, 31);
+    background: #202930;
     text-align: center;
     padding: 1em;
     color: white;
