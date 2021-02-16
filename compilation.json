@@ -28,29 +28,30 @@
   "javascript": {
     "index.js": [
       "client/js/lib/reconnecting-websocket.js",
-      "client/js/analytics.js",
-      "client/js/stats.js",
-      "client/js/board.js",
-      "client/js/model.js",
-      "client/js/layout.js",
-      "client/js/particles.js",
-      "client/js/curves.js",
-      "client/js/render.js",
-      "client/js/packets.js",
-      "client/js/network.js",
-      "client/js/game.js",
-      "client/js/screens.js",
+      "client/js/analytics/analytics.js",
+      "client/js/analytics/stats.js",
+      "client/js/game/board.js",
+      "client/js/game/model.js",
+      "client/js/ui/layout.js",
+      "client/js/ui/particles.js",
+      "client/js/ui/curves.js",
+      "client/js/ui/render.js",
+      "client/js/network/packets.js",
+      "client/js/network/network.js",
+      "client/js/game/game.js",
+      "client/js/ui/screens.js",
       "client/js/client.js"
     ],
     "resources.js": [
       "client/js/utils.js",
-      "client/js/resources.js"
+      "client/js/resources/resource.js",
+      "client/js/resources/game_resources.js"
     ],
     "simulation.js": [
       "client/js/utils.js",
-      "client/js/board.js",
-      "client/js/packets.js",
-      "client/js/simulation.js"
+      "client/js/network/packets.js",
+      "client/js/game/board.js",
+      "client/js/game/simulation.js"
     ]
   },
 

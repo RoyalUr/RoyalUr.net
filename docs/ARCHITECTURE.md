@@ -102,10 +102,10 @@ to `compilation.json` and they'll be added during compilation.
 
 # 3. Resource Loading
 
-| File             | Purpose                                   |
-| ---------------- |------------------------------------------ |
-| resources.js     | Loads all of the game assets.             |
-| compilation.json | Specifies names and sizes of game assets. |
+| File                  | Purpose                                          |
+| --------------------- |------------------------------------------------- |
+| client/js/resources/  | Contains code to dynamically load assets.        |
+| compilation.json      | Specifies names and sizes of assets to generate. |
 
 The resource loading done by the client is unusually
 complex. This is because it tries to prioritise what
