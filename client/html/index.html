@@ -22,7 +22,7 @@
               content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!">
         <meta name="twitter:image" content="https://royalur.net/banner.[ver].jpg">
 
-        <link rel="stylesheet" href="index.[ver].css" />
+        <link rel="stylesheet" href="/index.[ver].css" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 64x64 96x96 128x128" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon16.ico" sizes="16x16" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon32.ico" sizes="32x32" />
@@ -76,11 +76,11 @@
                     <canvas id="play-canvas"></canvas>
                     <img class="tile_dark_image dynamic_image" src="" alt="" />
                 </div>
-                <div id="learn-button" class="menu-button shadow">
+                <a id="learn-button" class="menu-button shadow" href="/rules">
                     <canvas id="learn-canvas"></canvas>
-                </div>
+                </a>
                 <a id="watch-button" class="menu-button shadow"
-                   href="https://youtu.be/WZskjLq040I" target="_blank" rel="noopener">
+                   href="https://youtu.be/WZskjLq040I" target="_blank">
                     <canvas id="watch-canvas"></canvas>
                 </a>
             </div>
@@ -186,58 +186,18 @@
             <div id="exit-control" class="control">
                 <img class="exit-icon control-icon" src="/res/control_exit.[ver].svg" alt="Exit" />
             </div>
-            <div id="learn-control" class="control">
+            <a id="learn-control" class="control" href="/rules" target="_blank">
                 <img class="question-mark-icon control-icon" src="/res/control_learn.[ver].svg" alt="Learn" />
-            </div>
+            </a>
             <div id="settings-control" class="control">
                 <img class="settings-icon control-icon" src="/res/control_settings.[ver].svg" alt="Settings" />
             </div>
-            <a id="github-control" class="control" href="https://github.com/Sothatsit/RoyalUrClient"
-               target="_blank" rel="noopener">
+            <a id="github-control" class="control" href="https://github.com/Sothatsit/RoyalUrClient" target="_blank">
                 <img class="github-icon control-icon" src="/res/control_github.[ver].svg" alt="GitHub" />
             </a>
-            <a id="discord-control" class="control" href="https://discord.gg/FbCp76esgb"
-               target="_blank" rel="noopener">
+            <a id="discord-control" class="control" href="https://discord.gg/FbCp76esgb" target="_blank">
                 <img class="discord-icon control-icon" src="/res/control_discord.[ver].svg" alt="Discord" />
             </a>
-        </div>
-
-        <!-- LEARN SCREEN -->
-        <div id="learn" style="display: none">
-            <div id="learn-scrollable-area" class="wood-background"><div id="learn-content">
-                <h1>Learn to play The Royal Game of Ur</h1>
-
-                <h2>Goal</h2>
-                <p>Get all of your pieces around and off the board!</p>
-                <img class="board_paths_image dynamic_image shadow-no-highlight" src="" alt="Piece paths" />
-
-                <h2>How to Play</h2>
-                <b>1.</b> Roll the Dice.<br/>
-                <p class="sub-text">Click on your dice to roll them.</p>
-                <p class="sub-text">The value shown is how far you can move one of your pieces!</p>
-                <br/>
-
-                <b>2.</b> Move a Piece.<br/>
-                <p class="sub-text">On desktop, click a piece to move it.</p>
-                <p class="sub-text">On mobile, you can drag or double tap the piece you wish to move.</p>
-                <br/>
-
-                <h2>Rosette Tiles</h2>
-                <p style="display: inline">Extra Moves:</p>
-                <p class="inline-sub-text">Moving your tiles onto rosette tiles gives you another move!</p><br/>
-
-                <p style="display: inline">Safe:</p>
-                <p class="inline-sub-text">Pieces on rosette tiles cannot be taken!</p><br/>
-                <img class="board_rosettes_image dynamic_image shadow-no-highlight" src="" alt="Rosette tiles" />
-
-                <br/>
-                <div id="learn-back-button" class="centre-text">
-                    <div class="text-button">
-                        Back to Game
-                    </div>
-                </div>
-                <br/>
-            </div></div>
         </div>
 
         <!-- JavaScript that doesn't need to be running straight away. -->

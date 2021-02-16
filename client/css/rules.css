@@ -1,0 +1,42 @@
+#content {
+    background-color: rgb(32, 41, 48);
+    font-size: 1.8rem;
+}
+#content, #content * {
+    font-family: Nunito, sans-serif;
+    text-decoration: none;
+    color: white;
+}
+#content h1 {
+    font-family: DuranGo, sans-serif;
+    font-size: 1.6em;
+    margin-top: 0.5em;
+    margin-bottom: 0.2em;
+}
+#content h2 {
+    text-decoration: underline;
+    font-size: 1.4em;
+    margin-top: 3vh;
+    margin-bottom: 1vh;
+}
+#content strong {
+    text-decoration: underline;
+    margin-right: 0.75vh;
+}
+#content p {
+    font-size: 1em;
+}
+#content .sub-text, #content .inline-sub-text {
+    font-size: 0.75em;
+    margin-top: 0.15vh;
+}
+#content .inline-sub-text { display: inline; }
+#content img {
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.2em;
+}
+#content img.rosettes {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}

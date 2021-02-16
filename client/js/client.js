@@ -102,14 +102,6 @@ function onPlayClick(event) {
     switchToScreen(SCREEN_PLAY_SELECT);
 }
 
-function onLearnClick(event) {
-    event.stopPropagation();
-    switchToScreen(SCREEN_LEARN);
-    if (screenState.exitTargetScreen === SCREEN_MENU) {
-        setHash("learn");
-    }
-}
-
 function onPlayLocal(event) {
     event.stopPropagation();
     game = new LocalGame();
@@ -176,11 +168,6 @@ function onPlayUnhover() {
 function onSettingsControlClick(event) {
     event.stopPropagation();
     console.log("settings control clicked");
-}
-
-function onLearnControlClick(event) {
-    event.stopPropagation();
-    switchToScreen(SCREEN_LEARN);
 }
 
 function onExitClick(event) {
@@ -335,10 +322,7 @@ function getHashGameID() {
 }
 
 function onHashChange() {
-    const rawHash = getHashRaw();
-    if (rawHash === "learn") {
-        switchToScreen(SCREEN_LEARN)
-    } else if (getHashGameID() !== null) {
+    if (getHashGameID() !== null) {
         connectToGame(new FriendGame());
     } else {
         switchToScreen(SCREEN_MENU);

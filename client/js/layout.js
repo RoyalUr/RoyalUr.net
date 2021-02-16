@@ -40,8 +40,6 @@ const difficultyDiv = document.getElementById("computer-difficulty"),
 const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
       waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
 
-const learnDiv = document.getElementById("learn");
-
 const loadingDiv = document.getElementById("loading"),
       loadingTextSpan = document.getElementById("loading-text");
 
@@ -67,13 +65,10 @@ const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
 
 const creditsDiv = document.getElementById("credits");
-const learnBackButton = document.getElementById("learn-back-button");
 
 const dynamicImagesByClass = {
     "logo_image": "logo_with_shadow",
-    "tile_dark_image": "tile_dark",
-    "board_paths_image": "board_paths",
-    "board_rosettes_image": "board_rosettes"
+    "tile_dark_image": "tile_dark"
 };
 
 
@@ -94,12 +89,9 @@ let mouseDown = false,
 
 function setupMenuElements() {
     playButton.addEventListener("click", onPlayClick);
-    learnButton.addEventListener("click", onLearnClick);
 
     settingsControlButton.addEventListener("click", onSettingsControlClick);
-    learnControlButton.addEventListener("click", onLearnControlClick);
     exitControlButton.addEventListener("click", onExitClick);
-    learnBackButton.addEventListener("click", onExitClick);
     winBackButton.addEventListener("click", onExitClick);
 
     messageContainerElement.addEventListener("click", tryDismissMessage);

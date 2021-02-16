@@ -35,7 +35,6 @@ function redraw(forceRedraw) {
         callRedraw(STAT_BOARD, redrawBoard);
         callRedraw(STAT_LOADING, redrawLoading);
         callRedraw(STAT_MENU, redrawMenu);
-        callRedraw(STAT_LEARN, redrawLearn);
         callRedraw(STAT_TILES, redrawTiles);
         callRedraw(STAT_DICE, redrawDice);
         callRedraw(STAT_SCORES, redrawScores);
@@ -47,7 +46,7 @@ function redraw(forceRedraw) {
 
         updateElementVisibilities([
             menuOuterDiv, playSelectDiv, difficultyDiv,
-            learnDiv, winDiv, boardCanvas, tilesCanvas,
+            winDiv, boardCanvas, tilesCanvas,
             diceCanvas, creditsDiv, waitingForFriendDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,
@@ -130,18 +129,12 @@ function redrawButton(name, canvas, ctx, imageKey, text, isActive, forceRedraw) 
 }
 
 function redrawMenu(forceRedraw) {
-    const menuFade = screenState.menuFade.get(),
-          staggered = (screenState.useStaggeredMenuFade && screenState.menuFade.isFadeIn()),
-          titleOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade, 0, 1)),
-          playOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.16, 0, 1)),
-          learnOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.33, 0, 1)),
-          watchOpacity = (!staggered ? menuFade : clamp(1.5 * menuFade - 0.5, 0, 1));
-
+    const menuFade = screenState.menuFade.get();
     menuOuterDiv.style.opacity = (menuFade > 0 ? 1 : 0);
-    menuTitleDiv.style.opacity = titleOpacity;
-    playButton.style.opacity = playOpacity;
-    learnButton.style.opacity = learnOpacity;
-    watchButton.style.opacity = watchOpacity;
+    menuTitleDiv.style.opacity = menuFade;
+    playButton.style.opacity = menuFade;
+    learnButton.style.opacity = menuFade;
+    watchButton.style.opacity = menuFade;
 
     creditsDiv.style.opacity = screenState.creditsFade.get();
     networkStatus.hidden = false;
@@ -170,21 +163,17 @@ function redrawMenu(forceRedraw) {
               watchButtonActive = (menuState.watchButton !== BUTTON_STATE_INACTIVE);
 
         const offMenuForceRedraw = (forceRedraw && !menuVisible);
-        if (offMenuForceRedraw || playOpacity > 0) {
+        if (offMenuForceRedraw || menuFade > 0) {
             redrawButton(
                 "play", playButtonCanvas, playButtonCtx,
                 (playButtonActive ? "play_active" : "play"),
                 "Play", playButtonActive, forceRedraw
             );
-        }
-        if (offMenuForceRedraw || learnOpacity > 0) {
             redrawButton(
                 "learn", learnButtonCanvas, learnButtonCtx,
                 (learnButtonActive ? "learn_active" : "learn"),
                 "Learn", learnButtonActive, forceRedraw
             );
-        }
-        if (offMenuForceRedraw || watchOpacity > 0) {
             redrawButton(
                 "watch", watchButtonCanvas, watchButtonCtx,
                 (watchButtonActive ? "watch_active" : "watch"),
@@ -231,18 +220,6 @@ function redrawMenu(forceRedraw) {
     leftPlayerRenderTarget.tilesCanvas.style.opacity = two;
     rightPlayerRenderTarget.scoreCanvas.style.opacity = two;
     rightPlayerRenderTarget.tilesCanvas.style.opacity = two;
-}
-
-
-
-//
-// Rendering of the learn screen.
-//
-
-function redrawLearn(forceRedraw) {
-    learnDiv.style.opacity = screenState.learnFade.get();
-    // if (!isOnScreen(SCREEN_LEARN) && !forceRedraw)
-    //     return;
 }
 
 

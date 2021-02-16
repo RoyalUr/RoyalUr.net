@@ -596,10 +596,6 @@ const stagedResources = [
         new AudioResource("dice_select", "/res/audio_dice_select.[ver].mp4", {instances: 4, volume: 0.5}),
         new AudioResource("firework_rocket", "/res/audio_firework_rocket.[ver].mp4", {instances: 4, volume: 0.03}),
         new AudioResource("firework_explode", "/res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.3}),
-    ],
-    [ // Learn Screen
-        new ImageResource("board_paths", "/res/board_paths.[ver]"),
-        new ImageResource("board_rosettes", "/res/board_rosettes.[ver]")
     ]
 ];
 const allResources = [];

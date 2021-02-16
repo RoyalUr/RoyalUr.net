@@ -6,6 +6,7 @@
 
   "html": {
     "client/html/index.html": "index.html",
+    "client/html/rules.html": "rules/index.html",
     "client/html/privacy.html": "privacy/index.html",
     "client/html/lost.html": "lost.html"
   },
@@ -14,9 +15,14 @@
       "client/css/base.css",
       "client/css/index.css"
     ],
-    "privacy/index.css": [
+    "articles.css": [
       "client/css/base.css",
       "client/css/article.css"
+    ],
+    "rules.css": [
+      "client/css/base.css",
+      "client/css/article.css",
+      "client/css/rules.css"
     ]
   },
   "javascript": {
@@ -70,6 +76,10 @@
     "res/audio/dice_select.mp4": "res/audio_dice_select.mp4",
     "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4",
+
+    "res/social/discord.svg": "res/discord.svg",
+    "res/social/reddit.svg": "res/reddit.svg",
+    "res/social/github.svg": "res/github.svg",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
     "res/social/star_on_github.svg": "res/star_on_github.svg",
     "res/buttons/play_local.svg": "res/play_local.svg",

@@ -1,19 +1,22 @@
-#header {
+#header, #footer {
     display: block;
     box-sizing: border-box;
     max-width: 900px;
     padding: 0.5rem;
-    margin-bottom: 1rem;
     margin-left: auto;
     margin-right: auto;
-    vertical-align: middle;
 
     font-size: 1.5rem;
     background: #202930;
     box-shadow: 0 0 10px 5px rgba(0,0,0,1);
 }
+#header {
+    margin-bottom: 1rem;
+}
 #header a {
     line-height: 48px;
+}
+#header a, #footer a {
     text-decoration: none;
 }
 #header a img, #header a span {
@@ -30,7 +33,38 @@
     color: white;
 }
 
-#content {
+
+#footer {
+    padding: 1rem;
+    margin-top: 1rem;
+    line-height: 40px;
+}
+#footer-text {
+    display: inline-block;
+    padding-top: 4px;
+}
+#footer a.link, #footer span.copyright {
+    color: #bbbbbb;
+    font-family: Nunito, sans-serif;
+    font-size: 0.7em;
+    margin-right: 1rem;
+    vertical-align: middle;
+}
+#footer span.copyright {
+    color: #999999;
+    font-size: 0.55em;
+}
+#footer a.link:hover {
+    color: #999999;
+}
+#footer a.social-icon {
+    float: right;
+    margin-left: 0.5em;
+    line-height: 0;
+}
+
+
+#content, #call-to-action {
     display: block;
     box-sizing: border-box;
     max-width: 900px;
@@ -89,4 +123,27 @@
 }
 #content p.list-title {
     margin-bottom: 0.3em;
+}
+
+
+#call-to-action {
+    background: rgb(21, 26, 31);
+    text-align: center;
+    padding: 1em;
+    color: white;
+}
+#call-to-action h2 {
+    margin-bottom: 0.3em;
+}
+#call-to-action p {
+    font-family: Nunito, sans-serif;
+}
+#call-to-action .play img {
+    width: 40%;
+    padding-top: 1em;
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.6));
+}
+
+#call-to-action .play:hover img {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
 }

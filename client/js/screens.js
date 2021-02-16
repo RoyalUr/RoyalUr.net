@@ -6,7 +6,6 @@ const SCREEN_LOADING = "screen_loading",
       SCREEN_MENU = "screen_menu",
       SCREEN_PLAY_SELECT = "screen_play_select",
       SCREEN_DIFFICULTY = "screen_difficulty",
-      SCREEN_LEARN = "screen_learn",
       SCREEN_CONNECTING = "screen_connecting",
       SCREEN_WAITING_FOR_FRIEND = "screen_waiting_for_friend",
       SCREEN_GAME = "screen_game",
@@ -14,8 +13,8 @@ const SCREEN_LOADING = "screen_loading",
 
 const MENU_VISIBLE_SCREENS = [SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY],
       GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN],
-      NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME, SCREEN_LEARN],
-      CREDITS_HIDDEN_SCREENS = [SCREEN_LOADING, SCREEN_LEARN];
+      NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME],
+      CREDITS_HIDDEN_SCREENS = [SCREEN_LOADING];
 
 const controlFadeDuration = 0.25;
 const screenState = {
@@ -31,7 +30,6 @@ const screenState = {
 
     loadingFade: new Fade(0.5).visible(),
     menuFade: new Fade(0.5),
-    useStaggeredMenuFade: true,
     playSelectFade: new Fade(0.5),
     difficultyFade: new Fade(0.5),
     learnFade: new Fade(0.5),
@@ -59,7 +57,6 @@ screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
 screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
 screenRequiredLoadingStages[SCREEN_DIFFICULTY] = 0;
-screenRequiredLoadingStages[SCREEN_LEARN] = 2;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_WAITING_FOR_FRIEND] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
@@ -76,7 +73,6 @@ const screenActiveControlFades = {};
     screenActiveControlFades[SCREEN_MENU] = [DISCORD, GITHUB];
     screenActiveControlFades[SCREEN_PLAY_SELECT] = [EXIT];
     screenActiveControlFades[SCREEN_DIFFICULTY] = [EXIT];
-    screenActiveControlFades[SCREEN_LEARN] = [DISCORD, EXIT];
     screenActiveControlFades[SCREEN_CONNECTING] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_WAITING_FOR_FRIEND] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
@@ -104,7 +100,7 @@ function registerScreenTransitionHandlers(screens, enterHandler, exitHandler) {
     registerScreenExitHandler(screens, exitHandler);
 }
 
-function registerScreenTransitionFade(screens, fade, enterDelay, name) {
+function registerScreenTransitionFade(screens, fade, enterDelay) {
     const fadeInHandler = (_1, _2, hasty) => fade.fadeIn(hasty ? 0 : undefined),
           fadeOutHandler = (_1, _2, hasty) => fade.fadeOut(hasty ? 0 : undefined);
 
@@ -190,12 +186,8 @@ function switchToScreen(screen, hasty) {
     if (fromScreen === screen)
         return;
 
-    // When the learn screen is exited, it should return to its previous screen.
-    if (screen === SCREEN_LEARN && fromScreen !== SCREEN_LOADING) {
-        screenState.exitTargetScreen = fromScreen;
-    } else {
-        screenState.exitTargetScreen = SCREEN_MENU;
-    }
+    // Controls the screen that the exit button should take you to.
+    screenState.exitTargetScreen = SCREEN_MENU;
 
     // When we switch to the menu screen, we want it to only load staggered if we've just loaded the page.
     screenState.useStaggeredMenuFade = (screen === SCREEN_MENU && fromScreen === SCREEN_LOADING);
@@ -240,13 +232,12 @@ function maybeSwitchOffLoadingScreen(stage) {
 registerScreenTransitionFade(SCREEN_LOADING, screenState.loadingFade);
 registerScreenTransitionFade(SCREEN_PLAY_SELECT, screenState.playSelectFade);
 registerScreenTransitionFade(SCREEN_DIFFICULTY, screenState.difficultyFade);
-registerScreenTransitionFade(SCREEN_LEARN, screenState.learnFade, 500);
 registerScreenTransitionFade(SCREEN_WAITING_FOR_FRIEND, screenState.waitingForFriendFade);
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.connectionFade, 0, "connectionFade");
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.socialsFade);
 registerScreenTransitionFade(SCREEN_WIN, screenState.winFade);
 registerScreenTransitionFade(MENU_VISIBLE_SCREENS, screenState.menuFade, 500);
-registerScreenTransitionFade(GAME_VISIBLE_SCREENS, screenState.boardFade);
+registerScreenTransitionFade(GAME_VISIBLE_SCREENS, screenState.boardFade, 500);
 
 registerScreenEnterHandler(SCREEN_LOADING, redrawLoadingBar);
 registerScreenEnterHandler(SCREEN_MENU, resetHash);
@@ -276,18 +267,14 @@ function onEnterGameScreen(fromScreen, toScreen, hasty) {
     setMessageAndFade("Found your Game", "", true, screenState.connectionFade);
     game.init();
     redrawBoard(true);
-    if (fromScreen !== SCREEN_LEARN) {
-        game.onGameStart();
-    }
+    game.onGameStart();
 }
 function onExitGameScreen(fromScreen, toScreen, hasty) {
     redraw(true);
-    if (toScreen !== SCREEN_LEARN) {
-        if (toScreen === SCREEN_WIN) {
-            game.onGameFinished();
-        } else {
-            game.onGameAborted();
-        }
+    if (toScreen === SCREEN_WIN) {
+        game.onGameFinished();
+    } else {
+        game.onGameAborted();
     }
 }
 

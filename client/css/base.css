@@ -38,3 +38,10 @@ body.no-webp, body.no-webp .wood-background {
 img {
     height: auto;
 }
+
+.shadow, .shadow-no-highlight {
+    filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.4));
+}
+.shadow:hover {
+    filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
+}
