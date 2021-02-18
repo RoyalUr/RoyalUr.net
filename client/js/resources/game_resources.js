@@ -63,10 +63,10 @@ const stagedResources = [
         new AudioResource("firework_explode", "/res/audio_firework_explode.[ver].mp4", {instances: 4, volume: 0.3}),
     ]
 ];
-
-const allResources = [];
-for (let index = 0; index < stagedResources.length; ++index) {
-    allResources.push.apply(allResources, stagedResources[index]);
+function getStageLoadingMessage(stage) {
+    if (stage >= 1)
+        return "Fetching Game Assets...";
+    return "The Royal Ur is Loading...";
 }
 
 
@@ -75,4 +75,8 @@ for (let index = 0; index < stagedResources.length; ++index) {
 // Start the loading!
 //
 
-loadResources();
+const resourceLoader = new ResourceLoader(stagedResources),
+      audioSystem = new AudioSystem(resourceLoader, audioPacks),
+      imageSystem = new ImageSystem(resourceLoader);
+
+resourceLoader.startLoading();

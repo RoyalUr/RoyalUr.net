@@ -66,15 +66,28 @@ function redraw(forceRedraw) {
 // Rendering of the loading screen.
 //
 
+const loadingBar = {
+    element: document.getElementById("loading-bar"),
+    stage: 0
+};
+
+function getRenderedLoadingStage() {
+    return min(loadingBar.stage, resourceLoader.loadingStage);
+}
+
 function redrawLoading(forceRedraw) {
     const opacity = screenState.loadingFade.get();
     loadingDiv.style.opacity = opacity;
     loadingDiv.style.display = (opacity === 0 ? "none" : "")
     if (screenState.loadingFade.isFadeIn()) {
-        loadingTextSpan.textContent = getStageLoadingMessage(loading.stage);
+        loadingTextSpan.textContent = getStageLoadingMessage(getRenderedLoadingStage());
     }
 }
 
+function redrawLoadingBar() {
+    const stage = getRenderedLoadingStage();
+    loadingBar.element.style.width = (resourceLoader.getPercentageLoaded(stage) * 100) + "%";
+}
 
 
 //
@@ -96,7 +109,7 @@ function redrawButton(name, canvas, ctx, imageKey, text, isActive, forceRedraw) 
         return;
 
     // We do need to repaint.
-    const imageResource = findImageResource(imageKey);
+    const imageResource = imageSystem.findImageResource(imageKey);
     if (!imageResource)
         throw "Could not find button image resource " + imageKey;
 
@@ -236,7 +249,9 @@ function redrawBoard(forceRedraw) {
     ctx.shadowColor = 'black';
     ctx.shadowBlur = 30;
     ctx.clearRect(0, 0, boardCanvasWidth, boardCanvasHeight);
-    ctx.drawImage(getImageResource("board", boardCanvasWidth), boardX, boardY, boardWidth, boardHeight);
+
+    const boardImage = imageSystem.getImageResource("board", boardWidth);
+    ctx.drawImage(boardImage, boardX, boardY, boardWidth, boardHeight);
 }
 
 
@@ -359,9 +374,9 @@ function updateTileMove(time) {
     if (!tileMove.hitSoundsPlayed) {
         tileMove.hitSoundsPlayed = true;
         if (tileMove.replacingOwner !== TILE_EMPTY) {
-            playSound("kill");
+            audioSystem.playSound("kill");
         } else {
-            playSound("place");
+            audioSystem.playSound("place");
         }
     }
     if (tileMove.isRosette && tileMove.ttl > -0.3)
@@ -597,8 +612,8 @@ function drawPath(ctx, time, endTile, curve, isValidMove, dragLoc) {
 }
 
 function getTileImage(owner, width) {
-    if(owner === TILE_DARK) return getImageResource("tile_dark", width);
-    if(owner === TILE_LIGHT)  return getImageResource("tile_light", width);
+    if(owner === TILE_DARK) return imageSystem.getImageResource("tile_dark", width);
+    if(owner === TILE_LIGHT)  return imageSystem.getImageResource("tile_light", width);
     return null;
 }
 
@@ -864,7 +879,7 @@ function redrawDice(forceRedraw) {
         if(lastDiceSelected !== dice.selected) {
             lastDiceSelected = dice.selected;
             if(dice.rolling && dice.selected > 0 && isDiceUp(dice.values[dice.selected - 1])) {
-                playSound("dice_select");
+                audioSystem.playSound("dice_select");
             }
         }
 
@@ -916,7 +931,7 @@ function redrawDice(forceRedraw) {
 
         // Play a sound to indicate the dice has hit the ground
         if(down && !diceDown[index] && timeToSelect >= -2 * DICE_FALL_DURATION) {
-            playSound("dice_hit");
+            audioSystem.playSound("dice_hit");
         }
         diceDown[index] = down;
 
@@ -925,7 +940,7 @@ function redrawDice(forceRedraw) {
             lastDiceSound = time;
 
             if (dice.rolling || (timeToSelect >= -DICE_FALL_DURATION && timeToSelect <= DICE_FALL_DURATION)) {
-                playSound("dice_click");
+                audioSystem.playSound("dice_click");
             }
         }
 
@@ -962,11 +977,11 @@ function getDiceImageFromValue(diceValue, width) {
         case 1:
         case 2:
         case 3:
-            return getImageResource("dice_up" + diceValue, width);
+            return imageSystem.getImageResource("dice_up" + diceValue, width);
         case 4:
         case 5:
         case 6:
-            return getImageResource("dice_down" + (diceValue - 3), width);
+            return imageSystem.getImageResource("dice_down" + (diceValue - 3), width);
         default:
             return null;
     }
@@ -975,7 +990,7 @@ function getDiceImageFromValue(diceValue, width) {
 function paintDice(ctx, diceImage, width, centreLeft, centreTop, lightShadow) {
     ctx.save();
 
-    const shadow = getImageResource((lightShadow ? "dice_light_shadow" : "dice_dark_shadow"), width);
+    const shadow = imageSystem.getImageResource((lightShadow ? "dice_light_shadow" : "dice_dark_shadow"), width);
     ctx.drawImage(shadow, centreLeft - width / 2, centreTop - width / 2, width, width);
     ctx.drawImage(diceImage, centreLeft - width / 2, centreTop - width / 2, width, width);
 

@@ -36,6 +36,10 @@ function copyText(textBoxID) {
     textBox.blur();
 }
 
+function isAudioElementPlaying(element) {
+    return element.currentTime > 0 && !element.paused && !element.ended && element.readyState > 2;
+}
+
 
 
 //
@@ -74,6 +78,15 @@ if (!Array.prototype.includes) {
     });
 }
 
+/**
+ * @author James Westgate
+ */
+function testWebPSupport(callback) {
+    const webP = new Image();
+    webP.onload = webP.onerror = () => { callback(webP.height === 2); };
+    webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+}
+
 
 
 //
@@ -95,6 +108,23 @@ function assert(predicate, message) {
 //
 // GRAPHIC UTILITIES
 //
+
+function renderResource(width, height, renderFunction) {
+    if (isNaN(width) || isNaN(height))
+        throw "Width and height cannot be NaN, was given " + width + " x " + height;
+    if (width < 1 || height < 1)
+        throw "Width and height must both be at least 1, was given " + width + " x " + height;
+
+    const canvas = document.createElement("canvas"),
+        ctx = canvas.getContext("2d");
+
+    canvas.width = width;
+    canvas.height = height;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    renderFunction(ctx, canvas);
+    return canvas;
+}
 
 function rgb(r, g, b) {
     if(g === undefined) {

@@ -130,7 +130,7 @@ function createFirework(x1, y1, x2, y2, speed, r, g, b) {
         r: r,
         g: g,
         b: b,
-        rocket_sound: playSound("firework_rocket")
+        rocket_sound: audioSystem.playSound("firework_rocket")
     });
 }
 
@@ -156,7 +156,7 @@ function simulateFireworks() {
             dl = Math.sqrt(dx*dx + dy*dy);
 
         if (age > 1) {
-            playSound("firework_explode");
+            audioSystem.playSound("firework_explode");
             if (firework.rocket_sound && isAudioElementPlaying(firework.rocket_sound)) {
                 firework.rocket_sound.pause();
                 firework.rocket_sound.currentTime = 0;

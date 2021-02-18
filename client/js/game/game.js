@@ -65,7 +65,7 @@ Game.prototype.init = function() {
 };
 Game.prototype.onTileHover = function(loc) {
     if(isAwaitingMove() && !isTileSelected() && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
-        playSound("hover");
+        audioSystem.playSound("hover");
     }
 };
 Game.prototype.onTileClick = function(loc) {
@@ -81,7 +81,7 @@ Game.prototype.onTileClick = function(loc) {
     const tileOwner = board.getTile(loc);
     if(!isAwaitingMove() || tileOwner !== ownPlayer.playerNo || !board.isValidMoveFrom(tileOwner, loc, diceUp)) {
         if(tileOwner !== TILE_EMPTY) {
-            playSound("error");
+            audioSystem.playSound("error");
         }
         unselectTile();
         return;
@@ -90,7 +90,7 @@ Game.prototype.onTileClick = function(loc) {
     // If a tile is already selected, then we want clicking a tile to select it instead of move it.
     if (isTileSelected()) {
         selectTile(loc);
-        playSound("pickup");
+        audioSystem.playSound("pickup");
     } else {
         this.performMove(loc);
     }
@@ -110,14 +110,14 @@ Game.prototype.onTileTouchClick = function(loc) {
         || !board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
 
         if(tileOwner !== TILE_EMPTY) {
-            playSound("error");
+            audioSystem.playSound("error");
         }
         unselectTile();
         return;
     }
 
     selectTile(loc);
-    playSound("pickup");
+    audioSystem.playSound("pickup");
 };
 Game.prototype.onTileTouchRelease = function(loc) {
     updateTilePathAnchorTime();
@@ -137,7 +137,7 @@ Game.prototype.onTileTouchRelease = function(loc) {
          && board.isValidMoveFrom(ownPlayer.playerNo, loc, countDiceUp())) {
 
         selectTile(loc);
-        playSound("pickup");
+        audioSystem.playSound("pickup");
     }
 };
 Game.prototype.setupStartTiles = function() {
@@ -160,7 +160,7 @@ Game.prototype.clearStartTiles = function() {
 };
 Game.prototype.triggerNoMovesMessage = function(reason) {
     setMessage("No moves", reason, true, undefined, NO_MOVES_DURATION, undefined);
-    setTimeout(() => {playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_TIME + 0.25));
+    setTimeout(() => {audioSystem.playSound("error");}, 1000 * (DEFAULT_MESSAGE_FADE_IN_TIME + 0.25));
     this.noMovesSwapPlayerTimeout = setTimeout(this.swapPlayerAfterNoMoves.bind(this), 1000 * NO_MOVES_TOTAL_DURATION);
 };
 Game.prototype.onMessageDismissed = function(title, subtitle) {

@@ -8,7 +8,8 @@ const clientStartTime = getTime();
 let menuResourcesLoadedTime = LONG_TIME_AGO,
     clientFinishSetupTime = LONG_TIME_AGO;
 
-setLoadingCallback(onStageLoaded);
+resourceLoader.setStageLoadedCallback(onStageLoaded);
+resourceLoader.setResourceLoadedCallback(redrawLoadingBar);
 function onStageLoaded(stage) {
     if (stage === 0) {
         setup();
@@ -258,8 +259,7 @@ function onPacketGame(gameInfo) {
     switchToScreen(SCREEN_GAME);
     // If the user has been waiting a while to find a game, notify them with a sound!
     if (getTime() - networkConnectTime > 3) {
-        console.log("playSound game_found");
-        playSound("game_found", null, true);
+        audioSystem.playSound("game_found", null, true);
     }
 }
 

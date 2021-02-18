@@ -194,7 +194,7 @@ function switchToScreen(screen, hasty) {
 
     // Check if we have to wait for resources to load before switching.
     const requiredLoadingStage = screenRequiredLoadingStages[screen];
-    if (loading.stage <= requiredLoadingStage) {
+    if (resourceLoader.loadingStage <= requiredLoadingStage) {
         screenState.loadingTargetScreen = screen;
         screenState.loadingTargetStage = requiredLoadingStage;
         loadingBar.stage = requiredLoadingStage;
@@ -253,23 +253,23 @@ registerScreenTransitionHandlers(
 );
 
 
-function onEnterWaitingForFriendScreen(fromScreen, toScreen, hasty) {
+function onEnterWaitingForFriendScreen() {
     waitingForFriendLinkTextBox.value = window.location.href;
 }
 
-function onEnterConnectingScreen(fromScreen, toScreen, hasty) {
+function onEnterConnectingScreen() {
     reconnect();
     setMessageAndFade("", "", false, screenState.connectionFade);
     socialsFadeAnchorTime = getTime();
 }
 
-function onEnterGameScreen(fromScreen, toScreen, hasty) {
+function onEnterGameScreen() {
     setMessageAndFade("Found your Game", "", true, screenState.connectionFade);
     game.init();
     redrawBoard(true);
     game.onGameStart();
 }
-function onExitGameScreen(fromScreen, toScreen, hasty) {
+function onExitGameScreen(fromScreen, toScreen) {
     redraw(true);
     if (toScreen === SCREEN_WIN) {
         game.onGameFinished();
@@ -278,6 +278,6 @@ function onExitGameScreen(fromScreen, toScreen, hasty) {
     }
 }
 
-function onEnterWinScreen(fromScreen, toScreen, hasty) {
+function onEnterWinScreen() {
     winMessageDiv.textContent = getActivePlayer().name + " wins!";
 }

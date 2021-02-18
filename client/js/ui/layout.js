@@ -234,21 +234,21 @@ function populateDynamicImages() {
             continue;
 
         const imageKey = dynamicImagesByClass[className],
-              image = getImageResource(imageKey, null, true);
+              image = imageSystem.getImageResource(imageKey, null, true);
 
         // The image isn't loaded yet, try again later.
         if (!image)
             continue;
 
-        const imageURL = getImageURL(imageKey),
-              elements = document.getElementsByClassName(className);
-
-        for (let index = 0; index < elements.length; ++index) {
-            const element = elements[index];
-            element.width = image.width;
-            element.height = image.height;
-            element.src = imageURL;
-        }
+        imageSystem.computeImageURL(imageKey, function(imageURL) {
+            const elements = document.getElementsByClassName(className);
+            for (let index = 0; index < elements.length; ++index) {
+                const element = elements[index];
+                element.width = image.width;
+                element.height = image.height;
+                element.src = imageURL;
+            }
+        });
     }
 }
 
@@ -275,7 +275,7 @@ function resize() {
     resizeMenu();
     resizeOverlay();
 
-    if (loading.stage > 1) {
+    if (resourceLoader.loadingStage > 1) {
         resizeBoard();
         resizeScores();
         resizeDice();
@@ -294,7 +294,7 @@ const menuWidthOnHeightRatio = 760 / 840,
       buttonMenuWidthPercentage = 0.5;
 
 function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWidth) {
-    const imageResource = findImageResource(imageKey),
+    const imageResource = imageSystem.findImageResource(imageKey),
           height = imageResource.calcImageHeight(buttonWidth);
 
     buttonElem.style.width = screenPixels(menuWidth);
@@ -436,7 +436,7 @@ function getBoardWidthToHeightRatio() {
     if (boardWidthToHeightRatio)
         return boardWidthToHeightRatio;
 
-    const boardImage = getImageResource("board");
+    const boardImage = imageSystem.getImageResource("board");
     if (!boardImage)
         throw "Missing board image";
 

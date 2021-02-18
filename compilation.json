@@ -44,7 +44,10 @@
     ],
     "resources.js": [
       "client/js/utils.js",
-      "client/js/resources/resource.js",
+      "client/js/resources/resource_types.js",
+      "client/js/resources/resource_loader.js",
+      "client/js/resources/audio_system.js",
+      "client/js/resources/image_system.js",
       "client/js/resources/game_resources.js"
     ],
     "simulation.js": [
