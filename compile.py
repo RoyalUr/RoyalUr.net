@@ -438,20 +438,33 @@ def filter_file(target_folder, file, *, prefix="", skip_versions=False):
             ver_target_file = ver_target_file[len("https://royalur.net/"):]
 
         # Find the modification time of the resource that we are versioning.
-        version_mtime = get_incomplete_file_mtime(resolve_path(target_folder, ver_target_file))
+        incomplete_path = resolve_path(target_folder, ver_target_file)
+        version_mtime = get_incomplete_file_mtime(incomplete_path)
 
         # In dev builds we don't add the versions to the URLs.
         if not skip_versions:
             filtered += ".v{}".format(int(version_mtime))
             source_mtime = max(source_mtime, version_mtime)
 
+        # Append the rest of the file name to the filtered file.
+        filtered += original_content[last_index:string_end + 1]
+        last_index = string_end + 1
+
+        # If this is a dynamically sourced image, add its placeholder SVG src with its aspect ratio.
+        if original_content[string_start - len("data-src="):string_start] == "data-src=":
+            image = PILImage.open(incomplete_path + ".png")
+            filtered += " src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 "
+            filtered += str(image.width) + " " + str(image.height)
+            filtered += "'%3E%3C/svg%3E\""
+
     return source_mtime, filtered, changed
 
 
-def add_file_versions(target_folder, comp_spec, *, prefix="", skip_versions=False):
+def filter_files(target_folder, comp_spec, *, prefix="", skip_versions=False):
     """
     Filters through all HTML, CSS, and JS files and replaces [ver]
     patterns in file paths with their last modification time.
+    Also adds placeholder SVG src attributes for dynamic images.
     """
     # The order here is important!!
     # The HTML files reference the CSS and JS files so they must be created first.
@@ -523,8 +536,8 @@ def create_release_build(target_folder):
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
     print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, prefix=" .. ")
-    print("\n7. Add Dynamic File Versions")
-    add_file_versions(target_folder, comp_spec, prefix=" .. ")
+    print("\n7. Perform File Filtering")
+    filter_files(target_folder, comp_spec, prefix=" .. ")
     print("\n8. Zip Development Resources Folder")
     zip_development_res_folder(target_folder, comp_spec, prefix=" .. ")
 
@@ -544,8 +557,8 @@ def create_dev_build(target_folder):
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
     print("\n6. Create Annotations File")
     combine_annotations(target_folder, comp_spec, prefix=" .. ")
-    print("\n7. Remove File Version Tags from Filenames")
-    add_file_versions(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
+    print("\n7. Perform File Filtering")
+    filter_files(target_folder, comp_spec, prefix=" .. ", skip_versions=True)
 
 
 
