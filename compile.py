@@ -455,7 +455,9 @@ def filter_file(target_folder, file, *, prefix="", skip_versions=False):
             image = PILImage.open(incomplete_path + ".png")
             filtered += " src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 "
             filtered += str(image.width) + " " + str(image.height)
-            filtered += "'%3E%3C/svg%3E\""
+            filtered += "'%3E%3C/svg%3E\" "
+            filtered += "width=\"" + str(image.width) + "\" "
+            filtered += "height=\"" + str(image.height) + "\""
 
     return source_mtime, filtered, changed
 

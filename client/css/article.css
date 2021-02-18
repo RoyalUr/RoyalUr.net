@@ -25,6 +25,8 @@
 }
 #header a img {
     vertical-align: middle;
+    height: 48px;
+    width: 48px;
 }
 #header a span {
     margin-left: 0.26em;
