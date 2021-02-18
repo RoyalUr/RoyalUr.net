@@ -165,7 +165,7 @@ is generated at compile time.
 | ---------- |--------------------------------------------- |
 | screens.js | Handles transitioning between screens.       |
 | utils.js   | Contains fading logic.                       |
-| render.js  | Sets the opacity of elements based on Fades. |
+| renderer.js  | Sets the opacity of elements based on Fades. |
 
 The Royal Game of Ur uses a screen system to control what content
 is visible at any given time. Only one screen is visible at a time,
@@ -181,7 +181,7 @@ of elements, and a lot of transition functions will `fadeIn` or
 
 ## 👾 Rendering based on Screens
 Some elements are only shown on certain screens. Therefore,
-`render.js` will avoid rendering some elements if they are not
+`renderer.js` will avoid rendering some elements if they are not
 on screen. This has led to some strange bugs around screen
 transitions and the game board not updating. Consequently, some
 care needs to be taken to make sure that switching screens and

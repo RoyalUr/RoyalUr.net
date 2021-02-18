@@ -32,14 +32,20 @@
       "client/js/analytics/stats.js",
       "client/js/game/board.js",
       "client/js/game/model.js",
-      "client/js/ui/layout.js",
-      "client/js/ui/particles.js",
-      "client/js/ui/curves.js",
-      "client/js/ui/render.js",
+      "client/js/layout.js",
+
+      "client/js/rendering/particles.js",
+      "client/js/rendering/curves.js",
+      "client/js/rendering/renderer.js",
+      "client/js/rendering/render_menu.js",
+      "client/js/rendering/render_overlays.js",
+      "client/js/rendering/render_game_ui.js",
+      "client/js/rendering/render_board.js",
+
       "client/js/network/packets.js",
       "client/js/network/network.js",
       "client/js/game/game.js",
-      "client/js/ui/screens.js",
+      "client/js/screens.js",
       "client/js/client.js"
     ],
     "resources.js": [
