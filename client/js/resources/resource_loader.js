@@ -64,17 +64,20 @@ ResourceLoader.prototype.completeRasterImageURL = function(url, callback) {
         callback(url + size + (ext.length ? "." + ext : ""));
     }.bind(this));
 }
+ResourceLoader.prototype.getEffectiveScreenSize = function() {
+    const unscaledSize = vec(document.documentElement.clientWidth, document.documentElement.clientHeight);
+    return vecMul(unscaledSize, window.devicePixelRatio);
+};
 ResourceLoader.prototype.calculateResolution = function() {
-    const width = document.documentElement.clientWidth * window.devicePixelRatio,
-        height = document.documentElement.clientHeight * window.devicePixelRatio;
+    const size = this.getEffectiveScreenSize();
     for (let index = 0; index < this.resolutions.length; ++index) {
         const resolution = this.resolutions[index],
               resolution_parts = resolution.split("_"),
               res_width = (resolution_parts[0] === "u" ? -1 : parseInt(resolution_parts[0])),
               res_height = (resolution_parts[1] === "u" ? -1 : parseInt(resolution_parts[1]));
-        if (res_width > 0 && width > res_width)
+        if (res_width > 0 && size.x > res_width)
             continue;
-        if (res_height > 0 && height > res_height)
+        if (res_height > 0 && size.y > res_height)
             continue;
         return resolution;
     }

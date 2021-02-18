@@ -37,13 +37,18 @@
 
 
 #footer {
-    padding: 1rem;
+    overflow: hidden;
     margin-top: 1rem;
-    line-height: 40px;
 }
 #footer-text {
     display: inline-block;
-    padding-top: 4px;
+    margin: 0.4em;
+    line-height: 40px;
+}
+#footer-social-icons {
+    display: inline;
+    float: right;
+    padding: 4px;
 }
 #footer a.link, #footer span.copyright {
     color: #bbbbbb;
@@ -60,7 +65,6 @@
     color: #999999;
 }
 #footer a.social-icon {
-    float: right;
     margin-left: 0.5em;
     line-height: 0;
 }
@@ -143,7 +147,8 @@
 }
 #call-to-action .play img {
     width: 40%;
-    padding-top: 1em;
+    min-width: 200px;
+    margin-top: 1.4rem;
     filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.6));
 }
 
