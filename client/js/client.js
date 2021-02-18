@@ -16,7 +16,6 @@ function onStageLoaded(stage) {
     } else if (stage === 1) {
         setupGameElements();
     }
-    populateDynamicImages();
     resize();
     maybeSwitchOffLoadingScreen(stage);
 }
@@ -24,6 +23,7 @@ function onStageLoaded(stage) {
 function setup() {
     menuResourcesLoadedTime = getTime();
 
+    imageSystem.populateDynamicImages();
     setupMenuElements();
     setInterval(updateRenderStatistics, 1000);
 

@@ -56,6 +56,12 @@
       "client/js/resources/image_system.js",
       "client/js/resources/game_resources.js"
     ],
+    "article_resources.js": [
+      "client/js/utils.js",
+      "client/js/resources/resource_loader.js",
+      "client/js/resources/image_system.js",
+      "client/js/resources/article_resources.js"
+    ],
     "simulation.js": [
       "client/js/utils.js",
       "client/js/network/packets.js",
@@ -143,10 +149,10 @@
       "u_720": "auto x 96"
     },
     "learn_board": {
-      "u_2160": "1536 x auto",
+      "u_2160": "1706 x auto",
       "u_1440": "1280 x auto",
-      "u_1080": "1024 x auto",
-      "u_720": "768 x auto"
+      "u_1080": "1066 x auto",
+      "u_720": "853 x auto"
     }
   },
 
@@ -157,7 +163,13 @@
     },
     "res/favicon.png": {
       "dest": "res/small_logo",
-      "sizes": {}
+      "sizes": {
+        "u_u": "96 x 96",
+        "u_2160": "96 x 96",
+        "u_1440": "96 x 96",
+        "u_1080": "96 x 96",
+        "u_720": "96 x 96"
+      }
     },
     "res/logo_with_shadow.png": {
       "dest": "res/logo_with_shadow",

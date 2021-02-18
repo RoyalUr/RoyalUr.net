@@ -48,11 +48,10 @@
     </script>
     <!-- End Matomo Code -->
 </head>
-<body class="no-webp"> <!-- TODO: Add proper webp support for this page. -->
+<body>
     <div id="header">
         <a href="/">
-            <!-- TODO: Dynamic sizing and webp support for this image. -->
-            <img src="/res/small_logo.png" alt="Logo" width="48" height="48" />
+            <img src="" data-src="/res/small_logo" alt="Logo" width="48" height="48" />
             <span>Royal Ur</span>
         </a>
     </div>
@@ -61,7 +60,8 @@
 
         <h2>Goal</h2>
         <p>Get all of your pieces around and off the board!</p>
-        <img class="shadow-no-highlight" src="/res/board_paths.png" alt="Piece paths" width="2607" height="1025" />
+        <img class="shadow-no-highlight" src="" data-src="/res/board_paths"
+             alt="Piece paths" width="2607" height="1025" />
 
         <h2>How to Play</h2>
         <strong>1.</strong> Roll the Dice.<br/>
@@ -78,14 +78,14 @@
 
         <p style="display: inline">Safe:</p>
         <p class="inline-sub-text">Pieces on rosette tiles cannot be taken!</p><br/>
-        <img class="rosettes shadow-no-highlight" src="/res/board_rosettes.png"
+        <img class="rosettes shadow-no-highlight" src="" data-src="/res/board_rosettes"
              alt="Rosette tiles" width="2602" height="1024" />
     </div>
     <div id="call-to-action">
         <h2>Play The Royal Game of Ur</h2>
         <p>Now that you've got the rules sorted, give the game a go!</p>
         <a class="play" href="/">
-            <img class="shadow" src="/res/button_play.png" alt="Play The Royal Game of Ur" />
+            <img class="shadow" src="" data-src="/res/button_play" alt="Play The Royal Game of Ur" />
         </a>
     </div>
     <div id="footer">
@@ -116,5 +116,8 @@
             <img src="/res/discord.svg" alt="Discord" width="48" height="48" />
         </a>
     </div>
+
+    <!-- JAVASCRIPT TO LOAD IMAGES -->
+    <script src="/article_resources.[ver].js"></script>
 </body>
 </html>

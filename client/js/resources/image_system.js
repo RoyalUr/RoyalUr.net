@@ -32,3 +32,18 @@ ImageSystem.prototype.computeImageURL = function(key, callback) {
     const resource = this.findImageResource(key);
     this.resourceLoader.completeRasterImageURL(resource.url, callback);
 };
+ImageSystem.prototype.populateDynamicImages = function() {
+    const images = document.body.getElementsByTagName("img");
+    for (let index = 0; index < images.length; ++index) {
+        const image = images[index],
+              dynamicSrc = image.getAttribute("data-src");
+
+        if (!dynamicSrc)
+            continue;
+
+        this.resourceLoader.completeRasterImageURL(dynamicSrc, function(completedURL) {
+            image.src = completedURL;
+            image.removeAttribute("data-src");
+        });
+    }
+};

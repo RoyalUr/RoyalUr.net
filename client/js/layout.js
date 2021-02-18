@@ -66,12 +66,6 @@ const overlayCanvas = document.getElementById("overlay"),
 
 const creditsDiv = document.getElementById("credits");
 
-const dynamicImagesByClass = {
-    "logo_image": "logo_with_shadow",
-    "tile_dark_image": "tile_dark"
-};
-
-
 let width = NaN,
     height = NaN,
     useWidth = NaN,
@@ -223,33 +217,6 @@ function setupGameElements() {
             updateMouse(VEC_NEG1, false);
         }
     };
-}
-
-/**
- * Sets the src, width, and height attributes of dynamically loaded image elements.
- */
-function populateDynamicImages() {
-    for (let className in dynamicImagesByClass) {
-        if (!dynamicImagesByClass.hasOwnProperty(className))
-            continue;
-
-        const imageKey = dynamicImagesByClass[className],
-              image = imageSystem.getImageResource(imageKey, null, true);
-
-        // The image isn't loaded yet, try again later.
-        if (!image)
-            continue;
-
-        imageSystem.computeImageURL(imageKey, function(imageURL) {
-            const elements = document.getElementsByClassName(className);
-            for (let index = 0; index < elements.length; ++index) {
-                const element = elements[index];
-                element.width = image.width;
-                element.height = image.height;
-                element.src = imageURL;
-            }
-        });
-    }
 }
 
 function toScreenPixels(size) {

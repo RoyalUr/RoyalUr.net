@@ -37,6 +37,8 @@ body.no-webp, body.no-webp .wood-background {
 }
 img {
     height: auto;
+    /* Stops showing the alt text if the image doesn't load */
+    font-size: 0;
 }
 
 .shadow, .shadow-no-highlight {

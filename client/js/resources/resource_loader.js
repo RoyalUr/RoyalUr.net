@@ -25,12 +25,14 @@ function ResourceLoader(stagedResources) {
     this.resolutions = ["u_720", "u_1080", "u_1440", "u_2160", this.max_resolution];
     this.resolution = this.calculateResolution();
 
-    // Organise and start the loading of the resources!
+    // Organise all of the resources to be loaded.
     this.loadingStage = -1;
-    this.stagedResources = stagedResources;
+    this.stagedResources = (stagedResources ? stagedResources : null);
     this.allResources = [];
-    for (let index = 0; index < stagedResources.length; ++index) {
-        this.allResources.push.apply(this.allResources, stagedResources[index]);
+    if (stagedResources) {
+        for (let index = 0; index < stagedResources.length; ++index) {
+            this.allResources.push.apply(this.allResources, stagedResources[index]);
+        }
     }
 
     // Some callbacks to be set elsewhere.
