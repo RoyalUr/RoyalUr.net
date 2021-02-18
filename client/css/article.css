@@ -46,9 +46,9 @@
     line-height: 40px;
 }
 #footer-social-icons {
-    display: inline;
     float: right;
-    padding: 4px;
+    margin-top: 0.2em;
+    margin-right: 0.4em;
 }
 #footer a.link, #footer span.copyright {
     color: #bbbbbb;
