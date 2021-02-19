@@ -7,6 +7,7 @@
   "html": {
     "client/html/index.html": "index.html",
     "client/html/rules.html": "rules/index.html",
+    "client/html/watch.html": "watch/index.html",
     "client/html/privacy.html": "privacy/index.html",
     "client/html/lost.html": "lost.html"
   },
@@ -19,10 +20,15 @@
       "client/css/base.css",
       "client/css/article.css"
     ],
-    "rules.css": [
+    "rules/index.css": [
       "client/css/base.css",
       "client/css/article.css",
       "client/css/rules.css"
+    ],
+    "watch/index.css": [
+      "client/css/base.css",
+      "client/css/article.css",
+      "client/css/watch.css"
     ]
   },
   "javascript": {

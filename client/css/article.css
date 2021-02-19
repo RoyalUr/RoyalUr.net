@@ -1,3 +1,9 @@
+iframe { /** IFrames are used for embedded YouTube videos. **/
+    border: 0;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
 #header, #footer {
     display: block;
     box-sizing: border-box;
@@ -104,7 +110,7 @@
     margin-bottom: 0.2em;
 }
 #content p {
-    font-size: 0.8em;
+    font-size: 0.65em;
     margin-bottom: 0.8em;
 }
 #content ul {
@@ -151,7 +157,6 @@
     margin-top: 1.4rem;
     filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.6));
 }
-
 #call-to-action .play:hover img {
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
 }

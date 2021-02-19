@@ -1,0 +1,17 @@
+#content {
+    background-color: rgb(32, 41, 48);
+    font-size: 1.8rem;
+}
+#content, #content * {
+    font-family: Nunito, sans-serif;
+    text-decoration: none;
+    color: white;
+}
+#content h1 {
+    font-family: DuranGo, sans-serif;
+    margin-top: 0.2em;
+}
+#content strong {
+    text-decoration: underline;
+    margin-right: 0.75vh;
+}
