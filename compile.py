@@ -12,6 +12,7 @@ import subprocess
 import shutil
 from PIL import Image as PILImage
 from datetime import datetime
+import xml.etree.ElementTree as ElementTree
 
 
 #
@@ -300,21 +301,64 @@ def create_sitemap(target_folder, comp_spec, *, prefix=""):
         dest_file.write(output_sitemap)
 
 
-def copy_html(target_folder, comp_spec, *, prefix=""):
+def filter_html(file, *, prefix=""):
+    """
+    Filter the HTML file at source_path and resolve its include statements.
+    """
+    # We want the modification times when skipping versions
+    # to be different than when including versions.
+    source_mtime = getmtime(file)
+    with open(file, 'r') as f:
+        original_content = f.read()
+
+    # Filter out <include>'s in the file.
+    last_index = 0
+    filtered = ""
+    changed = False
+    while True:
+        # Search for the next <include> to replace.
+        try:
+            current_index = original_content.index("<include", last_index)
+            changed = True
+        except ValueError:
+            # If there are is nothing more to replace, break out from the loop.
+            filtered += original_content[last_index:]
+            break
+
+        # Add the content up to the <include> tag.
+        filtered += original_content[last_index:current_index]
+        try:
+            last_index = original_content.index("/>", current_index) + len("/>")
+        except ValueError:
+            raise Exception("Found \"<include\" in file, but no closing \"/>\"")
+
+        # Parse the include tag.
+        node = ElementTree.fromstring(original_content[current_index:last_index])
+        src_path = node.get("src")
+
+        # Include the src file.
+        include_mtime, include_content, include_changed = filter_html(src_path, prefix=prefix)
+        source_mtime = max(source_mtime, include_mtime)
+        filtered += include_content
+
+    return source_mtime, filtered, changed
+
+
+def generate_html(target_folder, comp_spec, *, prefix=""):
     """
     Copies all of the HTML files to the target folder.
     """
     for from_path, to_rel in comp_spec.html_files.items():
         to_path = resolve_path(target_folder, to_rel)
-        source_mtime = getmtime(from_path)
-        # Skip this file if it hasn't changed.
-        if source_mtime == getmtime(to_path):
-            continue
+        file_mtime, filtered, changed = filter_html(from_path, prefix=prefix)
 
+        # Write the new filtered file.
         os.makedirs(os.path.dirname(to_path), exist_ok=True)
-        shutil.copyfile(from_path, to_path)
-        setmtime(to_path, source_mtime)
-        print("{}copied {}".format(prefix, to_rel))
+        if changed:
+            with open(to_path, 'w') as file:
+                file.write(filtered)
+            setmtime(to_path, file_mtime)
+            print(prefix + "generated " + to_path)
 
 
 def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
@@ -528,8 +572,8 @@ def create_release_build(target_folder):
     comp_spec = CompilationSpec.read("compilation.json")
     print("\n1. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
-    print("\n2. Copy HTML")
-    copy_html(target_folder, comp_spec, prefix=" .. ")
+    print("\n2. Generate HTML")
+    generate_html(target_folder, comp_spec, prefix=" .. ")
     print("\n3. Combine & Minify Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ", minify=True)
     print("\n4. Minify CSS")
@@ -549,8 +593,8 @@ def create_dev_build(target_folder):
     comp_spec = CompilationSpec.read("compilation.json")
     print("\n1. Create a Sitemap")
     create_sitemap(target_folder, comp_spec, prefix=" .. ")
-    print("\n2. Copy HTML")
-    copy_html(target_folder, comp_spec, prefix=" .. ")
+    print("\n2. Generate HTML")
+    generate_html(target_folder, comp_spec, prefix=" .. ")
     print("\n3. Combine Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ")
     print("\n4. Minify CSS")
