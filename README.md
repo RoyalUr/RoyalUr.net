@@ -21,13 +21,13 @@ well as discussion about RoyalUr development.
 
 <p float="left">
   <a href="https://discord.gg/Ea49VVru5N">
-    <img src="https://discord.com/assets/f8389ca1a741a115313bede9ac02e2c0.svg" height="80" valign="middle" />
+    <img src="https://royalur.net/res/discord.svg" height="64" valign="middle" />
   </a>
   <a href="https://www.reddit.com/r/GameofUr/">
-    <img src="https://www.redditinc.com/assets/images/site/reddit-logo.png" height="64" valign="middle" />
-  </a>&nbsp;
+    <img src="https://royalur.net/res/reddit.svg" height="64" valign="middle" />
+  </a>
   <a href="https://royalur.net">
-    <img src="https://royalur.net/favicon.ico" height="64" valign="middle" />
+    <img src="https://royalur.net/res/small_logo.png" height="64" valign="middle" />
   </a>
 </p>
 
