@@ -3,53 +3,20 @@
 <head>
     <meta charset="utf-8" />
     <title>Royal Ur | Videos</title>
-    <meta name="description"
-          content="Watch content about The Royal Game of Ur." />
 
     <meta name="og:title" content="Videos about The Royal Game of Ur" />
-    <meta name="og:determiner" content="" />
-    <meta name="og:type" content="website" />
-    <meta name="og:locale" content="en_US" />
-    <meta name="og:description"
-          content="Watch videos about The Royal Game of Ur." />
-    <meta name="og:image" content="https://royalur.net/banner.[ver].jpg" />
+    <meta name="twitter:title" content="Videos about The Royal Game of Ur" />
+    <meta property="twitter:url" content="https://royalur.net/rules" />
+    <meta name="description" content="Watch content about The Royal Game of Ur." />
+    <meta name="og:description" content="Watch videos about The Royal Game of Ur." />
+    <meta name="twitter:description" content="Watch videos about The Royal Game of Ur.">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="royalur.net">
-    <meta property="twitter:url" content="https://royalur.net/rules">
-    <meta name="twitter:title" content="Videos about The Royal Game of Ur">
-    <meta name="twitter:description"
-          content="Watch videos about The Royal Game of Ur.">
-    <meta name="twitter:image" content="https://royalur.net/banner.[ver].jpg">
-
-    <link rel="stylesheet" href="/watch/index.[ver].css" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 64x64 96x96 128x128" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon16.ico" sizes="16x16" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon32.ico" sizes="32x32" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon64.ico" sizes="64x64" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon96.ico" sizes="96x96" />
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon128.ico" sizes="128x128" />
-    <link rel="preload" href="/res/font_durango.[ver].ttf" as="font" type="font/ttf" crossorigin="anonymous" />
-    <link rel="preload" href="/res/font_nunito.[ver].woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Matomo -->
-    <script>
-        var _paq = window._paq = window._paq || [];
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-            var u="//matomo.royalur.net/";
-            _paq.push(['setTrackerUrl', u+'matomo.php']);
-            _paq.push(['setSiteId', '1']);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-        })();
-    </script>
-    <!-- End Matomo Code -->
+    <include src="client/html/components/head_boilerplate.html" />
+    <include src="client/html/components/matomo.html" />
+    <link rel="stylesheet" href="index.[ver].css" />
 </head>
 <body>
-    <include src="client/html/header.html" />
+    <include src="client/html/components/header.html" />
     <div id="content">
         <h1>Videos about The Royal Game of Ur</h1>
 
@@ -77,7 +44,7 @@
                 src="https://www.youtube-nocookie.com/embed/wHjznvH54Cw"
                 allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
     </div>
-    <include src="client/html/footer.html" />
+    <include src="client/html/components/footer.html" />
 
     <!-- JAVASCRIPT TO LOAD IMAGES -->
     <script src="/article_resources.[ver].js"></script>

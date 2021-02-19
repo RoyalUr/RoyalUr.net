@@ -1,31 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>Not Found</title>
-
-      <!-- Matomo -->
-      <script>
-          var _paq = window._paq = window._paq || [];
-          _paq.push([
-              'setDocumentTitle',
-              '404/URL = ' + encodeURIComponent(document.location.pathname + document.location.search)
-              + '/From = ' + encodeURIComponent(document.referrer)
-          ]);
-          _paq.push(['trackPageView']);
-          _paq.push(['enableLinkTracking']);
-          (function() {
-              var u="//matomo.royalur.net/";
-              _paq.push(['setTrackerUrl', u+'matomo.php']);
-              _paq.push(['setSiteId', '1']);
-              var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-              g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-          })();
-      </script>
-      <!-- End Matomo Code -->
-  </head>
-  <body>
-      <h1 style="width: 100%;  text-align: center">It appears you've stumbled across a missing page!</h1>
-      <a href="/" style="width: 100%;  text-align: center"><H2>Back to RoyalUr</H2></a>
-  </body>
+    <include src="client/html/components/matomo_404.html" />
+</head>
+<body>
+    <h1 style="width: 100%;  text-align: center">It appears you've stumbled across a missing page!</h1>
+    <a href="/" style="width: 100%;  text-align: center"><h2>Back to RoyalUr</h2></a>
+</body>
 </html>
