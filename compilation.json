@@ -16,6 +16,7 @@
       "client/css/font_durango.css",
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/block_scrolling.css",
       "client/css/index.css"
     ],
     "articles.css": [
@@ -41,6 +42,7 @@
     "lost.css": [
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/block_scrolling.css",
       "client/css/lost.css"
     ]
   },
