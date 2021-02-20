@@ -511,26 +511,3 @@ canvas { position: absolute; }
     font-size: 12vh;
     margin-bottom: 5vh;
 }
-.text-button {
-    display: inline;
-    border: 3px solid white;
-    border-radius: 1vh;
-    padding: 0.5vh 2vh;
-    margin-bottom: 3vh;
-
-    font-family: Nunito,sans-serif;
-    font-size: 5vh;
-    color: white;
-    cursor: pointer;
-
-    background-color: rgba(0, 0, 0, 0.8);
-    transition: background-color 0.1s ease-in-out;
-}
-.text-button:hover {
-    background-color: rgba(0, 0, 0, 1);
-    transition: background-color 0.1s ease-in-out;
-}
-.centre-text {
-    display: block;
-    text-align: center;
-}

@@ -1,0 +1,34 @@
+body {
+    font-size: 1rem;
+}
+
+body * {
+    font-family: Nunito, sans-serif;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    width: 100%;
+    font-size: 20em;
+    letter-spacing: 0.25em;
+    margin-bottom: 0;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 2.75em;
+}
+
+a {
+    width: 100%;
+    text-decoration: none;
+    margin-bottom: 3em;
+}
+
+.text-button {
+    border-radius: 0.2em;
+    padding: 0.1em 0.3em;
+    font-size: 3em;
+    margin-bottom: 0;
+}

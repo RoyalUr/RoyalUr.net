@@ -1,18 +1,3 @@
-@font-face {
-    font-family: 'Nunito';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Nunito Regular'), local('Nunito-Regular'), url("/res/font_nunito.[ver].woff2") format('woff2');
-    font-display: swap;
-}
-@font-face {
-    font-family: 'DuranGo';
-    font-style: normal;
-    font-weight: 400;
-    src: url("/res/font_durango.[ver].ttf") format('truetype');
-    font-display: swap;
-}
-
 * {
     padding: 0;
     margin: 0;
@@ -24,14 +9,15 @@ body, html {
     min-height: 100%;
 }
 
-body, body .wood-background {
-    background: rgb(32, 41, 48);
+body {
+    background-color: rgb(32, 41, 48);
+    background-image: linear-gradient(to bottom right, rgb(28, 34, 40), rgb(41, 54, 64));
 }
-body.webp, body.webp .wood-background {
+body.webp {
     background: rgb(32, 41, 48) url("/res/background.[ver].webp") repeat;
     background-size: 35vh;
 }
-body.no-webp, body.no-webp .wood-background {
+body.no-webp {
     background: rgb(32, 41, 48) url("/res/background.[ver].png") repeat;
     background-size: 35vh;
 }
@@ -46,4 +32,28 @@ img {
 }
 .shadow:hover {
     filter: drop-shadow(6px 6px 12px rgba(255, 255, 255, 0.1));
+}
+
+.text-button {
+    display: inline;
+    border: 3px solid white;
+    border-radius: 1vh;
+    padding: 0.5vh 2vh;
+    margin-bottom: 3vh;
+
+    font-family: Nunito,sans-serif;
+    font-size: 5vh;
+    color: white;
+    cursor: pointer;
+
+    background-color: rgba(0, 0, 0, 0.8);
+    transition: background-color 0.1s ease-in-out;
+}
+.text-button:hover {
+    background-color: rgba(0, 0, 0, 1);
+    transition: background-color 0.1s ease-in-out;
+}
+.centre-text {
+    display: block;
+    text-align: center;
 }
