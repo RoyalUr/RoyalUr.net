@@ -161,14 +161,14 @@ is generated at compile time.
 
 # 4. Screen System
 
-| File       | Purpose                                      |
-| ---------- |--------------------------------------------- |
-| screens.js | Handles transitioning between screens.       |
-| utils.js   | Contains fading logic.                       |
-| renderer.js  | Sets the opacity of elements based on Fades. |
+| File        | Purpose                                      |
+| ----------- |--------------------------------------------- |
+| screens.js  | Handles transitioning between screens.       |
+| utils.js    | Contains fading logic.                       |
+| renderer.js | Sets the opacity of elements based on Fades. |
 
-The Royal Game of Ur uses a screen system to control what content
-is visible at any given time. Only one screen is visible at a time,
+RoyalUr.net uses a screen system to control what content is visible
+at any given time. Only one screen is visible at a time,
 and transition functions are used to fade content in and out for
 each screen.
 

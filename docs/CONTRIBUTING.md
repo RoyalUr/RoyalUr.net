@@ -1,4 +1,4 @@
-# Contributing to The Royal Game of Ur
+# Contributing to RoyalUr.net
 
 **🎉 First off, a massive thankyou to everyone who has taken
 the time to contribute! 🎉** \
@@ -6,7 +6,7 @@ This is quite a small repository, so every contribution is greatly
 appreciated!
 
 This document contains guidelines about the best ways to go
-about helping out with The Royal Game of Ur project.
+about helping out with RoyalUr.net project.
 
 ## Table of Contents
 - [🐨 Code of Conduct](#-code-of-conduct)
@@ -46,7 +46,7 @@ information so that we have the best chance of fixing it:
 4. A clear set of **steps to reproduce the problem**. This is
    really important so that we can investigate the bug further.
 
-Thanks for helping us keep The Royal Game of Ur bug-free!
+Thanks for helping us keep RoyalUr.net bug-free!
 
 
 ## 2. Suggesting New Features ✨

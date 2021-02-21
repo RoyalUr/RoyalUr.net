@@ -11,9 +11,8 @@ const annotationsResource = new AnnotationsResource("annotations", "/res/annotat
 const stagedResources = [
     [ // Menu
         annotationsResource,
-        new ImageResource("logo_with_shadow", "/res/logo_with_shadow.[ver]"),
         new ImageResource("tile_dark", "/res/tile_dark.[ver]"),
-
+        new PreloadImageResource("logo", "/res/logo.svg"),
         new PreloadImageResource("play_local", "/res/play_local.svg"),
         new PreloadImageResource("play_computer", "/res/play_computer.svg"),
         new PreloadImageResource("play_online", "/res/play_online.svg"),

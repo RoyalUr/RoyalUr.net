@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug to help us improve The Royal Game of Ur
+about: Report a bug to help us improve RoyalUr.net
 title: ''
 labels: bug
 assignees: ''
@@ -26,4 +26,4 @@ _What browser and operating systems were you using?_
 _Add any other context about the problem here._
 
 
-Thankyou for reporting a bug in The Royal Game of Ur!
+Thankyou for reporting a bug in RoyalUr.net!

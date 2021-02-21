@@ -7,4 +7,4 @@ _A description of your changes._
 _If applicable, add screenshots to demonstrate your changes._
 
 
-Thankyou for making a contribution to The Royal Game of Ur!
+Thankyou for making a contribution to RoyalUr.net!

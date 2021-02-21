@@ -103,21 +103,12 @@ canvas { position: absolute; }
 
 #title {
     display: block;
-    width: 100%;
-    animation: bounce ease-in-out 2s infinite alternate;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
 }
 #title img {
     width: 100%;
-    height: auto;
-}
-
-@keyframes bounce {
-    from { transform: translateY(0px); }
-    to { transform: translateY(-2%);}
-}
-@-webkit-keyframes bounce {
-    from { transform: translateY(0px); }
-    to { transform: translateY(-2%); }
 }
 
 .menu-button {

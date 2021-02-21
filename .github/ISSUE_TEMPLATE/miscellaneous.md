@@ -9,4 +9,4 @@ assignees: ''
 
 _Please fill this up with as much detail related to your issue as possible._
 
-Thankyou for participating in the development of The Royal Game of Ur!
+Thankyou for participating in the development of RoyalUr.net!

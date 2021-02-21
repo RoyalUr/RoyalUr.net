@@ -1,13 +1,13 @@
 ---
 name: Feature Request
-about: Suggest a new idea to improve The Royal Game of Ur
+about: Suggest a new idea to improve RoyalUr.net
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-_Describe the feature you'd like to see added to The Royal Game of Ur._
+_Describe the feature you'd like to see added to RoyalUr.net._
 
 Please add:
 1. A clear and descriptive title to this issue.
@@ -19,4 +19,4 @@ Please add:
 4. Explain why this change would be useful.
 
 
-Thankyou for suggesting a new feature for The Royal Game of Ur!
+Thankyou for suggesting a new feature for RoyalUr.net!

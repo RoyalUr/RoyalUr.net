@@ -1,4 +1,5 @@
 iframe { /** IFrames are used for embedded YouTube videos. **/
+    max-width: 100%;
     border: 0;
     margin-top: 0.2em;
     margin-bottom: 0.2em;
@@ -32,7 +33,7 @@ iframe { /** IFrames are used for embedded YouTube videos. **/
 #header a img {
     vertical-align: middle;
     height: 48px;
-    width: 48px;
+    width: auto;
 }
 #header a span {
     margin-left: 0.26em;
