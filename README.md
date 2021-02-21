@@ -1,5 +1,5 @@
 # 🎲 RoyalUr.net
-A website for playing the ancient Mesopotamian board game, the Royal Game of Ur! 
+A website for playing the ancient Mesopotamian board game, The Royal Game of Ur!
 
 <p align="center"><a href="https://royalur.net">
   <img src="https://royalur.net/banner.jpg" />

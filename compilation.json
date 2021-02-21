@@ -114,7 +114,7 @@
     "res/audio/firework_explode.mp4": "res/audio_firework_explode.mp4",
     "res/audio/firework_rocket.mp4": "res/audio_firework_rocket.mp4",
 
-    "res/favicon.png": "res/favicon.png",
+    "res/favicon.png": "favicon.png",
     "res/logo.svg": "res/logo.svg",
     "res/logo_text_only.svg": "res/logo_text_only.svg",
     "res/social/discord.svg": "res/discord.svg",
