@@ -5,7 +5,8 @@
   },
 
   "html": {
-    "client/html/index.html": "index.html",
+    "client/html/home.html": "index.html",
+    "client/html/game.html": "game/index.html",
     "client/html/rules.html": "rules/index.html",
     "client/html/watch.html": "watch/index.html",
     "client/html/privacy.html": "privacy/index.html",
@@ -16,19 +17,29 @@
       "client/css/font_durango.css",
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/header_and_footer.css",
+      "client/css/github_corner.css",
+      "client/css/home.css"
+    ],
+    "game/index.css": [
+      "client/css/font_durango.css",
+      "client/css/font_nunito.css",
+      "client/css/base.css",
       "client/css/block_scrolling.css",
-      "client/css/index.css"
+      "client/css/game.css"
     ],
     "articles.css": [
       "client/css/font_durango.css",
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/header_and_footer.css",
       "client/css/article.css"
     ],
     "rules/index.css": [
       "client/css/font_durango.css",
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/header_and_footer.css",
       "client/css/article.css",
       "client/css/rules.css"
     ],
@@ -36,6 +47,7 @@
       "client/css/font_durango.css",
       "client/css/font_nunito.css",
       "client/css/base.css",
+      "client/css/header_and_footer.css",
       "client/css/article.css",
       "client/css/watch.css"
     ],
@@ -48,6 +60,12 @@
   },
   "javascript": {
     "index.js": [
+      "client/js/utils.js",
+      "client/js/resources/resource_loader.js",
+      "client/js/resources/image_system.js",
+      "client/js/resources/home_resources.js"
+    ],
+    "game/index.js": [
       "client/js/lib/reconnecting-websocket.js",
       "client/js/analytics/analytics.js",
       "client/js/analytics/stats.js",
@@ -69,7 +87,13 @@
       "client/js/screens.js",
       "client/js/client.js"
     ],
-    "resources.js": [
+    "game/simulation.js": [
+      "client/js/utils.js",
+      "client/js/network/packets.js",
+      "client/js/game/board.js",
+      "client/js/game/simulation.js"
+    ],
+    "game/resources.js": [
       "client/js/utils.js",
       "client/js/resources/resource_types.js",
       "client/js/resources/resource_loader.js",
@@ -82,12 +106,6 @@
       "client/js/resources/resource_loader.js",
       "client/js/resources/image_system.js",
       "client/js/resources/article_resources.js"
-    ],
-    "simulation.js": [
-      "client/js/utils.js",
-      "client/js/network/packets.js",
-      "client/js/game/board.js",
-      "client/js/game/simulation.js"
     ]
   },
 
@@ -175,15 +193,13 @@
   },
 
   "images": {
-    "res/wood-blue-1.png": {
+    "res/backgrounds/wood-blue-1.png": {
       "dest": "res/background",
-      "sizes": {
-        "u_u": "420 x 420",
-        "u_2160": "380 x 380",
-        "u_1440": "340 x 340",
-        "u_1080": "300 x 300",
-        "u_720": "260 x 260"
-      }
+      "sizes": { "u_u": "420 x 420" }
+    },
+    "res/backgrounds/home_background.png": {
+      "dest": "res/home_background",
+      "sizes": { "u_u": "400 x 400" }
     },
     "res/board_light.png": {
       "dest": "res/board",

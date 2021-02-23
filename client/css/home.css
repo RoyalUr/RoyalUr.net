@@ -1,0 +1,141 @@
+#greeting {
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding: 0;
+    padding-top: 2vh;
+    margin: 0;
+    text-align: center;
+}
+#greeting #logo {
+    display: inline-block;
+    height: 30vh;
+    margin-bottom: 2vh;
+    text-decoration: none;
+}
+#greeting #logo img {
+    width: auto;
+    height: 100%;
+}
+#greeting h1, #greeting h2, #greeting h3 {
+    line-height: 1.5em;
+}
+#greeting h1 {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    line-height: 1.2em;
+    font-size: 2rem;
+    color: white;
+}
+#greeting h2 {
+    margin-top: 1.5vh;
+    margin-bottom: 1.5vh;
+    font-family: Nunito, sans-serif;
+    font-size: 1.7rem;
+    color: white;
+}
+#greeting .play {
+    display: inline-block;
+    position: relative;
+    height: 18vh;
+    margin-top: 2vh;
+    text-decoration: none;
+}
+#greeting .play img {
+    width: auto;
+    height: 100%;
+    filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
+}
+#greeting .play:hover img {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+}
+#greeting .play svg {
+    position: absolute;
+    height: 18vh;
+    top: 0;
+    fill: white;
+    pointer-events: none;
+}
+#greeting .play svg.left-arrow {
+    right: 110%;
+    transition: right 0.15s ease-in-out;
+}
+#greeting .play svg.right-arrow {
+    left: 110%;
+    transition: left 0.15s ease-in-out;
+}
+#greeting .play:hover svg.left-arrow {
+    right: 105%;
+    transition: right 0.15s ease-in-out;
+}
+#greeting .play:hover svg.right-arrow {
+    left: 105%;
+    transition: left 0.15s ease-in-out;
+}
+#greeting #more-below {
+    margin-top: auto;
+}
+#greeting #more-below h2 {
+    margin-top: 5vh;
+    font-size: 1.3rem;
+}
+#greeting #more-below svg {
+    fill: rgb(12, 15, 18);
+    margin-bottom: 1vh;
+    height: 5vh;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+}
+
+#links {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4vh;
+    border: 5px solid black;
+    border-left: none;
+    border-right: none;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 1);
+}
+#links h2 {
+    margin-top: 1.5vh;
+    margin-bottom: 1vh;
+    font-size: 2rem;
+    color: white;
+}
+#links h3 {
+    font-family: Nunito, sans-serif;
+    margin-bottom: 1.5vh;
+    font-size: 1.2rem;
+    color: white;
+}
+#links .menu-button {
+    display: inline-block;
+    height: 14vh;
+    margin: 2vh;
+}
+#links .menu-button img {
+    width: auto;
+    height: 100%;
+}
+#links .menu-button:hover img {
+    filter: drop-shadow(2px 2px 3px rgba(255, 255, 255, 0.4));
+}
+
+#footer-container {
+    display: block;
+    width: 100%;
+    background: #151A1F;
+}
+#footer {
+    display: inline-block;
+    background: none;
+    box-shadow: none;
+    width: 100%;
+    margin: 0;
+    padding-bottom: 0;
+}
+#footer-text {
+    float: left;
+}

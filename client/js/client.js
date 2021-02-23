@@ -98,30 +98,62 @@ function onBeforeUnload(event) {
 // Menu interaction.
 //
 
-function onPlayClick(event) {
-    event.stopPropagation();
-    switchToScreen(SCREEN_PLAY_SELECT);
-}
-
 function onPlayLocal(event) {
     event.stopPropagation();
-    game = new LocalGame();
-    switchToScreen(SCREEN_GAME);
+    onGameModeSelected(GAME_MODE_LOCAL);
 }
 
 function onPlayComputer(event) {
     event.stopPropagation();
-    switchToScreen(SCREEN_DIFFICULTY);
+    onGameModeSelected(GAME_MODE_COMPUTER);
 }
 
 function onPlayOnline(event) {
     event.stopPropagation();
-    connectToGame(new OnlineGame())
+    onGameModeSelected(GAME_MODE_ONLINE);
 }
 
 function onPlayFriend(event) {
     event.stopPropagation();
-    connectToGame(new FriendGame())
+    onGameModeSelected(GAME_MODE_FRIEND);
+}
+
+function onGameModeSelected(gameMode) {
+    setGameSetupMode(gameMode);
+    playSelectDescriptionLabel.style.display = "";
+    playSelectPrompt.classList.add("inactive");
+}
+
+function onPlayClicked(event) {
+    if (gameSetup.mode === null) {
+        audioSystem.playSound("error");
+        return;
+    }
+
+    switch (gameSetup.mode) {
+        case GAME_MODE_LOCAL:
+            window.game = new LocalGame();
+            switchToScreen(SCREEN_GAME);
+            break;
+
+        case GAME_MODE_COMPUTER:
+            switchToScreen(SCREEN_DIFFICULTY);
+            break;
+
+        case GAME_MODE_ONLINE:
+            window.game = new OnlineGame();
+            switchToScreen(SCREEN_CONNECTING);
+            break;
+
+        case GAME_MODE_FRIEND:
+            window.game = new FriendGame();
+            switchToScreen(SCREEN_CONNECTING);
+            break;
+
+        default:
+            audioSystem.playSound("error");
+            break;
+    }
 }
 
 function onPlayComputerEasy(event) {
@@ -142,28 +174,28 @@ function onPlayComputerHard(event) {
     switchToScreen(SCREEN_GAME);
 }
 
-function onHoverPlayLocal() {
-    playSelectDescriptionDiv.textContent = "Two players, one computer.";
+const PLAY_SELECT_DESCRIPTIONS = {
+    "game_mode_local": "Two players on one computer.",
+    "game_mode_computer": "Try your luck against the computer.",
+    "game_mode_online": "Play people across the globe.",
+    "game_mode_friend": "Play with a friend over the internet."
+};
+
+function onHoverPlaySelectOption(gameMode) {
+    setGameSetupHoveredMode(gameMode);
+    playSelectDescriptionText.textContent = PLAY_SELECT_DESCRIPTIONS[gameMode];
+    playSelectDescriptionLabel.style.display = (gameSetup.mode === gameMode ? "" : "none");
     playSelectDescriptionFade.fadeIn();
 }
 
-function onHoverPlayOnline() {
-    playSelectDescriptionDiv.textContent = "Play people across the globe.";
-    playSelectDescriptionFade.fadeIn();
-}
-
-function onHoverPlayFriend() {
-    playSelectDescriptionDiv.textContent = "Play with a friend over the internet.";
-    playSelectDescriptionFade.fadeIn();
-}
-
-function onHoverPlayComputer() {
-    playSelectDescriptionDiv.textContent = "Try your luck against the computer.";
-    playSelectDescriptionFade.fadeIn();
-}
-
-function onPlayUnhover() {
-    playSelectDescriptionFade.fadeOut();
+function onUnhoverPlaySelectOption(gameMode) {
+    setGameSetupHoveredMode(null);
+    if (gameSetup.mode !== null) {
+        playSelectDescriptionText.textContent = PLAY_SELECT_DESCRIPTIONS[gameSetup.mode];
+        playSelectDescriptionLabel.style.display = "";
+    } else {
+        playSelectDescriptionFade.fadeOut();
+    }
 }
 
 function onSettingsControlClick(event) {
@@ -173,13 +205,18 @@ function onSettingsControlClick(event) {
 
 function onExitClick(event) {
     event.stopPropagation();
+
+    // Instead of taking the user back to the game selection screen,
+    // we'd rather just take them back to the site's home page.
+    if (isOnScreen([SCREEN_MENU, SCREEN_GAME, SCREEN_WIN])) {
+        window.location.href = "/";
+        return;
+    }
+
     const message = getExitConfirmation();
     if (message && !window.confirm(message))
         return;
 
-    if (screenState.exitTargetScreen === SCREEN_MENU) {
-        resetHash();
-    }
     switchToScreen(screenState.exitTargetScreen);
 }
 

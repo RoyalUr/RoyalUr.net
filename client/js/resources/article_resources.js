@@ -13,7 +13,10 @@ ArticleResourceLoader.prototype.getEffectiveScreenSize = function() {
     // expected size at a 720p resolution to find our target resolution.
     // Its messy, but should be more consistent than the window size.
     const expectedContentWidth = 900,
-          contentWidth = document.getElementById("content").clientWidth * window.devicePixelRatio,
+          currentContentWidth = document.getElementById("content").clientWidth,
+          rotate90ContentWidth = min(document.documentElement.clientHeight, expectedContentWidth),
+          maxPossibleContentWidth = max(rotate90ContentWidth, currentContentWidth),
+          contentWidth = maxPossibleContentWidth * window.devicePixelRatio,
           effectiveDevicePixelRatio = contentWidth / expectedContentWidth,
           multiplier = 1 + 2 * (effectiveDevicePixelRatio - 1);
     return vec(1280 * multiplier, 720 * multiplier);

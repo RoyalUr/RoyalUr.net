@@ -64,9 +64,12 @@ ResourceLoader.prototype.completeRasterImageURL = function(url, callback) {
         callback(url + size + (ext.length ? "." + ext : ""));
     }.bind(this));
 }
+/** We normalise screen sizes to landscape-oriented, and apply the device scaling. **/
 ResourceLoader.prototype.getEffectiveScreenSize = function() {
-    const unscaledSize = vec(document.documentElement.clientWidth, document.documentElement.clientHeight);
-    return vecMul(unscaledSize, window.devicePixelRatio);
+    const width = document.documentElement.clientWidth,
+          height = document.documentElement.clientHeight,
+          normedSize = vec(max(width, height), min(width, height));
+    return vecMul(normedSize, window.devicePixelRatio);
 };
 ResourceLoader.prototype.calculateResolution = function() {
     const size = this.getEffectiveScreenSize();

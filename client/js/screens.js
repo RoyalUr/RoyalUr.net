@@ -4,14 +4,13 @@
 
 const SCREEN_LOADING = "screen_loading",
       SCREEN_MENU = "screen_menu",
-      SCREEN_PLAY_SELECT = "screen_play_select",
       SCREEN_DIFFICULTY = "screen_difficulty",
       SCREEN_CONNECTING = "screen_connecting",
       SCREEN_WAITING_FOR_FRIEND = "screen_waiting_for_friend",
       SCREEN_GAME = "screen_game",
       SCREEN_WIN = "screen_win";
 
-const MENU_VISIBLE_SCREENS = [SCREEN_MENU, SCREEN_PLAY_SELECT, SCREEN_DIFFICULTY],
+const MENU_VISIBLE_SCREENS = [SCREEN_MENU, SCREEN_DIFFICULTY],
       GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN],
       NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME],
       CREDITS_HIDDEN_SCREENS = [SCREEN_LOADING];
@@ -30,7 +29,6 @@ const screenState = {
 
     loadingFade: new Fade(0.5).visible(),
     menuFade: new Fade(0.5),
-    playSelectFade: new Fade(0.5),
     difficultyFade: new Fade(0.5),
     learnFade: new Fade(0.5),
     boardFade: new Fade(0.5),
@@ -55,7 +53,6 @@ const allControlFades = [
 const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
-screenRequiredLoadingStages[SCREEN_PLAY_SELECT] = 0;
 screenRequiredLoadingStages[SCREEN_DIFFICULTY] = 0;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_WAITING_FOR_FRIEND] = 1;
@@ -70,8 +67,7 @@ const screenActiveControlFades = {};
           EXIT = screenState.exitControlFade;
 
     screenActiveControlFades[SCREEN_LOADING] = [];
-    screenActiveControlFades[SCREEN_MENU] = [DISCORD, GITHUB];
-    screenActiveControlFades[SCREEN_PLAY_SELECT] = [EXIT];
+    screenActiveControlFades[SCREEN_MENU] = [DISCORD, LEARN, EXIT];
     screenActiveControlFades[SCREEN_DIFFICULTY] = [EXIT];
     screenActiveControlFades[SCREEN_CONNECTING] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_WAITING_FOR_FRIEND] = [DISCORD, GITHUB, EXIT];
@@ -230,7 +226,6 @@ function maybeSwitchOffLoadingScreen(stage) {
 //
 
 registerScreenTransitionFade(SCREEN_LOADING, screenState.loadingFade);
-registerScreenTransitionFade(SCREEN_PLAY_SELECT, screenState.playSelectFade);
 registerScreenTransitionFade(SCREEN_DIFFICULTY, screenState.difficultyFade);
 registerScreenTransitionFade(SCREEN_WAITING_FOR_FRIEND, screenState.waitingForFriendFade);
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.connectionFade, 0, "connectionFade");
@@ -240,11 +235,12 @@ registerScreenTransitionFade(MENU_VISIBLE_SCREENS, screenState.menuFade, 500);
 registerScreenTransitionFade(GAME_VISIBLE_SCREENS, screenState.boardFade, 500);
 
 registerScreenEnterHandler(SCREEN_LOADING, redrawLoadingBar);
-registerScreenEnterHandler(SCREEN_MENU, resetHash);
+registerScreenEnterHandler(SCREEN_MENU, onEnterMenuScreen);
 registerScreenEnterHandler(SCREEN_WAITING_FOR_FRIEND, onEnterWaitingForFriendScreen);
 registerScreenEnterHandler(SCREEN_CONNECTING, onEnterConnectingScreen);
 registerScreenEnterHandler(SCREEN_WIN, onEnterWinScreen);
 registerScreenExitHandler(NETWORK_CONNECTED_SCREENS, disconnect);
+registerScreenTransitionHandlers(MENU_VISIBLE_SCREENS, onEnterMenuVisibleScreen, onExitMenuVisibleScreen)
 registerScreenTransitionHandlers(SCREEN_GAME, onEnterGameScreen, onExitGameScreen);
 registerScreenTransitionHandlers(
     CREDITS_HIDDEN_SCREENS,
@@ -252,6 +248,21 @@ registerScreenTransitionHandlers(
     (_1, _2, hasty) => screenState.creditsFade.fadeIn(hasty ? 0 : undefined)
 );
 
+
+function onEnterMenuScreen() {
+    resetHash();
+    resetGameSetup();
+    playSelectPrompt.classList.remove("inactive");
+    playSelectDescriptionFade.fadeOut();
+}
+
+function onEnterMenuVisibleScreen() {
+    setTimeout(() => document.body.classList.add("simple-background"), 1000);
+}
+
+function onExitMenuVisibleScreen() {
+    document.body.classList.remove("simple-background");
+}
 
 function onEnterWaitingForFriendScreen() {
     waitingForFriendLinkTextBox.value = window.location.href;

@@ -45,7 +45,7 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuOuterDiv, playSelectDiv, difficultyDiv,
+            menuDiv, playButton, difficultyDiv,
             winDiv, boardCanvas, tilesCanvas,
             diceCanvas, creditsDiv, waitingForFriendDiv,
             discordControlButton, githubControlButton,

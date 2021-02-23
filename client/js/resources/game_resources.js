@@ -10,8 +10,6 @@ const audioPacks = {
 const annotationsResource = new AnnotationsResource("annotations", "/res/annotations.[ver].json");
 const stagedResources = [
     [ // Menu
-        annotationsResource,
-        new ImageResource("tile_dark", "/res/tile_dark.[ver]"),
         new PreloadImageResource("logo", "/res/logo.svg"),
         new PreloadImageResource("play_local", "/res/play_local.svg"),
         new PreloadImageResource("play_computer", "/res/play_computer.svg"),
@@ -24,17 +22,13 @@ const stagedResources = [
         new PreloadImageResource("control_github", "/res/control_github.svg"),
         new PreloadImageResource("control_learn", "/res/control_learn.svg"),
         new PreloadImageResource("control_settings", "/res/control_settings.svg"),
-
-        new ImageResource("play", "/res/button_play.[ver]",  764, 335),
-        new ImageResource("play_active", "/res/button_play_active.[ver]", 764, 335),
-        new ImageResource("learn", "/res/button_learn.[ver]", 1037, 329),
-        new ImageResource("learn_active", "/res/button_learn_active.[ver]", 1037, 329),
-        new ImageResource("watch", "/res/button_watch.[ver]", 1037, 329),
-        new ImageResource("watch_active", "/res/button_watch_active.[ver]", 1037, 329),
+        new ImageResource("play", "/res/button_play.[ver]",  764, 335)
     ],
     [ // Game
+        annotationsResource,
         new ImageResource("board", "/res/board.[ver]"),
         new ImageResource("tile_light", "/res/tile_light.[ver]"),
+        new ImageResource("tile_dark", "/res/tile_dark.[ver]"),
         new ImageResource("dice_up1", "/res/dice_up1.[ver]"),
         new ImageResource("dice_up2", "/res/dice_up2.[ver]"),
         new ImageResource("dice_up3", "/res/dice_up3.[ver]"),

@@ -13,7 +13,7 @@ let computerWorker = null;
 
 function getComputerWorker() {
     if (computerWorker === null) {
-        computerWorker = new Worker("simulation.[ver].js");
+        computerWorker = new Worker("/game/simulation.[ver].js");
         computerWorker.onmessage = onComputerWorkerMessage;
     }
     return computerWorker;

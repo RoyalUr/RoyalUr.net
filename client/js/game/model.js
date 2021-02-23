@@ -11,19 +11,46 @@ function resetGame() {
 }
 
 
-
 //
 // MENU
 //
 
-const BUTTON_STATE_INACTIVE = "inactive",
-      BUTTON_STATE_HOVERED = "hovered";
+const GAME_MODE_LOCAL = "game_mode_local",
+      GAME_MODE_COMPUTER = "game_mode_computer",
+      GAME_MODE_ONLINE = "game_mode_online",
+      GAME_MODE_FRIEND = "game_mode_friend";
 
-const menuState = {
-    playButton: BUTTON_STATE_INACTIVE,
-    learnButton: BUTTON_STATE_INACTIVE,
-    watchButton: BUTTON_STATE_INACTIVE
+const defaultGameSetup = {
+    mode: null,
+    selectModeFade: new Fade(0.5),
+
+    hoveredMode: null,
+    difficulty: 0
 };
+const gameSetup = {};
+
+function setGameSetupMode(gameMode) {
+    gameSetup.mode = gameMode;
+    if (gameMode !== null) {
+        gameSetup.selectModeFade.fadeIn();
+    } else {
+        gameSetup.selectModeFade.fadeOut();
+    }
+}
+
+function setGameSetupHoveredMode(gameMode) {
+    gameSetup.hoveredMode = gameMode;
+}
+
+function resetGameSetup() {
+    Object.assign(gameSetup, defaultGameSetup);
+    gameSetup.selectModeFade.fadeOut();
+}
+
+/** Returns whether the given game mode is selected _or_ hovered. **/
+function isGameSetupModeActive(gameMode) {
+    return gameMode === gameSetup.mode || gameMode === gameSetup.hoveredMode;
+}
 
 
 

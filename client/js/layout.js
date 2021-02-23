@@ -4,19 +4,8 @@
 
 const maxWidthOnHeightRatio = 1.5;
 
-const menuOuterDiv = document.getElementById("menu-outer"),
-      menuDiv = document.getElementById("menu"),
-      menuTitleDiv = document.getElementById("title"),
-      playButton = document.getElementById("play-button"),
-      playButtonCanvas = document.getElementById("play-canvas"),
-      playButtonCtx = playButtonCanvas.getContext("2d"),
-      playButtonTiles = playButton.getElementsByTagName("img"),
-      learnButton = document.getElementById("learn-button"),
-      learnButtonCanvas = document.getElementById("learn-canvas"),
-      learnButtonCtx = learnButtonCanvas.getContext("2d"),
-      watchButton = document.getElementById("watch-button"),
-      watchButtonCanvas = document.getElementById("watch-canvas"),
-      watchButtonCtx = watchButtonCanvas.getContext("2d");
+const menuDiv = document.getElementById("menu"),
+      playButton = document.getElementById("play");
 
 const controlsDiv = document.getElementById("controls"),
       discordControlButton = document.getElementById("discord-control"),
@@ -25,12 +14,15 @@ const controlsDiv = document.getElementById("controls"),
       learnControlButton = document.getElementById("learn-control"),
       exitControlButton = document.getElementById("exit-control");
 
-const playSelectDiv = document.getElementById("play-select"),
+const playSelectPrompt = document.getElementById("play-select-prompt"),
       playLocalButton = document.getElementById("play-local"),
       playOnlineButton = document.getElementById("play-online"),
       playFriendButton = document.getElementById("play-friend"),
-      playComputerButton = document.getElementById("play-computer"),
-      playSelectDescriptionDiv = document.getElementById("play-select-description");
+      playComputerButton = document.getElementById("play-computer");
+
+const playSelectDescriptionDiv = document.getElementById("play-select-description"),
+      playSelectDescriptionLabel = document.getElementById("play-select-description-label"),
+      playSelectDescriptionText = document.getElementById("play-select-description-text");
 
 const difficultyDiv = document.getElementById("computer-difficulty"),
       playComputerEasyButton = document.getElementById("play-computer-easy"),
@@ -51,7 +43,8 @@ const tilesCanvas = document.getElementById("tiles"),
 
 const winDiv = document.getElementById("win"),
       winMessageDiv = document.getElementById("winner-message"),
-      winBackButton = document.getElementById("win-back-button");
+      winPlayAgainButton = document.getElementById("win-play-again-button"),
+      winBackToHomeButton = document.getElementById("win-home-button");
 
 const networkStatusElement = document.getElementById("network-status");
 
@@ -82,44 +75,34 @@ let mouseDown = false,
     draggedTile = VEC_NEG1;
 
 function setupMenuElements() {
-    playButton.addEventListener("click", onPlayClick);
-
     settingsControlButton.addEventListener("click", onSettingsControlClick);
     exitControlButton.addEventListener("click", onExitClick);
-    winBackButton.addEventListener("click", onExitClick);
+    winBackToHomeButton.addEventListener("click", onExitClick);
+    winPlayAgainButton.addEventListener("click", () => switchToScreen(SCREEN_MENU));
 
     messageContainerElement.addEventListener("click", tryDismissMessage);
 
-    playSelectDiv.addEventListener("click", onExitClick);
     difficultyDiv.addEventListener("click", onExitClick);
 
     playLocalButton.addEventListener("click", onPlayLocal);
     playComputerButton.addEventListener("click", onPlayComputer);
     playOnlineButton.addEventListener("click", onPlayOnline);
     playFriendButton.addEventListener("click", onPlayFriend);
+    playButton.addEventListener("click", onPlayClicked);
 
-    playLocalButton.addEventListener("mouseover", onHoverPlayLocal);
-    playComputerButton.addEventListener("mouseover", onHoverPlayComputer);
-    playOnlineButton.addEventListener("mouseover", onHoverPlayOnline);
-    playFriendButton.addEventListener("mouseover", onHoverPlayFriend);
+    playLocalButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_LOCAL));
+    playComputerButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_COMPUTER));
+    playOnlineButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_ONLINE));
+    playFriendButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_FRIEND));
 
-    playLocalButton.addEventListener("mouseout", onPlayUnhover);
-    playComputerButton.addEventListener("mouseout", onPlayUnhover);
-    playOnlineButton.addEventListener("mouseout", onPlayUnhover);
-    playFriendButton.addEventListener("mouseout", onPlayUnhover);
+    playLocalButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_LOCAL));
+    playComputerButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_COMPUTER));
+    playOnlineButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_ONLINE));
+    playFriendButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_FRIEND));
 
     playComputerEasyButton.addEventListener("click", onPlayComputerEasy);
     playComputerMediumButton.addEventListener("click", onPlayComputerMedium);
     playComputerHardButton.addEventListener("click", onPlayComputerHard);
-
-    playButton.addEventListener("mouseover", function() { menuState.playButton = BUTTON_STATE_HOVERED; });
-    playButton.addEventListener("mouseout", function() { menuState.playButton = BUTTON_STATE_INACTIVE; });
-
-    learnButton.addEventListener("mouseover", function() { menuState.learnButton = BUTTON_STATE_HOVERED; });
-    learnButton.addEventListener("mouseout", function() { menuState.learnButton = BUTTON_STATE_INACTIVE; });
-
-    watchButton.addEventListener("mouseover", function() { menuState.watchButton = BUTTON_STATE_HOVERED; });
-    watchButton.addEventListener("mouseout", function() { menuState.watchButton = BUTTON_STATE_INACTIVE; });
 
     waitingForFriendLinkTextBox.addEventListener("click", function() {
         if (document.activeElement === waitingForFriendLinkTextBox) {
@@ -239,7 +222,6 @@ function resize() {
     useWidth = width;
     useHeight = min(Math.round(useWidth / maxWidthOnHeightRatio), height);
 
-    resizeMenu();
     resizeOverlay();
 
     if (resourceLoader.loadingStage > 1) {
@@ -248,67 +230,6 @@ function resize() {
         resizeDice();
     }
     redraw(true);
-}
-
-
-
-//
-// Layout of the menu screen.
-//
-
-const menuWidthOnHeightRatio = 760 / 840,
-      menuVerticalPadding = 0.1,
-      buttonMenuWidthPercentage = 0.5;
-
-function layoutButton(buttonElem, canvasElem, ctx, imageKey, menuWidth, buttonWidth) {
-    const imageResource = imageSystem.findImageResource(imageKey),
-          height = imageResource.calcImageHeight(buttonWidth);
-
-    buttonElem.style.width = screenPixels(menuWidth);
-    buttonElem.style.height = screenPixels(height);
-
-    canvasElem.width = buttonWidth;
-    canvasElem.height = height;
-    canvasElem.style.width = screenPixels(buttonWidth);
-    canvasElem.style.height = screenPixels(height);
-}
-
-function resizeMenu() {
-    let menuWidth = menuWidthOnHeightRatio * height * (1 - 2 * menuVerticalPadding);
-    if (menuWidth > width) {
-        menuWidth = width;
-    }
-
-    const buttonWidth = menuWidth * buttonMenuWidthPercentage;
-
-    menuDiv.style.width = screenPixels(menuWidth);
-
-    layoutButton(playButton, playButtonCanvas, playButtonCtx, "play", menuWidth, buttonWidth);
-    layoutButton(learnButton, learnButtonCanvas, learnButtonCtx, "learn", menuWidth, buttonWidth);
-    layoutButton(watchButton, watchButtonCanvas, watchButtonCtx, "watch", menuWidth, buttonWidth);
-
-    // Set the spacing between the buttons and title
-    playButton.style.marginTop = screenPixels(0.05 * buttonWidth);
-    playButton.style.marginBottom = screenPixels(0.1 * buttonWidth);
-    learnButton.style.marginBottom = screenPixels(0.05 * buttonWidth);
-
-    // Set the size and spacing of the play selection buttons
-    const numButtons = 4,
-          playButtonWidth = min(buttonWidth, width / numButtons),
-          playButtonSpacing = min(playButtonWidth / 2, (width - playButtonWidth * numButtons) / (numButtons + 1)),
-          buttonSeparation = playButtonSpacing / numButtons + playButtonWidth,
-          middleAnchor = width / 2;
-
-    function layoutPlayButton(elem, left) {
-        elem.style.width = screenPixels(playButtonWidth);
-        elem.style.left = screenPixels(left);
-    }
-    layoutPlayButton(playLocalButton, middleAnchor - 2 * buttonSeparation);
-    layoutPlayButton(playComputerButton, middleAnchor - buttonSeparation);
-    layoutPlayButton(playOnlineButton, middleAnchor);
-    layoutPlayButton(playFriendButton, middleAnchor + buttonSeparation);
-
-    playSelectDescriptionDiv.style.top = screenPixels(0.5 * height + buttonSeparation / 2);
 }
 
 
