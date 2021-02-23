@@ -16,6 +16,13 @@ import xml.etree.ElementTree as ElementTree
 
 
 #
+# When we make a mistake and need to destroy everyone's caches, update this mod time.
+# Updating this will cause ALL assets versions to be upped to at least this value.
+#
+CACHE_DESTRUCTION_MOD_TIME = 1614055952
+
+
+#
 # Utility Functions
 #
 
@@ -250,10 +257,10 @@ class Image:
 
             # Save the scaled copies.
             scaled_image = self.get_scaled(size)
-            scaled_image.save(scaled_file_png)
+            scaled_image.save(scaled_file_png, lossless=True, quality=100)
             setmtime(scaled_file_png, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_png))
-            scaled_image.save(scaled_file_webp)
+            scaled_image.save(scaled_file_webp, lossless=True, quality=100)
             setmtime(scaled_file_webp, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_webp))
 
@@ -426,9 +433,14 @@ def copy_resource_files(target_folder, comp_spec, *, prefix=""):
     target_sizes = [16, 32, 64, 96, 128]
     for size in target_sizes:
         favicon_scaled = favicon_image.resize((size, size), PILImage.LANCZOS)
-        favicon_scaled.save(favicon_path.format(size), sizes=[(size, size)])
+        favicon_scaled.save(
+            favicon_path.format(size), sizes=[(size, size)], lossless=True, quality=100
+        )
         if size == max(target_sizes):
-            favicon_scaled.save(favicon_path.format(""), sizes=[(size, size) for size in target_sizes])
+            favicon_scaled.save(
+                favicon_path.format(""), sizes=[(size, size) for size in target_sizes],
+                lossless=True, quality=100
+            )
 
 
 def combine_annotations(target_folder, comp_spec, *, prefix=""):
@@ -487,7 +499,8 @@ def filter_file(target_folder, file, *, prefix="", skip_versions=False):
 
         # In dev builds we don't add the versions to the URLs.
         if not skip_versions:
-            filtered += ".v{}".format(int(version_mtime))
+            active_version = int(max(version_mtime, CACHE_DESTRUCTION_MOD_TIME))
+            filtered += ".v{}".format(active_version)
             source_mtime = max(source_mtime, version_mtime)
 
         # Append the rest of the file name to the filtered file.
