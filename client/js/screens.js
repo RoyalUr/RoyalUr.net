@@ -218,6 +218,11 @@ function maybeSwitchOffLoadingScreen(stage) {
     setScreen(screenState.loadingTargetScreen, false);
     screenState.loadingTargetScreen = null;
     screenState.loadingTargetStage = 0;
+
+    // Otherwise this can break when loading directly into a game.
+    if (!isOnScreen(MENU_VISIBLE_SCREENS)) {
+        onExitSimpleBgScreen();
+    }
 }
 
 
@@ -240,7 +245,7 @@ registerScreenEnterHandler(SCREEN_WAITING_FOR_FRIEND, onEnterWaitingForFriendScr
 registerScreenEnterHandler(SCREEN_CONNECTING, onEnterConnectingScreen);
 registerScreenEnterHandler(SCREEN_WIN, onEnterWinScreen);
 registerScreenExitHandler(NETWORK_CONNECTED_SCREENS, disconnect);
-registerScreenTransitionHandlers(MENU_VISIBLE_SCREENS, onEnterMenuVisibleScreen, onExitMenuVisibleScreen)
+registerScreenTransitionHandlers(MENU_VISIBLE_SCREENS, onEnterSimpleBgScreen, onExitSimpleBgScreen)
 registerScreenTransitionHandlers(SCREEN_GAME, onEnterGameScreen, onExitGameScreen);
 registerScreenTransitionHandlers(
     CREDITS_HIDDEN_SCREENS,
@@ -256,16 +261,17 @@ function onEnterMenuScreen() {
     playSelectDescriptionFade.fadeOut();
 }
 
-function onEnterMenuVisibleScreen() {
+function onEnterSimpleBgScreen() {
     setTimeout(() => document.body.classList.add("simple-background"), 1000);
 }
 
-function onExitMenuVisibleScreen() {
+function onExitSimpleBgScreen() {
     document.body.classList.remove("simple-background");
 }
 
 function onEnterWaitingForFriendScreen() {
     waitingForFriendLinkTextBox.value = window.location.href;
+    waitingForFriendLinkTextBox.style.minWidth = window.location.href.length + "ch";
 }
 
 function onEnterConnectingScreen() {

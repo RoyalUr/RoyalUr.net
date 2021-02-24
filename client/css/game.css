@@ -379,7 +379,7 @@ canvas { position: absolute; }
 #waiting-for-friend button {
     width: 20vmin;
     cursor: pointer;
-    margin-left: 1vmin;
+    margin: 1em;
     font-size: 5vmin;
     line-height: 5vmin;
 }

@@ -28,6 +28,7 @@ const defaultGameSetup = {
     difficulty: 0
 };
 const gameSetup = {};
+resetGameSetup();
 
 function setGameSetupMode(gameMode) {
     gameSetup.mode = gameMode;
