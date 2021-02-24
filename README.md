@@ -15,10 +15,22 @@ in a royal tomb in the city-state of Ur in ancient Mesopotamia.  Learn more abou
 on [Wikipedia](https://en.wikipedia.org/wiki/Royal_Game_of_Ur), or watch a fun match
 between Tom Scott and Irving Finkel on [YouTube](https://youtu.be/WZskjLq040I)!
 
-The game also has a Discord and a Reddit that you might want to check out! The Discord
-can be used to chat about the game, find worthy opponents to challenge, discuss the
-development of RoyalUr.net, and it also contains a changelog with a summary of the changes
-being made to the website.
+
+### How much of the game is luck?
+The answer is, **less than you might think**!
+
+If you'd like to learn more about strategy and the role
+of luck in The Royal Game of Ur, check out our efforts over in the
+[RoyalUrAnalysis repository](https://github.com/Sothatsit/RoyalUrAnalysis).
+In that repository we're currently undergoing efforts to use our computers
+to help us better understand the strategy and luck involved The Royal Game of Ur.
+
+
+### Join the community!
+If you're interested in The Royal Game of Ur, we have a [Discord](https://discord.gg/Ea49VVru5N)
+and a [Reddit](https://www.reddit.com/r/GameofUr/) that you might want to check out! These are
+both good places to talk about the game, its strategies, and see cool board recreations that
+people have made! The Discord is also a great place to find strong opponents to challenge!
 
 <p float="left">
   <a href="https://discord.gg/Ea49VVru5N">
