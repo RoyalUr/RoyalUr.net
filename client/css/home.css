@@ -1,3 +1,6 @@
+html {
+    scroll-behavior: smooth;
+}
 #greeting {
     display: flex;
     flex-direction: column;
