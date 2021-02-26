@@ -91,6 +91,8 @@
       "client/js/utils.js",
       "client/js/network/packets.js",
       "client/js/game/board.js",
+      "res/royal_ur_analysis/bytecoder.js",
+      "client/js/game/royal_ur_analysis_hook.js",
       "client/js/game/simulation.js"
     ],
     "game/resources.js": [
@@ -148,7 +150,9 @@
     "res/buttons/controls/exit.svg": "res/control_exit.svg",
     "res/buttons/controls/github.svg": "res/control_github.svg",
     "res/buttons/controls/learn.svg": "res/control_learn.svg",
-    "res/buttons/controls/settings.svg": "res/control_settings.svg"
+    "res/buttons/controls/settings.svg": "res/control_settings.svg",
+
+    "res/royal_ur_analysis/program.wasm": "game/royal_ur_analysis.wasm"
   },
 
   "image_size_classes": {
