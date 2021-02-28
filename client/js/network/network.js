@@ -118,7 +118,7 @@ function connectSocket() {
 }
 
 function receiveMessage(message) {
-    const packet = readPacket(message);
+    const packet = networkPackets.readPacket(message);
 
     printDebug("Recieved packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
 

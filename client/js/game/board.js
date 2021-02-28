@@ -224,6 +224,10 @@ function GameState() {
     this.won = false;
     this.lastMoveFrom = null;
 }
+GameState.prototype.updateStartTiles = function() {
+    this.board.setTile(LIGHT_START, (this.lightTiles > 0 ? TILE_LIGHT : TILE_EMPTY));
+    this.board.setTile(DARK_START, (this.darkTiles > 0 ? TILE_DARK : TILE_EMPTY));
+};
 GameState.prototype.copyFrom = function(other) {
     this.board.copyFrom(other.board);
     this.activePlayerNo = other.activePlayerNo;
@@ -234,6 +238,7 @@ GameState.prototype.copyFrom = function(other) {
     this.lightWon = other.lightWon;
     this.darkWon = other.darkWon;
     this.won = other.won;
+    this.updateStartTiles();
 };
 GameState.prototype.copyFromCurrentGame = function() {
     this.board.copyFrom(board);
@@ -245,15 +250,15 @@ GameState.prototype.copyFromCurrentGame = function() {
     this.lightWon = (this.lightScore >= 7);
     this.darkWon = (this.darkScore >= 7);
     this.won = (this.lightWon || this.darkWon);
+    this.updateStartTiles();
 };
 GameState.prototype.getValidMoves = function(diceValue, outList) {
-    this.board.setTile(LIGHT_START, (this.lightTiles > 0 ? TILE_LIGHT : TILE_EMPTY));
-    this.board.setTile(DARK_START, (this.darkTiles > 0 ? TILE_DARK : TILE_EMPTY));
+    this.updateStartTiles();
     return this.board.getAllValidMoves(this.activePlayerNo, diceValue, outList);
 };
 GameState.prototype.applyMove = function(from, diceValue) {
     const to = getTileMoveToLocation(this.activePlayerNo, from, diceValue),
-        toTile = this.board.getTile(to);
+          toTile = this.board.getTile(to);
 
     // Remove the old tile.
     this.board.setTile(from, TILE_EMPTY);
@@ -300,6 +305,7 @@ GameState.prototype.applyMove = function(from, diceValue) {
 
     // Update the last move that was applied.
     this.lastMoveFrom = from;
+    this.updateStartTiles();
 };
 GameState.prototype.swapActivePlayer = function() {
     this.activePlayerNo = (this.activePlayerNo === LIGHT_PLAYER_NO ? DARK_PLAYER_NO : LIGHT_PLAYER_NO);

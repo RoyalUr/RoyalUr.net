@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cp -f ../../Java/RoyalUrAnalysis/target/bytecoder/royal_ur_analysis.js res/royal_ur_analysis/bytecoder.js
-cp -f ../../Java/RoyalUrAnalysis/target/bytecoder/royal_ur_analysis.wasm res/royal_ur_analysis/program.wasm
-cp -f ../../Java/RoyalUrAnalysis/target/bytecoder/royal_ur_analysis.wasm.map res/royal_ur_analysis/program.wasm.map
-cp -f ../../Java/RoyalUrAnalysis/target/bytecoder/royal_ur_analysis.wat res/royal_ur_analysis/program.wat
+rsync -azP --delete-after ../../Java/RoyalUrAnalysis/target/bytecoder/ res/royal_ur_analysis/
+cp -f res/royal_ur_analysis/localedata.properties res/royal_ur_analysis/localedata_US.properties
+cp -f res/royal_ur_analysis/localedata.properties res/royal_ur_analysis/localedata_US_en.properties

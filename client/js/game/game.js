@@ -9,7 +9,9 @@ const DIFFICULTY_EASY = 1,
       DIFFICULTY_MEDIUM = 2,
       DIFFICULTY_HARD = 5;
 
-let computerWorker = null;
+let computerWorker = null,
+    pandaAvailable = false,
+    pandaUnsupported = false;
 
 function getComputerWorker() {
     if (computerWorker === null) {
@@ -19,15 +21,19 @@ function getComputerWorker() {
     return computerWorker;
 }
 function onComputerWorkerMessage(event) {
-    // Read the response.
-    const packet = new PacketIn(event.data, true),
-          response = readSimWorkerResponse(packet);
-    packet.assertEmpty();
+    const packet = aiPackets.readPacket(event.data);
 
-    // See if the current game is waiting for a computer move.
-    if (!game || !(game instanceof ComputerGame))
-        return;
-    game.onReceiveComputerMove(response.moveFrom);
+    if (packet.type === "ai_functionality") {
+        pandaAvailable = packet.pandaAvailable;
+        pandaUnsupported = packet.pandaUnsupported;
+    } else if (packet.type === "ai_move_response") {
+        // See if the current game is waiting for a computer move.
+        if (game && game instanceof ComputerGame) {
+            game.onReceiveComputerMove(packet.moveFrom);
+        }
+    } else {
+        throw "Unsupported packet type " + packet.type;
+    }
 }
 
 
@@ -380,6 +386,7 @@ function ComputerGame(difficulty) {
     otherPlayer.name = "Computer";
 
     this.turnPlayer = lightPlayer;
+    this.computerMove = null;
 }
 setSuperClass(ComputerGame, BrowserGame);
 
@@ -413,20 +420,6 @@ ComputerGame.prototype.updateActivePlayer = function() {
     ownPlayer.active = this.isHumansTurn();
     otherPlayer.active = this.isComputersTurn();
 };
-ComputerGame.prototype.setupRoll = function(delayComputerRoll) {
-    this.updateActivePlayer();
-    layoutDice();
-    unselectTile();
-    if (this.isHumansTurn()) {
-        setWaitingForDiceRoll();
-    } else {
-        setTimeout(function() {
-            startRollingDice();
-            dice.callback = this.onFinishDice.bind(this);
-            setDiceValues(generateRandomDiceValues());
-        }.bind(this), (delayComputerRoll ? 1500 : 0));
-    }
-};
 ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
     // If they've just taken a piece off the board, give them some score
     if (vecEquals(toTile, getEndTile(this.turnPlayer.playerNo))) {
@@ -447,13 +440,32 @@ ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
 
     this.setupRoll();
 };
+ComputerGame.prototype.swapPlayerAfterNoMoves = function() {
+    this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+    this.setupRoll();
+};
+ComputerGame.prototype.setupRoll = function() {
+    this.updateActivePlayer();
+    layoutDice();
+    unselectTile();
+    if (this.isHumansTurn()) {
+        setWaitingForDiceRoll();
+    } else {
+        startRollingDice();
+        dice.callback = this.onFinishDice.bind(this);
+        const diceValues = generateRandomDiceValues();
+        this.findComputerMove(countDiceUp(diceValues));
+        setDiceValues(diceValues);
+    }
+};
 ComputerGame.prototype.onFinishDice = function() {
     this.setupStartTiles();
 
-    const diceCount = countDiceUp();
-    const availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, diceCount);
+    const roll = countDiceUp(),
+          availableMoves = board.getAllValidMoves(this.turnPlayer.playerNo, roll);
+
     if (availableMoves.length === 0) {
-        if (diceCount === 0) {
+        if (roll === 0) {
             const player = (this.isHumansTurn() ? "You" : "Computer");
             this.triggerNoMovesMessage(player + " rolled a zero");
         } else {
@@ -464,36 +476,41 @@ ComputerGame.prototype.onFinishDice = function() {
         selectTile(availableMoves[0]);
     }
 
-    if (this.isComputersTurn()) {
-        if (availableMoves.length === 1) {
-            const move = availableMoves[0];
-            setTimeout(() => this.performComputerMove(move), Math.floor(max(0, 700)));
-            return;
-        }
-        this.determineComputerMove();
+    // Check if we've already found the computer move.
+    if (this.computerMove !== null) {
+        this.performComputerMove();
     }
 };
-ComputerGame.prototype.swapPlayerAfterNoMoves = function() {
-    this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
-    this.setupRoll();
-};
-ComputerGame.prototype.determineComputerMove = function() {
-    // Get the AI involved.
+ComputerGame.prototype.findComputerMove = function(roll) {
+    this.computerMove = null;
+
     const state = new GameState();
     state.copyFromCurrentGame();
-    const workerRequest = writeSimWorkerRequest(state, countDiceUp(), this.difficulty);
-    getComputerWorker().postMessage(workerRequest.data);
+    const availableMoves = state.board.getAllValidMoves(this.turnPlayer.playerNo, roll);
+    if (availableMoves.length === 0)
+        return;
+
+    // Get the AI involved.
+    const workerRequest = writeAIMoveRequestPacket(state, roll, this.difficulty);
     this.waitingForComputerMove = true;
-    return null;
+    getComputerWorker().postMessage(workerRequest.data);
 };
 ComputerGame.prototype.onReceiveComputerMove = function(from) {
     if (!this.waitingForComputerMove)
         return;
 
     this.waitingForComputerMove = false;
-    this.performComputerMove(from);
+    this.computerMove = from;
+
+    // We don't play the move until the dice are finished rolling.
+    if (!dice.rolling) {
+        this.performComputerMove();
+    }
 };
-ComputerGame.prototype.performComputerMove = function(from) {
+ComputerGame.prototype.performComputerMove = function() {
+    const from = this.computerMove;
+    this.computerMove = null;
+
     const diceValue = countDiceUp(),
           to = getTileMoveToLocation(otherPlayer.playerNo, from, diceValue),
           toTile = board.getTile(to);

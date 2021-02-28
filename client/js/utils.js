@@ -94,7 +94,9 @@ function testWebPSupport(callback) {
 //
 
 function error(cause) {
-    throw "[ERROR] " + cause;
+    const error = "[ERROR] " + cause;
+    console.trace(error);
+    throw new Error(error);
 }
 
 function assert(predicate, message) {

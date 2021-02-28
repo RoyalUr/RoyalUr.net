@@ -81,7 +81,11 @@
       "client/js/rendering/render_game_ui.js",
       "client/js/rendering/render_board.js",
 
+      "client/js/network/packet_reader.js",
+      "client/js/network/packet_writer.js",
       "client/js/network/packets.js",
+      "client/js/network/network_packets.js",
+      "client/js/network/ai_packets.js",
       "client/js/network/network.js",
       "client/js/game/game.js",
       "client/js/screens.js",
@@ -89,10 +93,12 @@
     ],
     "game/simulation.js": [
       "client/js/utils.js",
+      "client/js/network/packet_reader.js",
+      "client/js/network/packet_writer.js",
       "client/js/network/packets.js",
+      "client/js/network/ai_packets.js",
       "client/js/game/board.js",
-      "res/royal_ur_analysis/bytecoder.js",
-      "client/js/game/royal_ur_analysis_hook.js",
+      "res/royal_ur_analysis/api.js",
       "client/js/game/simulation.js"
     ],
     "game/resources.js": [
@@ -152,7 +158,11 @@
     "res/buttons/controls/learn.svg": "res/control_learn.svg",
     "res/buttons/controls/settings.svg": "res/control_settings.svg",
 
-    "res/royal_ur_analysis/program.wasm": "game/royal_ur_analysis.wasm"
+    "res/royal_ur_analysis/royal_ur_analysis.wasm": "game/royal_ur_analysis.wasm",
+    "res/royal_ur_analysis/localedata.properties": "game/localedata.properties",
+    "res/royal_ur_analysis/localedata_US.properties": "game/localedata_US.properties",
+    "res/royal_ur_analysis/localedata_US_en.properties": "game/localedata_US_en.properties",
+    "res/royal_ur_analysis/localedata_DE_de.properties": "game/localedata_DE_de.properties"
   },
 
   "image_size_classes": {

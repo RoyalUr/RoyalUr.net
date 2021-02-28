@@ -7,357 +7,85 @@ const ZERO_CHAR_CODE = "0".charCodeAt(0),
       PROTOCOL_VERSION = 3;
 
 
-
-//
-// INCOMING
-//
-
-const incomingPacketReaders = {};
-const incomingPacketTypes = [];
-registerPacketType("error", readErrorPacket);
-registerPacketType("set_id", readSetIdPacket);
-registerPacketType("invalid_game", readInvalidGamePacket);
-registerPacketType("game_pending", readGamePendingPacket);
-registerPacketType("game", readGamePacket);
-registerPacketType("game_end", readGameEndPacket);
-registerPacketType("message", readMessagePacket);
-registerPacketType("player_status", readPlayerStatusPacket);
-registerPacketType("state", readStatePacket);
-registerPacketType("move", readMovePacket);
-
-function registerPacketType(name, readFn) {
-    incomingPacketReaders[name] = readFn;
-    incomingPacketTypes.push(name);
+/** Represents the types of packets. **/
+function PacketType(direction, name, id) {
+    this.__class_name__ = "PacketType";
+    this.direction = direction;
+    this.name = name;
+    this.id = id;
 }
 
-/**
- * Holds the data of a packet and facilitates the reading of that data.
- * @param data a String holding the content of the packet.
- * @param isWorkerPacket indicates whether this is packet used to communicate with a web worker.
- */
-function PacketIn(data, isWorkerPacket) {
-    this.data = data;
-    this.index = 0;
 
-    // If this isn't a worker packet, read its type.
-    if (!isWorkerPacket) {
-        const typeID = this.nextChar().charCodeAt(0) - ZERO_CHAR_CODE;
-        assert(
-            typeID >= 0 && typeID <= incomingPacketTypes.length,
-            "invalid typeId " + typeID + "(" + data.charAt(0) + ")"
-        );
-        this.type = incomingPacketTypes[typeID];
-    } else {
-        this.type = "worker_packet"
-    }
+/** Types of packets that are incoming. **/
+function IncomingPacketType(name, id, readFn) {
+    PacketType.call(this, "incoming", name, id)
+    this.__class_name__ = "IncomingPacketType";
+    this.readFn = readFn;
 }
-PacketIn.prototype.consumeAll = function() {
-    const from = this.index;
-    this.index = this.data.length;
-    return this.data.substring(from, this.index);
-};
-PacketIn.prototype.nextChar = function() {
-    assert(this.index < this.data.length, "there are no characters left in the packet");
-    return this.data[this.index++];
-};
-PacketIn.prototype.nextString = function(length) {
-    assert(length >= 0, "length must be >= 0");
-    assert(this.index + length <= this.data.length, "there are not " + length + " characters left in the packet");
+setSuperClass(IncomingPacketType, PacketType);
 
-    const from = this.index;
-    this.index += length;
-    return this.data.substring(from, this.index);
-};
-PacketIn.prototype.nextVarString = function(lengthCharacters) {
-    if(lengthCharacters === undefined) lengthCharacters = 2;
-    assert(lengthCharacters > 0, "lengthCharacters must be positive");
-    const length = this.nextInt(lengthCharacters);
-    return this.nextString(length);
-};
-PacketIn.prototype.nextInt = function(length) {
-    return parseInt(this.nextString(length));
-};
-PacketIn.prototype.nextDigit = function() {
-    return this.nextInt(1);
-};
-PacketIn.prototype.nextUUID = function() {
-    return this.nextString(36);
-};
-PacketIn.prototype.nextGameID = function() {
-    return this.nextString(GAME_ID_LENGTH);
-};
-PacketIn.prototype.nextBool = function() {
-    const char = this.nextChar();
-    if(char === 't') return true;
-    if(char === 'f') return false;
-    assert(false, "expected a boolean, 't' or 'f'");
-};
-PacketIn.prototype.nextLocation = function() {
-    return vec(this.nextDigit(), this.nextDigit());
-};
-PacketIn.prototype.nextPlayer = function() {
-    const player = this.nextDigit();
-    if(player === 1) return "dark";
-    if(player === 2) return "light";
-    assert(false, "invalid player " + player);
-};
-PacketIn.prototype.nextPlayerState = function() {
-    return {
-        tiles: this.nextDigit(),
-        score: this.nextDigit()
-    };
-};
-PacketIn.prototype.nextBoard = function() {
-    const owners = [];
-    for(let index = 0; index < TILES_COUNT; ++index) {
-        owners.push(this.nextDigit());
+
+/** Types of packets that are outgoing. **/
+function OutgoingPacketType(name, id) {
+    PacketType.call(this, "outgoing", name, id)
+    this.__class_name__ = "OutgoingPacketType";
+}
+setSuperClass(OutgoingPacketType, PacketType);
+
+
+/** Represents a set of incoming and outgoing packet types. **/
+function PacketSet(name, debug) {
+    this.__class_name__ = "PacketSet";
+    this.name = name;
+    this.debug = !!debug;
+    this.incoming = [];
+    this.outgoing = [];
+    this.incomingByName = {};
+    this.outgoingByName = {};
+}
+PacketSet.prototype.printDebug = function(message) {
+    if (this.debug) {
+        console.log(this.name + " PacketSet: " + message);
     }
-    return owners;
 };
-PacketIn.prototype.nextGameState = function() {
-    const state = new GameState();
-    state.lightTiles = this.nextDigit();
-    state.lightScore = this.nextDigit();
-    state.darkTiles = this.nextDigit();
-    state.darkScore = this.nextDigit();
-    state.board.loadTileState(this.nextBoard());
-    state.activePlayerNo = this.nextDigit();
-    state.lightWon = (state.lightScore >= 7);
-    state.darkWon = (state.darkScore >= 7);
-    state.won = (state.lightWon || state.darkWon);
-    return state;
+PacketSet.prototype.addIncoming = function(typeName, readFn) {
+    const type = new IncomingPacketType(typeName, this.incoming.length, readFn);
+    this.incoming.push(type);
+    this.incomingByName[typeName] = type;
 };
-PacketIn.prototype.assertEmpty = function() {
-    assert(this.index === this.data.length, "expected packet " + this.type + " to be fully read");
+PacketSet.prototype.addOutgoing = function(typeName) {
+    const type = new OutgoingPacketType(typeName, this.outgoing.length);
+    this.outgoing.push(type);
+    this.outgoingByName[typeName] = type;
 };
+PacketSet.prototype.getIncoming = function(typeID) {
+    return this.incoming[typeID];
+};
+PacketSet.prototype.getOutgoing = function(typeName) {
+    return this.outgoingByName[typeName];
+};
+PacketSet.prototype.addBidirectional = function(typeName, readFn) {
+    assert(this.incoming.length === this.outgoing.length,
+        "Number of incoming and outgoing packets is uneven. Bidirectional packets require them to be even.");
+    this.addIncoming(typeName, readFn);
+    this.addOutgoing(typeName);
+};
+PacketSet.prototype.readPacket = function(data) {
+    const packet = new PacketIn(data),
+          type = this.getIncoming(packet.typeID);
+    if (!type)
+        throw "Unknown packet type " + packet.typeID;
 
-
-function readPacket(data) {
-    const packet = new PacketIn(data);
-    assert(packet.type in incomingPacketReaders, "Unknown packet type " + packet.type);
-
-    const out = incomingPacketReaders[packet.type](packet);
-    out.type = packet.type;
+    const out = type.readFn(packet);
+    out.type = type.name;
+    out.rawData = packet.rawData;
     packet.assertEmpty();
+
+    this.printDebug("readPacket " + JSON.stringify(out));
     return out;
-}
-
-function readErrorPacket(packet) {
-    return { error: packet.consumeAll() };
-}
-
-function readSetIdPacket(packet) {
-    return { id: packet.nextUUID() };
-}
-
-function readInvalidGamePacket(packet) {
-    return { gameID: packet.nextGameID() };
-}
-
-function readGamePendingPacket(packet) {
-    return { gameID: packet.nextGameID() };
-}
-
-function readGamePacket(packet) {
-    return {
-        gameID: packet.nextGameID(),
-        ownPlayer: packet.nextPlayer(),
-        ownName: packet.nextVarString(),
-        opponentName: packet.nextVarString(),
-        opponentConnected: packet.nextBool()
-    };
-}
-
-function readGameEndPacket(packet) {
-    return { reason: packet.consumeAll() };
-}
-
-function readMessagePacket(packet) {
-    return {
-        title: packet.nextVarString(),
-        subtitle: packet.nextVarString()
-    };
-}
-
-function readPlayerStatusPacket(packet) {
-    return {
-        player: packet.nextPlayer(),
-        connected: packet.nextBool()
-    };
-}
-
-function readStatePacket(packet) {
-    const values = {
-        light: packet.nextPlayerState(),
-        dark: packet.nextPlayerState(),
-        board: packet.nextBoard(),
-
-        isGameWon: packet.nextBool(),
-        currentPlayer: packet.nextPlayer(),
-        hasRoll: packet.nextBool()
-    };
-
-    if(values.hasRoll) {
-        values.roll = [
-            packet.nextDigit(),
-            packet.nextDigit(),
-            packet.nextDigit(),
-            packet.nextDigit()
-        ];
-        values.hasMoves = packet.nextBool();
-    }
-    return values;
-}
-
-function readMovePacket(packet) {
-    return {
-        from: packet.nextLocation(),
-        to: packet.nextLocation()
-    };
-}
-
-function readSimWorkerRequest(packet) {
-    return {
-        depth: packet.nextDigit(),
-        state: packet.nextGameState(),
-        diceValue: packet.nextDigit()
-    };
-}
-
-function readSimWorkerResponse(packet) {
-    return { moveFrom: packet.nextLocation() };
-}
-
-
-
-//
-// OUTGOING
-//
-
-const outgoingPacketTypes = [
-    "open",
-    "reopen",
-    "join_game",
-    "find_game",
-    "create_game",
-    "roll",
-    "move"
-];
-
-function PacketOut(type) {
-    this.type = type;
-    if (type !== "worker_packet") {
-        const typeId = outgoingPacketTypes.indexOf(type);
-        assert(typeId >= 0, "unknown type " + type);
-        this.data = String.fromCharCode(typeId + ZERO_CHAR_CODE);
-    } else {
-        this.data = "";
-    }
-}
-PacketOut.prototype.pushRaw = function(value) {
-    this.data += value;
 };
-PacketOut.prototype.pushDigit = function(digit) {
-    assert(digit >= 0 && digit <= 9, "expected digit to be a single digit from 0 -> 9 inclusive");
-    this.pushRaw(digit);
+PacketSet.prototype.newPacketOut = function(typeName) {
+    const type = this.getOutgoing(typeName);
+    assert(!!type, "Unknown packet type " + typeName);
+    return new PacketOut(type.id);
 };
-PacketOut.prototype.pushInt = function(value, digits) {
-    assert(Number.isInteger(value), "value must be an integer");
-    assert(value >= 0, "value must be >= 0");
-    assert(digits > 0, "digits must be positive");
-
-    let encoded = value.toString();
-    assert(encoded.length <= digits, "value has too many digits");
-
-    while (encoded.length < digits) {
-        encoded = "0" + encoded;
-    }
-    this.pushRaw(encoded);
-};
-PacketOut.prototype.pushVarString = function(string, lengthCharacters) {
-    if(lengthCharacters === undefined) lengthCharacters = 2;
-    assert(lengthCharacters > 0, "lengthCharacters must be positive");
-    assert(lengthCharacters > Math.log10(string.length), "the string is too long");
-    this.pushRaw(string.length.toString().padStart(lengthCharacters, "0"));
-    this.pushRaw(string);
-}
-PacketOut.prototype.pushLocation = function(loc) {
-    this.pushDigit(loc.x);
-    this.pushDigit(loc.y);
-};
-PacketOut.prototype.pushPlayer = function(playerNo) {
-    assert(playerNo === 1 || playerNo === 2, "invalid playerNo " + playerNo);
-    this.pushDigit(playerNo);
-};
-PacketOut.prototype.pushBoard = function(board) {
-    for (let index = 0; index < TILES_COUNT; ++index) {
-        this.pushDigit(board.tiles[index]);
-    }
-};
-PacketOut.prototype.pushGameState = function(state) {
-    this.pushDigit(state.lightTiles);
-    this.pushDigit(state.lightScore);
-    this.pushDigit(state.darkTiles);
-    this.pushDigit(state.darkScore);
-    this.pushBoard(state.board);
-    this.pushPlayer(state.activePlayerNo);
-};
-
-
-function writeOpenPacket() {
-    const packet = new PacketOut("open");
-    packet.pushInt(PROTOCOL_VERSION, 4);
-    return packet;
-}
-
-function writeReOpenPacket(previousId) {
-    assert(previousId.length === 36, "previousId must be a uuid");
-    const packet = new PacketOut("reopen");
-    packet.pushInt(PROTOCOL_VERSION, 4);
-    packet.pushRaw(previousId);
-    return packet;
-}
-
-function writeJoinGamePacket(gameID) {
-    assert(gameID.length === GAME_ID_LENGTH, "gameId must have " + GAME_ID_LENGTH + " characters");
-    const packet = new PacketOut("join_game");
-    packet.pushRaw(gameID);
-    return packet;
-}
-
-function writeFindGamePacket(name) {
-    const packet = new PacketOut("find_game");
-    packet.pushVarString(name);
-    return packet;
-}
-
-function writeCreateGamePacket(name) {
-    const packet = new PacketOut("create_game");
-    packet.pushVarString(name);
-    return packet;
-}
-
-function writeDiceRollPacket() {
-    return new PacketOut("roll");
-}
-
-function writeMovePacket(from) {
-    const packet = new PacketOut("move");
-    packet.pushDigit(from.x);
-    packet.pushDigit(from.y);
-    return packet;
-}
-
-function writeSimWorkerRequest(state, diceValue, depth) {
-    const packet = new PacketOut("worker_packet");
-    packet.pushDigit(depth);
-    packet.pushGameState(state);
-    packet.pushDigit(diceValue);
-    return packet;
-}
-
-function writeSimWorkerResponse(loc) {
-    const packet = new PacketOut("worker_packet");
-    packet.pushLocation(loc)
-    return packet;
-}

@@ -40,11 +40,11 @@ function GameSimulator(depth) {
         this.bestMoveAndUtilityObjects.push(new BestMoveAndUtility());
     }
 }
-GameSimulator.prototype.findBestMove = function(state, diceValue) {
-    return this.calculateBestMoveAndUtility(state, diceValue, 1).from;
+GameSimulator.prototype.findBestMove = function(state, roll) {
+    return this.calculateBestMoveAndUtility(state, roll, 1).from;
 };
-GameSimulator.prototype.calculateBestMoveAndUtility = function(state, diceValue, depth) {
-    const moveStates = this.findMoveStates(state, diceValue, depth);
+GameSimulator.prototype.calculateBestMoveAndUtility = function(state, roll, depth) {
+    const moveStates = this.findMoveStates(state, roll, depth);
     let bestFrom = null,
         bestUtility = 0;
 
@@ -69,9 +69,9 @@ GameSimulator.prototype.calculateBestMoveAndUtility = function(state, diceValue,
 };
 GameSimulator.prototype.calculateProbabilityWeightedUtility = function(state, depth) {
     let utility = 0;
-    for (let diceValue = 0; diceValue <= 4; ++diceValue) {
-        const moveAndUtility = this.calculateBestMoveAndUtility(state, diceValue, depth);
-        utility += MOVE_PROBABILITIES[diceValue] * moveAndUtility.utility;
+    for (let roll = 0; roll <= 4; ++roll) {
+        const moveAndUtility = this.calculateBestMoveAndUtility(state, roll, depth);
+        utility += MOVE_PROBABILITIES[roll] * moveAndUtility.utility;
     }
     return utility;
 };
@@ -82,9 +82,10 @@ GameSimulator.prototype.getStateObject = function(depth, index) {
     }
     return list[index];
 };
-GameSimulator.prototype.findMoveStates = function(state, diceValue, depth) {
-    const moves = state.getValidMoves(diceValue, this.validMoveLists[depth - 1]),
+GameSimulator.prototype.findMoveStates = function(state, roll, depth) {
+    const moves = state.getValidMoves(roll, this.validMoveLists[depth - 1]),
           moveStates = this.moveStateReturnLists[depth - 1];
+
     // Clear the moveStates list.
     moveStates.length = 0;
     if (moves.length > 0) {
@@ -92,7 +93,7 @@ GameSimulator.prototype.findMoveStates = function(state, diceValue, depth) {
         for (let index = 0; index < moves.length; ++index) {
             const moveState = this.getStateObject(depth, index);
             moveState.copyFrom(state);
-            moveState.applyMove(moves[index], diceValue);
+            moveState.applyMove(moves[index], roll);
             moveStates.push(moveState);
         }
     } else {
@@ -110,22 +111,55 @@ GameSimulator.prototype.findMoveStates = function(state, diceValue, depth) {
 // Web Worker Communication.
 //
 
-const simulators = {};
-function getSimulator(depth) {
-    if (!simulators.hasOwnProperty(depth)) {
-        simulators[depth] = new GameSimulator(depth);
-    }
-    return simulators[depth];
+function SimAPI() {
+    this.__class_name__ = "SimAPI";
+    this.simulators = {};
 }
+SimAPI.prototype.onMessage = function(event) {
+    const packet = aiPackets.readPacket(event.data);
 
-onmessage = function(event) {
-    // Read the request.
-    const packet = new PacketIn(event.data, true),
-          request = readSimWorkerRequest(packet);
-    packet.assertEmpty();
+    if (packet.type === "ai_move_request") {
+        this.onMoveRequest(packet);
+    } else {
+        throw "Unsupported packet type " + packet.type;
+    }
+};
+SimAPI.prototype.onMoveRequest = function(request) {
+    // Check if we should forward the request to RoyalUrAnalysis.
+    if (request.depth > 5) {
+        const responsePacket = new PacketIn(royalUrAnalysis.sendRequest(request.rawData), true),
+              responseMove = responsePacket.nextLocation();
+        responsePacket.assertEmpty();
+
+        postMessage(writeAIMoveResponsePacket(responseMove).data);
+        return;
+    }
 
     // Find the best move and respond with it.
-    const bestMove = getSimulator(request.depth).findBestMove(request.state, request.diceValue),
-          response = writeSimWorkerResponse(bestMove);
-    postMessage(response.data)
+    const moveFrom = this.getSimulator(request.depth).findBestMove(request.state, request.roll);
+    postMessage(writeAIMoveResponsePacket(moveFrom).data)
 };
+SimAPI.prototype.getSimulator = function(depth) {
+    if (!this.simulators.hasOwnProperty(depth)) {
+        this.simulators[depth] = new GameSimulator(depth);
+    }
+    return this.simulators[depth];
+};
+SimAPI.prototype.onRoyalUrAnalysisLoaded = function() {
+    postMessage(writeAIFunctionalityPacket(true, false).data);
+};
+SimAPI.prototype.onRoyalUrAnalysisLoadErrored = function(error) {
+    console.error("There was an error loading RoyalUrAnalysis: " + error);
+    postMessage(writeAIFunctionalityPacket(false, true).data);
+};
+
+
+// Load the simulator!
+const simAPI = new SimAPI();
+onmessage = simAPI.onMessage.bind(simAPI);
+royalUrAnalysis.load(
+    "/game/royal_ur_analysis.wasm",
+    simAPI.onRoyalUrAnalysisLoaded.bind(simAPI),
+    simAPI.onRoyalUrAnalysisLoadErrored.bind(simAPI)
+);
+
