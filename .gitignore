@@ -6,6 +6,7 @@
 __pycache__
 /package-lock.json
 /node_modules
+/pre_compile.sh
 /post_compile.sh
 /res.zip
 /.vs
