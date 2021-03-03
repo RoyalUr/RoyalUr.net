@@ -1,12 +1,21 @@
-.DS_Store
-/.idea
+# The resource files and generates files of the game are not stored in git.
 /res
+/res.zip
 /compiled
+
+# Optional user-specific scripts to run before/after compile.sh.
+/pre_compile.sh
+/post_compile.sh
 /deploy.sh
+
+# Python and NodeJs internal files and caches.
 __pycache__
 /package-lock.json
 /node_modules
-/pre_compile.sh
-/post_compile.sh
-/res.zip
+
+# IntelliJ Idea and VSCode internal files.
+/.idea
 /.vs
+
+# Mac OS puts .DS_Store files everywhere.
+.DS_Store
