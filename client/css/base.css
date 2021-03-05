@@ -23,7 +23,7 @@ body.no-webp, body.no-webp .wood-background {
     background: rgb(32, 41, 48) url("/res/background.[ver].png") repeat;
     background-size: 35vmin;
 }
-body.simple-background.png, body.png .simple-background {
+body.simple-background.no-webp, body.no-webp .simple-background {
     background: rgb(32, 41, 48) url("/res/home_background.[ver].png") repeat;
     background-size: 35vmin;
 }
