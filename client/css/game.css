@@ -44,7 +44,7 @@ canvas { position: absolute; }
     animation-delay: 0;
     animation-direction: normal;
     animation-fill-mode: forwards;
-    animation-play-state: running;
+    animation-mode-state: running;
     transform-origin: center center;
 }
 @keyframes stroke-spacing {
@@ -111,20 +111,20 @@ canvas { position: absolute; }
 /*
  * PLAY SELECTION SCREEN.
  */
-#play-select {
+#mode-select {
     display: block;
     margin-top: 5vh;
     margin-bottom: 3vh;
 }
-#play-select-prompt {
+#mode-select-prompt {
     color: white;
     margin: 1.5vh;
 }
-#play-select-prompt.inactive {
+#mode-select-prompt.inactive {
     opacity: 0.5;
     transition: opacity 0.2s ease-in-out;
 }
-.play-select-option {
+.mode-select-option {
     display: inline-block;
     cursor: pointer;
     margin: 2vmin 3vmin;
@@ -133,47 +133,47 @@ canvas { position: absolute; }
     opacity: 0.5;
     filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 }
-#play-select-description {
+#mode-select-description {
     margin-top: 2vh;
     cursor: default;
     color: white;
     text-align: center;
     vertical-align: middle;
 }
-#play-select-description-label {
+#mode-select-description-label {
     font-family: Nunito, sans-serif;
     margin-right: 0.4em;
 }
 
-.play-select-option {
+.mode-select-option {
     width: 16vw;
     height: 16vw;
 }
-#play-select-description {
+#mode-select-description {
     font-size: 3vw;
     height: 1.5em;
 }
 @media (min-aspect-ratio: 7/5) {
-    .play-select-option {
+    .mode-select-option {
         width: 24vh;
         height: 24vh;
     }
-    #play-select-description { font-size: 4vh; }
+    #mode-select-description { font-size: 4vh; }
 }
 @media (max-aspect-ratio: 3/4) {
-    .play-select-option {
+    .mode-select-option {
         width: 26vw;
         height: 26vw;
         margin-left: 7vw;
         margin-right: 7vw;
     }
-    #play-select-description {
+    #mode-select-description {
         font-size: 5vw;
         height: 2.5em;
     }
 }
 
-.play-select-text {
+.mode-select-text {
     font-family: Nunito, sans-serif;
     font-weight: 600;
     font-size: 4vmin;
@@ -181,19 +181,19 @@ canvas { position: absolute; }
     color: white;
     white-space: pre;
 }
-#play-local .play-select-icon {
+#mode-local .mode-select-icon {
     padding-top: 1%;
     width: 85%;
 }
-#play-online .play-select-icon {
+#mode-online .mode-select-icon {
     padding-top: 0;
     width: 80%;
 }
-#play-computer .play-select-icon {
+#mode-computer .mode-select-icon {
     padding-top: 5%;
     width: 75%;
 }
-#play-friend .play-select-icon {
+#mode-friend .mode-select-icon {
     padding-top: 0;
     width: 75%;
 }

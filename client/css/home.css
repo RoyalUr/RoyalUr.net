@@ -15,12 +15,9 @@ html {
 #greeting #logo {
     display: inline-block;
     height: 30vh;
+    width: auto;
     margin-bottom: 2vh;
     text-decoration: none;
-}
-#greeting #logo img {
-    width: auto;
-    height: 100%;
 }
 #greeting h1, #greeting h2, #greeting h3 {
     line-height: 1.5em;

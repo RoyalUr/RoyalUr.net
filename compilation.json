@@ -148,10 +148,10 @@
     "res/social/github.svg": "res/github.svg",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
     "res/social/star_on_github.svg": "res/star_on_github.svg",
-    "res/buttons/play_local.svg": "res/play_local.svg",
-    "res/buttons/play_online.svg": "res/play_online.svg",
-    "res/buttons/play_friend.svg": "res/play_friend.svg",
-    "res/buttons/play_computer.svg": "res/play_computer.svg",
+    "res/buttons/mode_local.svg": "res/mode_local.svg",
+    "res/buttons/mode_online.svg": "res/mode_online.svg",
+    "res/buttons/mode_friend.svg": "res/mode_friend.svg",
+    "res/buttons/mode_computer.svg": "res/mode_computer.svg",
     "res/buttons/controls/discord.svg": "res/control_discord.svg",
     "res/buttons/controls/exit.svg": "res/control_exit.svg",
     "res/buttons/controls/github.svg": "res/control_github.svg",
@@ -179,12 +179,6 @@
       "u_1440": "auto x 256",
       "u_1080": "auto x 192",
       "u_720": "auto x 128"
-    },
-    "play-select-button": {
-      "u_2160": "auto x 576",
-      "u_1440": "auto x 384",
-      "u_1080": "auto x 288",
-      "u_720": "auto x 192"
     },
     "dice": {
       "u_2160": "auto x 192",

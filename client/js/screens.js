@@ -257,7 +257,7 @@ registerScreenTransitionHandlers(
 function onEnterMenuScreen() {
     resetHash();
     resetGameSetup();
-    playSelectPrompt.classList.remove("inactive");
+    modeSelectPrompt.classList.remove("inactive");
     playSelectDescriptionFade.fadeOut();
 }
 

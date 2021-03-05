@@ -120,8 +120,8 @@ function onPlayFriend(event) {
 
 function onGameModeSelected(gameMode) {
     setGameSetupMode(gameMode);
-    playSelectDescriptionLabel.style.display = "";
-    playSelectPrompt.classList.add("inactive");
+    modeSelectDescriptionLabel.style.display = "";
+    modeSelectPrompt.classList.add("inactive");
 }
 
 function onPlayClicked(event) {
@@ -174,7 +174,7 @@ function onPlayComputerHard(event) {
     switchToScreen(SCREEN_GAME);
 }
 
-const PLAY_SELECT_DESCRIPTIONS = {
+const MODE_SELECT_DESCRIPTIONS = {
     "game_mode_local": "Two players on one computer.",
     "game_mode_computer": "Try your luck against the computer.",
     "game_mode_online": "Play people across the globe.",
@@ -183,16 +183,16 @@ const PLAY_SELECT_DESCRIPTIONS = {
 
 function onHoverPlaySelectOption(gameMode) {
     setGameSetupHoveredMode(gameMode);
-    playSelectDescriptionText.textContent = PLAY_SELECT_DESCRIPTIONS[gameMode];
-    playSelectDescriptionLabel.style.display = (gameSetup.mode === gameMode ? "" : "none");
+    modeSelectDescriptionText.textContent = MODE_SELECT_DESCRIPTIONS[gameMode];
+    modeSelectDescriptionLabel.style.display = (gameSetup.mode === gameMode ? "" : "none");
     playSelectDescriptionFade.fadeIn();
 }
 
 function onUnhoverPlaySelectOption(gameMode) {
     setGameSetupHoveredMode(null);
     if (gameSetup.mode !== null) {
-        playSelectDescriptionText.textContent = PLAY_SELECT_DESCRIPTIONS[gameSetup.mode];
-        playSelectDescriptionLabel.style.display = "";
+        modeSelectDescriptionText.textContent = MODE_SELECT_DESCRIPTIONS[gameSetup.mode];
+        modeSelectDescriptionLabel.style.display = "";
     } else {
         playSelectDescriptionFade.fadeOut();
     }

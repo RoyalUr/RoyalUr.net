@@ -11,10 +11,10 @@ const annotationsResource = new AnnotationsResource("annotations", "/res/annotat
 const stagedResources = [
     [ // Menu
         new PreloadImageResource("logo", "/res/logo.svg"),
-        new PreloadImageResource("play_local", "/res/play_local.svg"),
-        new PreloadImageResource("play_computer", "/res/play_computer.svg"),
-        new PreloadImageResource("play_online", "/res/play_online.svg"),
-        new PreloadImageResource("play_friend", "/res/play_friend.svg"),
+        new PreloadImageResource("mode_local", "/res/mode_local.svg"),
+        new PreloadImageResource("mode_computer", "/res/mode_computer.svg"),
+        new PreloadImageResource("mode_online", "/res/mode_online.svg"),
+        new PreloadImageResource("mode_friend", "/res/mode_friend.svg"),
         new PreloadImageResource("join_the_discord", "/res/join_the_discord.svg"),
         new PreloadImageResource("star_on_github", "/res/star_on_github.svg"),
         new PreloadImageResource("control_discord", "/res/control_discord.svg"),

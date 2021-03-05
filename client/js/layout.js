@@ -14,20 +14,20 @@ const controlsDiv = document.getElementById("controls"),
       learnControlButton = document.getElementById("learn-control"),
       exitControlButton = document.getElementById("exit-control");
 
-const playSelectPrompt = document.getElementById("play-select-prompt"),
-      playLocalButton = document.getElementById("play-local"),
-      playOnlineButton = document.getElementById("play-online"),
-      playFriendButton = document.getElementById("play-friend"),
-      playComputerButton = document.getElementById("play-computer");
+const modeSelectPrompt = document.getElementById("mode-select-prompt"),
+      modeLocalButton = document.getElementById("mode-local"),
+      modeOnlineButton = document.getElementById("mode-online"),
+      modeFriendButton = document.getElementById("mode-friend"),
+      modeComputerButton = document.getElementById("mode-computer");
 
-const playSelectDescriptionDiv = document.getElementById("play-select-description"),
-      playSelectDescriptionLabel = document.getElementById("play-select-description-label"),
-      playSelectDescriptionText = document.getElementById("play-select-description-text");
+const modeSelectDescriptionDiv = document.getElementById("mode-select-description"),
+      modeSelectDescriptionLabel = document.getElementById("mode-select-description-label"),
+      modeSelectDescriptionText = document.getElementById("mode-select-description-text");
 
 const difficultyDiv = document.getElementById("computer-difficulty"),
-      playComputerEasyButton = document.getElementById("play-computer-easy"),
-      playComputerMediumButton = document.getElementById("play-computer-medium"),
-      playComputerHardButton = document.getElementById("play-computer-hard");
+      playComputerEasyButton = document.getElementById("mode-computer-easy"),
+      playComputerMediumButton = document.getElementById("mode-computer-medium"),
+      playComputerHardButton = document.getElementById("mode-computer-hard");
 
 const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
       waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
@@ -43,7 +43,7 @@ const tilesCanvas = document.getElementById("tiles"),
 
 const winDiv = document.getElementById("win"),
       winMessageDiv = document.getElementById("winner-message"),
-      winPlayAgainButton = document.getElementById("win-play-again-button"),
+      winPlayAgainButton = document.getElementById("win-mode-again-button"),
       winBackToHomeButton = document.getElementById("win-home-button");
 
 const networkStatusElement = document.getElementById("network-status");
@@ -84,21 +84,21 @@ function setupMenuElements() {
 
     difficultyDiv.addEventListener("click", onExitClick);
 
-    playLocalButton.addEventListener("click", onPlayLocal);
-    playComputerButton.addEventListener("click", onPlayComputer);
-    playOnlineButton.addEventListener("click", onPlayOnline);
-    playFriendButton.addEventListener("click", onPlayFriend);
+    modeLocalButton.addEventListener("click", onPlayLocal);
+    modeComputerButton.addEventListener("click", onPlayComputer);
+    modeOnlineButton.addEventListener("click", onPlayOnline);
+    modeFriendButton.addEventListener("click", onPlayFriend);
     playButton.addEventListener("click", onPlayClicked);
 
-    playLocalButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_LOCAL));
-    playComputerButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_COMPUTER));
-    playOnlineButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_ONLINE));
-    playFriendButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_FRIEND));
+    modeLocalButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_LOCAL));
+    modeComputerButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_COMPUTER));
+    modeOnlineButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_ONLINE));
+    modeFriendButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_FRIEND));
 
-    playLocalButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_LOCAL));
-    playComputerButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_COMPUTER));
-    playOnlineButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_ONLINE));
-    playFriendButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_FRIEND));
+    modeLocalButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_LOCAL));
+    modeComputerButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_COMPUTER));
+    modeOnlineButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_ONLINE));
+    modeFriendButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_FRIEND));
 
     playComputerEasyButton.addEventListener("click", onPlayComputerEasy);
     playComputerMediumButton.addEventListener("click", onPlayComputerMedium);
