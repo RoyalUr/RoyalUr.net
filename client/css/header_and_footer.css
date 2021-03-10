@@ -4,16 +4,16 @@
     display: block;
     box-sizing: border-box;
     max-width: 900px;
-    padding: 0.5rem;
+    padding: 0.5em;
     margin-left: auto;
     margin-right: auto;
 
-    font-size: 1.5rem;
+    font-size: 1.5em;
     background: #151A1F;
     box-shadow: 0 0 10px 5px rgba(0,0,0,1);
 }
 #header {
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
 }
 #header a {
     line-height: 48px;
@@ -33,14 +33,14 @@
 #header a span {
     margin-left: 0.26em;
     margin-bottom: -0.3em;
-    font-size: 2rem;
+    font-size: 2em;
     color: white;
 }
 
 
 #footer {
     overflow: hidden;
-    margin-top: 1rem;
+    margin-top: 1em;
 }
 #footer-text {
     display: inline-block;
@@ -55,8 +55,8 @@
 #footer a.link, #footer span.copyright {
     color: #bbbbbb;
     font-family: Nunito, sans-serif;
-    font-size: 0.7em;
-    margin-right: 1rem;
+    font-size: 0.85em;
+    margin-right: 1em;
     vertical-align: middle;
 }
 #footer span.copyright {

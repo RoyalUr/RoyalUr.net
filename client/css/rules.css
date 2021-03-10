@@ -1,8 +1,9 @@
 #content {
     background-color: rgb(32, 41, 48);
-    font-size: 1.8rem;
+    font-size: 1.8em;
 }
-#content, #content * {
+#content,
+#content * {
     font-family: Nunito, sans-serif;
     text-decoration: none;
     color: white;
@@ -15,6 +16,9 @@
 }
 #content h2 {
     text-decoration: underline;
+}
+#content h2,
+#content h3 {
     font-size: 1.4em;
 }
 #content strong {
@@ -22,13 +26,8 @@
     margin-right: 0.75vh;
 }
 #content p {
-    font-size: 1em;
+    font-size: 0.9em;
 }
-#content .sub-text, #content .inline-sub-text {
-    font-size: 0.75em;
-    margin-top: 0.15vh;
-}
-#content .inline-sub-text { display: inline; }
 #content img {
     max-width: 100%;
     box-sizing: border-box;

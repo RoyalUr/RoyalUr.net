@@ -1,89 +1,110 @@
 html {
     scroll-behavior: smooth;
 }
+
 #greeting {
     display: flex;
     flex-direction: column;
 
     box-sizing: border-box;
     min-height: 100vh;
-    padding: 0;
-    padding-top: 2vh;
+    padding: 1.5vmin;
     margin: 0;
     text-align: center;
 }
-#greeting #logo {
+#logo {
     display: inline-block;
     height: 30vh;
+    margin-top: 3vh;
     width: auto;
     margin-bottom: 2vh;
     text-decoration: none;
 }
-#greeting h1, #greeting h2, #greeting h3 {
+@media (max-aspect-ratio: 30/35) {
+    #logo {
+        height: 35vmin;
+    }
+}
+
+#greeting h1,
+#greeting h2,
+#greeting h3 {
     line-height: 1.5em;
+    color: white;
+}
+#greeting h1,
+#greeting h2 {
+    margin-top: 1em;
+    font-family: Nunito, sans-serif;
 }
 #greeting h1 {
-    margin-top: 2vh;
-    margin-bottom: 2vh;
-    line-height: 1.2em;
-    font-size: 2rem;
-    color: white;
+    font-size: 1.7em;
 }
 #greeting h2 {
-    margin-top: 1.5vh;
-    margin-bottom: 1.5vh;
-    font-family: Nunito, sans-serif;
-    font-size: 1.7rem;
-    color: white;
+    font-size: 2.4em;
 }
-#greeting .play {
+
+#greeting .greeting-button,
+#greeting .greeting-button svg {
+    height: 18vh;
+}
+#greeting .greeting-button {
     display: inline-block;
     position: relative;
-    height: 18vh;
     margin-top: 2vh;
     text-decoration: none;
 }
-#greeting .play img {
+#greeting .greeting-button img,
+#greeting .learn img{
     width: auto;
     height: 100%;
     filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
 }
-#greeting .play:hover img {
+#greeting .greeting-button:hover img {
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
 }
-#greeting .play svg {
+#greeting .greeting-button svg {
     position: absolute;
-    height: 18vh;
     top: 0;
     fill: white;
     pointer-events: none;
 }
-#greeting .play svg.left-arrow {
+@media (max-aspect-ratio: 1/1) {
+    #greeting .greeting-button svg {
+        display: none;
+    }
+}
+#greeting .greeting-button svg.left-arrow {
     right: 110%;
     transition: right 0.15s ease-in-out;
 }
-#greeting .play svg.right-arrow {
+#greeting .greeting-button svg.right-arrow {
     left: 110%;
     transition: left 0.15s ease-in-out;
 }
-#greeting .play:hover svg.left-arrow {
+#greeting .greeting-button:hover svg.left-arrow {
     right: 105%;
     transition: right 0.15s ease-in-out;
 }
-#greeting .play:hover svg.right-arrow {
+#greeting .greeting-button:hover svg.right-arrow {
     left: 105%;
     transition: left 0.15s ease-in-out;
 }
-#greeting #more-below {
+
+#more-below {
     margin-top: auto;
+    font-size: 1.3em;
 }
-#greeting #more-below h2 {
+#more-below h2 {
     margin-top: 5vh;
-    font-size: 1.3rem;
+    font-size: 1.7em;
 }
-#greeting #more-below svg {
+#more-below h3 {
+    font-family: Nunito, sans-serif;
+}
+#more-below svg {
     fill: rgb(12, 15, 18);
-    margin-bottom: 1vh;
+    margin-top: 1vh;
     height: 5vh;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
 }
@@ -98,17 +119,19 @@ html {
     border-right: none;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 1);
 }
+#links h2,
+#links h3 {
+    color: white;
+}
 #links h2 {
     margin-top: 1.5vh;
     margin-bottom: 1vh;
-    font-size: 2rem;
-    color: white;
+    font-size: 2em;
 }
 #links h3 {
     font-family: Nunito, sans-serif;
     margin-bottom: 1.5vh;
-    font-size: 1.2rem;
-    color: white;
+    font-size: 1.4em;
 }
 #links .menu-button {
     display: inline-block;
