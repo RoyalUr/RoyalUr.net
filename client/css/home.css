@@ -38,10 +38,13 @@ html {
     font-family: Nunito, sans-serif;
 }
 #greeting h1 {
-    font-size: 1.7em;
+    font-size: 1.8em;
 }
 #greeting h2 {
     font-size: 2.4em;
+}
+#greeting h3 {
+    font-size: 1.6em;
 }
 
 #greeting .greeting-button,
@@ -93,11 +96,10 @@ html {
 
 #more-below {
     margin-top: auto;
-    font-size: 1.3em;
 }
 #more-below h2 {
     margin-top: 5vh;
-    font-size: 1.7em;
+    font-size: 2.4em;
 }
 #more-below h3 {
     font-family: Nunito, sans-serif;
@@ -131,7 +133,7 @@ html {
 #links h3 {
     font-family: Nunito, sans-serif;
     margin-bottom: 1.5vh;
-    font-size: 1.4em;
+    font-size: 1.6em;
 }
 #links .menu-button {
     display: inline-block;
