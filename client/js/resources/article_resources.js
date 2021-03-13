@@ -27,3 +27,4 @@ const resourceLoader = new ArticleResourceLoader(),
       imageSystem = new ImageSystem(resourceLoader);
 
 imageSystem.populateDynamicImages();
+imageSystem.loadDynamicButtons();

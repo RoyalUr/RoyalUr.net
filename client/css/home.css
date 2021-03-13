@@ -57,13 +57,12 @@ html {
     margin-top: 2vh;
     text-decoration: none;
 }
-#greeting .greeting-button img,
-#greeting .learn img{
+#greeting .greeting-button canvas {
     width: auto;
     height: 100%;
     filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
 }
-#greeting .greeting-button:hover img {
+#greeting .greeting-button:hover canvas {
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
 }
 #greeting .greeting-button svg {
@@ -140,11 +139,11 @@ html {
     height: 14vh;
     margin: 2vh;
 }
-#links .menu-button img {
+#links .menu-button canvas {
     width: auto;
     height: 100%;
 }
-#links .menu-button:hover img {
+#links .menu-button:hover canvas {
     filter: drop-shadow(2px 2px 3px rgba(255, 255, 255, 0.4));
 }
 

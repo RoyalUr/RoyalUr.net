@@ -82,11 +82,11 @@ iframe { /** IFrames are used for embedded YouTube videos. **/
     font-family: Nunito, sans-serif;
     margin-bottom: 0.8em;
 }
-#call-to-action .play img {
+#call-to-action .play canvas {
     width: 40%;
     min-width: 200px;
     filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.6));
 }
-#call-to-action .play:hover img {
+#call-to-action .play:hover canvas {
     filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
 }

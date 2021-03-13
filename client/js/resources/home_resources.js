@@ -6,3 +6,4 @@ const resourceLoader = new ResourceLoader(),
       imageSystem = new ImageSystem(resourceLoader);
 
 imageSystem.populateDynamicImages();
+imageSystem.loadDynamicButtons();

@@ -507,14 +507,22 @@ def filter_file(target_folder, file, *, prefix="", skip_versions=False):
         filtered += original_content[last_index:string_end + 1]
         last_index = string_end + 1
 
-        # If this is a dynamically sourced image, add its placeholder SVG src with its aspect ratio.
-        if original_content[string_start - len("data-src="):string_start] == "data-src=":
+        # Check if this is a dynamic image or a dynamic button.
+        is_dyn_image = (original_content[string_start - len("data-src="):string_start] == "data-src=")
+        is_dyn_button = (original_content[string_start - len("data-src-active="):string_start] == "data-src-active=")
+
+        # Add a placeholder SVG image to maintain the aspect ratio of dynamic images.
+        if is_dyn_image:
             image = PILImage.open(incomplete_path + ".png")
             filtered += " src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 "
             filtered += str(image.width) + " " + str(image.height)
             filtered += "'%3E%3C/svg%3E\" "
-            filtered += "width=\"" + str(image.width) + "\" "
-            filtered += "height=\"" + str(image.height) + "\""
+
+        # Add the width and height to preserve the aspect ratio of dynamic images and buttons.
+        if is_dyn_image or is_dyn_button:
+                image = PILImage.open(incomplete_path + ".png")
+                filtered += "width=\"" + str(image.width) + "\" "
+                filtered += "height=\"" + str(image.height) + "\""
 
     return source_mtime, filtered, changed
 

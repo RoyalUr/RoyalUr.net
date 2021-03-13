@@ -209,6 +209,10 @@ function convertHSVtoRGB(h, s, v) {
     };
 }
 
+function isImageLoaded(image) {
+    return image.complete && image.naturalWidth !== 0;
+}
+
 
 
 //
