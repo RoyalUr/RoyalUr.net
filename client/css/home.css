@@ -128,7 +128,7 @@ body.no-webp #greeting-background {
     font-family: Nunito, sans-serif;
 }
 #more-below svg {
-    fill: rgb(12, 15, 18);
+    fill: black;
     margin-top: 1vh;
     height: 5vh;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));

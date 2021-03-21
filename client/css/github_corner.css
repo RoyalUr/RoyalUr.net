@@ -1,6 +1,6 @@
 /** The banner in the top-left corner of the page that links to the GitHub. **/
 .github-corner svg {
-    fill: #151513;
+    fill: black;
     color: #ffffff;
     position: absolute;
     top: 0; right: 0; border: 0;
