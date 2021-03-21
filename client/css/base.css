@@ -20,24 +20,32 @@ body {
     }
 }
 
-body, .gradient-background {
+body,
+body.webp.gradient-background,
+body.webp .gradient-background,
+body.no-webp.gradient-background,
+body.no-webp .gradient-background {
     background-color: rgb(32, 41, 48);
     background-image: linear-gradient(to bottom right, rgb(28, 34, 40), rgb(41, 54, 64));
 }
-body.webp, body.webp .wood-background {
+body.webp.wood-background,
+body.webp .wood-background {
     background: rgb(32, 41, 48) url("/res/background.[ver].webp") repeat;
     background-size: 35vmin;
 }
-body.no-webp, body.no-webp .wood-background {
+body.no-webp.wood-background,
+body.no-webp .wood-background {
     background: rgb(32, 41, 48) url("/res/background.[ver].png") repeat;
     background-size: 35vmin;
 }
-body.simple-background.no-webp, body.no-webp .simple-background {
-    background: rgb(32, 41, 48) url("/res/home_background.[ver].png") repeat;
+body.webp.simple-background,
+body.webp .simple-background {
+    background: rgb(32, 41, 48) url("/res/home_background.[ver].webp") repeat;
     background-size: 35vmin;
 }
-body.simple-background.webp, body.webp .simple-background {
-    background: rgb(32, 41, 48) url("/res/home_background.[ver].webp") repeat;
+body.no-webp.simple-background,
+body.no-webp .simple-background {
+    background: rgb(32, 41, 48) url("/res/home_background.[ver].png") repeat;
     background-size: 35vmin;
 }
 img {

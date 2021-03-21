@@ -209,6 +209,10 @@
       "dest": "res/home_background",
       "sizes": { "u_u": "400 x 400" }
     },
+    "res/backgrounds/board_background.webp": {
+      "dest": "res/board_background",
+      "sizes": {}
+    },
     "res/board_light.png": {
       "dest": "res/board",
       "sizes": {

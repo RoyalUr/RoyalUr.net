@@ -26,6 +26,35 @@ html {
     }
 }
 
+body.webp #greeting-background {
+    background-color: rgb(32, 41, 48);
+    background-image: url("/res/board_background.[ver].webp");
+}
+body.no-webp #greeting-background {
+    background-color: rgb(32, 41, 48);
+    background-image: url("/res/board_background.[ver].webp");
+}
+#greeting-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -100;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
+}
+#greeting-background div {
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+    height: 100%;
+}
+
 #greeting h1,
 #greeting h2,
 #greeting h3 {
