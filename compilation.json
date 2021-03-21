@@ -211,15 +211,16 @@
     },
     "res/backgrounds/board_background.webp": {
       "dest": "res/board_background",
-      "sizes": {}
+      "sizes": {},
+      "compression_quality": 60
     },
     "res/board_light.png": {
       "dest": "res/board",
       "sizes": {
-        "u_2160": "auto x 2304",
-        "u_1440": "auto x 1536",
-        "u_1080": "auto x 1152",
-        "u_720": "auto x 768"
+        "u_2160": "auto x 3072",
+        "u_1440": "auto x 2048",
+        "u_1080": "auto x 1536",
+        "u_720": "auto x 1024"
       }
     },
     "res/board_paths.png": {

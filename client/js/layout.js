@@ -263,7 +263,7 @@ let boardWidthToHeightRatio = null,
 
 function resizeBoard() {
     boardCanvasHeight = useHeight;
-    boardCanvasWidth = Math.round((useHeight - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
+    boardCanvasWidth = Math.ceil((useHeight - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
     boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
     boardCanvasTop = centreTop - Math.round(boardCanvasHeight / 2);
 

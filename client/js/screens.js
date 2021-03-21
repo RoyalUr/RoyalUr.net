@@ -262,11 +262,15 @@ function onEnterMenuScreen() {
 }
 
 function onEnterSimpleBgScreen() {
-    setTimeout(() => document.body.classList.add("simple-background"), 1000);
+    setTimeout(() => {
+        document.body.classList.add("simple-background");
+        document.body.classList.remove("wood-background");
+    }, 1000);
 }
 
 function onExitSimpleBgScreen() {
     document.body.classList.remove("simple-background");
+    document.body.classList.add("wood-background");
 }
 
 function onEnterWaitingForFriendScreen() {

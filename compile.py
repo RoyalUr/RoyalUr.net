@@ -214,6 +214,7 @@ class Image:
     def __init__(self, from_rel, spec):
         self.from_rel = from_rel
         self.to_rel = spec["dest"] if "dest" in spec else None
+        self.compression_quality = float(spec["compression_quality"]) if "compression_quality" in spec else 99
         self.size_group = spec["size_group"] if "size_group" in spec else None
         self.sizes = None
         # If no size group is given, it must be directly specified.
@@ -256,11 +257,14 @@ class Image:
                 continue
 
             # Save the scaled copies.
+            quality = self.compression_quality
+            lossless = (quality >= 100)
+
             scaled_image = self.get_scaled(size)
-            scaled_image.save(scaled_file_png, lossless=True, quality=100)
+            scaled_image.save(scaled_file_png, lossless=lossless, quality=quality)
             setmtime(scaled_file_png, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_png))
-            scaled_image.save(scaled_file_webp, lossless=True, quality=100)
+            scaled_image.save(scaled_file_webp, lossless=lossless, quality=quality)
             setmtime(scaled_file_webp, getmtime(self.from_rel))
             print("{}created {}".format(prefix, scaled_file_webp))
 
