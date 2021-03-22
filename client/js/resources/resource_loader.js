@@ -58,9 +58,9 @@ ResourceLoader.prototype.testWebP = function(callback) {
 ResourceLoader.prototype.findRasterImageExtension = function(callback) {
     this.testWebP(supported => callback(supported ? "webp" : "png"));
 };
-ResourceLoader.prototype.completeRasterImageURL = function(url, callback) {
+ResourceLoader.prototype.completeRasterImageURL = function(url, callback, skipResolution) {
     this.findRasterImageExtension(function(ext) {
-        const size = (this.resolution !== this.max_resolution ? "." + this.resolution : "");
+        const size = (!skipResolution && this.resolution !== this.max_resolution ? "." + this.resolution : "");
         callback(url + size + (ext.length ? "." + ext : ""));
     }.bind(this));
 }

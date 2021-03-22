@@ -19,7 +19,8 @@
       "client/css/base.css",
       "client/css/header_and_footer.css",
       "client/css/github_corner.css",
-      "client/css/home.css"
+      "client/css/home.css",
+      "client/css/home_background.css"
     ],
     "game/index.css": [
       "client/css/font_durango.css",

@@ -8,6 +8,14 @@ function ImageSystem(resourceLoader) {
     this.dynamicButtons = [];
     this.dynamicButtonRedrawLoopStarted = false;
 }
+ImageSystem.prototype.loadImage = function(urlWithoutExt, loadCallback, errorCallback) {
+    this.resourceLoader.completeRasterImageURL(urlWithoutExt, function(url) {
+        const image = new Image();
+        image.onload = () => loadCallback(image);
+        image.onerror = errorCallback;
+        image.src = url;
+    }, true);
+};
 ImageSystem.prototype.findImageResource = function(key) {
     const resources = this.resourceLoader.allResources;
     for (let index = 0; index < resources.length; ++index) {
