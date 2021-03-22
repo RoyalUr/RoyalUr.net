@@ -210,7 +210,7 @@
       "dest": "res/home_background",
       "sizes": { "u_u": "400 x 400" }
     },
-    "res/backgrounds/board_background.webp": {
+    "res/backgrounds/board_background.png": {
       "dest": "res/board_background",
       "sizes": {},
       "compression_quality": 60

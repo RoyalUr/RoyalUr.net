@@ -2,16 +2,6 @@ html {
     scroll-behavior: smooth;
 }
 
-#greeting {
-    display: flex;
-    flex-direction: column;
-
-    box-sizing: border-box;
-    min-height: 100vh;
-    padding: 1.5vmin;
-    margin: 0;
-    text-align: center;
-}
 #logo {
     display: inline-block;
     height: 30vh;
@@ -26,6 +16,17 @@ html {
     }
 }
 
+#greeting {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding: 1.5vmin;
+    margin: 0;
+    text-align: center;
+}
 #greeting h1,
 #greeting h2,
 #greeting h3 {

@@ -8,7 +8,5 @@ const resourceLoader = new ResourceLoader(),
 imageSystem.populateDynamicImages();
 imageSystem.loadDynamicButtons();
 imageSystem.loadImage("/res/board_background", function() {
-    setTimeout(function() {
-        document.getElementById("greeting-background").classList.add("loaded");
-    }, 3000);
+    document.getElementById("greeting-background").classList.add("loaded");
 }, err => console.error("Failed to load home background: " + err))
