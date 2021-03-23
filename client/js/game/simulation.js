@@ -118,15 +118,26 @@ function SimAPI() {
 SimAPI.prototype.onMessage = function(event) {
     const packet = aiPackets.readPacket(event.data);
 
-    if (packet.type === "ai_move_request") {
+    if (packet.type === "ai_functionality_request") {
+        this.onFunctionalityRequest(packet);
+    } else if (packet.type === "ai_move_request") {
         this.onMoveRequest(packet);
     } else {
         throw "Unsupported packet type " + packet.type;
     }
 };
+SimAPI.prototype.onFunctionalityRequest = function(request) {
+    if (request.requestPanda) {
+        royalUrAnalysis.load(
+            "/game/royal_ur_analysis.wasm",
+            simAPI.onRoyalUrAnalysisLoaded.bind(simAPI),
+            simAPI.onRoyalUrAnalysisLoadErrored.bind(simAPI)
+        );
+    }
+}
 SimAPI.prototype.onMoveRequest = function(request) {
     // Check if we should forward the request to RoyalUrAnalysis.
-    if (request.depth > 5) {
+    if (request.usePanda) {
         const responsePacket = new PacketIn(royalUrAnalysis.sendRequest(request.rawData), true),
               responseMove = responsePacket.nextLocation();
         responsePacket.assertEmpty();
@@ -157,9 +168,4 @@ SimAPI.prototype.onRoyalUrAnalysisLoadErrored = function(error) {
 // Load the simulator!
 const simAPI = new SimAPI();
 onmessage = simAPI.onMessage.bind(simAPI);
-royalUrAnalysis.load(
-    "/game/royal_ur_analysis.wasm",
-    simAPI.onRoyalUrAnalysisLoaded.bind(simAPI),
-    simAPI.onRoyalUrAnalysisLoadErrored.bind(simAPI)
-);
 

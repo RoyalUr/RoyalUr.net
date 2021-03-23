@@ -491,7 +491,7 @@ ComputerGame.prototype.findComputerMove = function(roll) {
         return;
 
     // Get the AI involved.
-    const workerRequest = writeAIMoveRequestPacket(state, roll, this.difficulty);
+    const workerRequest = writeAIMoveRequestPacket(state, roll, this.difficulty, this.difficulty > 5);
     this.waitingForComputerMove = true;
     getComputerWorker().postMessage(workerRequest.data);
 };
