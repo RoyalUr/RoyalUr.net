@@ -147,16 +147,17 @@ canvas { position: absolute; }
     filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 
     opacity: 0.5;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;;
 }
 .menu-select.inactive .menu-select-option {
     opacity: 0.3;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
 }
 .menu-select .menu-select-option.option-selected,
 .menu-select .menu-select-option.option-hovered {
     opacity: 1;
-    transition: opacity 0.2s ease-in-out;
+    transform: scale(1.1);
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
 }
 .menu-select-description {
     font-size: 3vw;
@@ -172,11 +173,11 @@ canvas { position: absolute; }
 .menu-select-description-text {
     opacity: 1;
     white-space: nowrap;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
 }
 .menu-select.inactive .menu-select-description-text {
     opacity: 0.7;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
 }
 
 .menu-select-option {

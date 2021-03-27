@@ -64,8 +64,7 @@ GameSetupMenu.prototype.redraw = function() {
     updateElementVisibilities([this.computerSelect.elem, this.playButton]);
 };
 GameSetupMenu.prototype.resize = function() {
-    this.modeSelect.resize();
-    this.computerSelect.resize();
+    // Nothing to do.
 };
 GameSetupMenu.prototype.reset = function() {
     resetGameSetup();
@@ -84,9 +83,6 @@ function MenuSelectElem(idPrefix, optionMetadatas) {
     this.description = document.getElementById(idPrefix + "-select-description");
     this.descriptionText = document.getElementById(idPrefix + "-select-description-text");
     this.descriptionFade = new Fade(0.5);
-
-    // Create a canvas to use to measure the width of descriptions.
-    this.descWidthCtx = document.createElement("canvas").getContext("2d");
 
     this.options = [];
     for (let index = 0; index < optionMetadatas.length; ++index) {
@@ -129,48 +125,9 @@ MenuSelectElem.prototype.updateDesc = function() {
     }
     this.descriptionFade.fade(!!option);
     setElementClass(this.elem, "inactive", !!selectedOption);
-    this.positionDesc();
-};
-MenuSelectElem.prototype.positionDesc = function() {
-    const option = this.getDescOption();
-    if (!option)
-        return;
-
-    // Just center the description text if finding the width of text is not supported,
-    // or if the options are split over multiple lines.
-    if (!window.getComputedStyle || !this.descWidthCtx.measureText || 3 * height > 4 * width) {
-        this.description.style.width = "";
-        this.description.style.marginLeft = "";
-        this.description.style.marginRight = "";
-        return;
-    }
-
-    // Try to position the description text below the option.
-    const optionBounds = option.elem.getBoundingClientRect(),
-          centerX = optionBounds.x + optionBounds.width / 2,
-          descWidth = this.calcDescWidth(option.desc) * 1.05,
-          widthVW = Math.max(100 * descWidth / width, 100 - 200 * Math.abs(width / 2 - centerX) / width),
-          offsetVW = 100 - widthVW;
-
-    this.description.style.width = widthVW + "vw";
-    if (centerX < width / 2) {
-        this.description.style.marginLeft = "";
-        this.description.style.marginRight = offsetVW + "vw";
-    } else {
-        this.description.style.marginLeft = offsetVW + "vw";
-        this.description.style.marginRight = "";
-    }
-};
-MenuSelectElem.prototype.calcDescWidth = function(desc) {
-    const styles = window.getComputedStyle(this.descriptionText, null);
-    this.descWidthCtx.font = styles.getPropertyValue("font");
-    return this.descWidthCtx.measureText(desc).width;
 };
 MenuSelectElem.prototype.redraw = function() {
     this.description.style.opacity = this.descriptionFade.get();
-};
-MenuSelectElem.prototype.resize = function() {
-    this.positionDesc();
 };
 
 
