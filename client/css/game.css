@@ -151,16 +151,13 @@ canvas { position: absolute; }
 }
 .menu-select.inactive .menu-select-option {
     opacity: 0.3;
-    transition: opacity 0.1s ease-in-out;
 }
 .menu-select .menu-select-option.option-hovered {
     opacity: 1;
     transform: scale(1.1);
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
 }
 .menu-select .menu-select-option.option-selected {
     opacity: 1;
-    transition: opacity 0.1s ease-in-out;
 }
 .menu-select-description {
     font-size: 3vw;
