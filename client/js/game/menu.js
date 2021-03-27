@@ -82,7 +82,7 @@ function MenuSelectElem(idPrefix, optionMetadatas) {
     this.elem = document.getElementById(idPrefix + "-select");
     this.description = document.getElementById(idPrefix + "-select-description");
     this.descriptionText = document.getElementById(idPrefix + "-select-description-text");
-    this.descriptionFade = new Fade(0.5);
+    this.descriptionFade = new Fade(0.2);
 
     this.options = [];
     for (let index = 0; index < optionMetadatas.length; ++index) {
@@ -121,7 +121,7 @@ MenuSelectElem.prototype.updateDesc = function() {
           option = this.getDescOption();
 
     if (!!option) {
-        this.descriptionText.textContent = option.desc;
+        this.descriptionText.innerHTML = option.desc;
     }
     this.descriptionFade.fade(!!option);
     setElementClass(this.elem, "inactive", !!selectedOption);
