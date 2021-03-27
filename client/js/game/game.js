@@ -7,7 +7,8 @@ const NO_MOVES_DURATION = 2,
 
 const DIFFICULTY_EASY = 1,
       DIFFICULTY_MEDIUM = 2,
-      DIFFICULTY_HARD = 5;
+      DIFFICULTY_HARD = 5,
+      DIFFICULTY_PANDA = 7;
 
 let computerWorker = null,
     pandaAvailable = false,

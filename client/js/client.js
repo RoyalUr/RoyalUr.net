@@ -98,32 +98,6 @@ function onBeforeUnload(event) {
 // Menu interaction.
 //
 
-function onPlayLocal(event) {
-    event.stopPropagation();
-    onGameModeSelected(GAME_MODE_LOCAL);
-}
-
-function onPlayComputer(event) {
-    event.stopPropagation();
-    onGameModeSelected(GAME_MODE_COMPUTER);
-}
-
-function onPlayOnline(event) {
-    event.stopPropagation();
-    onGameModeSelected(GAME_MODE_ONLINE);
-}
-
-function onPlayFriend(event) {
-    event.stopPropagation();
-    onGameModeSelected(GAME_MODE_FRIEND);
-}
-
-function onGameModeSelected(gameMode) {
-    setGameSetupMode(gameMode);
-    modeSelectDescriptionLabel.style.display = "";
-    modeSelectPrompt.classList.add("inactive");
-}
-
 function onPlayClicked(event) {
     if (gameSetup.mode === null) {
         audioSystem.playSound("error");
@@ -137,7 +111,13 @@ function onPlayClicked(event) {
             break;
 
         case GAME_MODE_COMPUTER:
-            switchToScreen(SCREEN_DIFFICULTY);
+            if (!gameSetup.difficulty) {
+                audioSystem.playSound("error");
+                return;
+            }
+
+            window.game = new ComputerGame(gameSetup.difficulty);
+            switchToScreen(SCREEN_GAME);
             break;
 
         case GAME_MODE_ONLINE:
@@ -153,48 +133,6 @@ function onPlayClicked(event) {
         default:
             audioSystem.playSound("error");
             break;
-    }
-}
-
-function onPlayComputerEasy(event) {
-    event.stopPropagation();
-    game = new ComputerGame(DIFFICULTY_EASY);
-    switchToScreen(SCREEN_GAME);
-}
-
-function onPlayComputerMedium(event) {
-    event.stopPropagation();
-    game = new ComputerGame(DIFFICULTY_MEDIUM);
-    switchToScreen(SCREEN_GAME);
-}
-
-function onPlayComputerHard(event) {
-    event.stopPropagation();
-    game = new ComputerGame(DIFFICULTY_HARD);
-    switchToScreen(SCREEN_GAME);
-}
-
-const MODE_SELECT_DESCRIPTIONS = {
-    "game_mode_local": "Two players on one computer.",
-    "game_mode_computer": "Try your luck against the computer.",
-    "game_mode_online": "Play people across the globe.",
-    "game_mode_friend": "Play with a friend over the internet."
-};
-
-function onHoverPlaySelectOption(gameMode) {
-    setGameSetupHoveredMode(gameMode);
-    modeSelectDescriptionText.textContent = MODE_SELECT_DESCRIPTIONS[gameMode];
-    modeSelectDescriptionLabel.style.display = (gameSetup.mode === gameMode ? "" : "none");
-    playSelectDescriptionFade.fadeIn();
-}
-
-function onUnhoverPlaySelectOption(gameMode) {
-    setGameSetupHoveredMode(null);
-    if (gameSetup.mode !== null) {
-        modeSelectDescriptionText.textContent = MODE_SELECT_DESCRIPTIONS[gameSetup.mode];
-        modeSelectDescriptionLabel.style.display = "";
-    } else {
-        playSelectDescriptionFade.fadeOut();
     }
 }
 

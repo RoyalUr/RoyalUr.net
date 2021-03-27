@@ -72,6 +72,16 @@
       "client/js/analytics/stats.js",
       "client/js/game/board.js",
       "client/js/game/model.js",
+
+      "client/js/network/packet_reader.js",
+      "client/js/network/packet_writer.js",
+      "client/js/network/packets.js",
+      "client/js/network/network_packets.js",
+      "client/js/network/ai_packets.js",
+      "client/js/network/network.js",
+      "client/js/game/game.js",
+
+      "client/js/game/menu.js",
       "client/js/layout.js",
 
       "client/js/rendering/particles.js",
@@ -82,13 +92,6 @@
       "client/js/rendering/render_game_ui.js",
       "client/js/rendering/render_board.js",
 
-      "client/js/network/packet_reader.js",
-      "client/js/network/packet_writer.js",
-      "client/js/network/packets.js",
-      "client/js/network/network_packets.js",
-      "client/js/network/ai_packets.js",
-      "client/js/network/network.js",
-      "client/js/game/game.js",
       "client/js/screens.js",
       "client/js/client.js"
     ],
@@ -153,6 +156,10 @@
     "res/buttons/mode_online.svg": "res/mode_online.svg",
     "res/buttons/mode_friend.svg": "res/mode_friend.svg",
     "res/buttons/mode_computer.svg": "res/mode_computer.svg",
+    "res/buttons/mode_computer_easy.svg": "res/mode_computer_easy.svg",
+    "res/buttons/mode_computer_medium.svg": "res/mode_computer_medium.svg",
+    "res/buttons/mode_computer_hard.svg": "res/mode_computer_hard.svg",
+    "res/buttons/mode_computer_panda.svg": "res/mode_computer_panda.svg",
     "res/buttons/controls/discord.svg": "res/control_discord.svg",
     "res/buttons/controls/exit.svg": "res/control_exit.svg",
     "res/buttons/controls/github.svg": "res/control_github.svg",

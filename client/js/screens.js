@@ -4,13 +4,12 @@
 
 const SCREEN_LOADING = "screen_loading",
       SCREEN_MENU = "screen_menu",
-      SCREEN_DIFFICULTY = "screen_difficulty",
       SCREEN_CONNECTING = "screen_connecting",
       SCREEN_WAITING_FOR_FRIEND = "screen_waiting_for_friend",
       SCREEN_GAME = "screen_game",
       SCREEN_WIN = "screen_win";
 
-const MENU_VISIBLE_SCREENS = [SCREEN_MENU, SCREEN_DIFFICULTY],
+const MENU_VISIBLE_SCREENS = [SCREEN_MENU],
       GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN],
       NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME],
       CREDITS_HIDDEN_SCREENS = [SCREEN_LOADING];
@@ -29,7 +28,6 @@ const screenState = {
 
     loadingFade: new Fade(0.5).visible(),
     menuFade: new Fade(0.5),
-    difficultyFade: new Fade(0.5),
     learnFade: new Fade(0.5),
     boardFade: new Fade(0.5),
     connectionFade: new Fade(2, 0.5),
@@ -53,7 +51,6 @@ const allControlFades = [
 const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
 screenRequiredLoadingStages[SCREEN_MENU] = 0;
-screenRequiredLoadingStages[SCREEN_DIFFICULTY] = 0;
 screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_WAITING_FOR_FRIEND] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
@@ -68,7 +65,6 @@ const screenActiveControlFades = {};
 
     screenActiveControlFades[SCREEN_LOADING] = [];
     screenActiveControlFades[SCREEN_MENU] = [DISCORD, LEARN, EXIT];
-    screenActiveControlFades[SCREEN_DIFFICULTY] = [EXIT];
     screenActiveControlFades[SCREEN_CONNECTING] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_WAITING_FOR_FRIEND] = [DISCORD, GITHUB, EXIT];
     screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
@@ -231,7 +227,6 @@ function maybeSwitchOffLoadingScreen(stage) {
 //
 
 registerScreenTransitionFade(SCREEN_LOADING, screenState.loadingFade);
-registerScreenTransitionFade(SCREEN_DIFFICULTY, screenState.difficultyFade);
 registerScreenTransitionFade(SCREEN_WAITING_FOR_FRIEND, screenState.waitingForFriendFade);
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.connectionFade, 0, "connectionFade");
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.socialsFade);
@@ -257,8 +252,7 @@ registerScreenTransitionHandlers(
 function onEnterMenuScreen() {
     resetHash();
     resetGameSetup();
-    modeSelectPrompt.classList.remove("inactive");
-    playSelectDescriptionFade.fadeOut();
+    gameSetupMenu.reset();
 }
 
 function onEnterSimpleBgScreen() {

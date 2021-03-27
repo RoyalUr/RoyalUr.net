@@ -4,8 +4,7 @@
 
 const maxWidthOnHeightRatio = 1.5;
 
-const menuDiv = document.getElementById("menu"),
-      playButton = document.getElementById("play");
+const gameSetupMenu = new GameSetupMenu();
 
 const controlsDiv = document.getElementById("controls"),
       discordControlButton = document.getElementById("discord-control"),
@@ -13,21 +12,6 @@ const controlsDiv = document.getElementById("controls"),
       settingsControlButton = document.getElementById("settings-control"),
       learnControlButton = document.getElementById("learn-control"),
       exitControlButton = document.getElementById("exit-control");
-
-const modeSelectPrompt = document.getElementById("mode-select-prompt"),
-      modeLocalButton = document.getElementById("mode-local"),
-      modeOnlineButton = document.getElementById("mode-online"),
-      modeFriendButton = document.getElementById("mode-friend"),
-      modeComputerButton = document.getElementById("mode-computer");
-
-const modeSelectDescriptionDiv = document.getElementById("mode-select-description"),
-      modeSelectDescriptionLabel = document.getElementById("mode-select-description-label"),
-      modeSelectDescriptionText = document.getElementById("mode-select-description-text");
-
-const difficultyDiv = document.getElementById("computer-difficulty"),
-      playComputerEasyButton = document.getElementById("mode-computer-easy"),
-      playComputerMediumButton = document.getElementById("mode-computer-medium"),
-      playComputerHardButton = document.getElementById("mode-computer-hard");
 
 const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
       waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
@@ -81,28 +65,6 @@ function setupMenuElements() {
     winPlayAgainButton.addEventListener("click", () => switchToScreen(SCREEN_MENU));
 
     messageContainerElement.addEventListener("click", tryDismissMessage);
-
-    difficultyDiv.addEventListener("click", onExitClick);
-
-    modeLocalButton.addEventListener("click", onPlayLocal);
-    modeComputerButton.addEventListener("click", onPlayComputer);
-    modeOnlineButton.addEventListener("click", onPlayOnline);
-    modeFriendButton.addEventListener("click", onPlayFriend);
-    playButton.addEventListener("click", onPlayClicked);
-
-    modeLocalButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_LOCAL));
-    modeComputerButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_COMPUTER));
-    modeOnlineButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_ONLINE));
-    modeFriendButton.addEventListener("mouseover", () => onHoverPlaySelectOption(GAME_MODE_FRIEND));
-
-    modeLocalButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_LOCAL));
-    modeComputerButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_COMPUTER));
-    modeOnlineButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_ONLINE));
-    modeFriendButton.addEventListener("mouseout", () => onUnhoverPlaySelectOption(GAME_MODE_FRIEND));
-
-    playComputerEasyButton.addEventListener("click", onPlayComputerEasy);
-    playComputerMediumButton.addEventListener("click", onPlayComputerMedium);
-    playComputerHardButton.addEventListener("click", onPlayComputerHard);
 
     waitingForFriendLinkTextBox.addEventListener("click", function() {
         if (document.activeElement === waitingForFriendLinkTextBox) {
@@ -222,6 +184,7 @@ function resize() {
     useWidth = width;
     useHeight = min(Math.round(useWidth / maxWidthOnHeightRatio), height);
 
+    gameSetupMenu.resize();
     resizeOverlay();
 
     if (resourceLoader.loadingStage > 1) {

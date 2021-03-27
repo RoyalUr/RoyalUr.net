@@ -22,35 +22,13 @@ const GAME_MODE_LOCAL = "game_mode_local",
 
 const defaultGameSetup = {
     mode: null,
-    selectModeFade: new Fade(0.5),
-
-    hoveredMode: null,
-    difficulty: 0
+    difficulty: null
 };
 const gameSetup = {};
 resetGameSetup();
 
-function setGameSetupMode(gameMode) {
-    gameSetup.mode = gameMode;
-    if (gameMode !== null) {
-        gameSetup.selectModeFade.fadeIn();
-    } else {
-        gameSetup.selectModeFade.fadeOut();
-    }
-}
-
-function setGameSetupHoveredMode(gameMode) {
-    gameSetup.hoveredMode = gameMode;
-}
-
 function resetGameSetup() {
     Object.assign(gameSetup, defaultGameSetup);
-    gameSetup.selectModeFade.fadeOut();
-}
-
-/** Returns whether the given game mode is selected _or_ hovered. **/
-function isGameSetupModeActive(gameMode) {
-    return gameMode === gameSetup.mode || gameMode === gameSetup.hoveredMode;
 }
 
 

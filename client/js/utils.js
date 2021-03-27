@@ -40,6 +40,26 @@ function isAudioElementPlaying(element) {
     return element.currentTime > 0 && !element.paused && !element.ended && element.readyState > 2;
 }
 
+function jumpToID(id) {
+    const elem = document.createElement("a");
+    elem.setAttribute("href", "#" + id);
+    elem.click();
+    elem.remove();
+}
+
+/**
+ * Adds or removes a class from the given element {@param elem}.
+ * If {@param added} is true, then the class {@param clazz} is added.
+ * Otherwise, the class {@param clazz} is removed.
+ */
+function setElementClass(elem, clazz, added) {
+    if (added) {
+        elem.classList.add(clazz);
+    } else {
+        elem.classList.remove(clazz);
+    }
+}
+
 
 
 //
@@ -77,6 +97,32 @@ if (!Array.prototype.includes) {
         }
     });
 }
+
+// Get the first element from an array that matches a predicate.
+if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+        value: function(predicate) {
+            if (this == null)
+                throw TypeError('"this" is null or not defined');
+            if (typeof predicate !== 'function')
+                throw TypeError('predicate must be a function');
+
+            const o = Object(this),
+                len = o.length >>> 0,
+                thisArg = arguments[1];
+
+            for (let k = 0; k < len; ++k) {
+                const kValue = o[k];
+                if (predicate.call(thisArg, kValue, k, o))
+                    return kValue;
+            }
+            return undefined;
+        },
+        configurable: true,
+        writable: true
+    });
+}
+
 
 /**
  * @author James Westgate

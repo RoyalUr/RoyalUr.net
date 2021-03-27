@@ -20,6 +20,8 @@
         <link rel="stylesheet" href="/game/index.[ver].css" />
     </head>
     <body class="simple-background">
+        <a id="top"></a>
+
         <!-- LOADING SCREEN -->
         <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
             <div id="loading-bar"></div>
@@ -41,49 +43,76 @@
                 <img class="shadow" src="/res/logo.[ver].svg" alt="Logo" width="947" height="789" />
             </a>
 
-            <div id="mode-select">
-                <h1 id="mode-select-prompt" class="text-shadow">Select how you'd like to play</h1>
+            <!-- SELECT MODE TO PLAY THE GAME IN. -->
+            <div id="mode-select" class="menu-select">
+                <h1 id="mode-select-prompt" class="menu-select-prompt text-shadow">
+                    Select how you'd like to play
+                </h1>
 
-                <div id="mode-local" class="mode-select-option">
-                    <div class="mode-select-text">Local</div>
-                    <img class="mode-select-icon" src="/res/mode_local.[ver].svg" alt="Play locally" />
+                <div id="mode-local" class="menu-select-option">
+                    <div class="menu-select-text">Local</div>
+                    <img class="menu-select-icon" src="/res/mode_local.[ver].svg" alt="Play locally" />
                 </div>
 
-                <div id="mode-computer" class="mode-select-option">
-                    <div class="mode-select-text">Computer</div>
-                    <img class="mode-select-icon" src="/res/mode_computer.[ver].svg" alt="Play the computer" />
+                <div id="mode-computer" class="menu-select-option">
+                    <div class="menu-select-text">Computer</div>
+                    <img class="menu-select-icon" src="/res/mode_computer.[ver].svg" alt="Play the computer" />
                 </div>
 
-                <div id="mode-online" class="mode-select-option">
-                    <div class="mode-select-text">Online</div>
-                    <img class="mode-select-icon" src="/res/mode_online.[ver].svg" alt="Play online" />
+                <div id="mode-online" class="menu-select-option">
+                    <div class="menu-select-text">Online</div>
+                    <img class="menu-select-icon" src="/res/mode_online.[ver].svg" alt="Play online" />
                 </div>
 
-                <div id="mode-friend" class="mode-select-option">
-                    <div class="mode-select-text">Friend</div>
-                    <img class="mode-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
+                <div id="mode-friend" class="menu-select-option">
+                    <div class="menu-select-text">Friend</div>
+                    <img class="menu-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
                 </div>
 
                 <br/>
-                <div id="mode-select-description" class="text-shadow">
-                    <span id="mode-select-description-label">Selected:</span>
-                    <span id="mode-select-description-text"></span>
+                <div id="mode-select-description" class="menu-select-description text-shadow">
+                    <span id="mode-select-description-text" class="menu-select-description-text"></span>
                 </div>
             </div>
 
-            <div id="play" style="display: none">
-                <img data-src="/res/button_play.[ver]" alt="Play The Royal Game of Ur" />
+            <!-- SELECT DIFFICULTY OF COMPUTER. -->
+            <div id="computer-select" class="menu-select">
+                <h1 id="computer-select-prompt" class="menu-select-prompt text-shadow">
+                    Select the difficulty of your opponent
+                </h1>
+
+                <div id="computer-easy" class="menu-select-option">
+                    <div class="menu-select-text">Easy</div>
+                    <img class="menu-select-icon" src="/res/mode_computer_easy.[ver].svg"
+                         alt="Play the easy difficulty of the computer" />
+                </div>
+
+                <div id="computer-medium" class="menu-select-option">
+                    <div class="menu-select-text">Medium</div>
+                    <img class="menu-select-icon" src="/res/mode_computer_medium.[ver].svg"
+                         alt="Play the medium difficulty of the computer" />
+                </div>
+
+                <div id="computer-hard" class="menu-select-option">
+                    <div class="menu-select-text">Hard</div>
+                    <img class="menu-select-icon" src="/res/mode_computer_hard.[ver].svg"
+                         alt="Play the hard difficulty of the computer" />
+                </div>
+
+<!--                <div id="computer-panda" class="menu-select-option">-->
+<!--                    <div class="menu-select-text">Extreme</div>-->
+<!--                    <img class="menu-select-icon" src="/res/mode_computer_panda.[ver].svg"-->
+<!--                         alt="Play the hardest difficulty of the computer" />-->
+<!--                </div>-->
+
+                <br/>
+                <div id="computer-select-description" class="menu-select-description text-shadow">
+                    <span id="computer-select-description-text" class="menu-select-description-text"></span>
+                </div>
             </div>
-        </div>
 
-
-        <!-- COMPUTER DIFFICULTY SCREEN -->
-        <div id="computer-difficulty" style="display: none">
-            <div id="computer-difficulty-content">
-                <div id="computer-difficulty-title">Select Difficulty</div>
-                <div id="mode-computer-easy" class="difficulty-option">Easy</div>
-                <div id="mode-computer-medium" class="difficulty-option">Moderate</div>
-                <div id="mode-computer-hard" class="difficulty-option">Hard</div>
+            <div id="play">
+                <img data-src="/res/button_play.[ver]" alt="Play The Royal Game of Ur" />
             </div>
         </div>
 

@@ -6,6 +6,11 @@ function updateElementVisibilities(elements) {
     for (let index = 0; index < elements.length; ++index) {
         let element = elements[index];
 
+        if (!element) {
+            console.error("Missing updateElementVisibilities element " + index);
+            continue;
+        }
+
         if (element.style.opacity === "0") {
             element.style.display = "none";
         } else {
@@ -45,8 +50,7 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            menuDiv, playButton, difficultyDiv,
-            winDiv, boardCanvas, tilesCanvas,
+            gameSetupMenu.elem, winDiv, boardCanvas, tilesCanvas,
             diceCanvas, creditsDiv, waitingForFriendDiv,
             discordControlButton, githubControlButton,
             settingsControlButton, learnControlButton,

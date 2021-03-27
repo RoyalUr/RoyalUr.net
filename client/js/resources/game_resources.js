@@ -73,3 +73,5 @@ const resourceLoader = new ResourceLoader(stagedResources),
       imageSystem = new ImageSystem(resourceLoader);
 
 resourceLoader.startLoading();
+imageSystem.populateDynamicImages();
+imageSystem.loadDynamicButtons();

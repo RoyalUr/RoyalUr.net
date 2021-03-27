@@ -10,20 +10,11 @@
 // - Win Screen
 //
 
-const playSelectDescriptionFade = new Fade(0.1, 0.2).invisible();
 
-
-function redrawMenu(forceRedraw) {
-    const menuFade = screenState.menuFade.get();
-    menuDiv.style.opacity = menuFade;
-    playButton.style.opacity = min(menuFade, gameSetup.selectModeFade.get());
+function redrawMenu() {
     creditsDiv.style.opacity = screenState.creditsFade.get();
     networkStatus.hidden = false;
-
-    modeLocalButton.style.opacity = (isGameSetupModeActive(GAME_MODE_LOCAL) ? "1" : "");
-    modeComputerButton.style.opacity = (isGameSetupModeActive(GAME_MODE_COMPUTER) ? "1" : "");
-    modeOnlineButton.style.opacity = (isGameSetupModeActive(GAME_MODE_ONLINE) ? "1" : "");
-    modeFriendButton.style.opacity = (isGameSetupModeActive(GAME_MODE_FRIEND) ? "1" : "");
+    gameSetupMenu.redraw();
 
     let totalControlFades = 0;
     for (let index = 0; index < allControlFades.length; ++index) {
@@ -35,11 +26,6 @@ function redrawMenu(forceRedraw) {
     settingsControlButton.style.opacity = screenState.settingsControlFade.get();
     learnControlButton.style.opacity = screenState.learnControlFade.get();
     exitControlButton.style.opacity = screenState.exitControlFade.get();
-
-    const descriptionFade = playSelectDescriptionFade.get();
-    modeSelectDescriptionDiv.style.opacity = (screenState.menuFade.isFadeIn() ? descriptionFade : 0);
-
-    difficultyDiv.style.opacity = screenState.difficultyFade.get();
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {
