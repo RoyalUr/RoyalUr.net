@@ -44,12 +44,13 @@ and does not yet cover all major aspects of the codebase._
 
 # 2. Compilation
 
-| File             | Purpose                                      |
-| ---------------- |--------------------------------------------- |
-| compilation.json | Specifies everything to be compiled.         |
-| compile.py       | Performs the compilation.                    |
-| compile.sh       | Runs compile.py, and then post_compile.sh.   |
-| post_compile.sh  | An optional script to run after compilation. |
+| File             | Purpose                                       |
+| ---------------- |---------------------------------------------- |
+| compilation.json | Specifies everything to be compiled.          |
+| compile.py       | Performs the compilation.                     |
+| compile.sh       | Runs compile.py, and then post_compile.sh.    |
+| pre_compile.sh   | An optional script to run before compilation. |
+| post_compile.sh  | An optional script to run after compilation.  |
 
 The `compile.py` script does many small tasks to prepare the site:
 * Generates a `sitemap.xml`.
@@ -156,16 +157,17 @@ to ignore the version numbers when assets are requested.
 ## 📝 Resource metadata is served in annotations.json
 The rendering script needs to know where to place each tile on the
 board. This information is served in an `annotations.json` file that
-is generated at compile time.
+is generated at compile time. This was set up to allow for lots of
+information to be distributed in this way, but currently it is only
+used for tile placement.
 
 
 # 4. Screen System
 
-| File        | Purpose                                      |
-| ----------- |--------------------------------------------- |
-| screens.js  | Handles transitioning between screens.       |
-| utils.js    | Contains fading logic.                       |
-| renderer.js | Sets the opacity of elements based on Fades. |
+| File                  | Purpose                                 |
+| --------------------- |---------------------------------------- |
+| client/js/screens.js  | Handles transitioning between screens.  |
+| client/js/utils.js    | Contains the fading logic.              |
 
 RoyalUr.net uses a screen system to control what content is visible
 at any given time. Only one screen is visible at a time,
@@ -180,29 +182,28 @@ of elements, and a lot of transition functions will `fadeIn` or
 `fadeOut` the elements that should be visible on that screen.
 
 ## 👾 Rendering based on Screens
-Some elements are only shown on certain screens. Therefore,
-`renderer.js` will avoid rendering some elements if they are not
-on screen. This has led to some strange bugs around screen
-transitions and the game board not updating. Consequently, some
-care needs to be taken to make sure that switching screens and
-element rendering play nicely together.
+Some elements are only shown on certain screens. Therefore, scripts
+in `client/js/rendering/` will hide elements if they should not be
+on screen. This has led to some strange bugs around screen transitions
+and the game board not updating. Consequently, some care needs to be
+taken to make sure that switching screens and element rendering play
+nicely together.
 
 
 # 5. Client Input
 
-| File      | Purpose                                              |
-| --------- |----------------------------------------------------- |
-| client.js | Coordinates page load, networking, and client input. |
-| layout.js | Adds listeners to elements on the page.              |
+| File                | Purpose                                              |
+| ------------------- |----------------------------------------------------- |
+| client/js/client.js | Coordinates page load, networking, and client input. |
+| client/js/layout.js | Adds listeners to elements on the page.              |
 
-Inputs related to the keyboard, networking events, and browser events
-are all handled by `client.js`. In this way, the client file acts as
-a hub between different parts of the application. The exception to
-this is that `layout.js` handles most of the interactions related to
-elements on the page such as clicks and mouse movements.
+Inputs related to the keyboard, networking events, and browser events are all
+handled by `client/js/client.js`. In this way, the client file acts as a hub
+between different parts of the application. The exception to this is that
+`client/js/layout.js` handles most of the interactions related to elements
+on the page such as clicks and mouse movements.
 
-If there is a game running, these inputs are also forwarded to the
-game, so that it can handle them. This is often needed because
-different game modes need to handle input differently. For example,
-online games may need to send a packet while a computer game may
-need to calculate a move.
+If there is a game running, these inputs are also forwarded to the game, so that
+it can handle them. This is often needed because different game modes need to handle
+input differently. For example, online games may need to send a packet while a
+computer game may need to calculate a move.
