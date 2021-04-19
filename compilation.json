@@ -5,119 +5,122 @@
   },
 
   "html": {
-    "client/html/home.html": "index.html",
-    "client/html/game.html": "game/index.html",
-    "client/html/rules.html": "rules/index.html",
-    "client/html/watch.html": "watch/index.html",
-    "client/html/privacy.html": "privacy/index.html",
-    "client/html/lost.html": "lost.html"
+    "client/home/home.html": "index.html",
+    "client/game/game.html": "game/index.html",
+    "client/articles/rules.html": "rules/index.html",
+    "client/articles/watch.html": "watch/index.html",
+    "client/articles/privacy.html": "privacy/index.html",
+    "client/status/lost.html": "lost.html"
   },
   "css": {
     "index.css": [
-      "client/css/font_durango.css",
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/header_and_footer.css",
-      "client/css/github_corner.css",
-      "client/css/home.css",
-      "client/css/home_background.css"
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/footer.css",
+      "client/home/github_corner.css",
+      "client/home/home.css",
+      "client/home/home_background.css"
     ],
     "game/index.css": [
-      "client/css/font_durango.css",
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/block_scrolling.css",
-      "client/css/game.css"
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/block_scrolling.css",
+      "client/game/game.css"
     ],
     "articles.css": [
-      "client/css/font_durango.css",
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/header_and_footer.css",
-      "client/css/article.css"
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/footer.css",
+      "client/articles/base/header.css",
+      "client/articles/base/article.css"
     ],
     "rules/index.css": [
-      "client/css/font_durango.css",
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/header_and_footer.css",
-      "client/css/article.css",
-      "client/css/rules.css"
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/footer.css",
+      "client/articles/base/header.css",
+      "client/articles/base/article.css",
+      "client/articles/rules.css"
     ],
     "watch/index.css": [
-      "client/css/font_durango.css",
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/header_and_footer.css",
-      "client/css/article.css",
-      "client/css/watch.css"
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/footer.css",
+      "client/articles/base/header.css",
+      "client/articles/base/article.css",
+      "client/articles/watch.css"
     ],
     "lost.css": [
-      "client/css/font_nunito.css",
-      "client/css/base.css",
-      "client/css/block_scrolling.css",
-      "client/css/lost.css"
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/block_scrolling.css",
+      "client/status/lost.css"
     ]
   },
   "javascript": {
     "index.js": [
-      "client/js/utils.js",
-      "client/js/resources/resource_loader.js",
-      "client/js/resources/image_system.js",
-      "client/js/resources/home_resources.js"
+      "client/common/utils.js",
+      "client/common/resources/resource_loader.js",
+      "client/common/resources/image_system.js",
+      "client/home/home_resources.js"
     ],
     "game/index.js": [
-      "client/js/lib/reconnecting-websocket.js",
-      "client/js/analytics/analytics.js",
-      "client/js/analytics/stats.js",
-      "client/js/game/board.js",
-      "client/js/game/model.js",
+      "client/game/lib/reconnecting-websocket.js",
+      "client/game/analytics/analytics.js",
+      "client/game/analytics/stats.js",
+      "client/game/game/board.js",
+      "client/game/game/model.js",
 
-      "client/js/network/packet_reader.js",
-      "client/js/network/packet_writer.js",
-      "client/js/network/packets.js",
-      "client/js/network/network_packets.js",
-      "client/js/network/ai_packets.js",
-      "client/js/network/network.js",
-      "client/js/game/game.js",
+      "client/game/network/packet_reader.js",
+      "client/game/network/packet_writer.js",
+      "client/game/network/packets.js",
+      "client/game/network/network_packets.js",
+      "client/game/network/ai_packets.js",
+      "client/game/network/network.js",
+      "client/game/game/game.js",
 
-      "client/js/game/menu.js",
-      "client/js/layout.js",
+      "client/game/game/menu.js",
+      "client/game/layout.js",
 
-      "client/js/rendering/particles.js",
-      "client/js/rendering/curves.js",
-      "client/js/rendering/renderer.js",
-      "client/js/rendering/render_menu.js",
-      "client/js/rendering/render_overlays.js",
-      "client/js/rendering/render_game_ui.js",
-      "client/js/rendering/render_board.js",
+      "client/game/rendering/particles.js",
+      "client/game/rendering/curves.js",
+      "client/game/rendering/renderer.js",
+      "client/game/rendering/render_menu.js",
+      "client/game/rendering/render_overlays.js",
+      "client/game/rendering/render_game_ui.js",
+      "client/game/rendering/render_board.js",
 
-      "client/js/screens.js",
-      "client/js/client.js"
+      "client/game/screens.js",
+      "client/game/client.js"
     ],
     "game/simulation.js": [
-      "client/js/utils.js",
-      "client/js/network/packet_reader.js",
-      "client/js/network/packet_writer.js",
-      "client/js/network/packets.js",
-      "client/js/network/ai_packets.js",
-      "client/js/game/board.js",
+      "client/common/utils.js",
+      "client/game/network/packet_reader.js",
+      "client/game/network/packet_writer.js",
+      "client/game/network/packets.js",
+      "client/game/network/ai_packets.js",
+      "client/game/game/board.js",
       "res/royal_ur_analysis/api.js",
-      "client/js/game/simulation.js"
+      "client/game/game/simulation.js"
     ],
     "game/resources.js": [
-      "client/js/utils.js",
-      "client/js/resources/resource_types.js",
-      "client/js/resources/resource_loader.js",
-      "client/js/resources/audio_system.js",
-      "client/js/resources/image_system.js",
-      "client/js/resources/game_resources.js"
+      "client/common/utils.js",
+      "client/common/resources/resource_types.js",
+      "client/common/resources/resource_loader.js",
+      "client/common/resources/audio_system.js",
+      "client/common/resources/image_system.js",
+      "client/game/game_resources.js"
     ],
     "article_resources.js": [
-      "client/js/utils.js",
-      "client/js/resources/resource_loader.js",
-      "client/js/resources/image_system.js",
-      "client/js/resources/article_resources.js"
+      "client/common/utils.js",
+      "client/common/resources/resource_loader.js",
+      "client/common/resources/image_system.js",
+      "client/articles/base/article_resources.js"
     ]
   },
 

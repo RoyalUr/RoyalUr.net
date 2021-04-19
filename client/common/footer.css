@@ -1,0 +1,46 @@
+/** This file contains the CSS for styling the footer of the website. **/
+
+#footer {
+    display: block;
+    box-sizing: border-box;
+    max-width: 900px;
+    padding: 0.5em;
+    margin-top: 1em;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+
+    font-size: 1.5em;
+    background: #151A1F;
+    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
+}
+#footer-text {
+    display: inline-block;
+    margin: 0.4em;
+    line-height: 40px;
+}
+#footer-social-icons {
+    float: right;
+    margin-top: 0.2em;
+    margin-right: 0.4em;
+}
+#footer a.link, #footer span.copyright {
+    color: #bbbbbb;
+    font-family: Nunito, sans-serif;
+    font-size: 0.85em;
+    margin-right: 1em;
+    vertical-align: middle;
+}
+#footer span.copyright {
+    color: #999999;
+}
+#footer a {
+    text-decoration: none;
+}
+#footer a.link:hover {
+    color: #999999;
+}
+#footer a.social-icon {
+    margin-left: 0.5em;
+    line-height: 0;
+}

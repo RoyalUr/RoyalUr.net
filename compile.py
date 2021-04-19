@@ -348,7 +348,11 @@ def filter_html(file, *, prefix=""):
         src_path = node.get("src")
 
         # Include the src file.
-        include_mtime, include_content, include_changed = filter_html(src_path, prefix=prefix)
+        try:
+            include_mtime, include_content, include_changed = filter_html(src_path, prefix=prefix)
+        except FileNotFoundError as e:
+            raise Exception("Include not found while filtering {}: {}".format(file, str(e)))
+
         source_mtime = max(source_mtime, include_mtime)
         filtered += include_content
 
@@ -361,7 +365,10 @@ def generate_html(target_folder, comp_spec, *, prefix=""):
     """
     for from_path, to_rel in comp_spec.html_files.items():
         to_path = resolve_path(target_folder, to_rel)
-        file_mtime, filtered, changed = filter_html(from_path, prefix=prefix)
+        try:
+            file_mtime, filtered, changed = filter_html(from_path, prefix=prefix)
+        except FileNotFoundError as e:
+            raise Exception("Unable to generate {}: {}".format(to_rel, str(e)))
 
         # Write the new filtered file.
         os.makedirs(os.path.dirname(to_path), exist_ok=True)

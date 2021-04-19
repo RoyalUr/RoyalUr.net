@@ -36,7 +36,7 @@ and does not yet cover all major aspects of the codebase._
 | /res/ | Source images, audio, & annotations of the website.<br/>Hosted off GitHub at https://royalur.net/res.zip. |
 | [/client/](/client) | Source code and configuration files. |
 | [/client/js/](/client/js) | JavaScript source files. |
-| [/client/js/lib/](/client/js/lib) | JavaScript libraries used by the client. |
+| [/client/js/lib/](/client/game/lib) | JavaScript libraries used by the client. |
 | [/compilation.json](/compilation.json) | Specification used to compile the site. |
 | [/compile.sh](/compile.sh) & [/compile.py](/compile.py) | Scripts that compile the site. |
 | /compiled/ | The compiled site. |
