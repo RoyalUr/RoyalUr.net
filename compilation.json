@@ -46,15 +46,6 @@
       "client/articles/base/article.css",
       "client/articles/rules.css"
     ],
-    "watch/index.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
-      "client/common/base.css",
-      "client/common/footer.css",
-      "client/articles/base/header.css",
-      "client/articles/base/article.css",
-      "client/articles/watch.css"
-    ],
     "lost.css": [
       "client/common/font_nunito.css",
       "client/common/base.css",

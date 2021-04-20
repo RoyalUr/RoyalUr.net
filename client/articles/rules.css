@@ -1,29 +1,5 @@
 #content {
-    background-color: rgb(32, 41, 48);
     font-size: 1.8em;
-}
-#content,
-#content * {
-    font-family: Nunito, sans-serif;
-    text-decoration: none;
-    color: white;
-}
-#content h1 {
-    font-family: DuranGo, sans-serif;
-    font-size: 1.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.15em;
-}
-#content h2 {
-    text-decoration: underline;
-}
-#content h2,
-#content h3 {
-    font-size: 1.4em;
-}
-#content strong {
-    text-decoration: underline;
-    margin-right: 0.75vh;
 }
 #content p {
     font-size: 0.9em;
