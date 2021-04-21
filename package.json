@@ -3,6 +3,9 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
+    "autoprefixer": "^10.2.5",
+    "postcss-cli": "^8.3.1",
+    "postcss-preset-env": "^6.7.0",
     "uglify-js": "^3.11.5",
     "uglifycss": "^0.0.29"
   }

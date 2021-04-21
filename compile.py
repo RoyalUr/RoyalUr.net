@@ -390,7 +390,10 @@ def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
         if source_mtime == getmtime(output_file):
             continue
 
-        commands = [["npx", "babel", "--presets=@babel/env", *file_list]]
+        commands = [
+                ["cat", *file_list],
+                ["npx", "babel", "--presets=@babel/env", "--no-babelrc"]
+        ]
         if (minify):
             commands.append(["uglifyjs", "--compress", "--mangle"])
         commands.append(output_file)
@@ -399,7 +402,7 @@ def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
         setmtime(output_file, source_mtime)
 
 
-def minify_css(target_folder, comp_spec, *, prefix=""):
+def generate_css(target_folder, comp_spec, *, prefix=""):
     """
     Minify the CSS of the website.
     """
@@ -411,7 +414,10 @@ def minify_css(target_folder, comp_spec, *, prefix=""):
             continue
 
         assert execute_piped_commands(
-            ["npx", "uglifycss", *file_list],
+            ["cat", *file_list],
+            ["npx", "postcss", "--use", "postcss-preset-env"],
+            ["npx", "postcss", "--use", "autoprefixer"],
+            ["npx", "uglifycss"],
             output_file,
             prefix=prefix
         )
@@ -609,7 +615,7 @@ def create_release_build(target_folder):
     print("\n3. Combine & Minify Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ", minify=True)
     print("\n4. Minify CSS")
-    minify_css(target_folder, comp_spec, prefix=" .. ")
+    generate_css(target_folder, comp_spec, prefix=" .. ")
     print("\n5. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
     print("\n6. Create Annotations File")
@@ -630,7 +636,7 @@ def create_dev_build(target_folder):
     print("\n3. Combine Javascript")
     combine_js(target_folder, comp_spec, prefix=" .. ")
     print("\n4. Minify CSS")
-    minify_css(target_folder, comp_spec, prefix=" .. ")
+    generate_css(target_folder, comp_spec, prefix=" .. ")
     print("\n5. Copy Resource Files")
     copy_resource_files(target_folder, comp_spec, prefix=" .. ")
     print("\n6. Create Annotations File")
