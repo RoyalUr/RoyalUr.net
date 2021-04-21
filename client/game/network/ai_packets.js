@@ -5,19 +5,13 @@
 
 const aiPackets = new PacketSet("AI", true);
 
-aiPackets.addBidirectional("ai_functionality_request", readAIFunctionalityRequest)
 aiPackets.addBidirectional("ai_functionality", readAIFunctionalityPacket);
 aiPackets.addBidirectional("ai_move_request", readAIMoveRequestPacket);
 aiPackets.addBidirectional("ai_move_response", readAIMoveResponsePacket);
 
-function readAIFunctionalityRequest(packet) {
-    return {
-        requestPanda: packet.nextBool()
-    };
-}
-
 function readAIFunctionalityPacket(packet) {
     return {
+        available: packet.nextBool(),
         pandaAvailable: packet.nextBool(),
         pandaUnsupported: packet.nextBool()
     };
@@ -36,14 +30,9 @@ function readAIMoveResponsePacket(packet) {
     return { moveFrom: packet.nextLocation() };
 }
 
-function writeAIFunctionalityRequest(requestPanda) {
-    const packet = aiPackets.newPacketOut("ai_functionality_request");
-    packet.pushBool(requestPanda);
-    return packet;
-}
-
-function writeAIFunctionalityPacket(isPandaAvailable, isPandaUnsupported) {
+function writeAIFunctionalityPacket(isAvailable, isPandaAvailable, isPandaUnsupported) {
     const packet = aiPackets.newPacketOut("ai_functionality");
+    packet.pushBool(isAvailable);
     packet.pushBool(isPandaAvailable);
     packet.pushBool(isPandaUnsupported);
     return packet;

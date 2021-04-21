@@ -141,22 +141,43 @@ canvas { position: absolute; }
     transition: opacity 0.2s ease-in-out;
 }
 .menu-select-option {
+    position: relative;
     display: inline-block;
     cursor: pointer;
     padding: 2vmin 3vmin;
+}
+.menu-select-option-content {
     filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 
     opacity: 0.5;
     transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
 }
-.menu-select.inactive .menu-select-option {
+.menu-select-option.option-loading .menu-select-option-content {
     opacity: 0.3;
 }
-.menu-select .menu-select-option.option-hovered {
+.menu-select-option .loading-spinner {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+.menu-select-option.option-loading .loading-spinner {
+    opacity: 1;
+}
+.menu-select.inactive .menu-select-option-content {
+    opacity: 0.3;
+}
+.menu-select .option-loading .menu-select-option-content {
+    opacity: 0.3;
+    transform: scale(0.9);
+}
+.menu-select .option-unsupported .menu-select-option-content {
+    opacity: 0.2;
+    transform: scale(0.9);
+}
+.menu-select .option-hovered .menu-select-option-content {
     opacity: 1;
     transform: scale(1.1);
 }
-.menu-select .menu-select-option.option-selected {
+.menu-select .option-selected .menu-select-option-content {
     opacity: 1;
 }
 .menu-select-description {
@@ -164,7 +185,6 @@ canvas { position: absolute; }
     height: 1.5em;
     margin-top: 2vh;
     cursor: default;
-    color: white;
     text-align: center;
     vertical-align: middle;
 
@@ -172,9 +192,16 @@ canvas { position: absolute; }
 }
 .menu-select-description-text {
     opacity: 1;
+    color: white;
     white-space: nowrap;
     font-family: Nunito, sans-serif;
     transition: opacity 0.1s ease-in-out;
+}
+.menu-select-description-text.option-loading {
+    color: rgb(240, 164, 255);
+}
+.menu-select-description-text.option-unsupported {
+    color: rgb(255, 128, 128);
 }
 .menu-select.inactive .menu-select-description-text {
     opacity: 0.8;
@@ -213,6 +240,13 @@ canvas { position: absolute; }
     text-shadow: 0 0 20px rgb(0, 0, 0);
     color: white;
     white-space: pre;
+}
+.menu-select-option.option-loading .menu-select-text {
+    color: rgb(150, 150, 150);
+}
+.menu-select-option.option-unsupported .menu-select-text {
+    color: rgb(255, 130, 130);
+    text-decoration: line-through;
 }
 
 /* Specific menu select options have different icon sizes. */

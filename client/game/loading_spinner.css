@@ -1,0 +1,141 @@
+.loading-spinner {
+    position: absolute;
+    left: 35%;
+    top: 35%;
+    width: 30%;
+    padding-bottom: 38%;
+}
+
+.loading-spinner-bar {
+    position: absolute;
+    width: 12%;
+    height: 31%;
+    border-radius: 4px;
+    border: 2px solid black;
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+}
+
+.loading-spinner-bar-01 {
+    left: 0;
+    top: 34%;
+    animation-delay: 0.45s;
+    transform: rotate(-90deg);
+}
+
+.loading-spinner-bar-02 {
+    left: 13%;
+    top: 11.5%;
+    animation-delay: 0.6s;
+    transform: rotate(-45deg);
+}
+
+.loading-spinner-bar-03 {
+    left: 41%;
+    top: 4%;
+    animation-delay: 0.75s;
+    transform: rotate(0deg);
+}
+
+.loading-spinner-bar-04 {
+    right: 14%;
+    top: 11.5%;
+    animation-delay: 0.9s;
+    transform: rotate(45deg);
+}
+
+.loading-spinner-bar-05 {
+    right: 0;
+    top: 34%;
+    animation-delay: 1.05s;
+    transform: rotate(90deg);
+}
+
+.loading-spinner-bar-06 {
+    right: 13%;
+    bottom: 7.5%;
+    animation-delay: 1.2s;
+    transform: rotate(135deg);
+}
+
+.loading-spinner-bar-07 {
+    left: 41%;
+    bottom: 0;
+    animation-delay: 1.35s;
+    transform: rotate(180deg);
+}
+
+.loading-spinner-bar-08 {
+    left: 13%;
+    bottom: 7.5%;
+    animation-delay: 1.5s;
+    transform: rotate(-135deg);
+}
+
+
+.loading-spinner,
+.loading-spinner.purple-loading-spinner {
+    filter: drop-shadow(0 0 2.5vmin rgb(61, 24, 79));
+}
+.loading-spinner .loading-spinner-bar,
+.loading-spinner.purple-loading-spinner .loading-spinner-bar {
+    background-color: rgb(61, 24, 79);
+    animation-name: loadingFadePurple;
+}
+@keyframes loadingFadePurple {
+    0% { background-color: rgb(240, 164, 255); }
+    100% { background-color: rgb(61, 24, 79); }
+}
+
+
+.loading-spinner.green-loading-spinner {
+    filter: drop-shadow(0 0 2.5vmin rgb(39, 74, 23));
+}
+.loading-spinner.green-loading-spinner .loading-spinner-bar {
+    background-color: rgb(39, 74, 23);
+    animation-name: loadingFadeGreen;
+}
+@keyframes loadingFadeGreen {
+    0% { background-color: rgb(182, 255, 148); }
+    100% { background-color: rgb(39, 74, 23); }
+}
+
+
+.loading-spinner.orange-loading-spinner {
+    filter: drop-shadow(0 0 2.5vmin rgb(74, 53, 18));
+}
+.loading-spinner.orange-loading-spinner .loading-spinner-bar {
+    background-color: rgb(74, 53, 18);
+    animation-name: loadingFadeOrange;
+}
+@keyframes loadingFadeOrange {
+    0% { background-color: rgb(255, 205, 112); }
+    100% { background-color: rgb(74, 53, 18); }
+}
+
+
+.loading-spinner.red-loading-spinner {
+    filter: drop-shadow(0 0 2.5vmin rgb(74, 18, 18));
+}
+.loading-spinner.red-loading-spinner .loading-spinner-bar {
+    background-color: rgb(74, 18, 18);
+    animation-name: loadingFadeRed;
+}
+@keyframes loadingFadeRed {
+    0% { background-color: rgb(250, 120, 120); }
+    100% { background-color: rgb(74, 18, 18); }
+}
+
+
+.loading-spinner.blue-loading-spinner {
+    filter: drop-shadow(0 0 2.5vmin rgb(27, 32, 77));
+}
+.loading-spinner.blue-loading-spinner .loading-spinner-bar {
+    background-color: rgb(27, 32, 77);
+    animation-name: loadingFadeBlue;
+}
+@keyframes loadingFadeBlue {
+    0% { background-color: rgb(158, 168, 255); }
+    100% { background-color: rgb(27, 32, 77); }
+}

@@ -11,22 +11,35 @@ const DIFFICULTY_EASY = 1,
       DIFFICULTY_PANDA = 7;
 
 let computerWorker = null,
-    pandaAvailable = false,
-    pandaUnsupported = false;
+    computerAvailable = false,
+    computerUnsupported = false,
+    computerPandaAvailable = false,
+    computerPandaUnsupported = false;
 
-function getComputerWorker() {
-    if (computerWorker === null) {
-        computerWorker = new Worker("/game/simulation.[ver].js");
-        computerWorker.onmessage = onComputerWorkerMessage;
+function loadComputerWorker() {
+    if (computerWorker == null && !computerUnsupported) {
+        try {
+            computerWorker = new Worker("/game/simulation.[ver].js");
+            computerWorker.onmessage = onComputerWorkerMessage;
+        } catch (e) {
+            computerUnsupported = true;
+            computerPandaUnsupported = true;
+            gameSetupMenu.updateStates();
+        }
     }
+}
+function getComputerWorker() {
+    loadComputerWorker();
     return computerWorker;
 }
 function onComputerWorkerMessage(event) {
     const packet = aiPackets.readPacket(event.data);
 
     if (packet.type === "ai_functionality") {
-        pandaAvailable = packet.pandaAvailable;
-        pandaUnsupported = packet.pandaUnsupported;
+        computerAvailable = packet.available;
+        computerPandaAvailable = packet.pandaAvailable;
+        computerPandaUnsupported = packet.pandaUnsupported;
+        gameSetupMenu.updateStates();
     } else if (packet.type === "ai_move_response") {
         // See if the current game is waiting for a computer move.
         if (game && game instanceof ComputerGame) {

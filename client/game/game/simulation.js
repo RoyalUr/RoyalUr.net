@@ -114,27 +114,23 @@ GameSimulator.prototype.findMoveStates = function(state, roll, depth) {
 function SimAPI() {
     this.__class_name__ = "SimAPI";
     this.simulators = {};
+
+    postMessage(writeAIFunctionalityPacket(true, false, false).data);
+    royalUrAnalysis.load(
+        "/game/royal_ur_analysis.wasm",
+        this.onRoyalUrAnalysisLoaded.bind(this),
+        this.onRoyalUrAnalysisLoadErrored.bind(this)
+    );
 }
 SimAPI.prototype.onMessage = function(event) {
     const packet = aiPackets.readPacket(event.data);
 
-    if (packet.type === "ai_functionality_request") {
-        this.onFunctionalityRequest(packet);
-    } else if (packet.type === "ai_move_request") {
+    if (packet.type === "ai_move_request") {
         this.onMoveRequest(packet);
     } else {
         throw "Unsupported packet type " + packet.type;
     }
 };
-SimAPI.prototype.onFunctionalityRequest = function(request) {
-    if (request.requestPanda) {
-        royalUrAnalysis.load(
-            "/game/royal_ur_analysis.wasm",
-            simAPI.onRoyalUrAnalysisLoaded.bind(simAPI),
-            simAPI.onRoyalUrAnalysisLoadErrored.bind(simAPI)
-        );
-    }
-}
 SimAPI.prototype.onMoveRequest = function(request) {
     // Check if we should forward the request to RoyalUrAnalysis.
     if (request.usePanda) {
@@ -157,11 +153,11 @@ SimAPI.prototype.getSimulator = function(depth) {
     return this.simulators[depth];
 };
 SimAPI.prototype.onRoyalUrAnalysisLoaded = function() {
-    postMessage(writeAIFunctionalityPacket(true, false).data);
+    postMessage(writeAIFunctionalityPacket(true, true, false).data);
 };
 SimAPI.prototype.onRoyalUrAnalysisLoadErrored = function(error) {
     console.error("There was an error loading RoyalUrAnalysis: " + error);
-    postMessage(writeAIFunctionalityPacket(false, true).data);
+    postMessage(writeAIFunctionalityPacket(true, false, true).data);
 };
 
 

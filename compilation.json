@@ -27,7 +27,8 @@
       "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/block_scrolling.css",
-      "client/game/game.css"
+      "client/game/game.css",
+      "client/game/loading_spinner.css"
     ],
     "articles.css": [
       "client/common/font_durango.css",

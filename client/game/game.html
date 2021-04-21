@@ -49,25 +49,25 @@
                     Select how you'd like to play
                 </h1>
 
-                <div id="mode-local" class="menu-select-option">
+                <div id="mode-local" class="menu-select-option"><div class="menu-select-option-content">
                     <div class="menu-select-text">Local</div>
                     <img class="menu-select-icon" src="/res/mode_local.[ver].svg" alt="Play locally" />
-                </div>
+                </div></div>
 
-                <div id="mode-computer" class="menu-select-option">
+                <div id="mode-computer" class="menu-select-option"><div class="menu-select-option-content">
                     <div class="menu-select-text">Computer</div>
                     <img class="menu-select-icon" src="/res/mode_computer.[ver].svg" alt="Play the computer" />
-                </div>
+                </div></div>
 
-                <div id="mode-online" class="menu-select-option">
+                <div id="mode-online" class="menu-select-option"><div class="menu-select-option-content">
                     <div class="menu-select-text">Online</div>
                     <img class="menu-select-icon" src="/res/mode_online.[ver].svg" alt="Play online" />
-                </div>
+                </div></div>
 
-                <div id="mode-friend" class="menu-select-option">
+                <div id="mode-friend" class="menu-select-option"><div class="menu-select-option-content">
                     <div class="menu-select-text">Friend</div>
                     <img class="menu-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
-                </div>
+                </div></div>
 
                 <br/>
                 <div id="mode-select-description" class="menu-select-description text-shadow">
@@ -81,29 +81,49 @@
                     Select the difficulty of your opponent
                 </h1>
 
-                <div id="computer-easy" class="menu-select-option">
-                    <div class="menu-select-text">Easy</div>
-                    <img class="menu-select-icon" src="/res/mode_computer_easy.[ver].svg"
-                         alt="Play the easy difficulty of the computer" />
+                <div id="computer-easy" class="menu-select-option option-loading">
+                    <div class="menu-select-option-content">
+                        <div class="menu-select-text">Easy</div>
+                        <img class="menu-select-icon" src="/res/mode_computer_easy.[ver].svg"
+                             alt="Play the easy difficulty of the computer" />
+                    </div>
+                    <div class="loading-spinner green-loading-spinner">
+                        <include src="client/game/loading_spinner.html" />
+                    </div>
                 </div>
 
-                <div id="computer-medium" class="menu-select-option">
-                    <div class="menu-select-text">Medium</div>
-                    <img class="menu-select-icon" src="/res/mode_computer_medium.[ver].svg"
-                         alt="Play the medium difficulty of the computer" />
+                <div id="computer-medium" class="menu-select-option option-loading">
+                    <div class="menu-select-option-content">
+                        <div class="menu-select-text">Medium</div>
+                        <img class="menu-select-icon" src="/res/mode_computer_medium.[ver].svg"
+                             alt="Play the medium difficulty of the computer" />
+                    </div>
+                    <div class="loading-spinner orange-loading-spinner">
+                        <include src="client/game/loading_spinner.html" />
+                    </div>
                 </div>
 
-                <div id="computer-hard" class="menu-select-option">
-                    <div class="menu-select-text">Hard</div>
-                    <img class="menu-select-icon" src="/res/mode_computer_hard.[ver].svg"
-                         alt="Play the hard difficulty of the computer" />
+                <div id="computer-hard" class="menu-select-option option-loading">
+                    <div class="menu-select-option-content">
+                        <div class="menu-select-text">Hard</div>
+                        <img class="menu-select-icon" src="/res/mode_computer_hard.[ver].svg"
+                             alt="Play the hard difficulty of the computer" />
+                    </div>
+                    <div class="loading-spinner red-loading-spinner">
+                        <include src="client/game/loading_spinner.html" />
+                    </div>
                 </div>
 
-<!--                <div id="computer-panda" class="menu-select-option">-->
-<!--                    <div class="menu-select-text">Extreme</div>-->
-<!--                    <img class="menu-select-icon" src="/res/mode_computer_panda.[ver].svg"-->
-<!--                         alt="Play the hardest difficulty of the computer" />-->
-<!--                </div>-->
+                <div id="computer-panda" class="menu-select-option option-loading">
+                    <div class="menu-select-option-content">
+                        <div class="menu-select-text">Extreme</div>
+                        <img class="menu-select-icon" src="/res/mode_computer_panda.[ver].svg"
+                             alt="Play the hardest difficulty of the computer" />
+                    </div>
+                    <div class="loading-spinner blue-loading-spinner">
+                        <include src="client/game/loading_spinner.html" />
+                    </div>
+                </div>
 
                 <br/>
                 <div id="computer-select-description" class="menu-select-description text-shadow">

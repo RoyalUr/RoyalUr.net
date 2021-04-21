@@ -3,6 +3,11 @@
 //
 
 
+const OPT_AVAILABLE = "menu_option_available",
+      OPT_LOADING = "menu_option_loading",
+      OPT_UNSUPPORTED = "menu_option_unsupported";
+
+
 /**
  * The setup menu for starting games.
  */
@@ -22,20 +27,54 @@ function GameSetupMenu() {
     this.modeSelect.addSelectionListener(option => {
         gameSetup.mode = option.metadata.mode;
         if (option.name === "computer") {
-            setTimeout(() => jumpToID("computer-select"), 100)
+            setTimeout(() => jumpToID("computer-select"), 100);
+            loadComputerWorker();
         } else {
             jumpToID("top");
         }
     });
 
+    // The function that determines if the standard difficulty levels are available or loading.
+    const standardStateFn = () => {
+        if (computerAvailable)
+            return OPT_AVAILABLE;
+        return computerUnsupported ? OPT_UNSUPPORTED : OPT_LOADING;
+    };
     this.computerSelect = new MenuSelectElem(
         "computer",
         [
-            {"name": "easy",   "desc": "Good for beginners to the game.",        "difficulty": DIFFICULTY_EASY},
-            {"name": "medium", "desc": "Challenging to beat.",                   "difficulty": DIFFICULTY_MEDIUM},
-            {"name": "hard",   "desc": "Ruthless and very challenging to beat.", "difficulty": DIFFICULTY_HARD},
-            // {"name": "panda",  "desc": "The panda is world-class... good luck.", "difficulty": DIFFICULTY_PANDA},
-        ]
+            {
+                "name": "easy",
+                "desc": "Good for beginners to the game.",
+                "difficulty": DIFFICULTY_EASY,
+                "stateFn": standardStateFn
+            },
+            {
+                "name": "medium",
+                "desc": "Challenging to beat.",
+                "difficulty": DIFFICULTY_MEDIUM,
+                "stateFn": standardStateFn
+            },
+            {
+                "name": "hard",
+                "desc": "Ruthless and very challenging to beat.",
+                "difficulty": DIFFICULTY_HARD,
+                "stateFn": standardStateFn
+            },
+            {
+                "name": "panda",
+                "desc": "The panda difficulty is world-class... good luck!",
+                "difficulty": DIFFICULTY_PANDA,
+                "stateFn": () => {
+                    if (computerPandaAvailable)
+                        return OPT_AVAILABLE;
+                    return computerPandaUnsupported ? OPT_UNSUPPORTED : OPT_LOADING;
+                }
+            },
+        ],
+        "The {name} difficulty is loading...",
+        "The {name} difficulty is not supported on your browser",
+        "All computer difficulties are unsupported on your browser :("
     );
     this.computerSelect.addSelectionListener(option => {
         gameSetup.difficulty = option.metadata.difficulty;
@@ -71,22 +110,30 @@ GameSetupMenu.prototype.reset = function() {
     this.modeSelect.clearSelected();
     this.computerSelect.clearSelected();
 };
+GameSetupMenu.prototype.updateStates = function() {
+    this.modeSelect.updateStates();
+    this.computerSelect.updateStates();
+};
 
 
 /**
  * A menu element that allows the user to select
  * between several different options.
  */
-function MenuSelectElem(idPrefix, optionMetadatas) {
+function MenuSelectElem(idPrefix, options, loadingDesc, unsupportedDesc, allUnsupportedDesc) {
     this.__class_name__ = "MenuSelectElem";
     this.elem = document.getElementById(idPrefix + "-select");
     this.description = document.getElementById(idPrefix + "-select-description");
     this.descriptionText = document.getElementById(idPrefix + "-select-description-text");
     this.descriptionFade = new Fade(0.2);
 
+    this.loadingDesc = (loadingDesc ? loadingDesc : "The {name} option is loading...");
+    this.unsupportedDesc = (unsupportedDesc ? unsupportedDesc : "The {name} option is unsupported");
+    this.allUnsupportedDesc = (allUnsupportedDesc ? allUnsupportedDesc : "All options are unsupported :(");
+
     this.options = [];
-    for (let index = 0; index < optionMetadatas.length; ++index) {
-        const optionMeta = optionMetadatas[index];
+    for (let index = 0; index < options.length; ++index) {
+        const optionMeta = options[index];
         this.options.push(new MenuSelectOptionElem(this, idPrefix, optionMeta));
     }
 
@@ -111,19 +158,47 @@ MenuSelectElem.prototype.getHoveredOption = function() {
 MenuSelectElem.prototype.getSelectedOption = function() {
     return this.options.find(option => option.selected);
 };
+MenuSelectElem.prototype.areAllOptionsUnsupported = function() {
+    return !this.options.find(option => option.getState() !== OPT_UNSUPPORTED);
+};
 MenuSelectElem.prototype.getDescOption = function() {
     const hoveredOption = this.getHoveredOption(),
           selectedOption = this.getSelectedOption();
     return (hoveredOption ? hoveredOption : selectedOption);
 };
+MenuSelectElem.prototype.updateStates = function() {
+    for (let index = 0; index < this.options.length; ++index) {
+        this.options[index].updateElem(true);
+    }
+    this.updateDesc();
+};
 MenuSelectElem.prototype.updateDesc = function() {
     const selectedOption = this.getSelectedOption(),
           option = this.getDescOption();
 
+    let showDesc = !!option,
+        desc = "",
+        state = OPT_AVAILABLE;
+
     if (!!option) {
-        this.descriptionText.innerHTML = option.desc;
+        state = option.getState();
+        if (state === OPT_LOADING) {
+            desc = formatUnicorn(this.loadingDesc, {name: option.name});
+        } else if (state === OPT_UNSUPPORTED) {
+            desc = formatUnicorn(this.unsupportedDesc, {name: option.name});
+        } else {
+            desc = option.desc;
+        }
+    } else if (this.areAllOptionsUnsupported()) {
+        showDesc = true;
+        desc = this.allUnsupportedDesc;
+        state = OPT_UNSUPPORTED;
     }
-    this.descriptionFade.fade(!!option);
+
+    this.descriptionText.innerHTML = desc;
+    this.descriptionFade.fade(showDesc);
+    setElementClass(this.descriptionText, "option-loading", state === OPT_LOADING);
+    setElementClass(this.descriptionText, "option-unsupported", state === OPT_UNSUPPORTED);
     setElementClass(this.elem, "inactive", !!selectedOption);
 };
 MenuSelectElem.prototype.redraw = function() {
@@ -139,6 +214,7 @@ function MenuSelectOptionElem(parent, idPrefix, metadata) {
     this.parent = parent;
     this.name = metadata.name;
     this.desc = metadata.desc;
+    this.getState = (metadata.stateFn ? metadata.stateFn : () => OPT_AVAILABLE);
     this.metadata = metadata;
     this.elem = document.getElementById(idPrefix + "-" + this.name);
     this.hovered = false;
@@ -149,7 +225,7 @@ function MenuSelectOptionElem(parent, idPrefix, metadata) {
     this.elem.addEventListener("mouseout", this.onUnhover.bind(this));
 }
 MenuSelectOptionElem.prototype.onSelect = function() {
-    if (this.selected)
+    if (this.selected || this.getState() !== OPT_AVAILABLE)
         return;
 
     this.parent.clearSelected();
@@ -179,8 +255,11 @@ MenuSelectOptionElem.prototype.onUnhover = function() {
     this.updateElem();
 };
 MenuSelectOptionElem.prototype.updateElem = function(skipUpdateDesc) {
+    const state = this.getState();
+    setElementClass(this.elem, "option-loading", state === OPT_LOADING);
+    setElementClass(this.elem, "option-unsupported", state === OPT_UNSUPPORTED);
     setElementClass(this.elem, "option-selected", this.selected);
-    setElementClass(this.elem, "option-hovered", this.hovered);
+    setElementClass(this.elem, "option-hovered", state === OPT_AVAILABLE && this.hovered);
     if (!skipUpdateDesc) {
         this.parent.updateDesc();
     }

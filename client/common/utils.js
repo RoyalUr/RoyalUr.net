@@ -440,6 +440,28 @@ function pad(value, length, prefix) {
     return string.substring(string.length - length, string.length);
 }
 
+/**
+ * A format function used on Stack Overflow to format strings.
+ *
+ * e.g. formatUnicorn(
+ *             "Hello, {name}, are you feeling {adjective}?",
+ *             {name:"Gabriel", adjective: "OK"})
+ *     outputs:
+ *         "Hello, Gabriel, are you feeling OK?"
+ */
+function formatUnicorn(str, ...parameters) {
+    if (!parameters.length)
+        return str;
+
+    const isArray = (typeof parameters[0] === "string" || typeof parameters[0] === "number"),
+          args = isArray ? Array.prototype.slice.call(parameters) : parameters[0];
+    for (let key in args) {
+        if (args.hasOwnProperty(key)) {
+            str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+        }
+    }
+    return str;
+}
 
 
 //

@@ -252,7 +252,6 @@ registerScreenTransitionHandlers(
 function onEnterMenuScreen() {
     resetHash();
     resetGameSetup();
-    gameSetupMenu.reset();
 }
 
 function onEnterSimpleBgScreen() {
