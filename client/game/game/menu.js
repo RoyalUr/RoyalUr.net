@@ -62,8 +62,8 @@ function GameSetupMenu() {
                 "stateFn": standardStateFn
             },
             {
-                "name": "panda",
-                "desc": "The panda difficulty is world-class... good luck!",
+                "name": "extreme",
+                "desc": "The extreme difficulty is world-class... good luck!",
                 "difficulty": DIFFICULTY_PANDA,
                 "stateFn": () => {
                     if (computerPandaAvailable)
