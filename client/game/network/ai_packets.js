@@ -8,6 +8,7 @@ const aiPackets = new PacketSet("AI", true);
 aiPackets.addBidirectional("ai_functionality", readAIFunctionalityPacket);
 aiPackets.addBidirectional("ai_move_request", readAIMoveRequestPacket);
 aiPackets.addBidirectional("ai_move_response", readAIMoveResponsePacket);
+aiPackets.addOutgoing("ai_panda_move_request");
 
 function readAIFunctionalityPacket(packet) {
     return {
@@ -38,17 +39,25 @@ function writeAIFunctionalityPacket(isAvailable, isPandaAvailable, isPandaUnsupp
     return packet;
 }
 
-function writeAIMoveRequestPacket(state, diceValue, depth, usePanda) {
+function writeAIMoveRequestPacket(state, roll, depth, usePanda) {
     const packet = aiPackets.newPacketOut("ai_move_request");
     packet.pushInt(depth, 2);
     packet.pushBool(usePanda);
     packet.pushGameState(state);
-    packet.pushDigit(diceValue);
+    packet.pushDigit(roll);
     return packet;
 }
 
 function writeAIMoveResponsePacket(moveFrom) {
     const packet = aiPackets.newPacketOut("ai_move_response");
     packet.pushLocation(moveFrom);
+    return packet;
+}
+
+function writeAIPandaMoveRequestPacket(state, roll, depth) {
+    const packet = aiPackets.newPacketOut("ai_panda_move_request");
+    packet.pushInt(depth, 2);
+    packet.pushGameState(state);
+    packet.pushDigit(roll);
     return packet;
 }

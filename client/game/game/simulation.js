@@ -134,10 +134,18 @@ SimAPI.prototype.onMessage = function(event) {
 SimAPI.prototype.onMoveRequest = function(request) {
     // Check if we should forward the request to RoyalUrAnalysis.
     if (request.usePanda) {
-        const responsePacket = new PacketIn(royalUrAnalysis.sendRequest(request.rawData), true),
+        // Create a new request for RoyalUrAnalysis.
+        const pandaRequest = writeAIPandaMoveRequestPacket(
+            request.state, request.roll, request.depth
+        );
+
+        // Send the request to RoyalUrAnalysis and read the response.
+        const response = royalUrAnalysis.sendRequest(pandaRequest.getDataNoType()),
+              responsePacket = new PacketIn(response, true),
               responseMove = responsePacket.nextLocation();
         responsePacket.assertEmpty();
 
+        // Send the response back to the game.
         postMessage(writeAIMoveResponsePacket(responseMove).data);
         return;
     }

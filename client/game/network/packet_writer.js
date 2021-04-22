@@ -62,3 +62,6 @@ PacketOut.prototype.pushGameState = function(state) {
     this.pushBoard(state.board);
     this.pushPlayer(state.activePlayerNo);
 };
+PacketOut.prototype.getDataNoType = function() {
+    return this.data.substring(1);
+};
