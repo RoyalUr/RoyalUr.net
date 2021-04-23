@@ -404,21 +404,25 @@ function ComputerGame(difficulty) {
 }
 setSuperClass(ComputerGame, BrowserGame);
 
-ComputerGame.prototype.getAnalyticsDifficultyId = function() {
-    if (this.difficulty <= DIFFICULTY_EASY)
-        return EVENT_COMPUTER_EASY;
-    if (this.difficulty <= DIFFICULTY_MEDIUM)
-        return EVENT_COMPUTER_MEDIUM;
-    return EVENT_COMPUTER_HARD;
+ComputerGame.prototype.getAnalyticsName = function() {
+    if (this.difficulty === DIFFICULTY_EASY)
+        return EVENT_COMPUTER_GAME_EASY;
+    if (this.difficulty === DIFFICULTY_MEDIUM)
+        return EVENT_COMPUTER_GAME_MEDIUM;
+    if (this.difficulty === DIFFICULTY_HARD)
+        return EVENT_COMPUTER_GAME_HARD;
+    if (this.difficulty === DIFFICULTY_PANDA)
+        return EVENT_COMPUTER_GAME_PANDA;
+    return EVENT_COMPUTER_GAME_UNKNOWN;
 };
 ComputerGame.prototype.onGameStart = function() {
-    analytics.recordStartGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+    analytics.recordStartGame(this.getAnalyticsName());
 };
 ComputerGame.prototype.onGameAborted = function() {
-    analytics.recordAbortGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+    analytics.recordAbortGame(this.getAnalyticsName());
 };
 ComputerGame.prototype.onGameFinished = function() {
-    analytics.recordFinishGame(EVENT_COMPUTER_GAME, this.getAnalyticsDifficultyId())
+    analytics.recordFinishGame(this.getAnalyticsName());
 };
 
 ComputerGame.prototype.getTurnPlayer = function() {

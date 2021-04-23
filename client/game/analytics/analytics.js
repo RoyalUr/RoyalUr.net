@@ -24,9 +24,11 @@ const EVENT_CATEGORY_GAMES = "games",
       EVENT_ACTION_FINISH_GAME = "finish_game",
       EVENT_LOCAL_GAME = "local_game",
       EVENT_COMPUTER_GAME = "computer_game",
-      EVENT_COMPUTER_EASY = 1,
-      EVENT_COMPUTER_MEDIUM = 2,
-      EVENT_COMPUTER_HARD = 3,
+      EVENT_COMPUTER_GAME_UNKNOWN = EVENT_COMPUTER_GAME + "_unknown",
+      EVENT_COMPUTER_GAME_EASY = EVENT_COMPUTER_GAME + "_easy",
+      EVENT_COMPUTER_GAME_MEDIUM = EVENT_COMPUTER_GAME + "_medium",
+      EVENT_COMPUTER_GAME_HARD = EVENT_COMPUTER_GAME + "_hard",
+      EVENT_COMPUTER_GAME_PANDA = EVENT_COMPUTER_GAME + "_panda",
       EVENT_ONLINE_GAME = "online_game",
       EVENT_FRIEND_GAME = "friend_game";
 
@@ -73,14 +75,14 @@ Analytics.prototype.recordCloseConnection = function(targetURL) {
     this.recordConnectionEvent(EVENT_ACTION_CLOSE_CONNECTION, targetURL);
 };
 
-Analytics.prototype.recordStartGame = function(gameType, data) {
-    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_START_GAME, gameType, data);
+Analytics.prototype.recordStartGame = function(gameType) {
+    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_START_GAME, gameType);
 };
-Analytics.prototype.recordAbortGame = function(gameType, data) {
-    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_ABORT_GAME, gameType, data);
+Analytics.prototype.recordAbortGame = function(gameType) {
+    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_ABORT_GAME, gameType);
 };
-Analytics.prototype.recordFinishGame = function(gameType, data) {
-    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_FINISH_GAME, gameType, data);
+Analytics.prototype.recordFinishGame = function(gameType) {
+    this.recordEvent(EVENT_CATEGORY_GAMES, EVENT_ACTION_FINISH_GAME, gameType);
 };
 
 Analytics.prototype.recordSearchForOnlineGame = function() {
