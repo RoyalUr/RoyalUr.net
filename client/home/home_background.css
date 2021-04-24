@@ -45,6 +45,6 @@ body.no-webp #greeting-background {
 }
 #greeting-background div.dark-overlay {
     z-index: -99;
-    background-color: rgba(0, 0, 0, 0.5);
-    background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+    background-color: rgba(0, 0, 0, 0.6);
+    background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
 }
