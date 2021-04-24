@@ -12,8 +12,28 @@ html {
 }
 @media (max-aspect-ratio: 30/35) {
     #logo {
+        margin-top: 6vh;
         height: 35vmin;
     }
+}
+
+#header {
+    position: absolute;
+    top: 0.6em;
+    left: 0;
+    z-index: 999;
+}
+#header a {
+    margin-left: 0.8em;
+    font-family: Nunito, sans-serif;
+    font-size: 1.8em;
+    color: white;
+    text-decoration: none;
+    opacity: 0.6;
+}
+#header a:hover {
+    opacity: 1.0;
+    text-decoration: underline;
 }
 
 #greeting {

@@ -1,98 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Royal Ur | Play a friend, play online, or play the AI!</title>
+<head>
+    <meta charset="utf-8" />
+    <title>Royal Ur | Play a friend, play online, or play the AI!</title>
 
-        <meta name="og:title" content="Royal Ur" />
-        <meta name="twitter:title" content="Royal Ur" />
-        <meta property="twitter:url" content="https://royalur.net/" />
-        <meta name="description"
-              content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
-        <meta name="og:description"
-              content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
-        <meta name="twitter:description"
-              content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
+    <meta name="og:title" content="Royal Ur" />
+    <meta name="twitter:title" content="Royal Ur" />
+    <meta property="twitter:url" content="https://royalur.net/" />
+    <meta name="description"
+          content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
+    <meta name="og:description"
+          content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
+    <meta name="twitter:description"
+          content="Can you master the game played by ancient Mesopotamian kings and queens? Play online, with a friend, or against the AI!" />
 
-        <include src="client/common/head_boilerplate.html" />
-        <include src="client/common/matomo.html" />
-        <link rel="stylesheet" href="/index.[ver].css" />
-    </head>
-    <body class="gradient-background">
-        <div id="greeting">
-            <div id="greeting-background">
-                <div class="background-image"></div>
-                <div class="dark-overlay"></div>
-            </div>
+    <include src="client/common/head_boilerplate.html" />
+    <include src="client/common/matomo.html" />
+    <link rel="stylesheet" href="/index.[ver].css" />
+</head>
+<body class="gradient-background">
+    <header id="header">
+        <!-- About -->
+        <a class="link" href="/about">About</a>
+        <!-- Rules -->
+        <a class="link" href="/rules">Rules</a>
+        <!-- Videos -->
+        <a class="link" href="/watch">Videos</a>
+    </header>
 
-            <div class="centre-text">
-                <img id="logo" class="shadow" src="/res/logo.[ver].svg" alt="Logo" width="947" height="789" />
-            </div>
-
-            <h1 class="text-shadow">
-                Welcome! We are excited to have you here to share our love of The Royal Game of Ur!
-            </h1>
-            <div class="centre-text"><a class="greeting-button" href="/game">
-                <!-- Left Arrow. -->
-                <svg class="left-arrow shadow" xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 64 64"
-                     width="96" height="96">
-                    <path d="M34.484 11.984a1.5 1.5 0 00-1.045 2.577L40.88 22H3.5a1.5 1.5 0 100 3
-                         h37.379l-7.44 7.44a1.5 1.5 0 102.122 2.12l10-10a1.5 1.5 0 000-2.12l-10-10
-                         a1.5 1.5 0 00-1.077-.456z"/>
-                </svg>
-                <!-- Play Button. -->
-                <canvas data-src-inactive="/res/button_play.[ver]"
-                        data-src-active="/res/button_play_active.[ver]"></canvas>
-                <!-- Right Arrow. -->
-                <svg class="right-arrow shadow" xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 64 64"
-                     width="96" height="96">
-                    <path d="M34.484 11.984a1.5 1.5 0 00-1.045 2.577L40.88 22H3.5a1.5 1.5 0 100 3
-                         h37.379l-7.44 7.44a1.5 1.5 0 102.122 2.12l10-10a1.5 1.5 0 000-2.12l-10-10
-                         a1.5 1.5 0 00-1.077-.456z" transform="scale(-1,1) translate(-48,0)"/>
-                </svg>
-            </a></div>
-
-            <div id="more-below">
-                <h2 class="text-shadow">
-                    <strong>Want to learn more?</strong>
-                </h2>
-                <h3 class="text-shadow">
-                    Learn more about the rules, history, and strategy of the world's oldest board game below!
-                </h3>
-                
-                <a href="#links">
-                    <svg class="shadow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 284.929 284.929">
-                        <path d="M282.082 76.511l-14.274-14.273c-1.902-1.906-4.093-2.856-6.57-2.856-2.471
-                                 0-4.661.95-6.563 2.856L142.466 174.441 30.262 62.241c-1.903-1.906-4.093
-                                 -2.856-6.567-2.856-2.475 0-4.665.95-6.567 2.856L2.856 76.515C.95 78.417
-                                 0 80.607 0 83.082c0 2.473.953 4.663 2.856 6.565l133.043 133.046c1.902 1.903
-                                 4.093 2.854 6.567 2.854s4.661-.951 6.562-2.854L282.082 89.647c1.902-1.903
-                                 2.847-4.093 2.847-6.565 0-2.475-.945-4.665-2.847-6.571z"/>
-                    </svg>
-                </a>
-            </div>
+    <div id="greeting">
+        <div id="greeting-background">
+            <div class="background-image"></div>
+            <div class="dark-overlay"></div>
         </div>
 
-        <div id="links" class="centre-text simple-background">
-            <h2>Learn the rules, or watch strategy and history videos below</h2>
-            <h3>More content about the game is also being worked on, and should be available soon!</h3>
-            <a class="menu-button highlight-shadow" href="/rules">
-                <canvas class="shadow" data-src-inactive="/res/button_learn.[ver]"
-                        data-src-active="/res/button_learn_active.[ver]"></canvas>
-            </a>
-            <a class="menu-button highlight-shadow" href="/watch">
-                <canvas class="shadow" data-src-inactive="/res/button_watch.[ver]"
-                        data-src-active="/res/button_watch_active.[ver]"></canvas>
+        <div class="centre-text">
+            <img id="logo" class="shadow" src="/res/logo.[ver].svg" alt="Logo" width="947" height="789" />
+        </div>
+
+        <h1 class="text-shadow">
+            Welcome! We are excited to have you here to share our love of The Royal Game of Ur!
+        </h1>
+        <div class="centre-text"><a class="greeting-button" href="/game">
+            <!-- Left Arrow. -->
+            <svg class="left-arrow shadow" xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 64 64"
+                 width="96" height="96">
+                <path d="M34.484 11.984a1.5 1.5 0 00-1.045 2.577L40.88 22H3.5a1.5 1.5 0 100 3
+                     h37.379l-7.44 7.44a1.5 1.5 0 102.122 2.12l10-10a1.5 1.5 0 000-2.12l-10-10
+                     a1.5 1.5 0 00-1.077-.456z"/>
+            </svg>
+            <!-- Play Button. -->
+            <canvas data-src-inactive="/res/button_play.[ver]"
+                    data-src-active="/res/button_play_active.[ver]"></canvas>
+            <!-- Right Arrow. -->
+            <svg class="right-arrow shadow" xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 64 64"
+                 width="96" height="96">
+                <path d="M34.484 11.984a1.5 1.5 0 00-1.045 2.577L40.88 22H3.5a1.5 1.5 0 100 3
+                     h37.379l-7.44 7.44a1.5 1.5 0 102.122 2.12l10-10a1.5 1.5 0 000-2.12l-10-10
+                     a1.5 1.5 0 00-1.077-.456z" transform="scale(-1,1) translate(-48,0)"/>
+            </svg>
+        </a></div>
+
+        <div id="more-below">
+            <h2 class="text-shadow">
+                <strong>Want to learn more?</strong>
+            </h2>
+            <h3 class="text-shadow">
+                Learn more about the rules, history, and strategy of the world's oldest board game below!
+            </h3>
+
+            <a href="#links">
+                <svg class="shadow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 284.929 284.929">
+                    <path d="M282.082 76.511l-14.274-14.273c-1.902-1.906-4.093-2.856-6.57-2.856-2.471
+                             0-4.661.95-6.563 2.856L142.466 174.441 30.262 62.241c-1.903-1.906-4.093
+                             -2.856-6.567-2.856-2.475 0-4.665.95-6.567 2.856L2.856 76.515C.95 78.417
+                             0 80.607 0 83.082c0 2.473.953 4.663 2.856 6.565l133.043 133.046c1.902 1.903
+                             4.093 2.854 6.567 2.854s4.661-.951 6.562-2.854L282.082 89.647c1.902-1.903
+                             2.847-4.093 2.847-6.565 0-2.475-.945-4.665-2.847-6.571z"/>
+                </svg>
             </a>
         </div>
+    </div>
 
-        <div id="footer-container" class="centre-text">
-            <include src="client/common/footer.html" />
-        </div>
+    <div id="links" class="centre-text simple-background">
+        <h2>Learn the rules, or watch strategy and history videos below</h2>
+        <h3>More content about the game is also being worked on, and should be available soon!</h3>
+        <a class="menu-button highlight-shadow" href="/rules">
+            <canvas class="shadow" data-src-inactive="/res/button_learn.[ver]"
+                    data-src-active="/res/button_learn_active.[ver]"></canvas>
+        </a>
+        <a class="menu-button highlight-shadow" href="/watch">
+            <canvas class="shadow" data-src-inactive="/res/button_watch.[ver]"
+                    data-src-active="/res/button_watch_active.[ver]"></canvas>
+        </a>
+    </div>
 
-        <include src="client/home/github_corner.html" />
+    <div id="footer-container" class="centre-text">
+        <include src="client/common/footer.html" />
+    </div>
 
-        <!-- JAVASCRIPT TO LOAD IMAGES -->
-        <script src="/index.[ver].js"></script>
-    </body>
+    <include src="client/home/github_corner.html" />
+
+    <!-- JAVASCRIPT TO LOAD IMAGES -->
+    <script src="/index.[ver].js"></script>
+</body>
 </html>
