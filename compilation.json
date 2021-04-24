@@ -245,6 +245,26 @@
       "dest": "res/board_rosettes",
       "size_group": "learn_board"
     },
+    "res/example_dice.png": {
+      "dest": "res/example_dice",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
+      }
+    },
+    "res/example_move.png": {
+      "dest": "res/example_move",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
+      }
+    },
 
     "res/darkTile.png": {
       "dest": "res/tile_dark",
