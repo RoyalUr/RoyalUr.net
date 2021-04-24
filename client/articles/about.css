@@ -1,0 +1,17 @@
+
+#content a.contributor {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: white;
+    text-decoration: underline;
+    text-align: center;
+}
+#content a.contributor img {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+}

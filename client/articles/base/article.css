@@ -5,16 +5,30 @@ iframe { /** IFrames are used for embedded YouTube videos. **/
     margin-bottom: 0.2em;
 }
 
-
+body {
+    display: flex;
+    flex-direction: column;
+}
+#content,
+#call-to-action,
+#header,
+#footer {
+    display: block;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 900px;
+}
+#footer {
+    margin-top: auto;
+}
 #content,
 #call-to-action {
-    display: block;
-    box-sizing: border-box;
-    max-width: 900px;
     padding: 0.5em;
     padding-left: 1.5em;
     padding-right: 1.5em;
     margin: 1em;
+    margin-top: 0;
     margin-left: auto;
     margin-right: auto;
 
@@ -53,7 +67,8 @@ iframe { /** IFrames are used for embedded YouTube videos. **/
     font-size: 1em;
     margin-bottom: 0.8em;
 }
-#content ul {
+#content ul,
+#content ol {
     list-style-position: outside;
     margin-left: 1em;
     margin-bottom: 0.8em;
@@ -64,14 +79,18 @@ iframe { /** IFrames are used for embedded YouTube videos. **/
     margin-top: 0.2em;
     margin-left: 2em;
 }
-#content ul li {
+#content ul li,
+#content ol li {
     margin-bottom: 0.2em;
 }
 #content ul ul li {
     margin-bottom: 0;
 }
 #content a {
-    font-style: italic;
+    color: #3692e7;
+}
+#content a:hover {
+    color: #57aeff;
 }
 #content p.list-title {
     margin-bottom: 0.3em;

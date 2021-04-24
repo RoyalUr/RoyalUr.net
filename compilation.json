@@ -10,6 +10,7 @@
     "client/articles/rules.html": "rules/index.html",
     "client/articles/watch.html": "watch/index.html",
     "client/articles/privacy.html": "privacy/index.html",
+    "client/articles/about.html": "about/index.html",
     "client/status/lost.html": "lost.html"
   },
   "css": {
@@ -46,6 +47,15 @@
       "client/articles/base/header.css",
       "client/articles/base/article.css",
       "client/articles/rules.css"
+    ],
+    "about/index.css": [
+      "client/common/font_durango.css",
+      "client/common/font_nunito.css",
+      "client/common/base.css",
+      "client/common/footer.css",
+      "client/articles/base/header.css",
+      "client/articles/base/article.css",
+      "client/articles/about.css"
     ],
     "lost.css": [
       "client/common/font_nunito.css",
@@ -145,6 +155,7 @@
     "res/social/discord.svg": "res/discord.svg",
     "res/social/reddit.svg": "res/reddit.svg",
     "res/social/github.svg": "res/github.svg",
+    "res/social/twitter.svg": "res/twitter.svg",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
     "res/social/star_on_github.svg": "res/star_on_github.svg",
     "res/buttons/mode_local.svg": "res/mode_local.svg",

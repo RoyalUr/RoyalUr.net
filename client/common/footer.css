@@ -44,3 +44,8 @@
     margin-left: 0.5em;
     line-height: 0;
 }
+/* The twitter logo is oddly sized. */
+#footer a.social-icon.twitter-icon img {
+    margin-bottom: 4px;
+    margin-right: -4px;
+}
