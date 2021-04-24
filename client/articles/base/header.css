@@ -1,10 +1,11 @@
-/** This file contains the CSS for styling the header and footer of the website. **/
+/** This file contains the CSS for styling the header of the website. **/
 
 #header {
     display: block;
     box-sizing: border-box;
     max-width: 900px;
     padding: 0.5em;
+    padding-top: 0;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 1em;
@@ -13,22 +14,40 @@
     background: #151A1F;
     box-shadow: 0 0 10px 5px rgba(0,0,0,1);
 }
+#header-logo {
+    display: inline-block;
+    line-height: 40px;
+}
+#header-links {
+    display: inline-block;
+    margin-top: 0.5em;
+    margin-left: 2em;
+}
 #header a {
     line-height: 48px;
-}
-#header a {
     text-decoration: none;
 }
-#header a img, #header a span {
+#header a.link {
+    color: #bbbbbb;
+    font-family: Nunito, sans-serif;
+    font-size: 1.1em;
+    margin-right: 1em;
+    vertical-align: middle;
+}
+#header a.link:hover {
+    color: #999999;
+    text-decoration: underline;
+}
+#header img, #header span {
     display: inline-block;
     vertical-align: middle;
 }
-#header a img {
+#header img {
     vertical-align: middle;
     height: 48px;
     width: auto;
 }
-#header a span {
+#header span {
     margin-left: 0.26em;
     margin-bottom: -0.3em;
     font-size: 2em;
