@@ -12,7 +12,7 @@ html {
 }
 @media (max-aspect-ratio: 30/35) {
     #logo {
-        margin-top: 6vh;
+        margin-top: 8vh;
         height: 35vmin;
     }
 }

@@ -16,6 +16,7 @@
 }
 #header-logo {
     display: inline-block;
+    margin-top: 8px;
     line-height: 40px;
 }
 #header-links {
