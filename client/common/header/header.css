@@ -1,7 +1,12 @@
 /** This file contains the CSS for styling the header of the website. **/
 
-#header {
+#header,
+#header-full-width {
     display: block;
+    background: #151A1F;
+    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
+}
+#header {
     box-sizing: border-box;
     max-width: 900px;
     padding: 0.5em;
@@ -11,8 +16,7 @@
     margin-bottom: 1em;
 
     font-size: 1.5em;
-    background: #151A1F;
-    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
+    text-align: left;
 }
 #header-logo {
     display: inline-block;
@@ -54,3 +58,17 @@
     font-size: 2em;
     color: white;
 }
+
+
+/** CSS for when the header should take up the full width of the page. **/
+#header-full-width {
+    width: 100%;
+}
+#header-full-width #header {
+    display: inline-block;
+    background: none;
+    box-shadow: none;
+    width: 100%;
+    margin: 0;
+}
+

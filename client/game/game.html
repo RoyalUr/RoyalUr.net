@@ -22,201 +22,180 @@
     <body class="simple-background">
         <a id="top"></a>
 
-        <!-- LOADING SCREEN -->
-        <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
-            <div id="loading-bar"></div>
-            <span id="loading-text">Royal Ur is Loading...</span>
-            <svg id="loading-wheel" viewBox="0 0 100 100">
-                <polyline class="stroke-still" points="0,0 100,0 100,100" />
-                <polyline class="stroke-still" points="0,0 0,100 100,100" />
-                <polyline class="stroke-animation" points="0,0 100,0 100,100" />
-                <polyline class="stroke-animation" points="0,0 0,100 100,100" />
-            </svg>
-        </div>
+        <!-- Header -->
+        <include src="client/common/header/header_full_width.html" />
 
-        <!-- IMPORTANT JAVASCRIPT -->
-        <script src="/game/resources.[ver].js"></script>
-
-        <!-- MENU -->
-        <div id="menu" class="simple-background centre-text" style="display: none">
-            <a id="title" href="/">
-                <img class="shadow" src="/res/logo_text_only.[ver].svg" alt="Logo" width="947" height="789" />
-            </a>
-
-            <!-- SELECT MODE TO PLAY THE GAME IN. -->
-            <div id="mode-select" class="menu-select">
-                <h1 id="mode-select-prompt" class="menu-select-prompt text-shadow">
-                    Select how you'd like to play
-                </h1>
-
-                <div id="mode-local" class="menu-select-option"><div class="menu-select-option-content">
-                    <div class="menu-select-text">Local</div>
-                    <img class="menu-select-icon" src="/res/mode_local.[ver].svg" alt="Play locally" />
-                </div></div>
-
-                <div id="mode-computer" class="menu-select-option"><div class="menu-select-option-content">
-                    <div class="menu-select-text">Computer</div>
-                    <img class="menu-select-icon" src="/res/mode_computer.[ver].svg" alt="Play the computer" />
-                </div></div>
-
-                <div id="mode-online" class="menu-select-option"><div class="menu-select-option-content">
-                    <div class="menu-select-text">Online</div>
-                    <img class="menu-select-icon" src="/res/mode_online.[ver].svg" alt="Play online" />
-                </div></div>
-
-                <div id="mode-friend" class="menu-select-option"><div class="menu-select-option-content">
-                    <div class="menu-select-text">Friend</div>
-                    <img class="menu-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
-                </div></div>
-
-                <br/>
-                <div id="mode-select-description" class="menu-select-description text-shadow">
-                    <span id="mode-select-description-text" class="menu-select-description-text"></span>
-                </div>
+        <!-- Game -->
+        <div id="game">
+            <!-- LOADING SCREEN -->
+            <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
+                <div id="loading-bar"></div>
+                <span id="loading-text">Royal Ur is Loading...</span>
+                <svg id="loading-wheel" viewBox="0 0 100 100">
+                    <polyline class="stroke-still" points="0,0 100,0 100,100" />
+                    <polyline class="stroke-still" points="0,0 0,100 100,100" />
+                    <polyline class="stroke-animation" points="0,0 100,0 100,100" />
+                    <polyline class="stroke-animation" points="0,0 0,100 100,100" />
+                </svg>
             </div>
 
-            <!-- SELECT DIFFICULTY OF COMPUTER. -->
-            <div id="computer-select" class="menu-select">
-                <h1 id="computer-select-prompt" class="menu-select-prompt text-shadow">
-                    Select the difficulty of your opponent
-                </h1>
+            <!-- IMPORTANT JAVASCRIPT -->
+            <script src="/game/resources.[ver].js"></script>
 
-                <div id="computer-easy" class="menu-select-option option-loading">
-                    <div class="menu-select-option-content">
-                        <div class="menu-select-text">Easy</div>
-                        <img class="menu-select-icon" src="/res/mode_computer_easy.[ver].svg"
-                             alt="Play the easy difficulty of the computer" />
-                    </div>
-                    <div class="loading-spinner green-loading-spinner">
-                        <include src="client/game/loading_spinner.html" />
+            <!-- MENU -->
+            <div id="menu" class="centre-text" style="display: none">
+                <!-- SELECT MODE TO PLAY THE GAME IN. -->
+                <div id="mode-select" class="menu-select">
+                    <h1 id="mode-select-prompt" class="menu-select-prompt text-shadow">
+                        Select how you'd like to play
+                    </h1>
+
+                    <div id="mode-local" class="menu-select-option"><div class="menu-select-option-content">
+                        <div class="menu-select-text">Local</div>
+                        <img class="menu-select-icon" src="/res/mode_local.[ver].svg" alt="Play locally" />
+                    </div></div>
+
+                    <div id="mode-computer" class="menu-select-option"><div class="menu-select-option-content">
+                        <div class="menu-select-text">Computer</div>
+                        <img class="menu-select-icon" src="/res/mode_computer.[ver].svg" alt="Play the computer" />
+                    </div></div>
+
+                    <div id="mode-online" class="menu-select-option"><div class="menu-select-option-content">
+                        <div class="menu-select-text">Online</div>
+                        <img class="menu-select-icon" src="/res/mode_online.[ver].svg" alt="Play online" />
+                    </div></div>
+
+                    <div id="mode-friend" class="menu-select-option"><div class="menu-select-option-content">
+                        <div class="menu-select-text">Friend</div>
+                        <img class="menu-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
+                    </div></div>
+
+                    <br/>
+                    <div id="mode-select-description" class="menu-select-description text-shadow">
+                        <span id="mode-select-description-text" class="menu-select-description-text"></span>
                     </div>
                 </div>
 
-                <div id="computer-medium" class="menu-select-option option-loading">
-                    <div class="menu-select-option-content">
-                        <div class="menu-select-text">Medium</div>
-                        <img class="menu-select-icon" src="/res/mode_computer_medium.[ver].svg"
-                             alt="Play the medium difficulty of the computer" />
+                <!-- SELECT DIFFICULTY OF COMPUTER. -->
+                <div id="computer-select" class="menu-select">
+                    <h1 id="computer-select-prompt" class="menu-select-prompt text-shadow">
+                        Select the difficulty of your opponent
+                    </h1>
+
+                    <div id="computer-easy" class="menu-select-option option-loading">
+                        <div class="menu-select-option-content">
+                            <div class="menu-select-text">Easy</div>
+                            <img class="menu-select-icon" src="/res/mode_computer_easy.[ver].svg"
+                                 alt="Play the easy difficulty of the computer" />
+                        </div>
+                        <div class="loading-spinner green-loading-spinner">
+                            <include src="client/game/loading_spinner.html" />
+                        </div>
                     </div>
-                    <div class="loading-spinner orange-loading-spinner">
-                        <include src="client/game/loading_spinner.html" />
+
+                    <div id="computer-medium" class="menu-select-option option-loading">
+                        <div class="menu-select-option-content">
+                            <div class="menu-select-text">Medium</div>
+                            <img class="menu-select-icon" src="/res/mode_computer_medium.[ver].svg"
+                                 alt="Play the medium difficulty of the computer" />
+                        </div>
+                        <div class="loading-spinner orange-loading-spinner">
+                            <include src="client/game/loading_spinner.html" />
+                        </div>
+                    </div>
+
+                    <div id="computer-hard" class="menu-select-option option-loading">
+                        <div class="menu-select-option-content">
+                            <div class="menu-select-text">Hard</div>
+                            <img class="menu-select-icon" src="/res/mode_computer_hard.[ver].svg"
+                                 alt="Play the hard difficulty of the computer" />
+                        </div>
+                        <div class="loading-spinner red-loading-spinner">
+                            <include src="client/game/loading_spinner.html" />
+                        </div>
+                    </div>
+
+                    <div id="computer-extreme" class="menu-select-option option-loading">
+                        <div class="menu-select-option-content">
+                            <div class="menu-select-text">Extreme</div>
+                            <img class="menu-select-icon" src="/res/mode_computer_panda.[ver].svg"
+                                 alt="Play the hardest difficulty of the computer" />
+                        </div>
+                        <div class="loading-spinner blue-loading-spinner">
+                            <include src="client/game/loading_spinner.html" />
+                        </div>
+                    </div>
+
+                    <br/>
+                    <div id="computer-select-description" class="menu-select-description text-shadow">
+                        <span id="computer-select-description-text" class="menu-select-description-text"></span>
                     </div>
                 </div>
 
-                <div id="computer-hard" class="menu-select-option option-loading">
-                    <div class="menu-select-option-content">
-                        <div class="menu-select-text">Hard</div>
-                        <img class="menu-select-icon" src="/res/mode_computer_hard.[ver].svg"
-                             alt="Play the hard difficulty of the computer" />
-                    </div>
-                    <div class="loading-spinner red-loading-spinner">
-                        <include src="client/game/loading_spinner.html" />
-                    </div>
-                </div>
-
-                <div id="computer-extreme" class="menu-select-option option-loading">
-                    <div class="menu-select-option-content">
-                        <div class="menu-select-text">Extreme</div>
-                        <img class="menu-select-icon" src="/res/mode_computer_panda.[ver].svg"
-                             alt="Play the hardest difficulty of the computer" />
-                    </div>
-                    <div class="loading-spinner blue-loading-spinner">
-                        <include src="client/game/loading_spinner.html" />
-                    </div>
-                </div>
-
-                <br/>
-                <div id="computer-select-description" class="menu-select-description text-shadow">
-                    <span id="computer-select-description-text" class="menu-select-description-text"></span>
+                <div id="play">
+                    <img data-src="/res/button_play.[ver]" alt="Play The Royal Game of Ur" />
                 </div>
             </div>
 
-            <div id="play">
-                <img data-src="/res/button_play.[ver]" alt="Play The Royal Game of Ur" />
+            <!-- WAITING FOR A FRIEND SCREEN -->
+            <div id="waiting-for-friend" style="display: none">
+                <label for="waiting-for-friend-link">Send your friend this link</label>
+                <div class="flex-break"></div>
+                <input id="waiting-for-friend-link" type="text" value="" readonly="readonly" />
+                <button onclick="copyText('waiting-for-friend-link');this.textContent='Copied';">Copy</button>
+            </div>
+
+            <!-- WIN SCREEN -->
+            <div id="win" style="display: none">
+                <div id="winner-message">
+                    Light wins!
+                </div>
+                <div id="win-mode-again-button" class="text-button">
+                    Play another Game
+                </div>
+                <div id="win-home-button" class="text-button">
+                    Back to Home
+                </div>
+            </div>
+
+            <!-- BOARD -->
+            <canvas id="board" style="display: none"></canvas>
+            <canvas id="tiles" style="display: none"></canvas>
+
+            <!-- SCORES -->
+            <canvas id="left-tiles" class="score" style="display: none"></canvas>
+            <canvas id="left-score" class="score" style="display: none"></canvas>
+            <canvas id="right-tiles" class="score" style="display: none"></canvas>
+            <canvas id="right-score" class="score" style="display: none"></canvas>
+
+            <!-- DICE -->
+            <canvas id="dice" style="display: none"></canvas>
+
+            <!-- OVERLAY -->
+            <canvas id="overlay" style="display: none"></canvas>
+
+            <!-- NETWORK STATUS -->
+            <div id="network-status" class="network-status" style="display: none">Connecting...</div>
+
+            <!-- ANNOUNCEMENTS -->
+            <div id="message-container" class="message-container" style="display: none">
+                <div id="message">
+                    <div id="message-title">No moves</div>
+                    <div id="message-subtitle">All moves are blocked</div>
+                </div>
+                <a id="join-discord" href="https://discord.gg/FbCp76esgb"
+                   target="_blank" rel="noopener" style="display: none">
+                    <img class="shadow" src="/res/join_the_discord.[ver].svg" alt="Join the Discord!" />
+                </a>
+                <a id="star-github" href="https://github.com/Sothatsit/RoyalUrClient"
+                   target="_blank" rel="noopener" style="display: none">
+                    <img class="shadow" src="/res/star_on_github.[ver].svg" alt="Star on GitHub!" />
+                </a>
             </div>
         </div>
 
-        <!-- WAITING FOR A FRIEND SCREEN -->
-        <div id="waiting-for-friend" style="display: none">
-            <label for="waiting-for-friend-link">Send your friend this link</label>
-            <div class="flex-break"></div>
-            <input id="waiting-for-friend-link" type="text" value="" readonly="readonly" />
-            <button onclick="copyText('waiting-for-friend-link');this.textContent='Copied';">Copy</button>
-        </div>
-
-        <!-- WIN SCREEN -->
-        <div id="win" style="display: none">
-            <div id="winner-message">
-                Light wins!
-            </div>
-            <div id="win-mode-again-button" class="text-button">
-                Play another Game
-            </div>
-            <div id="win-home-button" class="text-button">
-                Back to Home
-            </div>
-        </div>
-
-        <!-- BOARD -->
-        <canvas id="board" style="display: none"></canvas>
-        <canvas id="tiles" style="display: none"></canvas>
-
-        <!-- SCORES -->
-        <canvas id="left-tiles" class="score" style="display: none"></canvas>
-        <canvas id="left-score" class="score" style="display: none"></canvas>
-        <canvas id="right-tiles" class="score" style="display: none"></canvas>
-        <canvas id="right-score" class="score" style="display: none"></canvas>
-
-        <!-- DICE -->
-        <canvas id="dice" style="display: none"></canvas>
-
-        <!-- OVERLAY -->
-        <canvas id="overlay" style="display: none"></canvas>
-
-        <!-- NETWORK STATUS -->
-        <div id="network-status" class="network-status" style="display: none">Connecting...</div>
-
-        <!-- ANNOUNCEMENTS -->
-        <div id="message-container" class="message-container" style="display: none">
-            <div id="message">
-                <div id="message-title">No moves</div>
-                <div id="message-subtitle">All moves are blocked</div>
-            </div>
-            <a id="join-discord" href="https://discord.gg/FbCp76esgb"
-               target="_blank" rel="noopener" style="display: none">
-                <img class="shadow" src="/res/join_the_discord.[ver].svg" alt="Join the Discord!" />
-            </a>
-            <a id="star-github" href="https://github.com/Sothatsit/RoyalUrClient"
-               target="_blank" rel="noopener" style="display: none">
-                <img class="shadow" src="/res/star_on_github.[ver].svg" alt="Star on GitHub!" />
-            </a>
-        </div>
-
-        <!-- CREDITS -->
-        <div id="credits" style="display: none">
-            <div id="created-by"><a href="https://github.com/Sothatsit" target="_blank" rel="noopener">
-                Created by Paddy Lamont
-            </a></div>
-        </div>
-
-        <!-- CONTROLS -->
-        <div id="controls" style="display: none">
-            <div id="exit-control" class="control">
-                <img class="exit-icon control-icon" src="/res/control_exit.[ver].svg" alt="Exit" />
-            </div>
-            <a id="learn-control" class="control" href="/rules" target="_blank">
-                <img class="question-mark-icon control-icon" src="/res/control_learn.[ver].svg" alt="Learn" />
-            </a>
-            <div id="settings-control" class="control">
-                <img class="settings-icon control-icon" src="/res/control_settings.[ver].svg" alt="Settings" />
-            </div>
-            <a id="github-control" class="control" href="https://github.com/Sothatsit/RoyalUrClient" target="_blank">
-                <img class="github-icon control-icon" src="/res/control_github.[ver].svg" alt="GitHub" />
-            </a>
-            <a id="discord-control" class="control" href="https://discord.gg/FbCp76esgb" target="_blank">
-                <img class="discord-icon control-icon" src="/res/control_discord.[ver].svg" alt="Discord" />
-            </a>
-        </div>
+        <!-- Footer -->
+        <include src="client/common/footer/footer_full_width.html" />
 
         <!-- JavaScript that doesn't need to be running straight away. -->
         <script src="/game/index.[ver].js"></script>

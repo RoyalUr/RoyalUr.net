@@ -11,10 +11,8 @@ const SCREEN_LOADING = "screen_loading",
 
 const MENU_VISIBLE_SCREENS = [SCREEN_MENU],
       GAME_VISIBLE_SCREENS = [SCREEN_GAME, SCREEN_WIN],
-      NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME],
-      CREDITS_HIDDEN_SCREENS = [SCREEN_LOADING];
+      NETWORK_CONNECTED_SCREENS = [SCREEN_CONNECTING, SCREEN_WAITING_FOR_FRIEND, SCREEN_GAME];
 
-const controlFadeDuration = 0.25;
 const screenState = {
     screen: SCREEN_LOADING,
     lastScreenSwitchTime: LONG_TIME_AGO,
@@ -32,21 +30,10 @@ const screenState = {
     boardFade: new Fade(0.5),
     connectionFade: new Fade(2, 0.5),
     waitingForFriendFade: new Fade(0.5, 0.5),
-    creditsFade: new Fade(0.25),
     winFade: new Fade(0.5),
-
-    discordControlFade: new Fade(controlFadeDuration),
-    githubControlFade: new Fade(controlFadeDuration),
-    settingsControlFade: new Fade(controlFadeDuration),
-    learnControlFade: new Fade(controlFadeDuration),
-    exitControlFade: new Fade(controlFadeDuration),
 
     socialsFade: new Fade(2.5, 0.5)
 };
-const allControlFades = [
-    screenState.discordControlFade, screenState.githubControlFade,
-    screenState.settingsControlFade, screenState.learnControlFade, screenState.exitControlFade
-];
 
 const screenRequiredLoadingStages = {};
 screenRequiredLoadingStages[SCREEN_LOADING] = -1;
@@ -55,21 +42,6 @@ screenRequiredLoadingStages[SCREEN_CONNECTING] = 1;
 screenRequiredLoadingStages[SCREEN_WAITING_FOR_FRIEND] = 1;
 screenRequiredLoadingStages[SCREEN_GAME] = 1;
 screenRequiredLoadingStages[SCREEN_WIN] = 1;
-
-const screenActiveControlFades = {};
-(() => {
-    const DISCORD = screenState.discordControlFade,
-          GITHUB = screenState.githubControlFade,
-          LEARN = screenState.learnControlFade,
-          EXIT = screenState.exitControlFade;
-
-    screenActiveControlFades[SCREEN_LOADING] = [];
-    screenActiveControlFades[SCREEN_MENU] = [DISCORD, LEARN, EXIT];
-    screenActiveControlFades[SCREEN_CONNECTING] = [DISCORD, GITHUB, EXIT];
-    screenActiveControlFades[SCREEN_WAITING_FOR_FRIEND] = [DISCORD, GITHUB, EXIT];
-    screenActiveControlFades[SCREEN_GAME] = [DISCORD, LEARN, EXIT];
-    screenActiveControlFades[SCREEN_WIN] = [DISCORD, LEARN, EXIT];
-})();
 
 function registerScreenHandler(screens, handler, handlersList) {
     screens = (typeof screens === 'string' || screens instanceof String ? [screens] : screens);
@@ -136,42 +108,6 @@ function isOnScreen(screens) {
     return false;
 }
 
-function getVisibleControlFades() {
-    const fades = [];
-    for (let index = 0; index < allControlFades.length; ++index) {
-        const fade = allControlFades[index];
-        if (fade.isFadeIn()) {
-            fades.push(fade);
-        }
-    }
-    return fades;
-}
-
-function setVisibleControlButtons(controlFades, hasty) {
-    const previousFades = getVisibleControlFades(),
-          fadeDuration = (hasty ? 0 : undefined);
-    // Fade out all controls that are not visible any more.
-    for (let index = 0; index < allControlFades.length; ++index) {
-        const fade = allControlFades[index];
-        if (!controlFades.includes(fade)) {
-            fade.fadeOut(fadeDuration);
-        }
-    }
-    // Fade out the controls that are going to change position.
-    for (let index = 0; index < controlFades.length; ++index) {
-        const fade = controlFades[index];
-        if (controlFades.length - index !== previousFades.length - previousFades.indexOf(fade)) {
-            fade.fadeOut(fadeDuration);
-        }
-    }
-    // Fade in all the controls after the controls have faded out.
-    const additionalFadeInDelay = (screenState.screen === SCREEN_MENU && screenState.useStaggeredMenuFade ? 0.5 : 0);
-    setTimeout(() => {
-        for (let index = 0; index < controlFades.length; ++index) {
-            controlFades[index].fadeIn(fadeDuration);
-        }
-    }, (controlFadeDuration + (additionalFadeInDelay ? additionalFadeInDelay : 0)) * 1000);
-}
 
 function switchToScreen(screen, hasty) {
     const fromScreen = screenState.screen;
@@ -203,7 +139,6 @@ function setScreen(screen, hasty) {
 
     screenState.screen = screen;
     screenState.lastScreenSwitchTime = getTime();
-    setVisibleControlButtons(screenActiveControlFades[screen], hasty);
     fireScreenHandlers(fromScreen, screen, !!hasty);
 }
 
@@ -242,11 +177,6 @@ registerScreenEnterHandler(SCREEN_WIN, onEnterWinScreen);
 registerScreenExitHandler(NETWORK_CONNECTED_SCREENS, disconnect);
 registerScreenTransitionHandlers(MENU_VISIBLE_SCREENS, onEnterSimpleBgScreen, onExitSimpleBgScreen)
 registerScreenTransitionHandlers(SCREEN_GAME, onEnterGameScreen, onExitGameScreen);
-registerScreenTransitionHandlers(
-    CREDITS_HIDDEN_SCREENS,
-    (_1, _2, hasty) => screenState.creditsFade.fadeOut(hasty ? 0 : undefined),
-    (_1, _2, hasty) => screenState.creditsFade.fadeIn(hasty ? 0 : undefined)
-);
 
 
 function onEnterMenuScreen() {

@@ -163,19 +163,7 @@ html {
     filter: drop-shadow(2px 2px 3px rgba(255, 255, 255, 0.4));
 }
 
-#footer-container {
-    display: block;
-    width: 100%;
-    background: #151A1F;
-}
-#footer {
-    display: inline-block;
-    background: none;
+
+#footer-full-width {
     box-shadow: none;
-    width: 100%;
-    margin: 0;
-    padding-bottom: 0;
-}
-#footer-text {
-    float: left;
 }

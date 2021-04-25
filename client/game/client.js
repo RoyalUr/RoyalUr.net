@@ -136,11 +136,6 @@ function onPlayClicked(event) {
     }
 }
 
-function onSettingsControlClick(event) {
-    event.stopPropagation();
-    console.log("settings control clicked");
-}
-
 function onExitClick(event) {
     event.stopPropagation();
 

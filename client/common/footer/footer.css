@@ -1,7 +1,12 @@
 /** This file contains the CSS for styling the footer of the website. **/
 
-#footer {
+#footer,
+#footer-full-width {
     display: block;
+    background: #151A1F;
+    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
+}
+#footer {
     box-sizing: border-box;
     max-width: 900px;
     padding: 0.5em;
@@ -12,8 +17,6 @@
 
     font-size: 1.5em;
     text-align: left;
-    background: #151A1F;
-    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
 }
 #footer-links {
     display: inline-block;
@@ -49,4 +52,18 @@
 #footer a.social-icon.twitter-icon img {
     margin-bottom: 4px;
     margin-right: -4px;
+}
+
+
+/** CSS for when the footer should take up the full width of the page. **/
+#footer-full-width {
+    width: 100%;
+}
+#footer-full-width #footer {
+    display: inline-block;
+    background: none;
+    box-shadow: none;
+    width: 100%;
+    margin: 0;
+    padding-bottom: 0;
 }

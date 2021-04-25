@@ -12,20 +12,8 @@
 
 
 function redrawMenu() {
-    creditsDiv.style.opacity = screenState.creditsFade.get();
     networkStatus.hidden = false;
     gameSetupMenu.redraw();
-
-    let totalControlFades = 0;
-    for (let index = 0; index < allControlFades.length; ++index) {
-        totalControlFades += allControlFades[index].get();
-    }
-    controlsDiv.style.display = (totalControlFades > 0 ? "block" : "none");
-    discordControlButton.style.opacity = screenState.discordControlFade.get();
-    githubControlButton.style.opacity = screenState.githubControlFade.get();
-    settingsControlButton.style.opacity = screenState.settingsControlFade.get();
-    learnControlButton.style.opacity = screenState.learnControlFade.get();
-    exitControlButton.style.opacity = screenState.exitControlFade.get();
 
     if (isOnScreen(SCREEN_CONNECTING)) {
         if (networkStatus.connected) {

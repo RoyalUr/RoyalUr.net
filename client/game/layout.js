@@ -4,14 +4,9 @@
 
 const maxWidthOnHeightRatio = 1.5;
 
-const gameSetupMenu = new GameSetupMenu();
+const gameDiv = document.getElementById("game");
 
-const controlsDiv = document.getElementById("controls"),
-      discordControlButton = document.getElementById("discord-control"),
-      githubControlButton = document.getElementById("github-control"),
-      settingsControlButton = document.getElementById("settings-control"),
-      learnControlButton = document.getElementById("learn-control"),
-      exitControlButton = document.getElementById("exit-control");
+const gameSetupMenu = new GameSetupMenu();
 
 const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
       waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
@@ -41,8 +36,6 @@ const messageContainerElement = document.getElementById("message-container"),
 const overlayCanvas = document.getElementById("overlay"),
       overlayCtx = overlayCanvas.getContext("2d");
 
-const creditsDiv = document.getElementById("credits");
-
 let width = NaN,
     height = NaN,
     useWidth = NaN,
@@ -59,8 +52,6 @@ let mouseDown = false,
     draggedTile = VEC_NEG1;
 
 function setupMenuElements() {
-    settingsControlButton.addEventListener("click", onSettingsControlClick);
-    exitControlButton.addEventListener("click", onExitClick);
     winBackToHomeButton.addEventListener("click", onExitClick);
     winPlayAgainButton.addEventListener("click", () => switchToScreen(SCREEN_MENU));
 
@@ -108,8 +99,8 @@ function setupGameElements() {
     document.onmousemove = function(event) {
         if (!game) return;
         updateMouse(vec(
-            fromScreenPixels(event.clientX) - tilesLeft,
-            fromScreenPixels(event.clientY) - tilesTop
+            fromScreenPixels(event.clientX - gameLeft) - tilesLeft,
+            fromScreenPixels(event.clientY - gameTop) - tilesTop
         ));
     };
     document.body.onmousedown = function(event) {
@@ -132,8 +123,8 @@ function setupGameElements() {
         if (!game || event.touches.length !== 1) return;
         const touch = event.touches[0];
         updateMouse(vec(
-            fromScreenPixels(touch.clientX) - tilesLeft,
-            fromScreenPixels(touch.clientY) - tilesTop
+            fromScreenPixels(touch.clientX - gameLeft) - tilesLeft,
+            fromScreenPixels(touch.clientY - gameTop) - tilesTop
         ));
         event.preventDefault();
     };
@@ -144,8 +135,8 @@ function setupGameElements() {
         } else if (mouseDown) return;
         const touch = event.touches[0];
         updateMouse(vec(
-            fromScreenPixels(touch.clientX) - tilesLeft,
-            fromScreenPixels(touch.clientY) - tilesTop
+            fromScreenPixels(touch.clientX - gameLeft) - tilesLeft,
+            fromScreenPixels(touch.clientY - gameTop) - tilesTop
         ), true);
 
         if (!game) return;
@@ -177,8 +168,9 @@ function screenPixels(size) {
 }
 
 function resize() {
-    width = Math.round(document.documentElement.clientWidth * window.devicePixelRatio);
-    height = Math.round(document.documentElement.clientHeight * window.devicePixelRatio);
+    const boundingBox = gameDiv.getBoundingClientRect();
+    width = Math.round(boundingBox.width * window.devicePixelRatio);
+    height = Math.round(boundingBox.height * window.devicePixelRatio);
     centreLeft = Math.round(width / 2);
     centreTop = Math.round(height / 2);
     useWidth = width;
@@ -204,6 +196,9 @@ function resize() {
 const boardPadding = 30,
       tileWidthRatio = 0.75;
 
+let gameLeft = NaN,
+    gameTop = NaN;
+
 let boardCanvasWidth = NaN,
     boardCanvasHeight = NaN,
     boardCanvasLeft = NaN,
@@ -225,6 +220,10 @@ let boardWidthToHeightRatio = null,
     tileWidth = null;
 
 function resizeBoard() {
+    const boundingBox = gameDiv.getBoundingClientRect();
+    gameLeft = boundingBox.left;
+    gameTop = boundingBox.top;
+
     boardCanvasHeight = useHeight;
     boardCanvasWidth = Math.ceil((useHeight - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
     boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);

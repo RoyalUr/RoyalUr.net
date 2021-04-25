@@ -1,10 +1,7 @@
-/* Stop users scrolling */
-html { overflow: hidden; }
-body {
-    overflow: auto;
+html, body {
     scroll-behavior: smooth;
+    min-height: 100vh;
 }
-html, body { height: 100%; }
 canvas { position: absolute; }
 #top {
     position: static;
@@ -12,6 +9,17 @@ canvas { position: absolute; }
     top: 0;
     width: 0;
     height: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+#game {
+    display: block;
+    position: relative;
+    width: 100%;
+    flex-grow: 1;
 }
 
 /*
@@ -90,7 +98,6 @@ canvas { position: absolute; }
  */
 #menu {
     width: 100%;
-    min-height: 100vh;
     padding: 2vh 0;
     box-sizing: border-box;
 }
@@ -485,32 +492,6 @@ canvas { position: absolute; }
     z-index: 9;
 
     pointer-events: none;
-}
-
-
-
-/*
- *  CREDITS
- */
-#credits {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    z-index: 50;
-    vertical-align: baseline;
-}
-#created-by {
-    padding: 10px;
-    padding-bottom: 6px;
-    font-family: DuranGo, sans-serif;
-    font-size: 2.5vh;
-    text-shadow: black 0 0 10px;
-}
-#created-by a {
-    display: inline-block;
-    text-decoration: none;
-    color: white;
-    cursor: pointer;
 }
 
 

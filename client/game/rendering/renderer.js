@@ -51,10 +51,7 @@ function redraw(forceRedraw) {
 
         updateElementVisibilities([
             gameSetupMenu.elem, winDiv, boardCanvas, tilesCanvas,
-            diceCanvas, creditsDiv, waitingForFriendDiv,
-            discordControlButton, githubControlButton,
-            settingsControlButton, learnControlButton,
-            exitControlButton, messageContainerElement,
+            diceCanvas, waitingForFriendDiv, messageContainerElement,
             joinDiscordElement, starGithubElement,
             leftPlayerRenderTarget.tilesCanvas,
             leftPlayerRenderTarget.scoreCanvas,
