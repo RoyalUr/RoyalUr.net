@@ -59,7 +59,7 @@ const stagedResources = [
 function getStageLoadingMessage(stage) {
     if (stage >= 1)
         return "Fetching Game Assets...";
-    return "The Royal Ur is Loading...";
+    return "Royal Ur is Loading...";
 }
 
 

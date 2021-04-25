@@ -1,0 +1,194 @@
+/*
+ *  MENU
+ */
+#menu {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 900px;
+    padding: 0.5em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    margin: 1em;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+
+    font-family: Nunito, sans-serif;
+    font-size: 1.4em;
+    background-color: rgb(32, 41, 48);
+    box-shadow: 0 0 10px 5px rgba(0,0,0,1);
+    color: white;
+    text-align: center;
+}
+
+.menu-button {
+    margin: auto;
+    cursor: pointer;
+}
+.menu-button canvas {
+    margin: auto;
+    position: relative;
+}
+#watch-button, #watch-button canvas, #learn-button, #learn-button canvas {
+    display: block;
+    vertical-align: middle;
+}
+.menu-select {
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.menu-select-prompt {
+    color: white;
+    font-family: DuranGo, serif;
+    font-size: 1.4em;
+    margin-bottom: 0.2em;
+    text-align: left;
+}
+.menu-select.inactive .menu-select-prompt {
+    opacity: 0.5;
+    transition: opacity 0.2s ease-in-out;
+}
+.menu-select-option {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    padding: 2vmin 3vmin;
+    text-align: center;
+}
+.menu-select-option-content {
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+
+    opacity: 0.5;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+}
+.menu-select-option.option-loading .menu-select-option-content {
+    opacity: 0.3;
+}
+.menu-select-option .loading-spinner {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+.menu-select-option.option-loading .loading-spinner {
+    opacity: 1;
+}
+.menu-select.inactive .menu-select-option-content {
+    opacity: 0.3;
+}
+.menu-select .option-loading .menu-select-option-content {
+    opacity: 0.3;
+    transform: scale(0.9);
+}
+.menu-select .option-unsupported .menu-select-option-content {
+    opacity: 0.2;
+    transform: scale(0.9);
+}
+.menu-select .option-hovered .menu-select-option-content {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.menu-select .option-selected .menu-select-option-content {
+    opacity: 1;
+}
+.menu-select-description-text {
+    opacity: 1;
+    color: white;
+    white-space: nowrap;
+    font-family: Nunito, sans-serif;
+    font-size: 0.7em;
+    transition: opacity 0.1s ease-in-out;
+}
+/** If on mobile, always put the description on the next line. **/
+@media (max-aspect-ratio: 3/4) {
+    .menu-select-description-text {
+        display: block;
+        font-size: 0.65em;
+    }
+}
+.menu-select-description-text.option-loading {
+    color: rgb(240, 164, 255);
+}
+.menu-select-description-text.option-unsupported {
+    color: rgb(255, 128, 128);
+}
+
+.menu-select-option {
+    width: 14vw;
+    height: 14vw;
+}
+@media (min-aspect-ratio: 7/5) {
+    .menu-select-option {
+        width: 14vh;
+        height: 14vh;
+    }
+}
+@media (max-aspect-ratio: 3/4) {
+    .menu-select-option {
+        width: 26vw;
+        height: 26vw;
+        padding-left: 7vw;
+        padding-right: 7vw;
+    }
+}
+
+.menu-select-text {
+    font-family: Nunito, sans-serif;
+    font-weight: 600;
+    font-size: 1em;
+    text-shadow: 0 0 20px rgb(0, 0, 0);
+    color: white;
+    white-space: pre;
+}
+.menu-select-option.option-loading .menu-select-text {
+    color: rgb(150, 150, 150);
+}
+.menu-select-option.option-unsupported .menu-select-text {
+    color: rgb(255, 130, 130);
+    text-decoration: line-through;
+}
+
+/* Specific menu select options have different icon sizes. */
+.menu-select-icon {
+    padding-top: 0;
+    width: 80%;
+}
+#mode-local .menu-select-icon {
+    padding-top: 1%;
+    width: 85%;
+}
+#mode-online .menu-select-icon {
+    padding-top: 0;
+    width: 80%;
+}
+#mode-computer .menu-select-icon {
+    padding-top: 5%;
+    width: 75%;
+}
+#mode-friend .menu-select-icon {
+    padding-top: 0;
+    width: 75%;
+}
+#computer-easy.menu-select-icon {
+    padding-top: 2%;
+    width: 75%;
+}
+#computer-medium.menu-select-icon {
+    padding-top: 1%;
+    width: 77.5%;
+}
+
+#play {
+    display: inline-block;
+    height: 12vh;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+#play img {
+    width: auto;
+    height: 100%;
+    filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
+}
+#play:hover img {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+}

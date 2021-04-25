@@ -19,7 +19,7 @@
         <include src="client/common/matomo.html" />
         <link rel="stylesheet" href="/game/index.[ver].css" />
     </head>
-    <body class="simple-background">
+    <body class="wood-background">
         <a id="top"></a>
 
         <!-- Header -->
@@ -28,7 +28,7 @@
         <!-- Game -->
         <div id="game">
             <!-- LOADING SCREEN -->
-            <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c;z-index:100">
+            <div id="loading" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#13181c">
                 <div id="loading-bar"></div>
                 <span id="loading-text">Royal Ur is Loading...</span>
                 <svg id="loading-wheel" viewBox="0 0 100 100">
@@ -47,8 +47,12 @@
                 <!-- SELECT MODE TO PLAY THE GAME IN. -->
                 <div id="mode-select" class="menu-select">
                     <h1 id="mode-select-prompt" class="menu-select-prompt text-shadow">
-                        Select how you'd like to play
+                        Game Type:
+                        <span id="mode-select-description-text" class="menu-select-description-text">
+                            Select a Game Type
+                        </span>
                     </h1>
+                    <hr/>
 
                     <div id="mode-local" class="menu-select-option"><div class="menu-select-option-content">
                         <div class="menu-select-text">Local</div>
@@ -69,18 +73,17 @@
                         <div class="menu-select-text">Friend</div>
                         <img class="menu-select-icon" src="/res/mode_friend.[ver].svg" alt="Play a friend" />
                     </div></div>
-
-                    <br/>
-                    <div id="mode-select-description" class="menu-select-description text-shadow">
-                        <span id="mode-select-description-text" class="menu-select-description-text"></span>
-                    </div>
                 </div>
 
                 <!-- SELECT DIFFICULTY OF COMPUTER. -->
                 <div id="computer-select" class="menu-select">
                     <h1 id="computer-select-prompt" class="menu-select-prompt text-shadow">
-                        Select the difficulty of your opponent
+                        Difficulty:
+                        <span id="computer-select-description-text" class="menu-select-description-text">
+                            Select a Difficulty
+                        </span>
                     </h1>
+                    <hr/>
 
                     <div id="computer-easy" class="menu-select-option option-loading">
                         <div class="menu-select-option-content">
@@ -124,11 +127,6 @@
                         <div class="loading-spinner blue-loading-spinner">
                             <include src="client/game/loading_spinner.html" />
                         </div>
-                    </div>
-
-                    <br/>
-                    <div id="computer-select-description" class="menu-select-description text-shadow">
-                        <span id="computer-select-description-text" class="menu-select-description-text"></span>
                     </div>
                 </div>
 

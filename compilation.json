@@ -30,6 +30,7 @@
       "client/common/footer/footer.css",
       "client/common/header/header.css",
       "client/game/game.css",
+      "client/game/menu.css",
       "client/game/loading_spinner.css"
     ],
     "articles.css": [

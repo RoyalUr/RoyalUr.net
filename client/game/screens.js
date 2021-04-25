@@ -149,11 +149,6 @@ function maybeSwitchOffLoadingScreen(stage) {
     setScreen(screenState.loadingTargetScreen, false);
     screenState.loadingTargetScreen = null;
     screenState.loadingTargetStage = 0;
-
-    // Otherwise this can break when loading directly into a game.
-    if (!isOnScreen(MENU_VISIBLE_SCREENS)) {
-        onExitSimpleBgScreen();
-    }
 }
 
 
@@ -175,25 +170,12 @@ registerScreenEnterHandler(SCREEN_WAITING_FOR_FRIEND, onEnterWaitingForFriendScr
 registerScreenEnterHandler(SCREEN_CONNECTING, onEnterConnectingScreen);
 registerScreenEnterHandler(SCREEN_WIN, onEnterWinScreen);
 registerScreenExitHandler(NETWORK_CONNECTED_SCREENS, disconnect);
-registerScreenTransitionHandlers(MENU_VISIBLE_SCREENS, onEnterSimpleBgScreen, onExitSimpleBgScreen)
 registerScreenTransitionHandlers(SCREEN_GAME, onEnterGameScreen, onExitGameScreen);
 
 
 function onEnterMenuScreen() {
     resetHash();
     resetGameSetup();
-}
-
-function onEnterSimpleBgScreen() {
-    setTimeout(() => {
-        document.body.classList.add("simple-background");
-        document.body.classList.remove("wood-background");
-    }, 1000);
-}
-
-function onExitSimpleBgScreen() {
-    document.body.classList.remove("simple-background");
-    document.body.classList.add("wood-background");
 }
 
 function onEnterWaitingForFriendScreen() {

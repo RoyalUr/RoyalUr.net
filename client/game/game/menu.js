@@ -123,7 +123,6 @@ GameSetupMenu.prototype.updateStates = function() {
 function MenuSelectElem(idPrefix, options, loadingDesc, unsupportedDesc, allUnsupportedDesc) {
     this.__class_name__ = "MenuSelectElem";
     this.elem = document.getElementById(idPrefix + "-select");
-    this.description = document.getElementById(idPrefix + "-select-description");
     this.descriptionText = document.getElementById(idPrefix + "-select-description-text");
     this.descriptionFade = new Fade(0.2);
 
@@ -195,14 +194,16 @@ MenuSelectElem.prototype.updateDesc = function() {
         state = OPT_UNSUPPORTED;
     }
 
-    this.descriptionText.innerHTML = desc;
+    if (desc !== "") {
+        this.descriptionText.innerHTML = desc;
+    }
     this.descriptionFade.fade(showDesc);
     setElementClass(this.descriptionText, "option-loading", state === OPT_LOADING);
     setElementClass(this.descriptionText, "option-unsupported", state === OPT_UNSUPPORTED);
     setElementClass(this.elem, "inactive", !!selectedOption);
 };
 MenuSelectElem.prototype.redraw = function() {
-    this.description.style.opacity = this.descriptionFade.get();
+    this.descriptionText.style.opacity = this.descriptionFade.get();
 };
 
 
