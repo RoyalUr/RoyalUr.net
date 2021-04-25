@@ -102,7 +102,6 @@
 @media (max-aspect-ratio: 3/4) {
     .menu-select-description-text {
         display: block;
-        font-size: 0.65em;
     }
 }
 .menu-select-description-text.option-loading {
@@ -115,6 +114,8 @@
 .menu-select-option {
     width: 14vw;
     height: 14vw;
+    max-width: 120px;
+    max-height: 120px;
 }
 @media (min-aspect-ratio: 7/5) {
     .menu-select-option {

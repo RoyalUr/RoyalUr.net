@@ -14,11 +14,6 @@ body, html {
 body {
     font-size: 0.8rem;
 }
-@media (max-aspect-ratio: 7/5) {
-    body {
-        font-size: 0.7rem;
-    }
-}
 
 body,
 body.webp.gradient-background,
