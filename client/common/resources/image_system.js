@@ -141,17 +141,17 @@ DynamicButton.prototype.forceRedraw = function() {
     this.forceRedraw = true;
 }
 DynamicButton.prototype.redraw = function() {
+    // Get the image to be drawn.
     const image = (this.hovered ? this.hoverImage : this.image);
-
-    // Clear the canvas.
-    if (!this.forceRedraw && !this.isDrawn && !isImageLoaded(image))
+    if (!isImageLoaded(image))
         return;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.isDrawn = false;
 
-    // Draw the image.
+    // Check if we need to redraw the button.
     if (!this.forceRedraw && this.isDrawn && this.isDrawnHovered === this.hovered)
         return;
+
+    // Redraw the button.
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
 
     this.forceRedraw = false;
