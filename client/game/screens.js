@@ -26,7 +26,7 @@ const screenState = {
 
     loadingFade: new Fade(0.5).visible(),
     menuFade: new Fade(0.5),
-    learnFade: new Fade(0.5),
+    gameControlsFade: new Fade(0.5),
     boardFade: new Fade(0.5),
     connectionFade: new Fade(2, 0.5),
     waitingForFriendFade: new Fade(0.5, 0.5),
@@ -64,22 +64,25 @@ function registerScreenTransitionHandlers(screens, enterHandler, exitHandler) {
     registerScreenExitHandler(screens, exitHandler);
 }
 
-function registerScreenTransitionFade(screens, fade, enterDelay) {
+function _addFadeHandlerDelay(screens, handler, delay, isExit) {
+    if (!delay)
+        return handler;
+
+    return (fromScreen, toScreen, hasty) => setTimeout(() => {
+        if (!!isOnScreen(screens) === !isExit) {
+            handler(fromScreen, toScreen, hasty);
+        }
+    }, hasty ? 0 : delay);
+}
+
+function registerScreenTransitionFade(screens, fade, enterDelay, exitDelay) {
     const fadeInHandler = (_1, _2, hasty) => fade.fadeIn(hasty ? 0 : undefined),
           fadeOutHandler = (_1, _2, hasty) => fade.fadeOut(hasty ? 0 : undefined);
 
-    // Some screens need a delay for the previous screen to fade out before this screen fades in.
-    let enterHandler = fadeInHandler;
-    if (enterDelay) {
-        enterHandler = (_1, _2, hasty) => setTimeout(() => {
-            if (isOnScreen(screens)) {
-                fadeInHandler();
-            }
-        }, hasty ? 0 : enterDelay);
-    }
-
     registerScreenTransitionHandlers(
-        screens, enterHandler, fadeOutHandler
+        screens,
+        _addFadeHandlerDelay(screens, fadeInHandler, enterDelay),
+        _addFadeHandlerDelay(screens, fadeOutHandler, exitDelay, true)
     )
 }
 
@@ -161,8 +164,9 @@ registerScreenTransitionFade(SCREEN_WAITING_FOR_FRIEND, screenState.waitingForFr
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.connectionFade, 0, "connectionFade");
 registerScreenTransitionFade(SCREEN_CONNECTING, screenState.socialsFade);
 registerScreenTransitionFade(SCREEN_WIN, screenState.winFade);
-registerScreenTransitionFade(MENU_VISIBLE_SCREENS, screenState.menuFade, 500);
-registerScreenTransitionFade(GAME_VISIBLE_SCREENS, screenState.boardFade, 500);
+registerScreenTransitionFade(MENU_VISIBLE_SCREENS, screenState.menuFade, 600);
+registerScreenTransitionFade(GAME_VISIBLE_SCREENS, screenState.boardFade, 600);
+registerScreenTransitionFade(SCREEN_GAME, screenState.gameControlsFade, 0, 600);
 
 registerScreenEnterHandler(SCREEN_LOADING, redrawLoadingBar);
 registerScreenEnterHandler(SCREEN_MENU, onEnterMenuScreen);
@@ -175,7 +179,6 @@ registerScreenTransitionHandlers(SCREEN_GAME, onEnterGameScreen, onExitGameScree
 
 function onEnterMenuScreen() {
     resetHash();
-    resetGameSetup();
 }
 
 function onEnterWaitingForFriendScreen() {

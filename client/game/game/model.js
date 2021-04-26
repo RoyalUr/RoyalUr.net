@@ -20,16 +20,10 @@ const GAME_MODE_LOCAL = "game_mode_local",
       GAME_MODE_ONLINE = "game_mode_online",
       GAME_MODE_FRIEND = "game_mode_friend";
 
-const defaultGameSetup = {
+const gameSetup = {
     mode: null,
     difficulty: null
 };
-const gameSetup = {};
-resetGameSetup();
-
-function resetGameSetup() {
-    Object.assign(gameSetup, defaultGameSetup);
-}
 
 
 

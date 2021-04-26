@@ -139,13 +139,6 @@ function onPlayClicked(event) {
 function onExitClick(event) {
     event.stopPropagation();
 
-    // Instead of taking the user back to the game selection screen,
-    // we'd rather just take them back to the site's home page.
-    if (isOnScreen([SCREEN_MENU, SCREEN_GAME, SCREEN_WIN])) {
-        window.location.href = "/";
-        return;
-    }
-
     const message = getExitConfirmation();
     if (message && !window.confirm(message))
         return;

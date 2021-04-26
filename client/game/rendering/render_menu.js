@@ -12,6 +12,11 @@
 
 
 function redrawMenu() {
+    const gameControlsFade = screenState.gameControlsFade.get();
+    controlsDiv.style.opacity = gameControlsFade;
+    headerDiv.style.opacity = 1 - gameControlsFade;
+    footerDiv.style.opacity = 1 - gameControlsFade;
+
     networkStatus.hidden = false;
     gameSetupMenu.redraw();
 

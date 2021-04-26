@@ -50,7 +50,8 @@ function redraw(forceRedraw) {
         callRedraw(STAT_OVERLAY, redrawOverlay);
 
         updateElementVisibilities([
-            gameSetupMenu.elem, winDiv, boardCanvas, tilesCanvas,
+            gameSetupMenu.elem, headerDiv, footerDiv,
+            controlsDiv, winDiv, boardCanvas, tilesCanvas,
             diceCanvas, waitingForFriendDiv, messageContainerElement,
             joinDiscordElement, starGithubElement,
             leftPlayerRenderTarget.tilesCanvas,

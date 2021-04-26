@@ -62,6 +62,8 @@
     "lost.css": [
       "client/common/font_nunito.css",
       "client/common/base.css",
+      "client/common/footer/footer.css",
+      "client/common/header/header.css",
       "client/status/lost.css"
     ]
   },

@@ -1,34 +1,35 @@
 body {
-    font-size: 1em;
+    display: flex;
+    flex-direction: column;
 }
-
-body * {
-    font-family: Nunito, sans-serif;
-    color: white;
+#content {
+    display: block;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 100%;
     text-align: center;
 }
-
-h1 {
-    width: 100%;
-    font-size: 20em;
+#content h1,
+#content h2,
+#content a {
+    font-family: Nunito, sans-serif;
+    color: white;
+}
+#content h1 {
+    font-size: 18em;
     letter-spacing: 0.25em;
     margin-bottom: 0;
 }
-
-h2 {
+#content h2 {
     font-size: 2em;
-    margin-bottom: 2.75em;
+    margin-bottom: 4.5rem;
 }
-
-a {
-    width: 100%;
+#content a {
+    display: inline-block;
     text-decoration: none;
-    margin-bottom: 3em;
-}
 
-.text-button {
+    font-size: 3em;
+    margin-bottom: 4rem;
     border-radius: 0.2em;
     padding: 0.1em 0.3em;
-    font-size: 3em;
-    margin-bottom: 0;
 }

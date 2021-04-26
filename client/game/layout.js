@@ -8,6 +8,16 @@ const gameDiv = document.getElementById("game");
 
 const gameSetupMenu = new GameSetupMenu();
 
+const controlsDiv = document.getElementById("controls"),
+      discordControlButton = document.getElementById("discord-control"),
+      githubControlButton = document.getElementById("github-control"),
+      settingsControlButton = document.getElementById("settings-control"),
+      learnControlButton = document.getElementById("learn-control"),
+      exitControlButton = document.getElementById("exit-control");
+
+const headerDiv = document.getElementById("header-full-width"),
+      footerDiv = document.getElementById("footer-full-width");
+
 const waitingForFriendDiv = document.getElementById("waiting-for-friend"),
       waitingForFriendLinkTextBox = document.getElementById("waiting-for-friend-link");
 
@@ -43,6 +53,9 @@ let width = NaN,
     centreLeft = NaN,
     centreTop = NaN;
 
+let gameLeft = NaN,
+    gameTop = NaN;
+
 let mouseLoc = VEC_NEG1,
     hoveredTile = VEC_NEG1;
 
@@ -52,6 +65,7 @@ let mouseDown = false,
     draggedTile = VEC_NEG1;
 
 function setupMenuElements() {
+    exitControlButton.addEventListener("click", onExitClick);
     winBackToHomeButton.addEventListener("click", onExitClick);
     winPlayAgainButton.addEventListener("click", () => switchToScreen(SCREEN_MENU));
 
@@ -65,7 +79,25 @@ function setupMenuElements() {
         }
     });
 
-    window.onresize = () => {window.requestAnimationFrame(resize);};
+    window.requestAnimationFrame(detectResize);
+}
+
+function detectGameSize() {
+    const boundingBox = gameDiv.getBoundingClientRect();
+    return {
+        left: Math.round(boundingBox.left),
+        top: Math.round(boundingBox.top),
+        width: Math.round(boundingBox.width * window.devicePixelRatio),
+        height: Math.round(boundingBox.height * window.devicePixelRatio)
+    };
+}
+
+function detectResize() {
+    const size = detectGameSize();
+    if (size.width !== width || size.height !== height || size.left !== gameLeft || size.top !== gameTop) {
+        resize();
+    }
+    window.requestAnimationFrame(detectResize);
 }
 
 function setupGameElements() {
@@ -168,9 +200,12 @@ function screenPixels(size) {
 }
 
 function resize() {
-    const boundingBox = gameDiv.getBoundingClientRect();
-    width = Math.round(boundingBox.width * window.devicePixelRatio);
-    height = Math.round(boundingBox.height * window.devicePixelRatio);
+    const size = detectGameSize();
+    gameLeft = size.left;
+    gameTop = size.top;
+    width = size.width;
+    height = size.height;
+
     centreLeft = Math.round(width / 2);
     centreTop = Math.round(height / 2);
     useWidth = width;
@@ -196,9 +231,6 @@ function resize() {
 const boardPadding = 30,
       tileWidthRatio = 0.75;
 
-let gameLeft = NaN,
-    gameTop = NaN;
-
 let boardCanvasWidth = NaN,
     boardCanvasHeight = NaN,
     boardCanvasLeft = NaN,
@@ -220,10 +252,6 @@ let boardWidthToHeightRatio = null,
     tileWidth = null;
 
 function resizeBoard() {
-    const boundingBox = gameDiv.getBoundingClientRect();
-    gameLeft = boundingBox.left;
-    gameTop = boundingBox.top;
-
     boardCanvasHeight = useHeight;
     boardCanvasWidth = Math.ceil((useHeight - 2 * boardPadding) / getBoardWidthToHeightRatio()) + 2 * boardPadding;
     boardCanvasLeft = centreLeft - Math.round(boardCanvasWidth / 2);
