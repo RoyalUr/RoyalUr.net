@@ -19,7 +19,7 @@ let computerWorker = null,
 function loadComputerWorker() {
     if (computerWorker == null && !computerUnsupported) {
         try {
-            computerWorker = new Worker("/game/simulation.[ver].js");
+            computerWorker = new Worker("/game/computer_worker.[ver].js");
             computerWorker.onmessage = onComputerWorkerMessage;
         } catch (e) {
             computerUnsupported = true;

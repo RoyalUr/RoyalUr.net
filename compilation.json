@@ -103,7 +103,7 @@
       "client/game/screens.js",
       "client/game/client.js"
     ],
-    "game/simulation.js": [
+    "game/computer_worker.js": [
       "client/common/utils.js",
       "client/game/network/packet_reader.js",
       "client/game/network/packet_writer.js",
@@ -111,7 +111,8 @@
       "client/game/network/ai_packets.js",
       "client/game/game/board.js",
       "res/royal_ur_analysis/api.js",
-      "client/game/game/simulation.js"
+      "client/game/game/simulation.js",
+      "client/game/game/computer_worker.js"
     ],
     "game/resources.js": [
       "client/common/utils.js",
