@@ -1,8 +1,11 @@
 #content {
-    font-size: 1.8em;
+    font-size: 1.5em;
 }
 #content p {
     font-size: 0.9em;
+}
+#content #capture-pieces {
+    margin-top: 1em;
 }
 #content img {
     max-width: 100%;
