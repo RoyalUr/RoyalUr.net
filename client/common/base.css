@@ -1,3 +1,22 @@
+@font-face {
+    font-family: 'DuranGo';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/res/font_durango.[ver].ttf") format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Nunito Regular'), local('Nunito-Regular'), url("/res/font_nunito.[ver].woff2") format('woff2');
+    font-display: swap;
+}
+
+
+
+
 * {
     padding: 0;
     margin: 0;

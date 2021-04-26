@@ -15,8 +15,6 @@
   },
   "css": {
     "index.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/home/github_corner.css",
@@ -24,8 +22,6 @@
       "client/home/home_background.css"
     ],
     "game/index.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
@@ -34,16 +30,12 @@
       "client/game/loading_spinner.css"
     ],
     "articles.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
       "client/articles/base/article.css"
     ],
     "rules/index.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
@@ -51,8 +43,6 @@
       "client/articles/rules.css"
     ],
     "about/index.css": [
-      "client/common/font_durango.css",
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
@@ -60,7 +50,6 @@
       "client/articles/about.css"
     ],
     "lost.css": [
-      "client/common/font_nunito.css",
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
