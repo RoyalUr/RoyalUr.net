@@ -110,7 +110,7 @@ function DynamicButton(canvas, src, srcHover) {
     this.image.src = src;
     this.hoverImage.src = srcHover;
 
-    this.forceRedraw = false;
+    this.nextRedrawForced = false;
     this.isDrawn = false;
     this.isDrawnHovered = false;
 }
@@ -136,9 +136,10 @@ DynamicButton.prototype.resize = function() {
         this.canvas.width = width;
         this.canvas.height = height;
     }
+    this.forceRedraw();
 };
 DynamicButton.prototype.forceRedraw = function() {
-    this.forceRedraw = true;
+    this.nextRedrawForced = true;
 }
 DynamicButton.prototype.redraw = function() {
     // Get the image to be drawn.
@@ -147,14 +148,14 @@ DynamicButton.prototype.redraw = function() {
         return;
 
     // Check if we need to redraw the button.
-    if (!this.forceRedraw && this.isDrawn && this.isDrawnHovered === this.hovered)
+    if (!this.nextRedrawForced && this.isDrawn && this.isDrawnHovered === this.hovered)
         return;
 
     // Redraw the button.
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
 
-    this.forceRedraw = false;
+    this.nextRedrawForced = false;
     this.isDrawn = true;
     this.isDrawnHovered = this.hovered;
 };
