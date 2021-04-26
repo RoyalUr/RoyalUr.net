@@ -15,6 +15,33 @@ function getOrDefault(dict, key, defaultValue) {
     return (value ? value : defaultValue);
 }
 
+
+//
+// DOM INTERACTION
+//
+
+/** Sets the opacity of an element, and if that opacity is 0 sets the element to display: none. **/
+function setElemOpacity(elem, opacity) {
+    setElemStyle(elem, "opacity", opacity);
+    setElemStyle(elem, "display", opacity <= 0 ? "none" : "");
+}
+
+/** Sets a style of an element, only if it has changed. **/
+function setElemStyle(elem, style, value) {
+    let previousStyles = elem.royalUrPreviousStyles;
+    if (!previousStyles) {
+        previousStyles = {};
+        elem.royalUrPreviousStyles = previousStyles;
+    }
+
+    // Avoid updating the style if we do not need to.
+    if (previousStyles[style] === value)
+        return;
+
+    elem.style[style] = value;
+    previousStyles[style] = value;
+}
+
 function setSuperClass(subclass, superclass) {
     subclass.prototype = Object.create(superclass.prototype);
     Object.defineProperty(subclass.prototype, "constructor", {

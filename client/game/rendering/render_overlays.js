@@ -14,8 +14,8 @@ function redrawMessage() {
     const messageFade = message.fade.get();
     messageTitleElement.textContent = message.title;
     messageSubtitleElement.textContent = message.subtitle;
-    messageSubtitleElement.style.display = (message.subtitle.length === 0 ? "none" : "");
-    messageContainerElement.style.opacity = messageFade;
+    setElemStyle(messageSubtitleElement, "display", (message.subtitle.length === 0 ? "none" : ""));
+    setElemOpacity(messageContainerElement, messageFade);
 
     // When messages cannot be dismissed, they should not block access to the controls.
     if (messageFade === 0 || message.dismissable) {
@@ -26,8 +26,8 @@ function redrawMessage() {
 
     const socialsOpacity = max(0, 2.5 * screenState.socialsFade.get() - 1.5);
     if (socialsOpacity <= 0) {
-        joinDiscordElement.style.opacity = 0;
-        starGithubElement.style.opacity = 0;
+        setElemOpacity(joinDiscordElement, 0);
+        setElemOpacity(starGithubElement, 0);
         return;
     }
 
@@ -38,11 +38,11 @@ function redrawMessage() {
         opacity = socialsOpacity * (value < ratio ? value : (1 - value < ratio ? 1 - value : ratio)) / ratio;
 
     if (transitionValue < 1) {
-        joinDiscordElement.style.opacity = opacity;
-        starGithubElement.style.opacity = 0;
+        setElemOpacity(joinDiscordElement, opacity);
+        setElemOpacity(starGithubElement, 0);
     } else {
-        joinDiscordElement.style.opacity = 0;
-        starGithubElement.style.opacity = opacity;
+        setElemOpacity(joinDiscordElement, 0);
+        setElemOpacity(starGithubElement, opacity);
     }
 }
 
@@ -54,12 +54,8 @@ function redrawMessage() {
 
 function redrawOverlay() {
     // If we don't have to draw to the canvas, just don't display it at all
-    if (fireworks.length === 0 && particles.birthTime.length === 0) {
-        overlayCanvas.style.display = "none";
-        return;
-    } else {
-        overlayCanvas.style.display = "";
-    }
+    const overlayIsEmpty = (fireworks.length === 0 && particles.birthTime.length === 0);
+    setElemStyle(overlayCanvas, "display", overlayIsEmpty ? "none" : "");
 
     overlayCtx.clearRect(0, 0, overlayWidth, overlayHeight);
 

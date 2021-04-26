@@ -2,23 +2,6 @@
 // This file stores all rendering logic for the game.
 //
 
-function updateElementVisibilities(elements) {
-    for (let index = 0; index < elements.length; ++index) {
-        let element = elements[index];
-
-        if (!element) {
-            console.error("Missing updateElementVisibilities element " + index);
-            continue;
-        }
-
-        if (element.style.opacity === "0") {
-            element.style.display = "none";
-        } else {
-            element.style.display = "";
-        }
-    }
-}
-
 function redrawLoop() {
     redraw(false);
     window.requestAnimationFrame(redrawLoop);
@@ -48,16 +31,5 @@ function redraw(forceRedraw) {
         callRedraw(STAT_MESSAGE, redrawMessage);
         callRedraw(STAT_WIN_SCREEN, redrawWinScreen);
         callRedraw(STAT_OVERLAY, redrawOverlay);
-
-        updateElementVisibilities([
-            gameSetupMenu.elem, headerDiv, footerDiv,
-            controlsDiv, winDiv, boardCanvas, tilesCanvas,
-            diceCanvas, waitingForFriendDiv, messageContainerElement,
-            joinDiscordElement, starGithubElement,
-            leftPlayerRenderTarget.tilesCanvas,
-            leftPlayerRenderTarget.scoreCanvas,
-            rightPlayerRenderTarget.tilesCanvas,
-            rightPlayerRenderTarget.scoreCanvas
-        ]);
     });
 }

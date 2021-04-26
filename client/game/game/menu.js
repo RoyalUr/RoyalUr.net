@@ -93,20 +93,17 @@ GameSetupMenu.prototype.redraw = function() {
     this.computerFade.fade(selectedMode && selectedMode.name === "computer");
     this.playFade.fade(selectedMode && (selectedMode.name !== "computer" || selectedComputer))
 
-    this.elem.style.opacity = screenState.menuFade.get();
-    this.computerSelect.elem.style.opacity = this.computerFade.get();
-    this.playButton.style.opacity = this.playFade.get();
+    setElemOpacity(this.elem, screenState.menuFade.get());
+    setElemOpacity(this.computerSelect.elem, this.computerFade.get());
+    setElemOpacity(this.playButton, this.playFade.get());
 
     this.modeSelect.redraw();
     this.computerSelect.redraw();
-
-    updateElementVisibilities([this.computerSelect.elem, this.playButton]);
 };
 GameSetupMenu.prototype.resize = function() {
     // Nothing to do.
 };
 GameSetupMenu.prototype.reset = function() {
-    resetGameSetup();
     this.modeSelect.clearSelected();
     this.computerSelect.clearSelected();
 };
@@ -203,7 +200,7 @@ MenuSelectElem.prototype.updateDesc = function() {
     setElementClass(this.elem, "inactive", !!selectedOption);
 };
 MenuSelectElem.prototype.redraw = function() {
-    this.descriptionText.style.opacity = this.descriptionFade.get();
+    setElemOpacity(this.descriptionText, this.descriptionFade.get());
 };
 
 

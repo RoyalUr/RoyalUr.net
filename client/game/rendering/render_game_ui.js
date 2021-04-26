@@ -204,11 +204,7 @@ function redrawDice(forceRedraw) {
         return;
 
     const canBeRolled = (dice.active && !dice.rolling && ownPlayer.active);
-    if(canBeRolled) {
-        diceCanvas.style.cursor = "pointer";
-    } else {
-        diceCanvas.style.cursor = "";
-    }
+    setElemStyle(diceCanvas, "cursor", canBeRolled ? "pointer" : "");
 
     diceCtx.save();
 

@@ -13,9 +13,9 @@
 
 function redrawMenu() {
     const gameControlsFade = screenState.gameControlsFade.get();
-    controlsDiv.style.opacity = gameControlsFade;
-    headerDiv.style.opacity = 1 - gameControlsFade;
-    footerDiv.style.opacity = 1 - gameControlsFade;
+    setElemOpacity(controlsDiv, gameControlsFade);
+    setElemOpacity(headerDiv, 1 - gameControlsFade);
+    setElemOpacity(footerDiv, 1 - gameControlsFade);
 
     networkStatus.hidden = false;
     gameSetupMenu.redraw();
@@ -33,13 +33,13 @@ function redrawMenu() {
           one = clamp(boardFade * 2, 0, 1),
           two = clamp(boardFade * 2 - 1, 0, 1);
 
-    boardCanvas.style.opacity = one;
-    tilesCanvas.style.opacity = one;
-    diceCanvas.style.opacity = two;
-    leftPlayerRenderTarget.scoreCanvas.style.opacity = two;
-    leftPlayerRenderTarget.tilesCanvas.style.opacity = two;
-    rightPlayerRenderTarget.scoreCanvas.style.opacity = two;
-    rightPlayerRenderTarget.tilesCanvas.style.opacity = two;
+    setElemOpacity(boardCanvas, one);
+    setElemOpacity(tilesCanvas, one);
+    setElemOpacity(diceCanvas, two);
+    setElemOpacity(leftPlayerRenderTarget.scoreCanvas, two);
+    setElemOpacity(leftPlayerRenderTarget.tilesCanvas, two);
+    setElemOpacity(rightPlayerRenderTarget.scoreCanvas, two);
+    setElemOpacity(rightPlayerRenderTarget.tilesCanvas, two);
 }
 
 
@@ -57,9 +57,7 @@ function getRenderedLoadingStage() {
 }
 
 function redrawLoading() {
-    const opacity = screenState.loadingFade.get();
-    loadingDiv.style.opacity = opacity;
-    loadingDiv.style.display = (opacity === 0 ? "none" : "")
+    setElemOpacity(loadingDiv, screenState.loadingFade.get());
     if (screenState.loadingFade.isFadeIn()) {
         loadingTextSpan.textContent = getStageLoadingMessage(getRenderedLoadingStage());
     }
@@ -67,7 +65,7 @@ function redrawLoading() {
 
 function redrawLoadingBar() {
     const stage = getRenderedLoadingStage();
-    loadingBar.element.style.width = (resourceLoader.getPercentageLoaded(stage) * 100) + "%";
+    setElemStyle(loadingBar.element, "width", (resourceLoader.getPercentageLoaded(stage) * 100) + "%");
 }
 
 
@@ -77,8 +75,7 @@ function redrawLoadingBar() {
 //
 
 function redrawNetworkStatus() {
-    networkStatusElement.style.display = (networkStatus.hidden ? "none" : "block");
-    networkStatusElement.style.opacity = networkStatus.fade.get();
+    setElemOpacity(networkStatusElement, networkStatus.hidden ? 0 : networkStatus.fade.get())
     networkStatusElement.textContent = getNetworkStatus();
 }
 
@@ -89,11 +86,11 @@ function redrawNetworkStatus() {
 //
 
 function renderWaitingForFriendScreen() {
-    waitingForFriendDiv.style.opacity = screenState.waitingForFriendFade.get();
+    setElemOpacity(waitingForFriendDiv, screenState.waitingForFriendFade.get());
 }
 
 function redrawWinScreen() {
-    winDiv.style.opacity = screenState.winFade.get();
+    setElemOpacity(winDiv, screenState.winFade.get());
     if (isOnScreen(SCREEN_WIN)) {
         spawnWinFireworks();
     }
