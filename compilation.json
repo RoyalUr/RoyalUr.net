@@ -123,6 +123,7 @@
     "client/.htaccess": ".htaccess",
     "client/robots.txt": "robots.txt",
     "res/social/banner.jpg": "banner.jpg",
+    "res/gameplay.mp4": "gameplay.mp4",
     "res/font/DuranGo.ttf": "res/font_durango.ttf",
     "res/font/Nunito.woff2": "res/font_nunito.woff2",
     "res/audio/game_found.mp4": "res/game_found.mp4",
