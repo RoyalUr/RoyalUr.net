@@ -31,6 +31,7 @@ If you're interested in The Royal Game of Ur, we have a [Discord](https://discor
 and a [Reddit](https://www.reddit.com/r/GameofUr/) that you might want to check out! These are
 both good places to talk about the game, its strategies, and see cool board recreations that
 people have made! The Discord is also a great place to find strong opponents to challenge!
+We also post updates about the game on our [Twitter](https://twitter.com/royalur_net).
 
 <p float="left">
   <a href="https://discord.gg/Ea49VVru5N">
@@ -38,6 +39,9 @@ people have made! The Discord is also a great place to find strong opponents to 
   </a>
   <a href="https://www.reddit.com/r/GameofUr/">
     <img src="https://royalur.net/res/reddit.svg" height="64" valign="middle" />
+  </a>
+  <a href="https://twitter.com/royalur_net">
+    <img src="https://royalur.net/res/twitter.svg" height="52" valign="middle" />
   </a>
   <a href="https://royalur.net">
     <img src="https://royalur.net/favicon.png" height="64" valign="middle" />
