@@ -2,8 +2,8 @@
 // This file manages the loading of resources for article pages.
 //
 
-function ArticleResourceLoader() {
-    ResourceLoader.call(this, null);
+function ArticleResourceLoader(staged_resources) {
+    ResourceLoader.call(this, staged_resources);
     this.__class_name__ = "ArticleResourceLoader";
 }
 setSuperClass(ArticleResourceLoader, ResourceLoader);
@@ -21,10 +21,3 @@ ArticleResourceLoader.prototype.getEffectiveScreenSize = function() {
           multiplier = 1 + 2 * (effectiveDevicePixelRatio - 1);
     return vec(1280 * multiplier, 720 * multiplier);
 };
-
-
-const resourceLoader = new ArticleResourceLoader(),
-      imageSystem = new ImageSystem(resourceLoader);
-
-imageSystem.populateDynamicImages();
-imageSystem.loadDynamicButtons();

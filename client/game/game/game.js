@@ -1,5 +1,5 @@
 //
-// This file stores the logic for controlling the game.
+// This file stores the logic for controlling games.
 //
 
 const NO_MOVES_DURATION = 2,

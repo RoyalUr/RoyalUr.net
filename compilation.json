@@ -9,6 +9,7 @@
     "client/game/game.html": "game/index.html",
     "client/articles/rules.html": "rules/index.html",
     "client/articles/watch.html": "watch/index.html",
+    "client/articles/dice/dice.html": "dice/index.html",
     "client/articles/privacy.html": "privacy/index.html",
     "client/articles/about.html": "about/index.html",
     "client/status/lost.html": "lost.html"
@@ -26,8 +27,8 @@
       "client/common/footer/footer.css",
       "client/common/header/header.css",
       "client/game/game.css",
-      "client/game/menu.css",
-      "client/game/loading_spinner.css"
+      "client/game/ui/menu.css",
+      "client/game/ui/loading_spinner.css"
     ],
     "articles.css": [
       "client/common/base.css",
@@ -41,6 +42,13 @@
       "client/common/header/header.css",
       "client/articles/base/article.css",
       "client/articles/rules.css"
+    ],
+    "dice/index.css": [
+      "client/common/base.css",
+      "client/common/footer/footer.css",
+      "client/common/header/header.css",
+      "client/articles/base/article.css",
+      "client/articles/dice/dice.css"
     ],
     "about/index.css": [
       "client/common/base.css",
@@ -68,7 +76,8 @@
       "client/game/analytics/analytics.js",
       "client/game/analytics/stats.js",
       "client/game/game/board.js",
-      "client/game/game/model.js",
+      "client/game/model/model.js",
+      "client/game/model/dice_model.js",
 
       "client/game/network/packet_reader.js",
       "client/game/network/packet_writer.js",
@@ -78,8 +87,8 @@
       "client/game/network/network.js",
       "client/game/game/game.js",
 
-      "client/game/game/menu.js",
-      "client/game/layout.js",
+      "client/game/ui/menu.js",
+      "client/game/ui/layout.js",
 
       "client/game/rendering/particles.js",
       "client/game/rendering/curves.js",
@@ -87,9 +96,10 @@
       "client/game/rendering/render_menu.js",
       "client/game/rendering/render_overlays.js",
       "client/game/rendering/render_game_ui.js",
+      "client/game/rendering/render_dice.js",
       "client/game/rendering/render_board.js",
 
-      "client/game/screens.js",
+      "client/game/ui/screens.js",
       "client/game/client.js"
     ],
     "game/computer_worker.js": [
@@ -115,7 +125,20 @@
       "client/common/utils.js",
       "client/common/resources/resource_loader.js",
       "client/common/resources/image_system.js",
-      "client/articles/base/article_resources.js"
+      "client/articles/base/article_resources.js",
+      "client/articles/base/articles.js"
+    ],
+    "dice/index.js": [
+      "client/common/utils.js",
+      "client/common/resources/resource_loader.js",
+      "client/common/resources/audio_system.js",
+      "client/common/resources/image_system.js",
+      "client/common/resources/resource_types.js",
+      "client/articles/base/article_resources.js",
+
+      "client/game/model/dice_model.js",
+      "client/game/rendering/render_dice.js",
+      "client/articles/dice/dice.js"
     ]
   },
 
@@ -257,6 +280,16 @@
         "u_1440": "auto x auto",
         "u_1080": "auto x auto",
         "u_720": "auto x auto"
+      }
+    },
+    "res/stick_dice.png": {
+      "dest": "res/stick_dice",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "960 x auto",
+        "u_1440": "640 x auto",
+        "u_1080": "480 x auto",
+        "u_720": "320 x auto"
       }
     },
 

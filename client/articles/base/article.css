@@ -45,13 +45,16 @@ body {
     text-decoration: none;
     color: white;
 }
+#content h1,
+#content h2,
+#content h3,
+#content hr {
+    clear: both;
+}
 #content h1 {
     font-size: 1.5em;
     margin-top: 0.2em;
     margin-bottom: 0.15em;
-}
-#content hr {
-    margin-bottom: 0.6em;
 }
 #content h2 {
     font-family: DuranGo, serif;
@@ -62,6 +65,9 @@ body {
 #content h3 {
     text-decoration: underline;
     font-size: 1.2em;
+}
+#content hr {
+    margin-bottom: 0.6em;
 }
 #content p {
     font-size: 1em;

@@ -9,8 +9,6 @@ const gameDiv = document.getElementById("game");
 const gameSetupMenu = new GameSetupMenu();
 
 const controlsDiv = document.getElementById("controls"),
-      discordControlButton = document.getElementById("discord-control"),
-      githubControlButton = document.getElementById("github-control"),
       settingsControlButton = document.getElementById("settings-control"),
       learnControlButton = document.getElementById("learn-control"),
       exitControlButton = document.getElementById("exit-control");
@@ -87,8 +85,8 @@ function detectGameSize() {
     return {
         left: Math.round(boundingBox.left),
         top: Math.round(boundingBox.top),
-        width: Math.round(boundingBox.width * window.devicePixelRatio),
-        height: Math.round(boundingBox.height * window.devicePixelRatio)
+        width: Math.ceil(boundingBox.width * window.devicePixelRatio),
+        height: Math.ceil(boundingBox.height * window.devicePixelRatio)
     };
 }
 
@@ -196,7 +194,7 @@ function fromScreenPixels(size) {
 }
 
 function screenPixels(size) {
-    return Math.round(toScreenPixels(size)) + "px";
+    return Math.floor(toScreenPixels(size)) + "px";
 }
 
 function resize() {
@@ -287,7 +285,7 @@ function getTileWidth() {
     if (isNaN(boardCanvasWidth))
         return 1;
     if (tileWidth)
-        return Math.round(tileWidth * boardWidth);
+        return Math.ceil(tileWidth * boardWidth);
 
     const regions = getBoardTileRegions();
 
@@ -307,7 +305,7 @@ function getTileWidth() {
 
     tileWidth = tileWidthRatio * cumulativeTileWidth / tilesRecordedCount;
 
-    return Math.round(tileWidth * boardWidth);
+    return Math.ceil(tileWidth * boardWidth);
 }
 
 function getBoardWidthToHeightRatio() {
@@ -544,12 +542,12 @@ let diceLeft = NaN,
     diceHeight = NaN;
 
 function resizeDice() {
-    const space = Math.round(getTileWidth() * diceWidthRatio);
+    const space = Math.ceil(getTileWidth() * diceWidthRatio);
 
     diceWidth = 4 * space;
-    diceHeight = 3 * space;
-    diceCanvas.width = diceWidth;
-    diceCanvas.height = diceHeight;
+    diceHeight = 2.2 * space;
+    diceCanvas.width = diceWidth + 1;
+    diceCanvas.height = diceHeight + 1;
     diceCanvas.style.width = screenPixels(diceWidth);
     diceCanvas.style.height = screenPixels(diceHeight);
 
@@ -580,8 +578,8 @@ let overlayWidth = NaN,
     overlayHeight = NaN;
 
 function resizeOverlay() {
-    overlayWidth = Math.round(width / 3);
-    overlayHeight = Math.round(height / 3);
+    overlayWidth = Math.ceil(width / 3);
+    overlayHeight = Math.ceil(height / 3);
 
     overlayCanvas.width = overlayWidth;
     overlayCanvas.height = overlayHeight;

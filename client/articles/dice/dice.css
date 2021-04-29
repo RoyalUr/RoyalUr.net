@@ -1,0 +1,78 @@
+#dice-container, #stick-dice {
+    position: relative;
+    display: inline-block;
+    background-color: #1b2229;
+    border-radius: 1em;
+    margin-bottom: 1em;
+    overflow: hidden;
+}
+#dice-container {
+    padding: 1em 0.5em;
+}
+#dice {
+    width: 320px;
+    height: 176px;
+}
+#dice-prompt {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.3em 0.6em;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-top-right-radius: 1em;
+
+    color: white;
+    font-family: Nunito, sans-serif;
+}
+#stick-dice {
+    width: 320px;
+    height: auto;
+    margin-bottom: 2em;
+}
+/* Displays the next paragraph to the right of the dice. */
+@media (min-width: 700px) {
+    #dice-container {
+        float: right;
+        margin-left: 1em;
+    }
+
+    #stick-dice {
+        float: left;
+        margin-right: 1em;
+    }
+}
+
+#one-die {
+    display: inline-block;
+    float: right;
+    width: 70px;
+    height: auto;
+}
+#four-die {
+    display: inline-block;
+    float: right;
+    /* Removes the spacing between the images. */
+    font-size: 0;
+}
+#four-die img {
+    width: 60px;
+    height: auto;
+}
+
+.chance_6_25,
+.chance_25_0,
+.chance_37_5 {
+    display: inline-block;
+    background-color: white;
+    height: 1em;
+    margin: 0 0.4em;
+}
+.chance_6_25 {
+    width: 25px;
+}
+.chance_25_0 {
+    width: 100px;
+}
+.chance_37_5 {
+    width: 150px;
+}
