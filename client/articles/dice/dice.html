@@ -17,128 +17,141 @@
 </head>
 <body class="wood-background">
     <include src="client/common/header/header.html" />
-    <div id="content">
-        <h1>🎲 Dice used in The Royal Game of Ur</h1>
-        <hr/>
+    <article id="content">
+        <!-- About the dice used in the game. -->
+        <section>
+            <h1>🎲 Dice used in The Royal Game of Ur</h1>
+            <hr/>
 
-        <p>
-            In The Royal Game of Ur, even if you are losing, a few lucky rolls
-            at the right time could win you the game! This page goes through
-            the different types of dice used in the game, and the probabilities
-            of your rolls. Any set of four D2 dice can be used to play The Royal
-            Game of Ur, although tetrahedral dice are the most commonly used.
-            Here, D2 refers to the fact that the dice used have two equally likely
-            outcomes.
-        </p>
+            <p>
+                In The Royal Game of Ur, even if you are losing, a few lucky rolls
+                at the right time could win you the game! This page goes through
+                the different types of dice used in the game, and the probabilities
+                of your rolls. Any set of four D2 dice can be used to play The Royal
+                Game of Ur, although tetrahedral dice are the most commonly used.
+                Here, D2 refers to the fact that the dice used have two equally likely
+                outcomes.
+            </p>
 
-        <h2>Tetrahedral Dice</h2>
-        <div id="dice-container">
-            <include src="client/game/ui/dice.html" />
-            <span id="dice-prompt" style="display: none">Click to roll!</span>
-        </div>
-        <p>
-            The most commonly used dice when playing The Royal Game of Ur
-            are the tetrahedral dice, which are dice that are shaped like
-            triangle-based pyramids. Each die has two corners marked
-            with white, and two unmarked corners. After rolling the dice,
-            you can count the number of die with a marked corner facing
-            upwards to get your roll.
-        </p>
+            <h2>Tetrahedral Dice</h2>
+            <div id="dice-container">
+                <include src="client/game/ui/dice.html" />
+                <span id="dice-prompt" style="display: none">Click to roll!</span>
+            </div>
+            <p>
+                The most commonly used dice when playing The Royal Game of Ur
+                are the tetrahedral dice, which are dice that are shaped like
+                triangle-based pyramids. Each die has two corners marked
+                with white, and two unmarked corners. After rolling the dice,
+                you can count the number of die with a marked corner facing
+                upwards to get your roll.
+            </p>
 
-        <h2>Throwing Stick Dice</h2>
-        <img id="stick-dice" class="shadow" data-src="/res/stick_dice.[ver]" alt="Example Throwing Stick Dice" />
-        <p>
-            Throwing sticks are another type of dice that are commonly used
-            to play The Royal Game of Ur. Throwing stick dice are flat sticks
-            with one side marked. You can then throw the sticks and count the
-            number of sticks with their marked side up. Throwing stick dice
-            are commonly used in another ancient game,
-            <a href="https://en.wikipedia.org/wiki/Senet">Senet</a>,
-            which is another ancient game similar to The Royal Game of Ur.
-        </p>
+            <h2>Throwing Stick Dice</h2>
+            <img id="stick-dice" class="shadow" data-src="/res/stick_dice.[ver]" alt="Example Throwing Stick Dice" />
+            <p>
+                Throwing sticks are another type of dice that are commonly used
+                to play The Royal Game of Ur. Throwing stick dice are flat sticks
+                with one side marked. You can then throw the sticks and count the
+                number of sticks with their marked side up. Throwing stick dice
+                are commonly used in another ancient game,
+                <a href="https://www.ancientgames.org/aseb-game-20-squares/">Aseb</a>,
+                which is another ancient game that is very similar to The Royal
+                Game of Ur. These two games are so common that they actually both
+                share another name, which is The Game of 20 Squares.
+            </p>
+        </section>
 
-        <h2>Probability</h2>
-        <h3>One die</h3>
-        <img id="one-die" class="shadow" data-src="/res/dice_up1.[ver]" alt="Die with a marked corner up" />
-        <p>
-            When using a single die, there is a 50% chance that it will
-            land with its marked corner or side up. This means that for
-            each individual die, you have a 50/50 chance of getting a one.
-        </p>
-        <h3>Four dice</h3>
-        <div id="four-die">
-            <img class="shadow" data-src="/res/dice_down2.[ver]" alt="Die with a marked corner up" />
-            <img class="shadow" data-src="/res/dice_down1.[ver]" alt="Die with an unmarked corner up" />
-            <br/>
-            <img class="shadow" data-src="/res/dice_up3.[ver]" alt="Die with an unmarked corner up" />
-            <img class="shadow" data-src="/res/dice_down2.[ver]" alt="Die with an unmarked corner up" />
-        </div>
-        <p>
-            When using four dice, you have to count the results of the
-            four individual die. This means that it is possible to get
-            a total of 0, 1, 2, 3, or 4. The chances of each of these
-            possibilities is respectively 1, 4, 6, 4, and 1 out of 16.
-        </p>
-        <p>
-            This means that you have a 6.25% chance of rolling 0 or 4,
-            a 25% chance of rolling 1 or 3, and a 37.5% chance of
-            rolling a 2.
-        </p>
-        <p>
-            0: <span class="chance_6_25"></span> 6.25% <br/>
-            1: <span class="chance_25_0"></span> 25%   <br/>
-            2: <span class="chance_37_5"></span> 37.5% <br/>
-            3: <span class="chance_25_0"></span> 25%   <br/>
-            4: <span class="chance_6_25"></span> 6.25%
-        </p>
-        <p>
-            If you'd like to understand why these are the probabilities
-            of each roll, the user rodecss on slideshare made a great
-            presentation that goes into detail on calculating the
-            probability of each roll. Check it out
-            <a href="https://www.slideshare.net/rodecss/probability-in-and-ancient-game">here</a>.
-        </p>
+        <!-- About the probability of the dice used in the game. -->
+        <section>
+            <h2>Probability</h2>
+            <h3>One die</h3>
+            <img id="one-die" class="shadow" data-src="/res/dice_up1.[ver]" alt="Die with a marked corner up" />
+            <p>
+                When using a single die, there is a 50% chance that it will
+                land with its marked corner or side up. This means that for
+                each individual die, you have a 50/50 chance of getting a one.
+            </p>
+            <h3>Four dice</h3>
+            <div id="four-die">
+                <img class="shadow" data-src="/res/dice_down2.[ver]" alt="Die with a marked corner up" />
+                <img class="shadow" data-src="/res/dice_down1.[ver]" alt="Die with an unmarked corner up" />
+                <br/>
+                <img class="shadow" data-src="/res/dice_up3.[ver]" alt="Die with an unmarked corner up" />
+                <img class="shadow" data-src="/res/dice_down2.[ver]" alt="Die with an unmarked corner up" />
+            </div>
+            <p>
+                When using four dice, you have to count the results of the
+                four individual die. This means that it is possible to get
+                a total of 0, 1, 2, 3, or 4. The chances of each of these
+                possibilities is respectively 1, 4, 6, 4, and 1 out of 16.
+            </p>
+            <p>
+                This means that you have a 6.25% chance of rolling a 0,
+                a 25% chance of rolling a 1, a 37.5% chance of rolling
+                a 2, a 25% chance of rolling a 3, and a 6.25% chance
+                of rolling a 4.
+            </p>
+            <p>
+                0: <span class="chance_6_25"></span> 6.25% <br/>
+                1: <span class="chance_25_0"></span> 25%   <br/>
+                2: <span class="chance_37_5"></span> 37.5% <br/>
+                3: <span class="chance_25_0"></span> 25%   <br/>
+                4: <span class="chance_6_25"></span> 6.25%
+            </p>
+            <p>
+                If you'd like to understand why these are the probabilities
+                of each roll, the user rodecss on slideshare made a great
+                presentation that goes into detail on calculating the
+                probability of each roll. Check it out
+                <a href="https://www.slideshare.net/rodecss/probability-in-and-ancient-game">here</a>.
+            </p>
+        </section>
 
-        <h2>Strategy</h2>
-        <p>
-            Now that you know the probability of each roll is not the
-            same, you can likely anticipate that this affects the best
-            strategies to use while playing the game, and it does!
-            Here are some tips for picking the best moves,
-        </p>
-        <h3>1. Avoid two spaces in front of your opponent's pieces</h3>
-        <p>
-            Preferably, we'd avoid putting our own pieces in front of our
-            opponents all the time. Unfortunately though, sometimes you have to
-            make progress and move your pieces in front of your opponents.
-            If you have the option, it is safer to do this by placing your
-            pieces 1 or 3 tiles ahead of your opponent's piece, instead of
-            2. This will slightly reduce their chances of being able to take
-            your piece on their turn.
-        </p>
-        <p>
-            It is also valuable to note that if your piece is 4 tiles ahead of
-            your opponent's, it is very unlikely that they will be able to take
-            it! Therefore, instead of moving that piece maybe it would be better
-            to move a new piece onto the board, or develop your less advanced
-            pieces.
-        </p>
-        <h3>2. Place your pieces two spaces behind your opponent's</h3>
-        <p>
-            For the opposite reasons to point 1, if you are looking to take
-            one of your opponent's pieces, it is best to get your pieces
-            two spaces behind theirs. This will give you the best chance of
-            being able to take their piece on your next turn.
-        </p>
-        <h3>More Strategy</h3>
-        <p>
-            If you'd like to learn more about strategy in The Royal
-            Game of Ur, check out
-            <a href="https://github.com/Sothatsit/RoyalUrAnalysis/">RoyalUrAnalysis</a>.
-            It contains detailed analysis of different strategies for
-            playing The Royal Game of Ur through the use of AI.
-        </p>
-    </div>
+        <!-- About strategy that develops from these probabilities. -->
+        <section>
+            <h2>Strategy</h2>
+            <p>
+                Now that you know the probability of each roll is not the
+                same, you can likely anticipate that this affects the best
+                strategies to use while playing the game, and it does!
+                Here are some tips for picking the best moves,
+            </p>
+            <h3>1. Avoid two spaces in front of your opponent's pieces</h3>
+            <p>
+                Preferably, we'd avoid putting our own pieces in front of our
+                opponents all the time. Unfortunately though, sometimes you have to
+                make progress and move your pieces in front of your opponents.
+                If you have the option, it is safer to do this by placing your
+                pieces 1 or 3 tiles ahead of your opponent's piece, instead of
+                2. This will slightly reduce their chances of being able to take
+                your piece on their turn.
+            </p>
+            <p>
+                It is also valuable to note that if your piece is 4 tiles ahead of
+                your opponent's, it is very unlikely that they will be able to take
+                it! Therefore, instead of moving that piece maybe it would be better
+                to move a new piece onto the board, or develop your less advanced
+                pieces.
+            </p>
+            <h3>2. Place your pieces two spaces behind your opponent's</h3>
+            <p>
+                For the opposite reasons to point 1, if you are looking to take
+                one of your opponent's pieces, it is best to get your pieces
+                two spaces behind theirs. This will give you the best chance of
+                being able to take their piece on your next turn.
+            </p>
+            <h3>More Strategy</h3>
+            <p>
+                If you'd like to learn more about strategy in The Royal
+                Game of Ur, check out
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis/">RoyalUrAnalysis</a>.
+                It contains detailed analysis of different strategies for
+                playing The Royal Game of Ur through the use of AI.
+            </p>
+        </section>
+    </article>
+
     <div id="call-to-action">
         <h2>Play The Royal Game of Ur</h2>
         <p>Now that you know some probability about the game, give it a go!</p>
