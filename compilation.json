@@ -7,6 +7,7 @@
   "html": {
     "client/home/home.html": "index.html",
     "client/game/game.html": "game/index.html",
+    "client/articles/learn.html": "learn/index.html",
     "client/articles/rules.html": "rules/index.html",
     "client/articles/watch.html": "watch/index.html",
     "client/articles/dice/dice.html": "dice/index.html",

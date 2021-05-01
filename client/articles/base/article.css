@@ -105,6 +105,12 @@ body {
     text-decoration: underline;
     margin-right: 0.75vh;
 }
+#content .list-of-links a {
+    display: block;
+    width: max-content;
+    font-size: 1.2em;
+    text-decoration: underline;
+}
 
 
 #call-to-action {
