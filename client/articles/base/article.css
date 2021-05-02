@@ -45,6 +45,10 @@ body {
     text-decoration: none;
     color: white;
 }
+#content .article-back-link {
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
 #content h1,
 #content h2,
 #content h3,
