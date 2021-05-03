@@ -45,9 +45,20 @@ body {
     text-decoration: none;
     color: white;
 }
-#content .article-back-link {
-    margin-bottom: 1em;
+#content .article-links {
     font-size: 0.9em;
+}
+#content .article-links .article-back-link {
+    display: inline-block;
+    float: left;
+    margin-bottom: 0.3em;
+}
+#content .article-links .twitter-share {
+    display: inline-block;
+    float: right;
+    margin-top: 0.2em;
+    margin-bottom: 0.3em;
+    font-size: 0.85em;
 }
 #content h1,
 #content h2,

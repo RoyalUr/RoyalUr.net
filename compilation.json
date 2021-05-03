@@ -35,6 +35,7 @@
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
+      "client/common/social/twitter_share.css",
       "client/articles/base/article.css"
     ],
     "rules/index.css": [
@@ -42,12 +43,14 @@
       "client/common/footer/footer.css",
       "client/common/header/header.css",
       "client/articles/base/article.css",
+      "client/common/social/twitter_share.css",
       "client/articles/rules.css"
     ],
     "dice/index.css": [
       "client/common/base.css",
       "client/common/footer/footer.css",
       "client/common/header/header.css",
+      "client/common/social/twitter_share.css",
       "client/articles/base/article.css",
       "client/articles/dice/dice.css"
     ],
@@ -56,6 +59,7 @@
       "client/common/footer/footer.css",
       "client/common/header/header.css",
       "client/articles/base/article.css",
+      "client/common/social/twitter_share.css",
       "client/articles/about.css"
     ],
     "lost.css": [
@@ -174,6 +178,7 @@
     "res/social/reddit.svg": "res/reddit.svg",
     "res/social/github.svg": "res/github.svg",
     "res/social/twitter.svg": "res/twitter.svg",
+    "res/social/twitter_small_white.svg": "res/twitter_small_white.svg",
     "res/social/join_the_discord.svg": "res/join_the_discord.svg",
     "res/social/star_on_github.svg": "res/star_on_github.svg",
     "res/buttons/mode_local.svg": "res/mode_local.svg",
