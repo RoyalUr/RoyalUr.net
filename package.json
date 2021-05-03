@@ -1,4 +1,25 @@
 {
+  "name": "royalur-net",
+  "author": {
+    "name": "Paddy Lamont",
+    "email": "padraiglamont@gmail.com",
+    "url": "https://github.com/Sothatsit"
+  },
+  "description": "A free and open-source website to let people play and learn about The Royal Game of Ur.",
+  "version": "1.0.0",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://royalur.net",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sothatsit/RoyalUrClient.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sothatsit/RoyalUrClient/issues"
+  },
+  "private": "true",
+  "scripts": {
+    "build": "webpack --mode production"
+  },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
@@ -6,7 +27,9 @@
     "autoprefixer": "^10.2.5",
     "postcss-cli": "^8.3.1",
     "postcss-preset-env": "^6.7.0",
-    "uglify-js": "^3.11.5",
-    "uglifycss": "^0.0.29"
+    "terser-webpack-plugin": "*",
+    "uglifycss": "^0.0.29",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.2.0"
   }
 }

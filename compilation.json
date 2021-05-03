@@ -20,6 +20,7 @@
 
     "src/status/lost.html": "lost.html"
   },
+
   "css": {
     "index.css": [
       "src/common/base.css",
@@ -90,83 +91,8 @@
       "src/status/lost.css"
     ]
   },
-  "javascript": {
-    "index.js": [
-      "src/common/utils.js",
-      "src/common/resources/resource_loader.js",
-      "src/common/resources/image_system.js",
-      "src/home/home_resources.js"
-    ],
-    "game/index.js": [
-      "src/game/lib/reconnecting-websocket.js",
-      "src/game/analytics/analytics.js",
-      "src/game/analytics/stats.js",
-      "src/game/game/board.js",
-      "src/game/model/model.js",
-      "src/game/model/dice_model.js",
 
-      "src/game/network/packet_reader.js",
-      "src/game/network/packet_writer.js",
-      "src/game/network/packets.js",
-      "src/game/network/network_packets.js",
-      "src/game/network/ai_packets.js",
-      "src/game/network/network.js",
-      "src/game/game/game.js",
-
-      "src/game/ui/menu.js",
-      "src/game/ui/layout.js",
-
-      "src/game/rendering/particles.js",
-      "src/game/rendering/curves.js",
-      "src/game/rendering/renderer.js",
-      "src/game/rendering/render_menu.js",
-      "src/game/rendering/render_overlays.js",
-      "src/game/rendering/render_game_ui.js",
-      "src/game/rendering/render_dice.js",
-      "src/game/rendering/render_board.js",
-
-      "src/game/ui/screens.js",
-      "src/game/client.js"
-    ],
-    "game/computer_worker.js": [
-      "src/common/utils.js",
-      "src/game/network/packet_reader.js",
-      "src/game/network/packet_writer.js",
-      "src/game/network/packets.js",
-      "src/game/network/ai_packets.js",
-      "src/game/game/board.js",
-      "res/royal_ur_analysis/api/api.js",
-      "src/game/game/simulation.js",
-      "src/game/game/computer_worker.js"
-    ],
-    "game/resources.js": [
-      "src/common/utils.js",
-      "src/common/resources/resource_types.js",
-      "src/common/resources/resource_loader.js",
-      "src/common/resources/audio_system.js",
-      "src/common/resources/image_system.js",
-      "src/game/game_resources.js"
-    ],
-    "article_resources.js": [
-      "src/common/utils.js",
-      "src/common/resources/resource_loader.js",
-      "src/common/resources/image_system.js",
-      "src/articles/base/article_resources.js",
-      "src/articles/base/articles.js"
-    ],
-    "dice/index.js": [
-      "src/common/utils.js",
-      "src/common/resources/resource_loader.js",
-      "src/common/resources/audio_system.js",
-      "src/common/resources/image_system.js",
-      "src/common/resources/resource_types.js",
-      "src/articles/base/article_resources.js",
-
-      "src/game/model/dice_model.js",
-      "src/game/rendering/render_dice.js",
-      "src/articles/learn/dice.js"
-    ]
-  },
+  "javascript": {},
 
   "resources": {
     "src/.htaccess": ".htaccess",
