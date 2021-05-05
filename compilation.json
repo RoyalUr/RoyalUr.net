@@ -7,10 +7,10 @@
   "html": {
     "client/home/home.html": "index.html",
     "client/game/game.html": "game/index.html",
-    "client/articles/learn.html": "learn/index.html",
-    "client/articles/rules.html": "rules/index.html",
-    "client/articles/watch.html": "watch/index.html",
-    "client/articles/dice/dice.html": "dice/index.html",
+    "client/articles/learn/learn.html": "learn/index.html",
+    "client/articles/learn/rules.html": "rules/index.html",
+    "client/articles/learn/watch.html": "watch/index.html",
+    "client/articles/learn/dice.html": "dice/index.html",
     "client/articles/privacy.html": "privacy/index.html",
     "client/articles/about.html": "about/index.html",
     "client/status/lost.html": "lost.html"
@@ -44,7 +44,7 @@
       "client/common/header/header.css",
       "client/articles/base/article.css",
       "client/common/social/twitter_share.css",
-      "client/articles/rules.css"
+      "client/articles/learn/rules.css"
     ],
     "dice/index.css": [
       "client/common/base.css",
@@ -52,7 +52,7 @@
       "client/common/header/header.css",
       "client/common/social/twitter_share.css",
       "client/articles/base/article.css",
-      "client/articles/dice/dice.css"
+      "client/articles/learn/dice.css"
     ],
     "about/index.css": [
       "client/common/base.css",
@@ -143,7 +143,7 @@
 
       "client/game/model/dice_model.js",
       "client/game/rendering/render_dice.js",
-      "client/articles/dice/dice.js"
+      "client/articles/learn/dice.js"
     ]
   },
 
