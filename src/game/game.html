@@ -15,15 +15,15 @@
               content="Can you master the world's oldest board game? Play online, with a friend, or against the AI!" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-        <include src="client/common/head/head_boilerplate_no_viewport.html" />
-        <include src="client/common/head/matomo.html" />
+        <include src="src/common/head/head_boilerplate_no_viewport.html" />
+        <include src="src/common/head/matomo.html" />
         <link rel="stylesheet" href="/game/index.[ver].css" />
     </head>
     <body class="wood-background">
         <a id="top"></a>
 
         <!-- Header -->
-        <include src="client/common/header/header_full_width.html" />
+        <include src="src/common/header/header_full_width.html" />
 
         <!-- Game -->
         <div id="game">
@@ -92,7 +92,7 @@
                                  alt="Play the easy difficulty of the computer" />
                         </div>
                         <div class="loading-spinner green-loading-spinner">
-                            <include src="client/game/ui/loading_spinner.html" />
+                            <include src="src/game/ui/loading_spinner.html" />
                         </div>
                     </div>
 
@@ -103,7 +103,7 @@
                                  alt="Play the medium difficulty of the computer" />
                         </div>
                         <div class="loading-spinner orange-loading-spinner">
-                            <include src="client/game/ui/loading_spinner.html" />
+                            <include src="src/game/ui/loading_spinner.html" />
                         </div>
                     </div>
 
@@ -114,7 +114,7 @@
                                  alt="Play the hard difficulty of the computer" />
                         </div>
                         <div class="loading-spinner red-loading-spinner">
-                            <include src="client/game/ui/loading_spinner.html" />
+                            <include src="src/game/ui/loading_spinner.html" />
                         </div>
                     </div>
 
@@ -125,7 +125,7 @@
                                  alt="Play the hardest difficulty of the computer" />
                         </div>
                         <div class="loading-spinner blue-loading-spinner">
-                            <include src="client/game/ui/loading_spinner.html" />
+                            <include src="src/game/ui/loading_spinner.html" />
                         </div>
                     </div>
                 </div>
@@ -167,7 +167,7 @@
             <canvas id="right-score" class="score" style="display: none"></canvas>
 
             <!-- DICE -->
-            <include src="client/game/ui/dice.html" />
+            <include src="src/game/ui/dice.html" />
 
             <!-- OVERLAY -->
             <canvas id="overlay" style="display: none"></canvas>
@@ -212,7 +212,7 @@
         </div>
 
         <!-- Footer -->
-        <include src="client/common/footer/footer_full_width.html" />
+        <include src="src/common/footer/footer_full_width.html" />
 
         <!-- JavaScript that doesn't need to be running straight away. -->
         <script src="/game/index.[ver].js"></script>

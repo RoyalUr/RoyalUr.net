@@ -1,155 +1,155 @@
 {
   "sitemap": {
-    "source": "client/sitemap.xml",
+    "source": "src/sitemap.xml",
     "dest": "sitemap.xml"
   },
 
   "html": {
-    "client/home/home.html": "index.html",
-    "client/game/game.html": "game/index.html",
-    "client/articles/learn/learn.html": "learn/index.html",
-    "client/articles/learn/rules.html": "rules/index.html",
-    "client/articles/learn/watch.html": "watch/index.html",
-    "client/articles/learn/dice.html": "dice/index.html",
-    "client/articles/privacy.html": "privacy/index.html",
-    "client/articles/about.html": "about/index.html",
-    "client/status/lost.html": "lost.html"
+    "src/home/home.html": "index.html",
+    "src/game/game.html": "game/index.html",
+    "src/articles/learn/learn.html": "learn/index.html",
+    "src/articles/learn/rules.html": "rules/index.html",
+    "src/articles/learn/watch.html": "watch/index.html",
+    "src/articles/learn/dice.html": "dice/index.html",
+    "src/articles/privacy.html": "privacy/index.html",
+    "src/articles/about.html": "about/index.html",
+    "src/status/lost.html": "lost.html"
   },
   "css": {
     "index.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/home/github_corner.css",
-      "client/home/home.css",
-      "client/home/home_background.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/home/github_corner.css",
+      "src/home/home.css",
+      "src/home/home_background.css"
     ],
     "game/index.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/game/game.css",
-      "client/game/ui/menu.css",
-      "client/game/ui/loading_spinner.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/game/game.css",
+      "src/game/ui/menu.css",
+      "src/game/ui/loading_spinner.css"
     ],
     "articles.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/common/social/twitter_share.css",
-      "client/articles/base/article.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/base/article.css"
     ],
     "rules/index.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/articles/base/article.css",
-      "client/common/social/twitter_share.css",
-      "client/articles/learn/rules.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/articles/base/article.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/learn/rules.css"
     ],
     "dice/index.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/common/social/twitter_share.css",
-      "client/articles/base/article.css",
-      "client/articles/learn/dice.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/base/article.css",
+      "src/articles/learn/dice.css"
     ],
     "about/index.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/articles/base/article.css",
-      "client/common/social/twitter_share.css",
-      "client/articles/about.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/articles/base/article.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/about.css"
     ],
     "lost.css": [
-      "client/common/base.css",
-      "client/common/footer/footer.css",
-      "client/common/header/header.css",
-      "client/status/lost.css"
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/status/lost.css"
     ]
   },
   "javascript": {
     "index.js": [
-      "client/common/utils.js",
-      "client/common/resources/resource_loader.js",
-      "client/common/resources/image_system.js",
-      "client/home/home_resources.js"
+      "src/common/utils.js",
+      "src/common/resources/resource_loader.js",
+      "src/common/resources/image_system.js",
+      "src/home/home_resources.js"
     ],
     "game/index.js": [
-      "client/game/lib/reconnecting-websocket.js",
-      "client/game/analytics/analytics.js",
-      "client/game/analytics/stats.js",
-      "client/game/game/board.js",
-      "client/game/model/model.js",
-      "client/game/model/dice_model.js",
+      "src/game/lib/reconnecting-websocket.js",
+      "src/game/analytics/analytics.js",
+      "src/game/analytics/stats.js",
+      "src/game/game/board.js",
+      "src/game/model/model.js",
+      "src/game/model/dice_model.js",
 
-      "client/game/network/packet_reader.js",
-      "client/game/network/packet_writer.js",
-      "client/game/network/packets.js",
-      "client/game/network/network_packets.js",
-      "client/game/network/ai_packets.js",
-      "client/game/network/network.js",
-      "client/game/game/game.js",
+      "src/game/network/packet_reader.js",
+      "src/game/network/packet_writer.js",
+      "src/game/network/packets.js",
+      "src/game/network/network_packets.js",
+      "src/game/network/ai_packets.js",
+      "src/game/network/network.js",
+      "src/game/game/game.js",
 
-      "client/game/ui/menu.js",
-      "client/game/ui/layout.js",
+      "src/game/ui/menu.js",
+      "src/game/ui/layout.js",
 
-      "client/game/rendering/particles.js",
-      "client/game/rendering/curves.js",
-      "client/game/rendering/renderer.js",
-      "client/game/rendering/render_menu.js",
-      "client/game/rendering/render_overlays.js",
-      "client/game/rendering/render_game_ui.js",
-      "client/game/rendering/render_dice.js",
-      "client/game/rendering/render_board.js",
+      "src/game/rendering/particles.js",
+      "src/game/rendering/curves.js",
+      "src/game/rendering/renderer.js",
+      "src/game/rendering/render_menu.js",
+      "src/game/rendering/render_overlays.js",
+      "src/game/rendering/render_game_ui.js",
+      "src/game/rendering/render_dice.js",
+      "src/game/rendering/render_board.js",
 
-      "client/game/ui/screens.js",
-      "client/game/client.js"
+      "src/game/ui/screens.js",
+      "src/game/client.js"
     ],
     "game/computer_worker.js": [
-      "client/common/utils.js",
-      "client/game/network/packet_reader.js",
-      "client/game/network/packet_writer.js",
-      "client/game/network/packets.js",
-      "client/game/network/ai_packets.js",
-      "client/game/game/board.js",
+      "src/common/utils.js",
+      "src/game/network/packet_reader.js",
+      "src/game/network/packet_writer.js",
+      "src/game/network/packets.js",
+      "src/game/network/ai_packets.js",
+      "src/game/game/board.js",
       "res/royal_ur_analysis/api.js",
-      "client/game/game/simulation.js",
-      "client/game/game/computer_worker.js"
+      "src/game/game/simulation.js",
+      "src/game/game/computer_worker.js"
     ],
     "game/resources.js": [
-      "client/common/utils.js",
-      "client/common/resources/resource_types.js",
-      "client/common/resources/resource_loader.js",
-      "client/common/resources/audio_system.js",
-      "client/common/resources/image_system.js",
-      "client/game/game_resources.js"
+      "src/common/utils.js",
+      "src/common/resources/resource_types.js",
+      "src/common/resources/resource_loader.js",
+      "src/common/resources/audio_system.js",
+      "src/common/resources/image_system.js",
+      "src/game/game_resources.js"
     ],
     "article_resources.js": [
-      "client/common/utils.js",
-      "client/common/resources/resource_loader.js",
-      "client/common/resources/image_system.js",
-      "client/articles/base/article_resources.js",
-      "client/articles/base/articles.js"
+      "src/common/utils.js",
+      "src/common/resources/resource_loader.js",
+      "src/common/resources/image_system.js",
+      "src/articles/base/article_resources.js",
+      "src/articles/base/articles.js"
     ],
     "dice/index.js": [
-      "client/common/utils.js",
-      "client/common/resources/resource_loader.js",
-      "client/common/resources/audio_system.js",
-      "client/common/resources/image_system.js",
-      "client/common/resources/resource_types.js",
-      "client/articles/base/article_resources.js",
+      "src/common/utils.js",
+      "src/common/resources/resource_loader.js",
+      "src/common/resources/audio_system.js",
+      "src/common/resources/image_system.js",
+      "src/common/resources/resource_types.js",
+      "src/articles/base/article_resources.js",
 
-      "client/game/model/dice_model.js",
-      "client/game/rendering/render_dice.js",
-      "client/articles/learn/dice.js"
+      "src/game/model/dice_model.js",
+      "src/game/rendering/render_dice.js",
+      "src/articles/learn/dice.js"
     ]
   },
 
   "resources": {
-    "client/.htaccess": ".htaccess",
-    "client/robots.txt": "robots.txt",
+    "src/.htaccess": ".htaccess",
+    "src/robots.txt": "robots.txt",
     "res/social/banner.jpg": "banner.jpg",
     "res/gameplay.mp4": "gameplay.mp4",
     "res/font/DuranGo.ttf": "res/font_durango.ttf",

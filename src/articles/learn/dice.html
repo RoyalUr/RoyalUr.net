@@ -11,19 +11,19 @@
     <meta name="og:description" content="Learn about the dice used in The Royal Game of Ur." />
     <meta name="twitter:description" content="Learn about the dice used in The Royal Game of Ur.">
 
-    <include src="client/common/head/head_boilerplate.html" />
-    <include src="client/common/head/matomo.html" />
+    <include src="src/common/head/head_boilerplate.html" />
+    <include src="src/common/head/matomo.html" />
     <link rel="stylesheet" href="/dice/index.[ver].css" />
 </head>
 <body class="wood-background">
-    <include src="client/common/header/header.html" />
+    <include src="src/common/header/header.html" />
     <article id="content">
         <section class="article-links">
             <p class="article-back-link"><a href="/learn">← Back to Learn</a></p>
 
             <a class="twitter-share"
                href="https://twitter.com/intent/tweet?url=https%3A%2F%2Froyalur.net%2Fdice&via=royalur_net&text=The%20dice%20used%20in%20the%20oldest%20board%20game%20in%20the%20world%20are%20more%20interesting%20than%20you%20might%20think%21&hashtags=boardgames%2Chistory%2Croyalgameofur%2Cdice">
-                <include src="client/common/social/twitter_share.html" />
+                <include src="src/common/social/twitter_share.html" />
             </a>
         </section>
 
@@ -44,7 +44,7 @@
 
             <h2>Tetrahedral Dice</h2>
             <div id="dice-container">
-                <include src="client/game/ui/dice.html" />
+                <include src="src/game/ui/dice.html" />
                 <span id="dice-prompt" style="display: none">Click to roll!</span>
             </div>
             <p>
@@ -169,7 +169,7 @@
                     data-src-active="/res/button_play_active.[ver]"></canvas>
         </a>
     </div>
-    <include src="client/common/footer/footer.html" />
+    <include src="src/common/footer/footer.html" />
 
     <!-- JavaScript to load images and let people roll the dice.  -->
     <script src="/dice/index.[ver].js"></script>
