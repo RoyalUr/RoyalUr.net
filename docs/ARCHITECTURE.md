@@ -39,7 +39,7 @@ and does not yet cover all major aspects of the codebase._
 | [/client/js/lib/](/src/game/lib) | JavaScript libraries used by the client. |
 | [/compilation.json](/compilation.json) | Specification used to compile the site. |
 | [/compile.sh](/compile.sh) & [/compile.py](/compile.py) | Scripts that compile the site. |
-| /compiled/ | The compiled site. |
+| /dist/ | The compiled site. |
 
 
 # 2. Compilation
@@ -72,7 +72,7 @@ compilation script will check the following:
 * It will make sure the `/res` directory exists. If it does not,
   it will attempt to download and unzip it from royalur.net.
 
-* It will make sure the `/compiled` directory exists, as it is
+* It will make sure the `/dist` directory exists, as it is
   required to build the site into.
 
 * It will make sure that the `/node_modules` directory exists, as

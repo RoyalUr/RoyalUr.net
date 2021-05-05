@@ -664,7 +664,7 @@ if __name__ == "__main__":
 
     mode = sys.argv[1]
     do_clean = (mode == "clean" or mode == "release")
-    target_folder = "./compiled"
+    target_folder = "./dist"
     if arg_count == 3:
         if mode != "clean":
             exit_with_usage()

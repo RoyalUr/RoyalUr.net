@@ -1,7 +1,8 @@
 # The resource files and generates files of the game are not stored in git.
 /res
 /res.zip
-/compiled
+/build
+/dist
 
 # Optional user-specific scripts to run before/after compile.sh.
 /pre_compile.sh

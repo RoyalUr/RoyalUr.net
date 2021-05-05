@@ -52,9 +52,9 @@ We also post updates about the game on our [Twitter](https://twitter.com/royalur
 This project uses Babel to transpile all Javascript to a single ES5 compatible file,
 as well as a Python script to generate the resource files needed for the site.
 
-The following commands will compile the site to _./compiled_: \
+The following commands will compile the site to _./dist_: \
 `./compile.sh release` -- Full clean compilation, with minified JS. \
-`./compile.sh dev` -- No minification, no cleaning of _./compiled_ folder.
+`./compile.sh dev` -- No minification, no cleaning of _./dist_ folder.
 
 **If you run into ./res file related issues during
 compilation, try updating your ./res folder.**
