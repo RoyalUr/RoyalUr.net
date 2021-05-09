@@ -379,27 +379,12 @@ def generate_html(target_folder, comp_spec, *, prefix=""):
             print(prefix + "generated " + to_path)
 
 
-def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
+def generate_js(target_folder, comp_spec, *, prefix="", webpack_mode="production"):
     """
-    Concatenate all javascript into a single source file, and optionally minify it.
+    Copy the JavaScript files generated using webpack.
     """
-    for to_rel, file_list in comp_spec.js_files.items():
-        output_file = resolve_path(target_folder, to_rel)
-        source_mtime = getmtime(file_list)
-        # Skip this output if none of its sources have changed.
-        if source_mtime == getmtime(output_file):
-            continue
-
-        commands = [
-                ["cat", *file_list],
-                ["npx", "babel", "--presets=@babel/env", "--no-babelrc"]
-        ]
-        if (minify):
-            commands.append(["uglifyjs", "--compress", "--mangle"])
-        commands.append(output_file)
-
-        assert execute_piped_commands(*commands, prefix=prefix)
-        setmtime(output_file, source_mtime)
+    assert execute_command("npx", "webpack", "--mode", webpack_mode, prefix=prefix)
+    assert execute_command("rsync", "-qabuzP", "./build/js/", target_folder, prefix=prefix)
 
 
 def generate_css(target_folder, comp_spec, *, prefix=""):
@@ -613,7 +598,7 @@ def create_release_build(target_folder):
     print("\n2. Generate HTML")
     generate_html(target_folder, comp_spec, prefix=" .. ")
     print("\n3. Combine & Minify Javascript")
-    combine_js(target_folder, comp_spec, prefix=" .. ", minify=True)
+    generate_js(target_folder, comp_spec, prefix=" .. ")
     print("\n4. Minify CSS")
     generate_css(target_folder, comp_spec, prefix=" .. ")
     print("\n5. Copy Resource Files")
@@ -634,7 +619,7 @@ def create_dev_build(target_folder):
     print("\n2. Generate HTML")
     generate_html(target_folder, comp_spec, prefix=" .. ")
     print("\n3. Combine Javascript")
-    combine_js(target_folder, comp_spec, prefix=" .. ")
+    generate_js(target_folder, comp_spec, prefix=" .. ", webpack_mode="development")
     print("\n4. Minify CSS")
     generate_css(target_folder, comp_spec, prefix=" .. ")
     print("\n5. Copy Resource Files")
