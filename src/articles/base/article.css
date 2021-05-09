@@ -67,19 +67,30 @@ body {
     clear: both;
 }
 #content h1 {
-    font-size: 1.5em;
     margin-top: 0.2em;
     margin-bottom: 0.15em;
+    font-size: 1.5em;
 }
 #content h2 {
-    font-family: DuranGo, serif;
-    font-size: 1.5em;
     margin-top: 1em;
     margin-bottom: 0.1em;
+    font-size: 1.5em;
 }
 #content h3 {
     text-decoration: underline;
     font-size: 1.2em;
+}
+#content h1,
+#content h1 a,
+#content h2,
+#content h2 a,
+#content h3,
+#content h3 a {
+    color: white;
+}
+#content h2,
+#content h2 a {
+    font-family: DuranGo, serif;
 }
 #content hr {
     margin-bottom: 0.6em;
@@ -120,7 +131,7 @@ body {
     text-decoration: underline;
     margin-right: 0.75vh;
 }
-#content .list-of-links a {
+#content .list-of-links :not(h2) a {
     display: block;
     width: max-content;
     font-size: 1.2em;

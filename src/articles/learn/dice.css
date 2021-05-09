@@ -42,23 +42,6 @@
     }
 }
 
-#one-die {
-    display: inline-block;
-    float: right;
-    width: 70px;
-    height: auto;
-}
-#four-die {
-    display: inline-block;
-    float: right;
-    /* Removes the spacing between the images. */
-    font-size: 0;
-}
-#four-die img {
-    width: 60px;
-    height: auto;
-}
-
 .chance_6_25,
 .chance_25_0,
 .chance_37_5 {
