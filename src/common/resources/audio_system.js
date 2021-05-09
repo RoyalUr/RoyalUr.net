@@ -2,10 +2,14 @@
 // This file contains the code that manages the playing of audio.
 //
 
+import {LONG_TIME_AGO, getTime, randElement, error} from "../utils.js"
+import {AudioResource} from "./resource_types.js";
+
+
 /** When the audio is errored, how long to wait before trying to play audio again. **/
 const ERRORED_AUDIO_PAUSE_DURATION = 60;
 
-function AudioSystem(resourceLoader, audioPacks) {
+export function AudioSystem(resourceLoader, audioPacks) {
     this.__class_name__ = "AudioSystem";
     this.resourceLoader = resourceLoader;
     this.audioPacks = audioPacks;

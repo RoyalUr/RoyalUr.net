@@ -2,7 +2,11 @@
 // This file manages the loading of resources for article pages.
 //
 
-function ArticleResourceLoader(staged_resources) {
+import {vec, min, max, setSuperClass} from "@src/common/utils";
+import {ResourceLoader} from "@src/common/resources/resource_loader";
+
+
+export function ArticleResourceLoader(staged_resources) {
     ResourceLoader.call(this, staged_resources);
     this.__class_name__ = "ArticleResourceLoader";
 }

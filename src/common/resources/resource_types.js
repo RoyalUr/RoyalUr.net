@@ -3,6 +3,12 @@
 // that Royal Ur may need to load, and code to load them.
 //
 
+import {
+    LONG_TIME_AGO, getOrDefault, getTime, unimplemented,
+    setSuperClass, renderResource, isAudioElementPlaying
+} from "../utils";
+
+
 function Resource(name, url) {
     this.__class_name__ = "Resource";
     this.name = name;
@@ -49,7 +55,7 @@ Resource.prototype.hasMeaningfulLoadStats = () => true;
 
 
 /** Annotations about other resources. **/
-function AnnotationsResource(name, url) {
+export function AnnotationsResource(name, url) {
     Resource.call(this, name, url);
     this.__class_name__ = "AnnotationsResource";
     this.data = null;
@@ -76,7 +82,7 @@ AnnotationsResource.prototype.get = function(key) {
 
 
 /** Used to preload an image. **/
-function PreloadImageResource(name, url) {
+export function PreloadImageResource(name, url) {
     Resource.call(this, name, url);
     this.__class_name__ = "PreloadImageResource";
     this.image = null;
@@ -95,7 +101,7 @@ PreloadImageResource.prototype._load = function() {
 
 
 /** Images to be displayed. **/
-function ImageResource(name, url, maxWidth, maxHeight) {
+export function ImageResource(name, url, maxWidth, maxHeight) {
     Resource.call(this, name, url);
     this.__class_name__ = "ImageResource";
     this.image = null;
@@ -165,7 +171,7 @@ ImageResource.prototype.getScaledImage = function(width) {
 
 
 /** Sounds to be played. **/
-function AudioResource(name, url, options) {
+export function AudioResource(name, url, options) {
     Resource.call(this, name, url);
     this.__class_name__ = "AudioResource";
     this.volume = getOrDefault(options, "volume", 1);

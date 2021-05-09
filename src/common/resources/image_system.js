@@ -2,7 +2,10 @@
 // This file contains the code for managing finding image resources to display.
 //
 
-function ImageSystem(resourceLoader) {
+import {isImageLoaded} from "../utils.js"
+
+
+export function ImageSystem(resourceLoader) {
     this.__class_name__ = "ImageSystem";
     this.resourceLoader = resourceLoader;
     this.dynamicButtons = [];
@@ -91,7 +94,7 @@ ImageSystem.prototype._redrawDynamicButtonsLoop = function() {
 };
 
 
-function DynamicButton(canvas, src, srcHover) {
+export function DynamicButton(canvas, src, srcHover) {
     this.__class_name__ = "DynamicButton";
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");

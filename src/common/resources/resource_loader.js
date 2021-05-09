@@ -3,7 +3,10 @@
 // the loading of resources for Royal Ur.
 //
 
-function ResourceLoader(stagedResources) {
+import {testWebPSupport, vec, vecMul, max, min} from "../utils";
+
+
+export function ResourceLoader(stagedResources) {
     this.__class_name__ = "ResourceLoader";
 
     // Detection of WebP support.

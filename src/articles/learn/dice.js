@@ -3,6 +3,13 @@
 // This code allows people to roll the dice on this page.
 //
 
+import {getTime, setElemStyle} from "@src/common/utils"
+import {ArticleResourceLoader} from "@src/articles/base/article_resources";
+import {ImageResource, AudioResource} from "@src/common/resources/resource_types";
+import {AudioSystem} from "@src/common/resources/audio_system";
+import {ImageSystem} from "@src/common/resources/image_system";
+
+
 const resourceLoader = new ArticleResourceLoader([[
     new ImageResource("dice_up1", "/res/dice_up1.[ver]"),
     new ImageResource("dice_up2", "/res/dice_up2.[ver]"),

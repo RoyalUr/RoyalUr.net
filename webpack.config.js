@@ -15,6 +15,11 @@ module.exports = {
     output: {
         path: abs('build', 'js')
     },
+    resolve: {
+        alias: {
+            '@src': abs('src')
+        }
+    },
     entry: {
         home: {
             import:  rel('src', 'home', 'home.js'),

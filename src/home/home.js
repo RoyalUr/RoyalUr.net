@@ -2,9 +2,9 @@
 // This file manages the loading of resources for the home page.
 //
 
-import "../common/utils"
-import "../common/resources/resource_loader"
-import "../common/resources/image_system"
+import {ResourceLoader} from "@src/common/resources/resource_loader";
+import {ImageSystem} from "@src/common/resources/image_system";
+
 
 const resourceLoader = new ResourceLoader(),
       imageSystem = new ImageSystem(resourceLoader);

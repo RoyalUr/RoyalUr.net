@@ -2,13 +2,13 @@
 // This file contains non-game-specific utility functions.
 //
 
-const LONG_TIME_AGO = -1000;
+export const LONG_TIME_AGO = -1000;
 
-function unimplemented(name) {
+export function unimplemented(name) {
     return () => { error(name + " is not implemented within " + this.__class_name__); };
 }
 
-function getOrDefault(dict, key, defaultValue) {
+export function getOrDefault(dict, key, defaultValue) {
     if (!dict)
         return defaultValue;
     const value = dict[key];
@@ -21,13 +21,13 @@ function getOrDefault(dict, key, defaultValue) {
 //
 
 /** Sets the opacity of an element, and if that opacity is 0 sets the element to display: none. **/
-function setElemOpacity(elem, opacity) {
+export function setElemOpacity(elem, opacity) {
     setElemStyle(elem, "opacity", opacity);
     setElemStyle(elem, "display", opacity <= 0 ? "none" : "");
 }
 
 /** Sets a style of an element, only if it has changed. **/
-function setElemStyle(elem, style, value) {
+export function setElemStyle(elem, style, value) {
     let previousStyles = elem.royalUrPreviousStyles;
     if (!previousStyles) {
         previousStyles = {};
@@ -42,20 +42,20 @@ function setElemStyle(elem, style, value) {
     previousStyles[style] = value;
 }
 
-function setSuperClass(subclass, superclass) {
+export function setSuperClass(subclass, superclass) {
     subclass.prototype = Object.create(superclass.prototype);
     Object.defineProperty(subclass.prototype, "constructor", {
         value: subclass, enumerable: false, writable: true
     });
 }
 
-function selectText(textBox) {
+export function selectText(textBox) {
     textBox.select();
     textBox.setSelectionRange(0, 99999);
     textBox.focus();
 }
 
-function copyText(textBoxID) {
+export function copyText(textBoxID) {
     const textBox = document.getElementById(textBoxID);
     selectText(textBox);
     document.execCommand("copy");
@@ -63,11 +63,11 @@ function copyText(textBoxID) {
     textBox.blur();
 }
 
-function isAudioElementPlaying(element) {
+export function isAudioElementPlaying(element) {
     return element.currentTime > 0 && !element.paused && !element.ended && element.readyState > 2;
 }
 
-function jumpToID(id) {
+export function jumpToID(id) {
     const elem = document.createElement("a");
     elem.setAttribute("href", "#" + id);
     elem.click();
@@ -79,7 +79,7 @@ function jumpToID(id) {
  * If {@param added} is true, then the class {@param clazz} is added.
  * Otherwise, the class {@param clazz} is removed.
  */
-function setElementClass(elem, clazz, added) {
+export function setElementClass(elem, clazz, added) {
     if (added) {
         elem.classList.add(clazz);
     } else {
@@ -94,7 +94,7 @@ function setElementClass(elem, clazz, added) {
 //
 
 // Timing.
-let getTime = null;
+let getTimeFn = null;
 if (typeof window !== "undefined") {
     window.requestAnimationFrame = window.requestAnimationFrame ||
         window.mozRequestAnimationFrame ||
@@ -103,14 +103,19 @@ if (typeof window !== "undefined") {
         function(f) {setTimeout(f, 1000/60)};
 
     if (window.performance.now) {
-        getTime = function() { return window.performance.now() / 1000; };
+        getTimeFn = function() { return window.performance.now() / 1000; };
     } else if (window.performance.webkitNow) {
-        getTime = function() { return window.performance.webkitNow() / 1000; };
+        getTimeFn = function() { return window.performance.webkitNow() / 1000; };
     }
 }
-if (getTime === null) {
-    getTime = function() { return new Date().getTime() / 1000; };
+if (getTimeFn === null) {
+    getTimeFn = function() { return new Date().getTime() / 1000; };
 }
+export function getTime() {
+    return getTimeFn();
+}
+
+
 // Check if an array includes an element.
 if (!Array.prototype.includes) {
     Object.defineProperty(Array.prototype, "includes", {
@@ -154,7 +159,7 @@ if (!Array.prototype.find) {
 /**
  * @author James Westgate
  */
-function testWebPSupport(callback) {
+export function testWebPSupport(callback) {
     const webP = new Image();
     webP.onload = webP.onerror = () => { callback(webP.height === 2); };
     webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
@@ -166,13 +171,13 @@ function testWebPSupport(callback) {
 // ERRORS
 //
 
-function error(cause) {
+export function error(cause) {
     const error = "[ERROR] " + cause;
     console.trace(error);
     throw new Error(error);
 }
 
-function assert(predicate, message) {
+export function assert(predicate, message) {
     if(!predicate) {
         error(message);
     }
@@ -184,7 +189,7 @@ function assert(predicate, message) {
 // GRAPHIC UTILITIES
 //
 
-function renderResource(width, height, renderFunction) {
+export function renderResource(width, height, renderFunction) {
     if (isNaN(width) || isNaN(height))
         throw "Width and height cannot be NaN, was given " + width + " x " + height;
     if (width < 1 || height < 1)
@@ -201,7 +206,7 @@ function renderResource(width, height, renderFunction) {
     return canvas;
 }
 
-function rgb(r, g, b) {
+export function rgb(r, g, b) {
     if(g === undefined) {
         g = r;
         b = r;
@@ -209,7 +214,7 @@ function rgb(r, g, b) {
     return "rgb(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ")";
 }
 
-function rgba(r, g, b, a) {
+export function rgba(r, g, b, a) {
     if(b === undefined) {
         a = g;
         g = r;
@@ -219,7 +224,7 @@ function rgba(r, g, b, a) {
     return "rgba(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ", " + a + ")";
 }
 
-function drawCircularShadow(ctx, x, y, radius, r, g, b) {
+export function drawCircularShadow(ctx, x, y, radius, r, g, b) {
     if(r === undefined) {
         r = 0;
         g = 0;
@@ -247,7 +252,7 @@ function drawCircularShadow(ctx, x, y, radius, r, g, b) {
     ctx.restore();
 }
 
-function pathRoundedRect(ctx, x, y, w, h, r) {
+export function pathRoundedRect(ctx, x, y, w, h, r) {
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
     ctx.beginPath();
@@ -260,7 +265,7 @@ function pathRoundedRect(ctx, x, y, w, h, r) {
     return ctx;
 }
 
-function convertHSVtoRGB(h, s, v) {
+export function convertHSVtoRGB(h, s, v) {
     let r, g, b, i, f, p, q, t;
     i = Math.floor(h * 6);
     f = h * 6 - i;
@@ -282,7 +287,7 @@ function convertHSVtoRGB(h, s, v) {
     };
 }
 
-function isImageLoaded(image) {
+export function isImageLoaded(image) {
     return image.complete && image.naturalWidth !== 0;
 }
 
@@ -292,23 +297,23 @@ function isImageLoaded(image) {
 // NUMBER UTILITIES
 //
 
-function max(a, b) {
+export function max(a, b) {
     return a > b ? a : b;
 }
 
-function min(a, b) {
+export function min(a, b) {
     return a < b ? a : b;
 }
 
-function clamp(num, min, max) {
+export function clamp(num, min, max) {
     return (num < min ? min : (num > max ? max : num));
 }
 
-function randElement(array) {
+export function randElement(array) {
     return array[randInt(array.length)];
 }
 
-function rand(min, max) {
+export function rand(min, max) {
     if(min === undefined)
         return Math.random();
 
@@ -318,7 +323,7 @@ function rand(min, max) {
     return min + (max - min) * Math.random();
 }
 
-function randInt(min, max) {
+export function randInt(min, max) {
     if (min === undefined)
         return -1;
     if (max === undefined) {
@@ -328,24 +333,24 @@ function randInt(min, max) {
     return clamp(Math.floor(rand(min, max)), min, max - 1);
 }
 
-function randBool() {
+export function randBool() {
     return rand() < 0.5;
 }
 
-function easeInOutSine(value) {
+export function easeInOutSine(value) {
     return (1 - Math.cos(value * Math.PI)) / 2;
 }
 
-function easeOutSine(value) {
+export function easeOutSine(value) {
     return Math.sin(value * 0.5 * Math.PI);
 }
 
-function easeInSine(value) {
+export function easeInSine(value) {
     return 1 - easeOutSine(1 - value);
 }
 
 /** Allows the controlling of animations based on linearly interpolating between 0 and 1. **/
-function Fade(defaultInDuration, defaultOutDuration) {
+export function Fade(defaultInDuration, defaultOutDuration) {
     this.__class_name__ = "Fade";
     this.defaultInDuration = (defaultInDuration === undefined ? -1 : defaultInDuration);
     this.defaultOutDuration = (defaultOutDuration === undefined ? this.defaultInDuration : defaultOutDuration);
@@ -401,7 +406,7 @@ Fade.prototype.get = function() {
 
 
 /** An asymmetric fade which fades in, waits, and then fades out. **/
-function StagedFade(inDuration, stayDuration, outDuration) {
+export function StagedFade(inDuration, stayDuration, outDuration) {
     if(inDuration === undefined || stayDuration === undefined || outDuration === undefined)
         throw "Must specify inDuration, stayDuration, and outDuration";
 
@@ -457,7 +462,7 @@ StagedFade.prototype.isFadeOut = function() {
 // STRING STUFF
 //
 
-function pad(value, length, prefix) {
+export function pad(value, length, prefix) {
     if(value.length >= length) return value;
     if(prefix === undefined) prefix = ' ';
     let string = value;
@@ -476,7 +481,7 @@ function pad(value, length, prefix) {
  *     outputs:
  *         "Hello, Gabriel, are you feeling OK?"
  */
-function formatUnicorn(str, ...parameters) {
+export function formatUnicorn(str, ...parameters) {
     if (!parameters.length)
         return str;
 
@@ -497,7 +502,7 @@ function formatUnicorn(str, ...parameters) {
 
 const VEC_NEG1 = new Vector2D(-1, -1);
 
-function Vector2D(x, y) {
+export function Vector2D(x, y) {
     this.x = x;
     this.y = y;
 }
@@ -508,7 +513,7 @@ Vector2D.prototype.toString = function() {
 /**
  * Create a vector with the given {@param x} and {@param y} components.
  */
-function vec(x, y) {
+export function vec(x, y) {
     if (typeof x !== "number" || typeof y !== "number")
         throw "x and y must be numbers: " + x + ", " + y;
     if (isNaN(x) || isNaN(y))
@@ -521,7 +526,7 @@ function vec(x, y) {
 /**
  * Construct a list of vectors from a list of pairs of coordinates in the form [x1, y1, x2, y2, ..., xn, yn].
  */
-function vecList() {
+export function vecList() {
     if (arguments.length % 2 !== 0)
         throw "Arguments must be of even length";
 
@@ -536,15 +541,15 @@ function vecList() {
     return vecs;
 }
 
-function vecAdd(v1, v2) {
+export function vecAdd(v1, v2) {
     return vec(v1.x + v2.x, v1.y + v2.y);
 }
 
-function vecSub(v1, v2) {
+export function vecSub(v1, v2) {
     return vec(v1.x - v2.x, v1.y - v2.y);
 }
 
-function vecMul(v, mul) {
+export function vecMul(v, mul) {
     return vec(mul * v.x, mul * v.y);
 }
 
@@ -552,51 +557,51 @@ function vecMul(v, mul) {
  * Linearly interpolate between {@param v1} and {@param v2} with {@param t}
  * giving the distance moved from v1 to v2 as a value from 0 to 1 inclusive.
  */
-function vecLin(v1, v2, t) {
+export function vecLin(v1, v2, t) {
     return vec(
         v1.x * (1 - t) + v2.x * t,
         v1.y * (1 - t) + v2.y * t
     );
 }
 
-function vecLenSquared(v) {
+export function vecLenSquared(v) {
     return v.x * v.x + v.y * v.y;
 }
 
-function vecLen(v) {
+export function vecLen(v) {
     return Math.sqrt(vecLenSquared(v));
 }
 
 /**
  * Get the dot product of {@param v1} and {@param v2}.
  */
-function vecDot(v1, v2) {
+export function vecDot(v1, v2) {
     return v1.x * v2.x + v1.y * v2;
 }
 
 /**
  * Get the vector projection of {@param v1} onto {@param v2}.
  */
-function vecProject(v1, v2) {
+export function vecProject(v1, v2) {
     return vecDot(v1, v2) / vecLen(v2);
 }
 
-function vecMidpoint(v1, v2) {
+export function vecMidpoint(v1, v2) {
     return vec(
         (v1.x + v2.x) / 2,
         (v1.y + v2.y) / 2
     );
 }
 
-function vecEquals(v1, v2) {
+export function vecEquals(v1, v2) {
     return v1.x === v2.x && v1.y === v2.y;
 }
 
-function vecDist(v1, v2) {
+export function vecDist(v1, v2) {
     return vecLen(vecSub(v1, v2));
 }
 
-function vecListIndexOf(locations, v) {
+export function vecListIndexOf(locations, v) {
     for(let index = 0; index < locations.length; ++index) {
         if(vecEquals(locations[index], v))
             return index;
@@ -604,6 +609,6 @@ function vecListIndexOf(locations, v) {
     return -1;
 }
 
-function vecListContains(locations, v) {
+export function vecListContains(locations, v) {
     return vecListIndexOf(locations, v) !== -1;
 }
