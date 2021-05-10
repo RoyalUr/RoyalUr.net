@@ -43,7 +43,6 @@ body {
     font-size: 1em;
     line-height: 1.6em;
     text-decoration: none;
-    color: white;
 }
 #content .article-links {
     font-size: 0.9em;
@@ -135,7 +134,23 @@ body {
     display: block;
     width: max-content;
     font-size: 1.2em;
+}
+#content .list-of-links :not(h2) a span {
     text-decoration: underline;
+}
+
+#content table {
+    margin-bottom: 1em;
+}
+#content table,
+#content th,
+#content td {
+    border: 1px solid white;
+    border-collapse: collapse;
+}
+#content th,
+#content td {
+    padding: 0.5em;
 }
 
 

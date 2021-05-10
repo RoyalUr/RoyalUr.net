@@ -13,6 +13,7 @@
     "src/articles/learn/dice.html": "dice/index.html",
     "src/articles/privacy.html": "privacy/index.html",
     "src/articles/about.html": "about/index.html",
+    "src/articles/analysis/royal_ur_analysis.html": "analysis/index.html",
     "src/status/lost.html": "lost.html"
   },
   "css": {
@@ -53,6 +54,14 @@
       "src/common/social/twitter_share.css",
       "src/articles/base/article.css",
       "src/articles/learn/dice.css"
+    ],
+    "analysis/index.css": [
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/base/article.css",
+      "src/articles/analysis/royal_ur_analysis.css"
     ],
     "about/index.css": [
       "src/common/base.css",
@@ -114,7 +123,7 @@
       "src/game/network/packets.js",
       "src/game/network/ai_packets.js",
       "src/game/game/board.js",
-      "res/royal_ur_analysis/api.js",
+      "res/royal_ur_analysis/api/api.js",
       "src/game/game/simulation.js",
       "src/game/game/computer_worker.js"
     ],
@@ -195,11 +204,11 @@
     "res/buttons/controls/learn.svg": "res/control_learn.svg",
     "res/buttons/controls/settings.svg": "res/control_settings.svg",
 
-    "res/royal_ur_analysis/royal_ur_analysis.wasm": "game/royal_ur_analysis.wasm",
-    "res/royal_ur_analysis/localedata.properties": "game/localedata.properties",
-    "res/royal_ur_analysis/localedata_US.properties": "game/localedata_US.properties",
-    "res/royal_ur_analysis/localedata_US_en.properties": "game/localedata_US_en.properties",
-    "res/royal_ur_analysis/localedata_DE_de.properties": "game/localedata_DE_de.properties"
+    "res/royal_ur_analysis/api/royal_ur_analysis.wasm": "game/royal_ur_analysis.wasm",
+    "res/royal_ur_analysis/api/localedata.properties": "game/localedata.properties",
+    "res/royal_ur_analysis/api/localedata_US.properties": "game/localedata_US.properties",
+    "res/royal_ur_analysis/api/localedata_US_en.properties": "game/localedata_US_en.properties",
+    "res/royal_ur_analysis/api/localedata_DE_de.properties": "game/localedata_DE_de.properties"
   },
 
   "image_size_classes": {
@@ -296,6 +305,27 @@
         "u_1440": "640 x auto",
         "u_1080": "480 x auto",
         "u_720": "320 x auto"
+      }
+    },
+
+    "res/royal_ur_analysis/logo.png": {
+      "dest": "res/analysis/logo",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
+      }
+    },
+    "res/royal_ur_analysis/example_window.png": {
+      "dest": "res/analysis/example_window",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
       }
     },
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>RoyalUrAnalysis | RoyalUr.net</title>
+
+    <meta name="og:title" content="The RoyalUrAnalysis Project" />
+    <meta name="twitter:title" content="The RoyalUrAnalysis Project" />
+    <meta property="twitter:url" content="https://royalur.net/analysis/" />
+    <meta name="description" content="Analysing strategy in The Royal Game of Ur!" />
+    <meta name="og:description" content="Analysing strategy in The Royal Game of Ur!" />
+    <meta name="twitter:description" content="Analysing strategy in The Royal Game of Ur!">
+
+    <include src="src/common/head/head_boilerplate.html" />
+    <include src="src/common/head/matomo.html" />
+    <link rel="stylesheet" href="index.[ver].css" />
+</head>
+<body class="wood-background">
+    <include src="src/common/header/header.html" />
+    <article id="content">
+        <section class="article-links">
+            <p class="article-back-link"><a href="/learn">← Back to Learn</a></p>
+
+            <a class="twitter-share"
+               href="https://twitter.com/intent/tweet?url=https%3A%2F%2Froyalur.net%2Fdice&via=royalur_net&text=The%20dice%20used%20in%20the%20oldest%20board%20game%20in%20the%20world%20are%20more%20interesting%20than%20you%20might%20think%21&hashtags=boardgames%2Chistory%2Croyalgameofur%2Cdice">
+                <include src="src/common/social/twitter_share.html" />
+            </a>
+        </section>
+
+        <section>
+            <h1>The Royal Game of Ur Analysis Project</h1>
+            <hr/>
+            <img id="analysis-logo" class="shadow" data-src="/res/analysis/logo" alt="RoyalUrAnalysis Logo" />
+            <p>
+                RoyalUrAnalysis is a project dedicated to the technical analysis of
+                The Royal Game of Ur. The project uses AI to find the best strategies
+                to use in the game to win!
+            </p>
+            <p>
+                RoyalUrAnalysis is an open source effort! If you'd like to check out the
+                codebase, or just drop by to give us a star, check us out on
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis">GitHub</a>!
+            </p>
+        </section>
+
+        <section class="goals">
+            <h2 id="goals"><a href="#goals">Goals</a></h2>
+            <p class="goals">
+                This project aims to answer questions such as:
+            </p>
+            <ul class="goals">
+                <li>🍀 How much of the game is luck?</li>
+                <li>🐇 Does playing first give you an advantage?</li>
+                <li>🏆 What are the best moves to play from unclear positions?</li>
+            </ul>
+            <p>
+                If you'd like to read about our progress in answering these questions,
+                then you can read about
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis/blob/main/docs/Insights.md">
+                    our insights
+                </a>
+                over on GitHub!
+            </p>
+        </section>
+
+        <section>
+            <h2 id="agents"><a href="#agents">Meet the Agents</a></h2>
+            <p>
+                We currently have a small set of agents designed to play
+                The Royal Game of Ur, and each takes a slightly different
+                approach to picking their moves!
+            </p>
+            <table id="agents-table">
+                <tr>
+                    <th class="agent-name">Agent</th>
+                    <th class="agent-desc">Description</th>
+                </tr>
+                <tr>
+                    <td class="agent-name">🎲 Random</td>
+                    <td class="agent-desc">Picks a random move, every time!</td>
+                </tr>
+                <tr>
+                    <td class="agent-name">👶 First-Move</td>
+                    <td class="agent-desc">Picks the least advanced piece to move.</td>
+                </tr>
+                <tr>
+                    <td class="agent-name">👴 Last-Move</td>
+                    <td class="agent-desc">Picks the most advanced piece to move.</td>
+                </tr>
+                <tr>
+                    <td class="agent-name">🤑 Greedy</td>
+                    <td class="agent-desc">Prioritises taking pieces, and moving onto rosettes.</td>
+                </tr>
+                <tr>
+                    <td class="agent-name">📒 Expectimax</td>
+                    <td class="agent-desc">Does a statistical analysis to determine the best move.</td>
+                </tr>
+                <tr>
+                    <td class="agent-name">🐼 Panda</td>
+                    <td class="agent-desc">A cheaper variant of expectimax that skips checking some rolls.</td>
+                </tr>
+            </table>
+            <p>
+                If you'd like to delve deeper into each agent, how they function,
+                and more statistics about each of them, then check out
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis/blob/main/docs/Agents.md">
+                    the agent documentation
+                </a>
+                on GitHub!
+            </p>
+        </section>
+
+        <section>
+            <h2 id="analysis-window"><a href="#analysis-window">Anaylsis Window</a></h2>
+            <p>
+                RoyalUrAnalysis provides a windowed mode for analysing specific
+                game positions. If you'd like to setup your own positions to analyse,
+                then download the latest RoyalUrAnalysis release on
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis/releases/">GitHub</a>!
+            </p>
+            <p class="centre-text">
+                <img id="example-window" class="shadow"
+                     data-src="/res/analysis/example_window" alt="Example RoyalUrAnalysis Window" />
+            </p>
+
+            <h3 id="analysis-window-usage"><a href="#analysis-window-usage">Usage</a></h3>
+            <p>
+                To use the analysis window, simply click on whatever you wish to change.
+                For example, to change the game to "Dark's Turn", simply click on the
+                "Light's Turn" text, and it will swap over.
+            </p>
+            <p>
+                Once you have your position set up, click "Analyse",
+                and RoyalUrAnalysis will use the Panda AI from the
+                <a href="/game">webgame</a>
+                to evaluate how strong it thinks each move is!
+            </p>
+
+            <h3 id="analysis-window-issues"><a href="#analysis-window-issues">Issues</a></h3>
+            <p>
+                If you find any bugs in the program, or want to suggest improvements or changes,
+                then feel free to create an issue on
+                <a href="https://github.com/Sothatsit/RoyalUrAnalysis/issues/new">GitHub</a>.
+            </p>
+        </section>
+    </article>
+
+    <div id="call-to-action">
+        <h2>Play The Royal Game of Ur</h2>
+        <p>See if you can beat the Panda difficulty powered by RoyalUrAnalysis!</p>
+        <a class="play" href="/game">
+            <canvas class="highlight-shadow" data-src-inactive="/res/button_play.[ver]"
+                    data-src-active="/res/button_play_active.[ver]"></canvas>
+        </a>
+    </div>
+    <include src="src/common/footer/footer.html" />
+
+    <!-- JAVASCRIPT TO LOAD IMAGES -->
+    <script src="/article_resources.[ver].js"></script>
+</body>
+</html>

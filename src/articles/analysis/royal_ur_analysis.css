@@ -1,0 +1,29 @@
+
+#content .goals {
+    clear: both;
+}
+#content ul.goals {
+    font-size: 1.4em;
+}
+
+#analysis-logo {
+    width: 10em;
+    margin-right: 1em;
+    margin-bottom: 2em;
+    float: left;
+}
+/** Display the text below the logo on small screens. **/
+@media (max-width: 400px) {
+    #analysis-logo {
+        display: block;
+    }
+}
+
+#content table td.agent-name {
+    font-family: DuranGo, serif;
+}
+
+#example-window {
+    display: inline-block;
+    width: 20em;
+}
