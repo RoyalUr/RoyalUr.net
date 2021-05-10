@@ -15,3 +15,17 @@
     border-radius: 50%;
     border: 3px solid white;
 }
+
+#logo {
+    width: 10em;
+    height: auto;
+    margin-right: 1em;
+    margin-bottom: 2em;
+    float: left;
+}
+/** Display the text below the logo on small screens. **/
+@media (max-width: 400px) {
+    #logo {
+        display: block;
+    }
+}
