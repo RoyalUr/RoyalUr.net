@@ -72,13 +72,14 @@ function resetTiles() {
 //
 
 const darkPlayer = initPlayer(TILE_DARK, "Dark"),
-      lightPlayer = initPlayer(TILE_LIGHT, "Light");
+      lightPlayer = initPlayer(TILE_LIGHT, "Light"),
+      spectatorPlayer = initPlayer(TILE_SPECTATOR, "Spectator");
 
 let leftPlayer = darkPlayer,
     rightPlayer = lightPlayer;
 
 let ownPlayer = darkPlayer,
-    otherPlayer = lightPlayer;
+    otherPlayers = [lightPlayer];
 
 function initPlayer(playerNo, name) {
     return {
@@ -128,16 +129,27 @@ function addScore(player) {
 }
 
 function setOwnPlayer(player) {
-    if(player === "light") {
-        ownPlayer = lightPlayer;
-        otherPlayer = darkPlayer;
-    } else {
-        ownPlayer = darkPlayer;
-        otherPlayer = lightPlayer;
+    if (player === "spectator") {
+        ownPlayer = spectatorPlayer;
+        otherPlayers = [lightPlayer, darkPlayer];
+        leftPlayer = lightPlayer;
+        rightPlayer = darkPlayer;
+        return;
     }
-    // With the exception of local games, ownPlayer is left and otherPlayer is right.
-    leftPlayer = ownPlayer;
-    rightPlayer = otherPlayer;
+
+    if (player === "light") {
+        ownPlayer = lightPlayer;
+        otherPlayers = [darkPlayer];
+        leftPlayer = lightPlayer;
+        rightPlayer = darkPlayer;
+    } else if (player === "dark") {
+        ownPlayer = darkPlayer;
+        otherPlayers = [lightPlayer];
+        leftPlayer = darkPlayer;
+        rightPlayer = lightPlayer;
+    } else {
+        throw "Unknown player " + player;
+    }
 }
 
 function getPlayer(playerNo) {

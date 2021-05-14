@@ -293,6 +293,7 @@ OnlineGame.prototype.onPacketState = function(state) {
         setDiceValues(state.roll);
     } else {
         setWaitingForDiceRoll();
+        dice.canBeRolled = ownPlayer.active;
     }
 };
 OnlineGame.prototype.onDiceClick = function() {
@@ -397,7 +398,7 @@ function ComputerGame(difficulty) {
 
     setOwnPlayer(randBool() ? "light" : "dark");
     ownPlayer.name = "Human";
-    otherPlayer.name = "Computer";
+    otherPlayers[0].name = "Computer";
 
     this.turnPlayer = lightPlayer;
     this.computerMove = null;
@@ -429,14 +430,14 @@ ComputerGame.prototype.getTurnPlayer = function() {
     return this.turnPlayer;
 };
 ComputerGame.prototype.isComputersTurn = function() {
-    return this.turnPlayer === otherPlayer;
+    return this.turnPlayer === otherPlayers[0];
 };
 ComputerGame.prototype.isHumansTurn = function() {
     return this.turnPlayer === ownPlayer;
 };
 ComputerGame.prototype.updateActivePlayer = function() {
     ownPlayer.active = this.isHumansTurn();
-    otherPlayer.active = this.isComputersTurn();
+    otherPlayers[0].active = this.isComputersTurn();
 };
 ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
     // If they've just taken a piece off the board, give them some score
@@ -453,13 +454,13 @@ ComputerGame.prototype.onFinishMove = function(fromTile, toTile) {
     }
 
     if (!isRosetteTile(toTile)) {
-        this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+        this.turnPlayer = (this.isHumansTurn() ? otherPlayers[0] : ownPlayer);
     }
 
     this.setupRoll();
 };
 ComputerGame.prototype.swapPlayerAfterNoMoves = function() {
-    this.turnPlayer = (this.isHumansTurn() ? otherPlayer : ownPlayer);
+    this.turnPlayer = (this.isHumansTurn() ? otherPlayers[0] : ownPlayer);
     this.setupRoll();
 };
 ComputerGame.prototype.setupRoll = function() {
@@ -468,6 +469,7 @@ ComputerGame.prototype.setupRoll = function() {
     unselectTile();
     if (this.isHumansTurn()) {
         setWaitingForDiceRoll();
+        dice.canBeRolled = ownPlayer.active;
     } else {
         startRollingDice();
         dice.callback = this.onFinishDice.bind(this);
@@ -530,12 +532,12 @@ ComputerGame.prototype.performComputerMove = function() {
     this.computerMove = null;
 
     const diceValue = countDiceUp(),
-          to = getTileMoveToLocation(otherPlayer.playerNo, from, diceValue),
+          to = getTileMoveToLocation(otherPlayers[0].playerNo, from, diceValue),
           toTile = board.getTile(to);
 
     // Moving a new piece onto the board
-    if (vecEquals(from, getStartTile(otherPlayer.playerNo))) {
-        takeTile(otherPlayer);
+    if (vecEquals(from, getStartTile(otherPlayers[0].playerNo))) {
+        takeTile(otherPlayers[0]);
     }
 
     // Taking out a piece
@@ -544,9 +546,9 @@ ComputerGame.prototype.performComputerMove = function() {
     }
 
     animateTileMove(from, to, this.onFinishMove.bind(this));
-    board.setTile(to, otherPlayer.playerNo);
+    board.setTile(to, otherPlayers[0].playerNo);
     board.setTile(from, TILE_EMPTY);
-    otherPlayer.active = false;
+    otherPlayers[0].active = false;
 
     this.clearStartTiles();
 };
@@ -582,13 +584,14 @@ LocalGame.prototype.updateActivePlayer = function() {
     leftPlayer.active = this.isLeftTurn();
     rightPlayer.active = this.isRightTurn();
     ownPlayer = (leftPlayer.active ? leftPlayer : rightPlayer);
-    otherPlayer = (leftPlayer.active ? rightPlayer : leftPlayer);
+    otherPlayers = [(leftPlayer.active ? rightPlayer : leftPlayer)];
 };
 LocalGame.prototype.setupRoll = function() {
     this.updateActivePlayer();
     layoutDice();
     unselectTile();
     setWaitingForDiceRoll();
+    dice.canBeRolled = ownPlayer.active;
 };
 
 LocalGame.prototype.onFinishMove = function(fromTile, toTile) {

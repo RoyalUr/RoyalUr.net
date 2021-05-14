@@ -84,8 +84,8 @@ function GameSetupMenu() {
     this.playButton = document.getElementById("play");
     this.playButton.addEventListener("click", onPlayClicked);
 
-    this.computerFade = new Fade(0.5);
-    this.playFade = new Fade(0.5, 0);
+    this.computerFade = new Fade(0);
+    this.playFade = new Fade(0);
 }
 GameSetupMenu.prototype.redraw = function() {
     const selectedMode = this.modeSelect.getSelectedOption(),

@@ -15,10 +15,12 @@ for(let x = 0; x < TILES_WIDTH; ++x) {
 
 const TILE_EMPTY = 0,
       TILE_DARK = 1,
-      TILE_LIGHT = 2;
+      TILE_LIGHT = 2,
+      TILE_SPECTATOR = 3;
 
 const LIGHT_PLAYER_NO = TILE_LIGHT,
-      DARK_PLAYER_NO = TILE_DARK;
+      DARK_PLAYER_NO = TILE_DARK,
+      SPECTATOR_PLAYER_NO = TILE_SPECTATOR;
 
 const LIGHT_PATH = vecList(
     0, 4,
@@ -90,6 +92,7 @@ function getTilePath(playerNo) {
     switch (playerNo) {
         case LIGHT_PLAYER_NO: return LIGHT_PATH;
         case DARK_PLAYER_NO:  return DARK_PATH;
+        case SPECTATOR_PLAYER_NO: return vecList();
         default:
             throw "Unknown playerNo " + playerNo;
     }
@@ -99,6 +102,7 @@ function getStartTile(playerNo) {
     switch (playerNo) {
         case LIGHT_PLAYER_NO: return LIGHT_START;
         case DARK_PLAYER_NO:  return DARK_START;
+        case SPECTATOR_PLAYER_NO: return VEC_NEG1;
         default:
             throw "Unknown playerNo " + playerNo;
     }
@@ -108,6 +112,7 @@ function getEndTile(playerNo) {
     switch (playerNo) {
         case LIGHT_PLAYER_NO: return LIGHT_END;
         case DARK_PLAYER_NO:  return DARK_END;
+        case SPECTATOR_PLAYER_NO: return VEC_NEG1;
         default:
             throw "Unknown playerNo " + playerNo;
     }

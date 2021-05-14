@@ -49,9 +49,10 @@ function readGamePacket(packet) {
     return {
         gameID: packet.nextGameID(),
         ownPlayer: packet.nextPlayer(),
-        ownName: packet.nextVarString(),
-        opponentName: packet.nextVarString(),
-        opponentConnected: packet.nextBool()
+        lightName: packet.nextVarString(),
+        darkName: packet.nextVarString(),
+        lightConnected: packet.nextBool(),
+        darkConnected: packet.nextBool()
     };
 }
 

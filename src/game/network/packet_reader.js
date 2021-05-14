@@ -66,10 +66,10 @@ PacketIn.prototype.nextLocation = function() {
     return vec(this.nextDigit(), this.nextDigit());
 };
 PacketIn.prototype.nextPlayer = function() {
-    console.trace("test");
     const player = this.nextDigit();
-    if(player === 1) return "dark";
-    if(player === 2) return "light";
+    if (player === 1) return "dark";
+    if (player === 2) return "light";
+    if (player === 3) return "spectator";
     assert(false, "invalid player " + player);
 };
 PacketIn.prototype.nextPlayerState = function() {

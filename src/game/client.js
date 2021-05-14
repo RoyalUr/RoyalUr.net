@@ -209,10 +209,10 @@ function onPacketGamePending(gameInfo) {
 function onPacketGame(gameInfo) {
     setHash(gameInfo.gameID);
     setOwnPlayer(gameInfo.ownPlayer);
-    ownPlayer.name = gameInfo.ownName;
-    ownPlayer.connected = true;
-    otherPlayer.name = gameInfo.opponentName;
-    otherPlayer.connected = gameInfo.opponentConnected;
+    lightPlayer.name = gameInfo.lightName;
+    lightPlayer.connected = gameInfo.lightConnected;
+    darkPlayer.name = gameInfo.darkName;
+    darkPlayer.connected = gameInfo.darkConnected;
 
     // TODO : Remove this when users are actually able to set their own names!
     lightPlayer.name = "Light";
