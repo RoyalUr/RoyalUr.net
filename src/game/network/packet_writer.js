@@ -37,8 +37,9 @@ PacketOut.prototype.pushBool = function(value) {
 PacketOut.prototype.pushVarString = function(string, lengthCharacters) {
     if(lengthCharacters === undefined) lengthCharacters = 2;
     assert(lengthCharacters > 0, "lengthCharacters must be positive");
-    assert(lengthCharacters > Math.log10(string.length), "the string is too long");
-    this.pushRaw(string.length.toString().padStart(lengthCharacters, "0"));
+    assert(string.length.toString().length <= lengthCharacters, "the string is too long");
+
+    this.pushRaw(pad(string.length.toString(), lengthCharacters, "0"))
     this.pushRaw(string);
 };
 PacketOut.prototype.pushLocation = function(loc) {

@@ -242,7 +242,7 @@ OnlineGame.prototype._init = function() {
 };
 OnlineGame.prototype.sendOpenGamePacket = function() {
     analytics.recordSearchForOnlineGame();
-    sendPacket(writeFindGamePacket("Name" + randInt(100, 1000)));
+    sendPacket(writeFindGamePacket());
 };
 OnlineGame.prototype.onPacketMessage = function(data) {
     if (data.title === "No moves") {
@@ -339,7 +339,7 @@ FriendGame.prototype.onGameFinished = () => analytics.recordFinishGame(EVENT_FRI
 
 FriendGame.prototype.sendOpenGamePacket = function() {
     analytics.recordCreateGame();
-    sendPacket(writeCreateGamePacket("Name" + randInt(100, 1000)));
+    sendPacket(writeCreateGamePacket());
 };
 
 

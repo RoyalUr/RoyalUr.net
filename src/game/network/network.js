@@ -29,6 +29,12 @@ function sendPacket(packet) {
     socket.send(packet.data);
 }
 
+function getName() {
+    const queryString = window.location.search,
+          params = new URLSearchParams(queryString);
+    return params.has("name") ? params.get("name") : "unknown";
+}
+
 function reconnect() {
     disconnect();
     connect();
@@ -81,9 +87,9 @@ function connectSocket() {
         analytics.recordConnected(address);
 
         if(uniqueId) {
-            sendPacket(writeReOpenPacket(uniqueId));
+            sendPacket(writeReOpenPacket(uniqueId, getName()));
         } else {
-            sendPacket(writeOpenPacket());
+            sendPacket(writeOpenPacket(getName()));
         }
 
         onNetworkConnected();

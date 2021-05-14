@@ -214,10 +214,12 @@ function onPacketGame(gameInfo) {
     darkPlayer.name = gameInfo.darkName;
     darkPlayer.connected = gameInfo.darkConnected;
 
-    // TODO : Remove this when users are actually able to set their own names!
-    lightPlayer.name = "Light";
-    darkPlayer.name = "Dark";
-    // TODO END
+    if (lightPlayer.name === "unknown" || lightPlayer.name.trim().length === 0) {
+        lightPlayer.name = "Light";
+    }
+    if (darkPlayer.name === "unknown" || darkPlayer.name.trim().length === 0) {
+        darkPlayer.name = "Dark";
+    }
 
     switchToScreen(SCREEN_GAME);
     // If the user has been waiting a while to find a game, notify them with a sound!

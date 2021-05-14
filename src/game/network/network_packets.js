@@ -109,17 +109,19 @@ function readMovePacket(packet) {
 // OUTGOING PACKETS.
 //
 
-function writeOpenPacket() {
+function writeOpenPacket(name) {
     const packet = networkPackets.newPacketOut("open");
     packet.pushInt(PROTOCOL_VERSION, 4);
+    packet.pushVarString(name, 2);
     return packet;
 }
 
-function writeReOpenPacket(previousId) {
+function writeReOpenPacket(previousId, name) {
     assert(previousId.length === 36, "previousId must be a uuid");
     const packet = networkPackets.newPacketOut("reopen");
     packet.pushInt(PROTOCOL_VERSION, 4);
     packet.pushRaw(previousId);
+    packet.pushVarString(name, 2);
     return packet;
 }
 
@@ -130,16 +132,12 @@ function writeJoinGamePacket(gameID) {
     return packet;
 }
 
-function writeFindGamePacket(name) {
-    const packet = networkPackets.newPacketOut("find_game");
-    packet.pushVarString(name);
-    return packet;
+function writeFindGamePacket() {
+    return networkPackets.newPacketOut("find_game");
 }
 
-function writeCreateGamePacket(name) {
-    const packet = networkPackets.newPacketOut("create_game");
-    packet.pushVarString(name);
-    return packet;
+function writeCreateGamePacket() {
+    return networkPackets.newPacketOut("create_game");
 }
 
 function writeDiceRollPacket() {
