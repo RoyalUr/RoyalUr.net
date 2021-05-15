@@ -281,6 +281,7 @@ OnlineGame.prototype.onPacketState = function(state) {
         runOnTileMoveFinish(function() {
             switchToScreen(SCREEN_WIN);
         });
+        disconnect();
         return;
     }
 
