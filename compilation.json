@@ -14,6 +14,10 @@
     "src/articles/privacy.html": "privacy/index.html",
     "src/articles/about.html": "about/index.html",
     "src/articles/analysis/royal_ur_analysis.html": "analysis/index.html",
+
+    "src/articles/tournaments/tournaments.html": "tournaments/index.html",
+    "src/articles/tournaments/first.html": "tournaments/first/index.html",
+
     "src/status/lost.html": "lost.html"
   },
   "css": {
@@ -70,6 +74,14 @@
       "src/articles/base/article.css",
       "src/common/social/twitter_share.css",
       "src/articles/about.css"
+    ],
+    "tournaments/index.css": [
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/articles/base/article.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/tournaments/tournaments.css"
     ],
     "lost.css": [
       "src/common/base.css",
@@ -208,7 +220,17 @@
     "res/royal_ur_analysis/api/localedata.properties": "game/localedata.properties",
     "res/royal_ur_analysis/api/localedata_US.properties": "game/localedata_US.properties",
     "res/royal_ur_analysis/api/localedata_US_en.properties": "game/localedata_US_en.properties",
-    "res/royal_ur_analysis/api/localedata_DE_de.properties": "game/localedata_DE_de.properties"
+    "res/royal_ur_analysis/api/localedata_DE_de.properties": "game/localedata_DE_de.properties",
+
+    "res/tournament_1_awards/gold-aratkovich.pdf": "tournaments/first/gold-aratkovich.pdf",
+    "res/tournament_1_awards/silver-timogustafson.pdf": "tournaments/first/silver-timogustafson.pdf",
+    "res/tournament_1_awards/bronze-nitt.pdf": "tournaments/first/bronze-nitt.pdf",
+    "res/tournament_1_awards/ellaroman.pdf": "tournaments/first/ellaroman.pdf",
+    "res/tournament_1_awards/georgia.pdf": "tournaments/first/georgia.pdf",
+    "res/tournament_1_awards/jfenton.pdf": "tournaments/first/jfenton.pdf",
+    "res/tournament_1_awards/pixteca.pdf": "tournaments/first/pixteca.pdf",
+    "res/tournament_1_awards/sothatsit.pdf": "tournaments/first/sothatsit.pdf",
+    "res/tournament_1_awards/zakklightman.pdf": "tournaments/first/zakklightman.pdf"
   },
 
   "image_size_classes": {
@@ -243,12 +265,33 @@
       "u_1440": "1280 x auto",
       "u_1080": "1065 x auto",
       "u_720": "852 x auto"
+    },
+    "tournament_certificate_thumbnail": {
+      "u_2160": "auto x 968",
+      "u_1440": "auto x 512",
+      "u_1080": "auto x 484",
+      "u_720": "auto x 256"
     }
   },
 
   "images": {
+    "res/tournaments-logo.png": {
+      "dest": "tournaments/logo",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
+      }
+    },
+
     "res/backgrounds/wood-blue-1.png": {
-      "dest": "res/background",
+      "dest": "res/wood_background",
+      "sizes": { "u_u": "420 x 420" }
+    },
+    "res/backgrounds/wood-brown-1.png": {
+      "dest": "res/plain_wood_background",
       "sizes": { "u_u": "420 x 420" }
     },
     "res/backgrounds/home_background.png": {
@@ -394,6 +437,47 @@
     "res/dice/lightShadow.png": {
       "dest": "res/dice_light_shadow",
       "size_group":  "dice"
+    },
+
+    "res/tournament_1_awards/gold-aratkovich.png": {
+      "dest": "tournaments/first/gold-aratkovich",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/silver-timogustafson.png": {
+      "dest": "tournaments/first/silver-timogustafson",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/bronze-nitt.png": {
+      "dest": "tournaments/first/bronze-nitt",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/ellaroman.png": {
+      "dest": "tournaments/first/ellaroman",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/georgia.png": {
+      "dest": "tournaments/first/georgia",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/jfenton.png": {
+      "dest": "tournaments/first/jfenton",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/pixteca.png": {
+      "dest": "tournaments/first/pixteca",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/sothatsit.png": {
+      "dest": "tournaments/first/sothatsit",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/zakklightman.png": {
+      "dest": "tournaments/first/zakklightman",
+      "size_group": "tournament_certificate_thumbnail"
+    },
+    "res/tournament_1_awards/diegoraposo.png": {
+      "dest": "tournaments/first/diegoraposo",
+      "size_group": "tournament_certificate_thumbnail"
     }
   },
 

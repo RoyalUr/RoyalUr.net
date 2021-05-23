@@ -126,7 +126,7 @@ html {
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
 }
 
-#links {
+.banner {
     display: block;
     box-sizing: border-box;
     width: 100%;
@@ -135,34 +135,84 @@ html {
     border-left: none;
     border-right: none;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 1);
+    font-size: 1.15em;
 }
-#links h2,
-#links h3 {
+#links {
+    border-bottom: none;
+}
+.banner h2,
+.banner h3,
+.banner p {
     color: white;
 }
-#links h2 {
+.banner h2 {
     margin-top: 1.5vh;
     margin-bottom: 1vh;
     font-size: 2em;
 }
-#links h3 {
+.banner h3,
+.banner p {
     font-family: Nunito, sans-serif;
     margin-bottom: 1.5vh;
     font-size: 1.6em;
 }
-#links .menu-button {
+.banner .menu-button {
     display: inline-block;
     height: 14vh;
     margin: 2vh;
 }
-#links .menu-button canvas {
+.banner .menu-button canvas,
+.banner .menu-button img {
     width: auto;
     height: 100%;
 }
-#links .menu-button:hover canvas {
+.banner .menu-button:hover canvas {
     filter: drop-shadow(2px 2px 3px rgba(255, 255, 255, 0.4));
 }
 
+a.read-about-tournaments {
+    color: #3692e7;
+}
+a.read-about-tournaments:hover {
+    color: #57aeff;
+}
+
+a.read-about-tournaments.read-about-tournaments {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    text-decoration: none;
+    padding-right: 2.5vmin;
+}
+.read-about-tournaments .left,
+.read-about-tournaments .right {
+    display: inline-block;
+}
+.read-about-tournaments .left {
+    height: 100%;
+}
+.read-about-tournaments .left {
+    margin-right: 2.5vmin;
+}
+.read-about-tournaments .right span {
+    display: block;
+    text-decoration: none;
+    font-family: Nunito, sans-serif;
+    line-height: 0.88em;
+    text-shadow: 6px 6px 12px rgba(0, 0, 0, 1);
+}
+.read-about-tournaments .right span.top {
+    font-size: 1.6em;
+}
+.read-about-tournaments .right span.bottom {
+    font-size: 3.2em;
+}
+
+.tournaments-logo,
+.join-the-discord:hover {
+    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 1));
+}
 
 #footer-full-width {
     box-shadow: none;

@@ -1,0 +1,44 @@
+#logo {
+    width: 6em;
+    height: auto;
+    margin-right: 1.5em;
+    margin-bottom: 1em;
+    float: left;
+}
+/** Display the text below the logo on small screens. **/
+@media (max-width: 400px) {
+    #logo {
+        display: block;
+    }
+}
+
+.join-the-discord,
+.join-the-discord img {
+    width: auto;
+    height: 4em;
+}
+.join-the-discord:hover {
+    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 1));
+}
+
+
+#content a.certificate {
+    display: inline-block;
+    height: 6em;
+    width: auto;
+    margin-top: 1em;
+    margin-right: 1em;
+    font-size: 1.2em;
+    color: white;
+    text-decoration: underline;
+    text-align: center;
+}
+#content a.certificate img {
+    display: block;
+    height: 100%;
+    width: auto;
+    border: 3px solid white;
+}
+#content a.certificate:hover {
+    filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, 1));
+}

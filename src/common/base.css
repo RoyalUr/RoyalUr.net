@@ -59,12 +59,22 @@ body.no-webp .gradient-background {
 }
 body.webp.wood-background,
 body.webp .wood-background {
-    background: rgb(32, 41, 48) url("/res/background.[ver].webp") repeat;
+    background: rgb(32, 41, 48) url("/res/wood_background.[ver].webp") repeat;
     background-size: 35vmin;
 }
 body.no-webp.wood-background,
 body.no-webp .wood-background {
-    background: rgb(32, 41, 48) url("/res/background.[ver].png") repeat;
+    background: rgb(32, 41, 48) url("/res/wood_background.[ver].png") repeat;
+    background-size: 35vmin;
+}
+body.webp.plain-wood-background,
+body.webp .plain-wood-background {
+    background: rgb(32, 41, 48) url("/res/plain_wood_background.[ver].webp") repeat;
+    background-size: 35vmin;
+}
+body.no-webp.plain-wood-background,
+body.no-webp .plain-wood-background {
+    background: rgb(32, 41, 48) url("/res/plain_wood_background.[ver].png") repeat;
     background-size: 35vmin;
 }
 body.webp.simple-background,
@@ -77,10 +87,13 @@ body.no-webp .simple-background {
     background: rgb(32, 41, 48) url("/res/home_background.[ver].png") repeat;
     background-size: 35vmin;
 }
-img {
+img,
+#content img {
     height: auto;
     /* Stops showing the alt text if the image doesn't load */
-    font-size: 0;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .highlight-shadow, .shadow {

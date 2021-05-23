@@ -28,7 +28,7 @@
         <a class="link" href="/watch">Videos</a>
     </header>
 
-    <div id="greeting">
+    <section id="greeting">
         <div id="greeting-background">
             <div class="background-image"></div>
             <div class="dark-overlay"></div>
@@ -77,11 +77,14 @@
                 </svg>
             </a>
         </div>
-    </div>
+    </section>
 
-    <div id="links" class="centre-text simple-background">
+    <section id="links" class="banner centre-text simple-background">
         <h2>Learn the rules, or watch strategy and history videos</h2>
-        <h3>Our community has been accumulating knowledge about The Royal Game of Ur, check it out below!</h3>
+        <p>
+            Our community has been accumulating knowledge
+            about The Royal Game of Ur, check it out below!
+        </p>
         <a class="menu-button highlight-shadow" href="/learn">
             <canvas class="shadow" data-src-inactive="/res/button_learn.[ver]"
                     data-src-active="/res/button_learn_active.[ver]"></canvas>
@@ -90,7 +93,31 @@
             <canvas class="shadow" data-src-inactive="/res/button_watch.[ver]"
                     data-src-active="/res/button_watch_active.[ver]"></canvas>
         </a>
-    </div>
+    </section>
+
+    <section id="tournaments" class="banner centre-text plain-wood-background text-shadow">
+        <h2>Join our tournaments!</h2>
+        <p>
+            We host tournaments through our Discord, and
+            we'd love to have you join our next one!
+        </p>
+        <a class="read-about-tournaments menu-button" href="/tournaments">
+            <div class="left">
+                <img class="tournaments-logo" data-src="/tournaments/logo.[ver]" alt="Tournaments logo!" />
+            </div>
+            <div class="right">
+                <span class="top">
+                    Read about our
+                </span>
+                    <span class="bottom">
+                    tournaments!
+                </span>
+            </div>
+        </a>
+        <a class="join-the-discord menu-button shadow" href="https://discord.gg/FbCp76esgb" target="_blank">
+            <img class="shadow" src="/res/join_the_discord.[ver].svg" alt="Join the Discord!" />
+        </a>
+    </section>
 
     <include src="src/common/footer/footer_full_width.html" />
     <include src="src/home/github_corner.html" />
