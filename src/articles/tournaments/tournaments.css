@@ -12,8 +12,8 @@
     }
 }
 
-.join-the-discord,
-.join-the-discord img {
+#content .join-the-discord,
+#content .join-the-discord img {
     width: auto;
     height: 4em;
 }
