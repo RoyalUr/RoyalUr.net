@@ -18,18 +18,23 @@
   },
   "private": "true",
   "scripts": {
-    "build": "webpack --mode production"
+    "build": "webpack --mode production --config webpack.config.js --stats verbose"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
+    "@types/fork-ts-checker-webpack-plugin": "^0.4.5",
+    "@types/webpack-dev-server": "^4.7.2",
     "autoprefixer": "^10.2.5",
+    "babel-loader": "^8.2.4",
+    "fork-ts-checker-webpack-plugin": "^7.2.6",
     "postcss-cli": "^8.3.1",
-    "postcss-preset-env": "^6.7.0",
+    "postcss-preset-env": "^5.3.0",
     "terser-webpack-plugin": "*",
     "uglifycss": "^0.0.29",
-    "webpack": "^5.4.0",
-    "webpack-cli": "^4.2.0"
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1"
   }
 }

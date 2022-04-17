@@ -166,8 +166,8 @@ used for tile placement.
 
 | File                  | Purpose                                 |
 | --------------------- |---------------------------------------- |
-| client/js/screens.js  | Handles transitioning between screens.  |
-| client/js/utils.js    | Contains the fading logic.              |
+| client/js/screens.ts  | Handles transitioning between screens.  |
+| client/js/utils.ts    | Contains the fading logic.              |
 
 RoyalUr.net uses a screen system to control what content is visible
 at any given time. Only one screen is visible at a time,
@@ -194,13 +194,13 @@ nicely together.
 
 | File                | Purpose                                              |
 | ------------------- |----------------------------------------------------- |
-| client/js/client.js | Coordinates page load, networking, and client input. |
-| client/js/layout.js | Adds listeners to elements on the page.              |
+| client/js/client.ts | Coordinates page load, networking, and client input. |
+| client/js/layout.ts | Adds listeners to elements on the page.              |
 
 Inputs related to the keyboard, networking events, and browser events are all
-handled by `client/js/client.js`. In this way, the client file acts as a hub
+handled by `client/js/client.ts`. In this way, the client file acts as a hub
 between different parts of the application. The exception to this is that
-`client/js/layout.js` handles most of the interactions related to elements
+`client/js/layout.ts` handles most of the interactions related to elements
 on the page such as clicks and mouse movements.
 
 If there is a game running, these inputs are also forwarded to the game, so that

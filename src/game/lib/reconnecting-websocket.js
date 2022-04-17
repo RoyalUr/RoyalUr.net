@@ -92,9 +92,15 @@
  * - The maximum time in milliseconds to wait for a connection to succeed before closing and retrying. Accepts integer. Default: 2000.
  *
  */
-(function (factory) {
-    window.ReconnectingWebSocket = factory();
-})(function () {
+(function (global, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else if (typeof module !== 'undefined' && module.exports){
+        module.exports = factory();
+    } else {
+        global.ReconnectingWebSocket = factory();
+    }
+})(this, function () {
 
     if (!('WebSocket' in window)) {
         return;
@@ -126,7 +132,7 @@
 
             /** The binary type, possible values 'blob' or 'arraybuffer', default 'blob'. */
             binaryType: 'blob'
-        };
+        }
         if (!options) { options = {}; }
 
         // Overwrite and define settings with options if they exist.
@@ -197,7 +203,7 @@
             var evt = document.createEvent("CustomEvent");
             evt.initCustomEvent(s, false, false, args);
             return evt;
-        }
+        };
 
         this.open = function (reconnectAttempt) {
             ws = new WebSocket(self.url, protocols || []);
@@ -281,10 +287,10 @@
                 }
                 eventTarget.dispatchEvent(generateEvent('error'));
             };
-        };
+        }
 
         // Whether or not to create a websocket upon instantiation
-        if (this.automaticOpen === true) {
+        if (this.automaticOpen == true) {
             this.open(false);
         }
 
