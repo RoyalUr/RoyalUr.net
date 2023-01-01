@@ -2,6 +2,8 @@
 // This file contains non-game-specific utility functions.
 //
 
+import {Milliseconds} from "@/common/units";
+
 export const LONG_TIME_AGO = -1000;
 
 export function getOrDefault<K extends keyof any, V>(dict: {[key in K]?: V}, key: K, defaultValue: V): V {
@@ -10,6 +12,18 @@ export function getOrDefault<K extends keyof any, V>(dict: {[key in K]?: V}, key
 
     const value = dict[key];
     return (value ? value : defaultValue);
+}
+
+export function debounce(func, time: number = 100) {
+    let timer = null;
+    return function(event) {
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        const context = this, args = arguments;
+        timer = setTimeout(() => func.apply(context, args), time, event);
+    };
 }
 
 
@@ -100,21 +114,21 @@ export function getCanvasByID(id: string): HTMLCanvasElement {
 //
 
 // Timing.
-let getTimeFn: () => number = null;
+let getTimeFn: () => Milliseconds = null;
 if (typeof window !== "undefined") {
-    // We have to use "as any", as otherwise we get type issues we don't care about...
-    (window as any).requestAnimationFrame = window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        function(f) { return setTimeout(f, 1000/60); };
+    const win = window as any;
+    win.requestAnimationFrame = win.requestAnimationFrame ||
+        win.webkitRequestAnimationFrame ||
+        ((f) => setTimeout(f, 1000/60.0));
 
     if (window.performance.now) {
-        getTimeFn = function() { return window.performance.now() / 1000; };
+        getTimeFn = () => window.performance.now() / 1000;
     }
 }
 if (getTimeFn === null) {
-    getTimeFn = function() { return new Date().getTime() / 1000; };
+    getTimeFn = () => new Date().getTime() / 1000;
 }
-export function getTime(): number {
+export function getTime(): Milliseconds {
     return getTimeFn();
 }
 

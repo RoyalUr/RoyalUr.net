@@ -4,53 +4,57 @@
 
 import {Vec2} from "@/common/vectors";
 import {getTime, LONG_TIME_AGO} from "@/common/utils";
+import {StylePixels} from "@/common/units";
 
 
 /**
  * The mouse listener methods should return whether they wish to consume
  * the event and stop it propagating to any HTML components.
  */
-export interface MouseListener {
-    onMouseMove(loc: Vec2): boolean;
-    onMouseDown(loc: Vec2): boolean;
-    onMouseUp(loc: Vec2): boolean;
-    onTouchStart(loc: Vec2): boolean;
-    onTouchEnd(loc: Vec2): boolean;
+export interface MouseListener<UNITS extends number> {
+    onMouseMove(loc: Vec2<UNITS>): boolean;
+    onMouseDown(loc: Vec2<UNITS>): boolean;
+    onMouseUp(loc: Vec2<UNITS>): boolean;
+    onTouchStart(loc: Vec2<UNITS>): boolean;
+    onTouchEnd(loc: Vec2<UNITS>): boolean;
 }
 
-abstract class MouseAdapter implements MouseListener {
-    private readonly mouseListeners: MouseListener[] = [];
+abstract class MouseAdapter<RAW extends number, ADAPTED extends number> implements MouseListener<RAW> {
+    private readonly mouseListeners: MouseListener<ADAPTED>[] = [];
 
-    addMouseListener(listener: MouseListener) {
+    addMouseListener(listener: MouseListener<ADAPTED>) {
         this.mouseListeners.push(listener);
     }
 
-    removeMouseListener(listener: MouseListener) {
+    removeMouseListener(listener: MouseListener<ADAPTED>) {
         const index = this.mouseListeners.indexOf(listener);
         if (index >= 0) {
             this.mouseListeners.splice(index, 1);
         }
     }
 
-    protected abstract adaptMouseLoc(loc: Vec2): Vec2;
+    protected abstract adaptMouseLoc(loc: Vec2<RAW>): Vec2<ADAPTED>;
 
-    protected abstract getRawMouseLoc(): Vec2;
+    protected abstract getRawMouseLoc(): Vec2<RAW>;
 
     abstract isMouseDown(): boolean;
 
     abstract getMouseDownTime(): number;
 
-    protected abstract getRawMouseDownLoc(): Vec2;
+    protected abstract getRawMouseDownLoc(): Vec2<RAW>;
 
-    getMouseLoc(): Vec2 {
+    getMouseLoc(): Vec2<ADAPTED> {
         return this.adaptMouseLoc(this.getRawMouseLoc());
     }
 
-    getMouseDownLoc(): Vec2 {
+    getMouseDownLoc(): Vec2<ADAPTED> {
         return this.adaptMouseLoc(this.getRawMouseDownLoc());
     }
 
-    private invokeMouseListeners(loc: Vec2, invokeFn: (listener: MouseListener, adaptedLoc: Vec2) => boolean): boolean {
+    private invokeMouseListeners(
+            loc: Vec2<RAW>,
+            invokeFn: (listener: MouseListener<ADAPTED>, loc: Vec2<ADAPTED>) => boolean): boolean {
+
         const adaptedLoc = this.adaptMouseLoc(loc);
 
         let consumeEvent = false;
@@ -60,37 +64,38 @@ abstract class MouseAdapter implements MouseListener {
         return consumeEvent;
     }
 
-    onMouseMove(loc: Vec2): boolean {
-        return this.invokeMouseListeners(loc, (listener, adaptedLoc) => listener.onMouseMove(adaptedLoc));
+    onMouseMove(loc: Vec2<RAW>): boolean {
+        return this.invokeMouseListeners(loc, (listener, loc) => listener.onMouseMove(loc));
     }
 
-    onMouseDown(loc: Vec2): boolean {
-        return this.invokeMouseListeners(loc, (listener, adaptedLoc) => listener.onMouseDown(adaptedLoc));
+    onMouseDown(loc: Vec2<RAW>): boolean {
+        return this.invokeMouseListeners(loc, (listener, loc) => listener.onMouseDown(loc));
     }
 
-    onMouseUp(loc: Vec2): boolean {
-        return this.invokeMouseListeners(loc, (listener, adaptedLoc) => listener.onMouseUp(adaptedLoc));
+    onMouseUp(loc: Vec2<RAW>): boolean {
+        return this.invokeMouseListeners(loc, (listener, loc) => listener.onMouseUp(loc));
     }
 
-    onTouchStart(loc: Vec2): boolean {
-        return this.invokeMouseListeners(loc, (listener, adaptedLoc) => listener.onTouchStart(adaptedLoc));
+    onTouchStart(loc: Vec2<RAW>): boolean {
+        return this.invokeMouseListeners(loc, (listener, loc) => listener.onTouchStart(loc));
     }
 
-    onTouchEnd(loc: Vec2): boolean {
-        return this.invokeMouseListeners(loc, (listener, adaptedLoc) => listener.onTouchEnd(adaptedLoc));
+    onTouchEnd(loc: Vec2<RAW>): boolean {
+        return this.invokeMouseListeners(loc, (listener, loc) => listener.onTouchEnd(loc));
     }
 }
 
-abstract class DelegatedMouseAdapter extends MouseAdapter {
+abstract class DelegatedMouseAdapter<RAW extends number, ADAPTED extends number>
+        extends MouseAdapter<RAW, ADAPTED> {
 
-    private readonly parent: MouseAdapter;
+    private readonly parent: MouseAdapter<any, RAW>;
 
-    protected constructor(parent: MouseAdapter) {
+    protected constructor(parent: MouseAdapter<any, RAW>) {
         super();
         this.parent = parent;
     }
 
-    protected override getRawMouseLoc(): Vec2 {
+    protected override getRawMouseLoc(): Vec2<RAW> {
         return this.parent.getMouseLoc();
     }
 
@@ -102,7 +107,7 @@ abstract class DelegatedMouseAdapter extends MouseAdapter {
         return this.parent.getMouseDownTime();
     }
 
-    protected override getRawMouseDownLoc(): Vec2 {
+    protected override getRawMouseDownLoc(): Vec2<RAW> {
         return this.parent.getMouseDownLoc();
     }
 }
@@ -111,34 +116,35 @@ abstract class DelegatedMouseAdapter extends MouseAdapter {
 /**
  * Performs a linear shift and scale to the mouse location, and optionally rounds the result.
  */
-export class LinearMouseAdapter extends DelegatedMouseAdapter {
+export class LinearMouseAdapter<RAW extends number, ADAPTED extends number>
+        extends DelegatedMouseAdapter<RAW, ADAPTED> {
 
-    private anchorLoc: Vec2 = Vec2.ZERO;
+    private anchorLoc: Vec2<RAW> = Vec2.ZERO;
     private scale: number = 1;
     private floor: boolean;
 
-    constructor(parent: MouseAdapter) {
+    constructor(parent: MouseAdapter<any, RAW>) {
         super(parent);
     }
 
-    setTransform(anchorLoc: Vec2, scale: number, floor?: boolean) {
+    setTransform(anchorLoc: Vec2<RAW>, scale: number, floor?: boolean) {
         this.anchorLoc = anchorLoc;
         this.scale = scale;
         this.floor = !!floor;
     }
 
-    protected override adaptMouseLoc(loc: Vec2): Vec2 {
-        const adapted = loc.sub(this.anchorLoc).mul(this.scale);
+    protected override adaptMouseLoc(loc: Vec2<RAW>): Vec2<ADAPTED> {
+        const adapted: Vec2<ADAPTED> = loc.sub(this.anchorLoc).mul(this.scale).cast();
         return this.floor ? adapted.floor() : adapted;
     }
 }
 
-export class MouseEventSource extends MouseAdapter {
+export class MouseEventSource extends MouseAdapter<StylePixels, StylePixels> {
 
-    mouseLoc: Vec2 = Vec2.NEG1;
+    mouseLoc: Vec2<StylePixels> = Vec2.NEG1;
     mouseDown: boolean = false;
     mouseDownTime: number = LONG_TIME_AGO;
-    mouseDownLoc: Vec2 = Vec2.NEG1;
+    mouseDownLoc: Vec2<StylePixels> = Vec2.NEG1;
 
     addDocumentMouseListeners() {
         document.addEventListener("mousemove", this.onMouseMoveEvent.bind(this));
@@ -154,15 +160,15 @@ export class MouseEventSource extends MouseAdapter {
 
     addTouchListenersToElement(element: HTMLElement) {
         element.addEventListener("touchmove", this.onTouchMoveEvent.bind(this));
-        element.addEventListener("touchstart", this.onTouchMoveEvent.bind(this));
-        element.addEventListener("touchend", this.onTouchMoveEvent.bind(this));
+        element.addEventListener("touchstart", this.onTouchStartEvent.bind(this));
+        element.addEventListener("touchend", this.onTouchEndEvent.bind(this));
     }
 
-    protected override adaptMouseLoc(loc: Vec2): Vec2 {
+    protected override adaptMouseLoc(loc: Vec2<StylePixels>): Vec2<StylePixels> {
         return loc;
     }
 
-    protected override getRawMouseLoc(): Vec2 {
+    protected override getRawMouseLoc(): Vec2<StylePixels> {
         return this.mouseLoc;
     }
 
@@ -174,11 +180,11 @@ export class MouseEventSource extends MouseAdapter {
         return this.mouseDownTime;
     }
 
-    protected override getRawMouseDownLoc(): Vec2 {
+    protected override getRawMouseDownLoc(): Vec2<StylePixels> {
         return this.mouseDownLoc;
     }
 
-    private updateMouse(loc: Vec2, isDown?: boolean) {
+    private updateMouse(loc: Vec2<StylePixels>, isDown?: boolean) {
         this.mouseLoc = loc;
         if (isDown === undefined)
             return;

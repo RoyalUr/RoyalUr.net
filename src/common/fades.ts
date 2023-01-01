@@ -1,5 +1,5 @@
 import {getTime, LONG_TIME_AGO} from "@/common/utils";
-import {PlayerNo} from "@/game/game/board";
+import {Milliseconds} from "@/common/units";
 
 
 /**
@@ -24,10 +24,10 @@ export class Fade {
     readonly defaultOutDuration: number;
 
     direction: FadeDirection = FadeDirection.OUT;
-    start: number = LONG_TIME_AGO;
-    duration: number = -1;
+    start: Milliseconds = LONG_TIME_AGO;
+    duration: Milliseconds = -1;
 
-    constructor(defaultInDuration?: number, defaultOutDuration?: number) {
+    constructor(defaultInDuration?: Milliseconds, defaultOutDuration?: Milliseconds) {
         this.defaultInDuration = (defaultInDuration === undefined ? -1 : defaultInDuration);
         this.defaultOutDuration = (defaultOutDuration === undefined ? this.defaultInDuration : defaultOutDuration);
     }
@@ -54,7 +54,7 @@ export class Fade {
         return this.direction == FadeDirection.OUT;
     }
 
-    fade(direction: FadeDirection, duration?: number, fromStart?: boolean): Fade {
+    fade(direction: FadeDirection, duration?: Milliseconds, fromStart?: boolean): Fade {
         if (duration === undefined) {
             duration = (direction == FadeDirection.IN ? this.defaultInDuration : this.defaultOutDuration);
         }
@@ -75,15 +75,15 @@ export class Fade {
         return this;
     }
 
-    fadeInOrOut(fadeIn: boolean, duration?: number): Fade {
+    fadeInOrOut(fadeIn: boolean, duration?: Milliseconds): Fade {
         return this.fade(FadeDirection.inIf(fadeIn), duration);
     }
 
-    fadeIn(duration?: number): Fade {
+    fadeIn(duration?: Milliseconds): Fade {
         return this.fade(FadeDirection.IN, duration);
     }
 
-    fadeOut(duration?: number): Fade {
+    fadeOut(duration?: Milliseconds): Fade {
         return this.fade(FadeDirection.OUT, duration);
     }
 
@@ -97,18 +97,18 @@ export class Fade {
 }
 
 /**
- * An assymetric fade which fades in, waits, and then fades out.
+ * An asymmetric fade which fades in, waits, and then fades out.
  */
 export class StagedFade extends Fade {
 
-    readonly inDuration: number;
-    readonly stayDuration: number;
-    readonly outDuration: number;
+    readonly inDuration: Milliseconds;
+    readonly stayDuration: Milliseconds;
+    readonly outDuration: Milliseconds;
     readonly inRatio: number;
     readonly stayRatio: number;
     readonly outRatio: number;
 
-    constructor(inDuration: number, stayDuration: number, outDuration: number) {
+    constructor(inDuration: Milliseconds, stayDuration: Milliseconds, outDuration: Milliseconds) {
         super(inDuration + stayDuration + outDuration, outDuration);
 
         this.inDuration = inDuration;
@@ -140,7 +140,7 @@ export class StagedFade extends Fade {
         return !this.isFadeIn();
     }
 
-    fade(direction: FadeDirection, duration?: number, fromStart?: boolean): Fade {
+    fade(direction: FadeDirection, duration?: Milliseconds, fromStart?: boolean): Fade {
         const currentValue = this.get();
         super.fade(direction, duration, fromStart);
 

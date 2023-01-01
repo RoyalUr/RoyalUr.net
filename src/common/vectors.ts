@@ -4,8 +4,8 @@
  */
 export class Vec2 {
 
-    static NEG1 = new Vec2(-1, -1);
-    static ZERO = new Vec2(0, 0);
+    static NEG1: Vec2 = new Vec2(-1, -1);
+    static ZERO: Vec2 = new Vec2(0, 0);
 
     readonly x: number;
     readonly y: number;
@@ -20,6 +20,10 @@ export class Vec2 {
 
     toString(): string {
         return "Vec2(" + this.x + ", " + this.y + ")";
+    }
+
+    cast(): Vec2 {
+        return this;
     }
 
     add(other: Vec2): Vec2 {
@@ -81,15 +85,15 @@ export class Vec2 {
         return Vec2.create(Math.floor(this.x), Math.floor(this.y));
     }
 
-    static dotProduct(v1: Vec2, v2: Vec2): number {
+    static dotProduct<N extends number>(v1: Vec2, v2: Vec2): number {
         return v1.x * v2.x + v1.y * v2.y;
     }
 
-    static project(v1, v2) {
+    static project<N extends number>(v1: Vec2, v2: Vec2): number {
         return Vec2.dotProduct(v1, v2) / v2.len();
     }
 
-    static midpoint(v1, v2) {
+    static midpoint<N extends number>(v1: Vec2, v2: Vec2): Vec2 {
         return Vec2.create(
             (v1.x + v2.x) / 2,
             (v1.y + v2.y) / 2
@@ -100,29 +104,32 @@ export class Vec2 {
      * Linearly interpolate between {@param v1} and {@param v2} with {@param t}
      * where t=0 gives v1, and t=1 gives v2.
      */
-    static linearlyInterpolate(v1: Vec2, v2: Vec2, t: number): Vec2 {
+    static linearlyInterpolate<N extends number>(v1: Vec2, v2: Vec2, t: number): Vec2 {
         return Vec2.create(
             v1.x * (1 - t) + v2.x * t,
             v1.y * (1 - t) + v2.y * t
         );
     }
 
-    static quadratic(a: Vec2, b: Vec2, c: Vec2, t: number): Vec2 {
+    static quadratic<N extends number>(a: Vec2, b: Vec2, c: Vec2, t: number): Vec2 {
         return Vec2.create(
             0.5*a.x*t*t + b.x*t + c.x,
             0.5*a.y*t*t + b.y*t + c.y
         );
     }
 
-    static create(x: number, y: number): Vec2 {
+    /**
+     * We are lenient for convenience.
+     */
+    static create<N extends number>(x: number, y: number): Vec2 {
         if (x === -1 && y === -1)
-            return Vec2.NEG1;
+            return <Vec2> Vec2.NEG1;
         if (x === 0 && y === 0)
-            return Vec2.ZERO;
-        return new Vec2(x, y);
+            return <Vec2> Vec2.ZERO;
+        return new Vec2(<N> x, <N> y);
     }
 
-    static polar(length: number, angle: number): Vec2 {
+    static polar<N extends number>(length: N, angle: number): Vec2 {
         return Vec2.create(
             Math.cos(angle) * length,
             Math.sin(angle) * length
@@ -138,7 +145,7 @@ export class Vec2 {
  */
 export class Vec2List {
 
-    static EMPTY = new Vec2List([]);
+    static EMPTY: Vec2List = new Vec2List([]);
 
     readonly vectors: Vec2[];
     length: number;
@@ -178,7 +185,7 @@ export class Vec2List {
      * Construct a list of vectors from a list of tuples of coordinates
      * in the form [[x1, y1], [x2, y2], ..., [xn, yn]].
      */
-    static create(...args: [number, number][]): Vec2List {
+    static create<N extends number>(...args: [number, number][]): Vec2List {
         const vectors: Vec2[] = [];
         for (let index = 0; index < arguments.length; index += 2) {
             const loc = args[index];
@@ -193,8 +200,8 @@ export class Vec2List {
      *
      * All of the waypoints must be integer points.
      */
-    static path(...args: [number, number][]): Vec2List {
-        const waypoints: Vec2List = Vec2List.create(...args);
+    static path<N extends number>(...args: [number, number][]): Vec2List {
+        const waypoints: Vec2List<N> = Vec2List.create(...args);
 
         let curr: Vec2 = waypoints.get(0);
         const path: Vec2[] = [curr];
@@ -212,7 +219,7 @@ export class Vec2List {
      * Constructs a list of vectors for all integer positions within
      * the region from 0, 0 inclusive to width, height exclusive.
      */
-    static all(width: number, height: number): Vec2List {
+    static all<N extends number>(width: number, height: number): Vec2List {
         if (width <= 0 || height <= 0 || !Number.isInteger(width) || !Number.isInteger(height))
             throw new Error("width and height must be positive integers");
 

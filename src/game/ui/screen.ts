@@ -3,16 +3,13 @@
 //
 
 import {MouseEventSource} from "@/game/ui/mouse";
+import {StylePixels} from "@/common/units";
 
 
 export class Screen extends MouseEventSource {
 
-    width: number = NaN;
-    height: number = NaN;
-    // useWidth: number = NaN;
-    // useHeight: number = NaN;
-    // centreLeft: number = NaN;
-    // centreTop: number = NaN;
+    width: StylePixels = NaN;
+    height: StylePixels = NaN;
 
     constructor() {
         super();
@@ -20,18 +17,17 @@ export class Screen extends MouseEventSource {
 
     init() {
         this.addDocumentMouseListeners();
+        window.addEventListener('resize', this.onScreenResize.bind(this));
     }
 
-    toPixels(size) {
-        return size / window.devicePixelRatio;
-    }
+    onScreenResize(event: Event) {
+        this.width = window.innerWidth
+            || document.documentElement.clientWidth
+            || document.body.clientWidth;
 
-    fromPixels(size) {
-        return size * window.devicePixelRatio;
-    }
-
-    pixels(size) {
-        return Math.floor(this.toPixels(size)) + "px";
+        this.height = window.innerHeight
+            || document.documentElement.clientHeight
+            || document.body.clientHeight;
     }
 }
 
