@@ -61,24 +61,17 @@ function disconnect() {
 }
 
 function connectSocket() {
-    socket = new ReconnectingWebSocket(address, null, {
-        debug: false,
+    socket = io(address);
 
-        timeoutInterval: 15000,
-        reconnectInterval: 1000,
-        maxReconnectInterval: 5000,
-        reconnectDecay: 1.5
-    });
-
-    socket.onconnecting = function() {
+    socket.on("open", function() {
         if(socketState === "opened")
             return;
 
         onNetworkConnecting();
-    }.bind(socket);
+    });
 
-    socket.onopen = function() {
-        if(socket.readyState !== WebSocket.OPEN || socketState === "opened")
+    socket.on("connect", function() {
+        if(socketState === "opened")
             return;
 
         socketState = "opened";
@@ -93,9 +86,9 @@ function connectSocket() {
         }
 
         onNetworkConnected();
-    }.bind(socket);
+    });
 
-    socket.onclose = function() {
+    socket.on("disconnect", function() {
         const lastState = socketState;
         socketState = "closed";
 
@@ -114,19 +107,17 @@ function connectSocket() {
         analytics.recordLoseConnection(address);
         onNetworkLoseConnection();
         console.info("Connection lost, attempting to reconnect...");
-    }.bind(socket);
+    });
 
-    socket.onmessage = function(event) {
-        receiveMessage(event.data);
-    }.bind(socket);
-
-    socket.onerror = function() {}.bind(socket);
+    socket.on("message", (data) => {
+        receiveMessage(data);
+    });
 }
 
 function receiveMessage(message) {
     const packet = networkPackets.readPacket(message);
 
-    printDebug("Recieved packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
+    printDebug("Received packet length " + message.length + ": " + message + " - " + JSON.stringify(packet));
 
     if (packet.type in packetHandlers) {
         packetHandlers[packet.type](packet);

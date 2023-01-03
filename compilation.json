@@ -98,7 +98,7 @@
       "src/home/home_resources.js"
     ],
     "game/index.js": [
-      "src/game/lib/reconnecting-websocket.js",
+      "src/game/lib/socket.io.js",
       "src/game/analytics/analytics.js",
       "src/game/analytics/stats.js",
       "src/game/game/board.js",
