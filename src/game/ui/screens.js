@@ -198,12 +198,15 @@ function onEnterGameScreen() {
     redrawBoard(true);
     game.onGameStart();
 }
+
 function onExitGameScreen(fromScreen, toScreen) {
     redraw(true);
-    if (toScreen === SCREEN_WIN) {
-        game.onGameFinished();
-    } else {
-        game.onGameAborted();
+    if (game !== null) {
+        if (toScreen === SCREEN_WIN) {
+            game.onGameFinished();
+        } else {
+            game.onGameAborted();
+        }
     }
 }
 
