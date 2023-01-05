@@ -3,7 +3,8 @@
 //
 
 const isLocalhost = (window.location.hostname === "localhost"),
-      address = (isLocalhost ? "ws://localhost:9113" : "wss://royalur.net:9113");
+      isHTTPS = (window.location.protocol === "https:"),
+      address = (isHTTPS ? "wss://" : "ws://") + window.location.hostname + (isHTTPS ? ":9113" : ":9112");
 let debug = isLocalhost;
 
 
