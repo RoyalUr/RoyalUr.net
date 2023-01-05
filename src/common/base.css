@@ -1,19 +1,22 @@
 @font-face {
     font-family: 'DuranGo';
+    src: url("/res/font_durango.[ver].woff2") format('woff2'),
+         url("/res/font_durango.[ver].woff") format('woff'),
+         url("/res/font_durango.[ver].ttf") format('truetype');
+    font-weight: bold;
     font-style: normal;
-    font-weight: 400;
-    src: url("/res/font_durango.[ver].ttf") format('truetype');
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Nunito';
+    src: url("/res/font_nunito.[ver].woff2") format('woff2'),
+         url("/res/font_nunito.[ver].woff") format('woff'),
+         url("/res/font_nunito.[ver].ttf") format('truetype');
+    font-weight: normal;
     font-style: normal;
-    font-weight: 400;
-    src: local('Nunito Regular'), local('Nunito-Regular'), url("/res/font_nunito.[ver].woff2") format('woff2');
     font-display: swap;
 }
-
 
 
 
