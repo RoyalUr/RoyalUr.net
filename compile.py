@@ -395,7 +395,7 @@ def combine_js(target_folder, comp_spec, *, prefix="", minify=False):
                 ["npx", "babel", "--presets=@babel/env", "--no-babelrc"]
         ]
         if (minify):
-            commands.append(["uglifyjs", "--compress", "--mangle"])
+            commands.append(["npx", "uglifyjs", "--compress", "--mangle"])
         commands.append(output_file)
 
         assert execute_piped_commands(*commands, prefix=prefix)
