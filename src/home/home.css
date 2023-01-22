@@ -140,6 +140,7 @@ html {
 #links {
     border-bottom: none;
 }
+.banner .content,
 .banner h2,
 .banner h3,
 .banner p {
@@ -150,10 +151,10 @@ html {
     margin-bottom: 1vh;
     font-size: 2em;
 }
+.banner figcaption,
 .banner h3,
 .banner p {
     font-family: Nunito, sans-serif;
-    margin-bottom: 1.5vh;
     font-size: 1.6em;
 }
 .banner .menu-button {
@@ -216,4 +217,17 @@ a.read-about-tournaments.read-about-tournaments {
 
 #footer-full-width {
     box-shadow: none;
+}
+
+#description {
+    text-align: center;
+}
+
+#description .content {
+    text-align: left;
+    max-width: 800px;
+    line-height: 1.8;
+    padding: 1em;
+    margin-left: auto;
+    margin-right: auto;
 }

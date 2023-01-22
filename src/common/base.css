@@ -131,9 +131,38 @@ img,
     text-align: center;
 }
 
+/**
+ * Standard elements.
+ */
+p {
+    margin-bottom: 33px;
+}
 a {
     color: #3692e7;
 }
 a:hover {
     color: #57aeff;
+}
+
+figure {
+    text-align: center;
+}
+figure img {
+    width: auto;
+    height: auto;
+    max-width: 40em;
+    max-height: 20em;
+}
+figure figcaption {
+    font-style: italic;
+    font-size: 0.9em;
+    margin-bottom: 2em;
+}
+
+/**
+ * Common text styling elements.
+ */
+.italics {
+    font-style: italic;
+    font-family: inherit;
 }

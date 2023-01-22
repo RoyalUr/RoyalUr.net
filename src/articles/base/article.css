@@ -152,19 +152,6 @@ body {
 #content td {
     padding: 0.5em;
 }
-#content figure {
-    text-align: center;
-}
-#content figure img {
-    width: auto;
-    height: auto;
-    max-width: 40em;
-    max-height: 20em;
-}
-#content figure figcaption {
-    font-style: italic;
-    font-size: 0.9em;
-}
 
 
 #call-to-action {
