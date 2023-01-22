@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>FAQ | RoyalUr.net</title>
+
+    <meta name="og:title" content="Frequently Asked Questions about The Royal Game of Ur" />
+    <meta name="twitter:title" content="Frequently Asked Questions about The Royal Game of Ur" />
+    <meta property="twitter:url" content="https://royalur.net/faq/" />
+    <meta name="description" content="Get answers to your common questions about The Royal Game of Ur." />
+    <meta name="og:description" content="Get answers to your common questions about The Royal Game of Ur." />
+    <meta name="twitter:description" content="Get answers to your common questions about The Royal Game of Ur.">
+
+    <include src="src/common/head/head_boilerplate.html" />
+    <include src="src/common/head/matomo.html" />
+    <link rel="stylesheet" href="/faq/index.[ver].css" />
+</head>
+<body class="wood-background">
+    <include src="src/common/header/header.html" />
+    <article id="content">
+        <section class="article-links">
+            <p class="article-back-link"><a href="/learn">← Back to Learn</a></p>
+
+            <a class="twitter-share"
+               href="https://twitter.com/intent/tweet?url=https%3A%2F%2Froyalur.net%2Ffaq%2F&via=royalur_net&text=Check%20out%20some%20FAQ%20about%20the%20oldest%20board%20game%20in%20the%20world&hashtags=boardgames%2Chistory">
+                <include src="src/common/social/twitter_share.html" />
+            </a>
+        </section>
+
+        <section>
+            <h1>FAQ - Frequently Asked Questions</h1>
+            <!-- Written by Diego Raposo, James Masters, and Padraig X. Lamont -->
+            <hr/>
+        </section>
+
+        <section>
+            <p>
+                Our community members often discuss the same questions, so we decided
+                to come together to compile this list of common answers, in the hope
+                that it can help old and new members alike! But don’t be shy. If you
+                have any further questions or suggestions, or think anything here
+                should be changed, please enquire through our Discord page, and we
+                will reply ASAP!
+            </p>
+            <figure class="hero-image">
+                <img id="rgu-board" class="shadow" data-src="/res/rgu-board.[ver]"
+                     alt="The board of the Royal Game of Ur" />
+            </figure>
+        </section>
+
+        <section>
+            <h2 id="royalur-fairness"><a href="#royalur-fairness">
+                Are the bots on RoyalUr.net fair?
+            </a></h2>
+            <p>
+                Yes. The probabilities of you and the AI rolling each number is the
+                exact same! Each dice roll is independent, and has no influence based
+                upon what would benefit the AI. The dice rolls are modelled based upon
+                the roll of 4 fair tetrahedral dice, as in the physical game. In fact,
+                Potherca from the Discord community created a CodePen to test the
+                fairness of the RoyalUr.net dice, which you can find
+                <a href="https://codepen.io/potherca/full/mdBrvZK">here</a>.
+            </p>
+            <p>
+                Why then does it feel like the AI is cheating when its doing well?
+                There are two psychological factors that we believe contribute to
+                this: the
+                <a href="https://effectiviology.com/law-of-small-numbers/">Law of Small Numbers</a>
+                and the
+                <a href="https://effectiviology.com/gamblers-fallacy/">Gamblers Fallacy</a>.
+                The Law of Small Numbers states that the inferences we make about
+                data is unreliable when the sample size is small, but people often
+                consider these inferences to be reliable. For example, consider that
+                while you are playing you observe a long sequence of five 0’s in a
+                row. The probability of this happening is very small, only 0.00009%.
+                Therefore, you may be inclined to believe that the game is unfair,
+                with incorrect odds. However, this would be an example of the Law of
+                Small Numbers! To gather meaningful inferences about the distribution
+                of dice rolls you would need to look at rolls over the course of many
+                games, not just your five unlucky rolls in a row.
+            </p>
+            <p>
+                Hopefully you are now convinced that the distribution of dice rolls is
+                fair. However, you may also make another mistake in predicting future
+                dice rolls based upon the rolls you’ve just made. This would be an
+                example of the Gambler’s Fallacy! The Gambler’s Fallacy states that
+                future random dice rolls are not affected by previous dice rolls, but
+                people often believe that their dice rolls will be affected by the past.
+                For example, if you have rolled five 0’s in a row, you may believe that
+                it is less likely that you will roll another 0. In fact, this is false!
+                The chance that you will roll another 0 is actually the exact same as
+                before! These dice rolls are statistically independent.
+            </p>
+            <p>
+                Humans are hardwired to find patterns. In fact, we are so inclined to
+                this behavior that we find patterns where there are none! In particular,
+                evaluating the fairness of dice rolls can feel very unintuitive to people.
+                Gambling has often exploited these quirks of human intuition to promote
+                fun. However, unfortunately, casinos also often use them to exploit money
+                from people. This can be avoided though, using mathematics and statistics!
+                We hope that you will turn to these tools if you wish to evaluate random
+                variables.
+            </p>
+        </section>
+
+        <section>
+            <h2 id="hardness"><a href="#hardness">
+                How complex (or hard) is the Royal Game of Ur?
+            </a></h2>
+            <p>
+                Our own experience has shown that the Royal Game of Ur is easy to learn,
+                but hard to master! We have some players that find good challenge from
+                the Medium bot, and others who often beat the hardest Panda agent! However,
+                these observations are quite subjective. Can we be a bit more scientific?
+                In fact, we can! There are several mathematical definitions for complexity
+                that we can use to compare the “hardness” of the Royal Game of Ur (RGU)
+                to other games. Two definitions that are often used for this purpose are
+                the State-Space Complexity (SSC) and the Game-Tree Complexity (GTC).
+            </p>
+            <p>
+                State-Space Complexity measures the number of possible valid game states
+                (i.e., how many positions are there?). Alternatively, Game-Tree Complexity
+                measures the number of possible games that can be played, including all
+                dice rolls and chosen moves. Additional information about these measures
+                of complexity can be found
+                <a href="https://www.pipmodern.com/post/complexity-state-space-game-tree">here</a>
+                and
+                <a href="https://www.pipmodern.com/post/complexity-modern-board-game-analysis">here</a>.
+                Diego Raposo found that The Royal Game of Ur has a low State-Space Complexity,
+                but a medium Game-Tree Complexity, in his paper with Padraig Lamont that is
+                yet to be published. A graphical comparison between the Royal Game of Ur
+                (using the simplified rules used by Finkel in the YouTube video) and other
+                popular games is shown below:
+            </p>
+            <figure>
+                <img id="rgu-complexity" class="shadow" data-src="/res/rgu-complexity.[ver]"
+                     alt="The State-Space Complexity and Game-Tree Complexity of the Royal Game of Ur" />
+                <figcaption>
+                    The State-Space Complexity and Game-Tree Complexity of the Royal Game of Ur (RGU).
+                </figcaption>
+            </figure>
+        </section>
+
+        <section>
+            <h2 id="rules-origins"><a href="#rules-origins">
+                What is the primary source of the rules of The Royal Game of Ur?
+            </a></h2>
+            <p>
+                Irving's paper on his translation of the special cuneiform tablet
+                and its relationship to the zodiac and the Game of Twenty Squares
+                was published in 2007 in his book “Ancient Board Games in Perspective”.
+                This book is an assembly of information presented at the first Board
+                Games Studies Colloquium in 1990 in London. It took them some time
+                between first presentation and first publication!
+            </p>
+            <p>
+                The rules used by RoyalUr.net and in the Tom Scott v. Finkel video
+                were included with a Royal Game of Ur replica board that has been
+                sold by the British Museum since 1991 (if you know of any earlier
+                publication of these rules, let us know!). This product also included
+                a second, more complex, set of rules with a gambling element, which
+                was based on the cuneiform tablet deciphered by Irving Finkel. However,
+                there is no evidence that directly links these rules to the Royal Game
+                of Ur board.
+            </p>
+            <p>
+                There are many other proposed rules for the Royal Game of Ur, including
+                those from famous games historians R.C. Bell (Board and Table Games
+                from many Civilisations, 1979) and H. J. R. Murray (Board Games other
+                than Chess, 1952).
+            </p>
+        </section>
+
+        <section>
+            <h2 id="finkel-rules"><a href="#finkel-rules">
+                Are the default rules on RoyalUr.net the same as those presented
+                by Finkel in “On the Rules for the Royal Game of Ur”?
+            </a></h2>
+            <p>
+                No. The Royal Game of Ur is dated around 2500 years earlier and is
+                played with different equipment to that identified from the tablet.
+                The rules for the Game of Twenty Squares as played in 177BC were
+                proposed by Irving Finkel primarily based on his interpretation of
+                a cuneiform tablet held at the British Museum. The rules for the
+                game played on the Ur board as explained in the video are also
+                proposed by Irving, but are simpler. Irving simply concocted some
+                straight-forward rules for a race game that play well using the
+                equipment found at the Ur site. There are some reasonable basic
+                similarities between the two games such as the path taken by the
+                pieces and the very fact that it is a race game.
+            </p>
+        </section>
+
+        <section>
+            <h2 id="game-of-twenty-squares"><a href="#game-of-twenty-squares">
+                Is the Game of Twenty Squares the same as the Royal Game of Ur?
+            </a></h2>
+            <p>
+                The Game of Twenty Squares is the term generally used for the game
+                played on a board with a rectangle of twelve squares and a tail of
+                eight squares, whereas The Royal Game of Ur is synonymous with the
+                distinctively shaped board shown at the top of this page. The two
+                games are not the same because not only are the boards different
+                shapes, but the pieces and dice were also not identical. However,
+                it was assumed by Finkel and other academics that the earlier Royal
+                Game of Ur boards are probably the ancestor of the Game of Twenty
+                Squares, and therefore that the two games had similar basic traits.
+            </p>
+        </section>
+
+        <section>
+            <h2 id="royal-game-of-ur-origins"><a href="#royal-game-of-ur-origins">
+                Was the Royal Game of Ur only played in Mesopotamia?
+            </a></h2>
+            <p>
+                One other board exists with the same distinctive layout, and this
+                was found at Shahr-e Sukhteh in ancient Persia (now Iran). However,
+                any rosettes or other features on this board, if they once existed,
+                are no longer visible. Therefore, it is possible that the game played
+                on this board was different. For example, Draughts (Checkers) and
+                Chess are a modern example of two different games played on the
+                same board.
+            </p>
+        </section>
+
+        <section>
+            <h2 id="ongoing-questions"><a href="#ongoing-questions">
+                Ongoing Questions
+            </a></h2>
+            <p>
+                There are still several questions that we are still investigating.
+                If you have any opinions or work on these questions, we'd love to
+                hear about it in our Discord!
+            </p>
+            <ul>
+                <li>A simple and useful notation for the Royal Game of Ur</li>
+                <li>Quantification of the amount of luck and skill in the game</li>
+                <li>Ways to quantify, rank and analyze the progress of players</li>
+                <li>How to best apply neural network algorithms to the Royal Game of Ur</li>
+                <li>Analysis of the mathematics of the game</li>
+            </ul>
+        </section>
+    </article>
+
+    <div id="call-to-action">
+        <h2>Join us on Discord</h2>
+        <p>
+            Join us to discuss these questions with us on our
+            <a href="https://discord.gg/FbCp76esgb">Discord</a>!
+        </p>
+        <a class="play" href="https://discord.gg/FbCp76esgb">
+            <img class="discord-link highlight-shadow" src="/res/join_the_discord.[ver].svg" alt="Join the Discord!" />
+        </a>
+    </div>
+    <include src="src/common/footer/footer.html" />
+
+    <!-- JAVASCRIPT TO LOAD IMAGES -->
+    <script src="/article_resources.[ver].js"></script>
+</body>
+</html>

@@ -1,21 +1,19 @@
 @font-face {
-    font-family: 'DuranGo';
-    src: url("/res/font_durango.[ver].woff2") format('woff2'),
-         url("/res/font_durango.[ver].woff") format('woff'),
-         url("/res/font_durango.[ver].ttf") format('truetype');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
     font-family: 'Nunito';
     src: url("/res/font_nunito.[ver].woff2") format('woff2'),
          url("/res/font_nunito.[ver].woff") format('woff'),
          url("/res/font_nunito.[ver].ttf") format('truetype');
     font-weight: normal;
     font-style: normal;
-    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DuranGo';
+    src: url("/res/font_durango.[ver].woff2") format('woff2'),
+         url("/res/font_durango.[ver].woff") format('woff'),
+         url("/res/font_durango.[ver].ttf") format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
 
@@ -131,4 +129,11 @@ img,
 .centre-text {
     display: block;
     text-align: center;
+}
+
+a {
+    color: #3692e7;
+}
+a:hover {
+    color: #57aeff;
 }

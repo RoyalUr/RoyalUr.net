@@ -11,6 +11,7 @@
     "src/articles/learn/rules.html": "rules/index.html",
     "src/articles/learn/watch.html": "watch/index.html",
     "src/articles/learn/dice.html": "dice/index.html",
+    "src/articles/learn/faq.html": "faq/index.html",
     "src/articles/privacy.html": "privacy/index.html",
     "src/articles/about.html": "about/index.html",
     "src/articles/analysis/royal_ur_analysis.html": "analysis/index.html",
@@ -74,6 +75,14 @@
       "src/articles/base/article.css",
       "src/common/social/twitter_share.css",
       "src/articles/about.css"
+    ],
+    "faq/index.css": [
+      "src/common/base.css",
+      "src/common/footer/footer.css",
+      "src/common/header/header.css",
+      "src/articles/base/article.css",
+      "src/common/social/twitter_share.css",
+      "src/articles/learn/faq.css"
     ],
     "tournaments/index.css": [
       "src/common/base.css",
@@ -352,6 +361,26 @@
         "u_1440": "640 x auto",
         "u_1080": "480 x auto",
         "u_720": "320 x auto"
+      }
+    },
+    "res/rgu-complexity.png": {
+      "dest": "res/rgu-complexity",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "960 x auto",
+        "u_1440": "640 x auto",
+        "u_1080": "480 x auto",
+        "u_720": "320 x auto"
+      }
+    },
+    "res/rgu-board.png": {
+      "dest": "res/rgu-board",
+      "sizes": {
+        "u_u": "auto x auto",
+        "u_2160": "auto x auto",
+        "u_1440": "auto x auto",
+        "u_1080": "auto x auto",
+        "u_720": "auto x auto"
       }
     },
 

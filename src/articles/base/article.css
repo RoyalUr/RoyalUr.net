@@ -117,12 +117,6 @@ body {
 #content ul ul li {
     margin-bottom: 0;
 }
-#content a {
-    color: #3692e7;
-}
-#content a:hover {
-    color: #57aeff;
-}
 #content p.list-title {
     margin-bottom: 0.3em;
 }
@@ -157,6 +151,19 @@ body {
 #content th,
 #content td {
     padding: 0.5em;
+}
+#content figure {
+    text-align: center;
+}
+#content figure img {
+    width: auto;
+    height: auto;
+    max-width: 40em;
+    max-height: 20em;
+}
+#content figure figcaption {
+    font-style: italic;
+    font-size: 0.9em;
 }
 
 
