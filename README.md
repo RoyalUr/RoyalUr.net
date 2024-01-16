@@ -7,7 +7,7 @@ A website for playing the ancient Mesopotamian board game, The Royal Game of Ur!
 
 This repository holds the client code for [RoyalUr.net](https://royalur.net).
 The server code for RoyalUr.net can be found in the
-[RoyalUrServer repository](https://github.com/Sothatsit/RoyalUrServer).
+[RoyalUrServer repository](https://github.com/RoyalUr/RoyalUr.net-Backend).
 
 RoyalUr.net was created based upon the ancient Sumerian board game, The Royal Game of Ur,
 in the British Museum. The original board game can be dated to 2600 BC, and was discovered
@@ -21,7 +21,7 @@ The answer is, **less than you might think**!
 
 If you'd like to learn more about strategy and the role
 of luck in The Royal Game of Ur, check out our efforts over in the
-[RoyalUrAnalysis repository](https://github.com/Sothatsit/RoyalUrAnalysis).
+[RoyalUrAnalysis repository](https://github.com/RoyalUr/RoyalUr-Analysis).
 In that repository we're currently undergoing efforts to use our computers
 to help us better understand the strategy and luck involved The Royal Game of Ur.
 
@@ -77,6 +77,6 @@ https://royalur.net/res.zip.
 # Contributors
 A massive thanks to all contributors to the RoyalUrClient project!
 
-<a href="https://github.com/Sothatsit/RoyalUrClient/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Sothatsit/RoyalUrClient" />
+<a href="https://github.com/RoyalUr/RoyalUr.net/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=RoyalUr/RoyalUr.net" />
 </a>
