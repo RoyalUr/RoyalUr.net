@@ -1,6 +1,8 @@
 **This is an archive of an old version of the website.** We have since rewritten the website
-using a new codebase. However, we will keep this repository up for any who are interested!
-The new version of the website is no longer open-source.
+from the ground up using more modern technologies. However, we will keep this repository up
+for any who are interested! The new version of the website is no longer open-source.
+
+-----
 
 # 🎲 RoyalUr.net
 A website for playing the ancient Mesopotamian board game, The Royal Game of Ur!
